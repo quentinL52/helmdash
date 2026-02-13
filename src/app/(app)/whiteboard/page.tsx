@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, MouseEvent, useEffect } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, RectangleHorizontal, Circle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { Textarea } from '@/components/ui/textarea';
@@ -23,7 +23,19 @@ type PostItNote = {
   zIndex: number;
 };
 
-const NOTE_COLORS = [
+type Shape = {
+  id: string;
+  type: 'rectangle' | 'circle';
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: string;
+  rotation: number;
+  zIndex: number;
+};
+
+const ITEM_COLORS = [
   '#FFF9C4', // Light Yellow
   '#FFCDD2', // Light Pink
   '#C8E6C9', // Light Green
@@ -35,7 +47,8 @@ const getRandomItem = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.le
 
 export default function WhiteboardPage() {
   const [notes, setNotes] = useLocalStorage<PostItNote[]>('whiteboard-post-it-notes', []);
-  const [draggingNote, setDraggingNote] = useState<string | null>(null);
+  const [shapes, setShapes] = useLocalStorage<Shape[]>('whiteboard-shapes', []);
+  const [draggingItem, setDraggingItem] = useState<{ id: string; type: 'note' | 'shape' } | null>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const whiteboardRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -43,10 +56,10 @@ export default function WhiteboardPage() {
 
   useEffect(() => {
     setIsMounted(true);
-    if (notes && notes.length > 0) {
-      setZIndexCounter(Math.max(0, ...notes.map(n => n.zIndex || 0)));
-    }
-  }, [notes]);
+    const maxNoteZ = notes.length > 0 ? Math.max(0, ...notes.map(n => n.zIndex || 0)) : 0;
+    const maxShapeZ = shapes.length > 0 ? Math.max(0, ...shapes.map(s => s.zIndex || 0)) : 0;
+    setZIndexCounter(Math.max(maxNoteZ, maxShapeZ));
+  }, [notes, shapes]);
 
   const addNote = (e: MouseEvent) => {
     if (!whiteboardRef.current) return;
@@ -59,72 +72,111 @@ export default function WhiteboardPage() {
       content: '',
       x: e.clientX - rect.left - 100, // center note on cursor
       y: e.clientY - rect.top - 100,
-      color: getRandomItem(NOTE_COLORS),
+      color: getRandomItem(ITEM_COLORS),
       rotation: Math.random() * 4 - 2, // between -2 and 2 deg
       zIndex: newZIndex,
     };
     setNotes([...notes, newNote]);
   };
 
+  const addShape = (type: 'rectangle' | 'circle') => {
+    if (!whiteboardRef.current) return;
+    const rect = whiteboardRef.current.getBoundingClientRect();
+    const newZIndex = zIndexCounter + 1;
+    setZIndexCounter(newZIndex);
+
+    const newShape: Shape = {
+      id: Date.now().toString(),
+      type,
+      x: rect.width / 2 - 100,
+      y: rect.height / 2 - 75,
+      width: 200,
+      height: 150,
+      color: getRandomItem(ITEM_COLORS),
+      rotation: 0,
+      zIndex: newZIndex,
+    };
+    setShapes([...shapes, newShape]);
+  };
+
   const updateNoteContent = (id: string, newContent: string) => {
     setNotes(notes.map(note => note.id === id ? { ...note, content: newContent } : note));
   };
   
-  const bringToFront = (id: string) => {
+  const bringToFront = (id: string, type: 'note' | 'shape') => {
     const newZIndex = zIndexCounter + 1;
     setZIndexCounter(newZIndex);
-     setNotes(notes.map(note => {
-      if (note.id === id) {
-        return { ...note, zIndex: newZIndex };
-      }
-      return note;
-    }));
+    if (type === 'note') {
+      setNotes(notes.map(note => note.id === id ? { ...note, zIndex: newZIndex } : note));
+    } else {
+      setShapes(shapes.map(shape => shape.id === id ? { ...shape, zIndex: newZIndex } : shape));
+    }
   }
 
-  const handleMouseDown = (e: MouseEvent<HTMLDivElement>, id: string) => {
-    const note = notes.find(n => n.id === id);
-    if (!note || !whiteboardRef.current) return;
+  const handleMouseDown = (e: MouseEvent<HTMLDivElement>, id: string, type: 'note' | 'shape') => {
+    const item = type === 'note' ? notes.find(n => n.id === id) : shapes.find(s => s.id === id);
+    if (!item || !whiteboardRef.current) return;
 
-    bringToFront(id);
+    bringToFront(id, type);
     
-    setDraggingNote(id);
-    const noteElement = e.currentTarget;
-    const noteRect = noteElement.getBoundingClientRect();
+    setDraggingItem({ id, type });
+    const itemElement = e.currentTarget;
+    const itemRect = itemElement.getBoundingClientRect();
     const whiteboardRect = whiteboardRef.current.getBoundingClientRect();
     
     setOffset({
-      x: e.clientX - (noteRect.left - whiteboardRect.left),
-      y: e.clientY - (noteRect.top - whiteboardRect.top),
+      x: e.clientX - (itemRect.left - whiteboardRect.left),
+      y: e.clientY - (itemRect.top - whiteboardRect.top),
     });
   };
 
   const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (draggingNote === null || !whiteboardRef.current) return;
+    if (draggingItem === null || !whiteboardRef.current) return;
     
     e.preventDefault();
     const whiteboardRect = whiteboardRef.current.getBoundingClientRect();
     let newX = e.clientX - offset.x - whiteboardRect.left;
     let newY = e.clientY - offset.y - whiteboardRect.top;
     
-    // Boundary checks
-    newX = Math.max(0, Math.min(newX, whiteboardRect.width - 200)); // 200 is note width
-    newY = Math.max(0, Math.min(newY, whiteboardRect.height - 200)); // 200 is note height
+    const item = draggingItem.type === 'note'
+      ? notes.find(n => n.id === draggingItem.id)
+      : shapes.find(s => s.id === draggingItem.id);
+    
+    if (!item) return;
 
-    setNotes(notes.map(note =>
-      note.id === draggingNote ? { ...note, x: newX, y: newY } : note
-    ));
+    const itemWidth = draggingItem.type === 'note' ? 200 : (item as Shape).width;
+    const itemHeight = draggingItem.type === 'note' ? 200 : (item as Shape).height;
+
+    // Boundary checks
+    newX = Math.max(0, Math.min(newX, whiteboardRect.width - itemWidth));
+    newY = Math.max(0, Math.min(newY, whiteboardRect.height - itemHeight));
+
+    if (draggingItem.type === 'note') {
+      setNotes(notes.map(note =>
+        note.id === draggingItem.id ? { ...note, x: newX, y: newY } : note
+      ));
+    } else {
+      setShapes(shapes.map(shape =>
+          shape.id === draggingItem.id ? { ...shape, x: newX, y: newY } : shape
+      ));
+    }
   };
 
   const handleMouseUp = () => {
-    setDraggingNote(null);
+    setDraggingItem(null);
   };
   
-  const deleteNote = (id: string) => {
-      setNotes(notes.filter(note => note.id !== id));
+  const deleteItem = (id: string, type: 'note' | 'shape') => {
+      if (type === 'note') {
+        setNotes(notes.filter(note => note.id !== id));
+      } else {
+        setShapes(shapes.filter(shape => shape.id !== id));
+      }
   }
   
   const clearBoard = () => {
     setNotes([]);
+    setShapes([]);
   }
 
   if (!isMounted) {
@@ -140,10 +192,10 @@ export default function WhiteboardPage() {
 
   return (
     <div className="flex flex-col h-full whiteboard-page">
-        <div className="flex items-center justify-between mb-4 px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8">
+        <div className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 border-b">
             <div>
-            <h1 className="text-3xl font-bold tracking-tight">Whiteboard</h1>
-            <p className="text-muted-foreground">Right-click on the board to add a new note. Drag to move.</p>
+              <h1 className="text-3xl font-bold tracking-tight">Whiteboard</h1>
+              <p className="text-muted-foreground">Right-click to add a note. Use the toolbar to add shapes.</p>
             </div>
             <Button variant="outline" size="sm" onClick={clearBoard}>
                 <Trash2 className="mr-2 h-4 w-4" />
@@ -151,10 +203,19 @@ export default function WhiteboardPage() {
             </Button>
         </div>
 
+        <div className="flex items-center gap-2 p-2 border-b">
+          <Button variant="ghost" size="icon" onClick={() => addShape('rectangle')} title="Add Rectangle">
+              <RectangleHorizontal className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => addShape('circle')} title="Add Circle">
+              <Circle className="h-5 w-5" />
+          </Button>
+        </div>
+
         <ContextMenu>
             <ContextMenuTrigger
                 ref={whiteboardRef}
-                className="relative flex-grow rounded-lg border-2 border-dashed border-border bg-card/50 overflow-hidden mx-4 sm:mx-6 lg:mx-8 mb-4 sm:mb-6 lg:mb-8"
+                className="relative flex-grow overflow-hidden whiteboard-grid"
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
@@ -164,7 +225,7 @@ export default function WhiteboardPage() {
                     key={note.id}
                     className={cn(
                         "absolute w-[200px] h-[200px] p-4 shadow-lg cursor-grab flex flex-col transition-shadow duration-200 group",
-                        draggingNote === note.id && 'cursor-grabbing shadow-2xl scale-105'
+                        draggingItem?.id === note.id && 'cursor-grabbing shadow-2xl scale-105'
                     )}
                     style={{ 
                         left: note.x, 
@@ -173,7 +234,7 @@ export default function WhiteboardPage() {
                         backgroundColor: note.color,
                         zIndex: note.zIndex
                     }}
-                    onMouseDown={(e) => handleMouseDown(e, note.id)}
+                    onMouseDown={(e) => handleMouseDown(e, note.id, 'note')}
                 >
                     <Textarea
                         value={note.content}
@@ -183,7 +244,7 @@ export default function WhiteboardPage() {
                         onClick={(e) => e.stopPropagation()}
                         onMouseDown={(e) => {
                             e.stopPropagation();
-                            bringToFront(note.id);
+                            bringToFront(note.id, 'note');
                         }}
                     />
                      <Button
@@ -192,7 +253,40 @@ export default function WhiteboardPage() {
                         className="absolute -top-2 -right-2 h-7 w-7 text-black/40 hover:text-black rounded-full hover:bg-black/10 opacity-0 group-hover:opacity-100"
                         onClick={(e) => {
                             e.stopPropagation();
-                            deleteNote(note.id);
+                            deleteItem(note.id, 'note');
+                        }}
+                        onMouseDown={(e) => e.stopPropagation()}
+                    >
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                </div>
+                ))}
+                {shapes.map(shape => (
+                <div
+                    key={shape.id}
+                    className={cn(
+                        "absolute shadow-lg cursor-grab flex flex-col transition-shadow duration-200 group",
+                        draggingItem?.id === shape.id && 'cursor-grabbing shadow-2xl scale-105'
+                    )}
+                    style={{ 
+                        left: shape.x, 
+                        top: shape.y,
+                        width: shape.width,
+                        height: shape.height,
+                        transform: `rotate(${shape.rotation}deg)`,
+                        backgroundColor: shape.color,
+                        zIndex: shape.zIndex,
+                        borderRadius: shape.type === 'circle' ? '50%' : '0.25rem',
+                    }}
+                    onMouseDown={(e) => handleMouseDown(e, shape.id, 'shape')}
+                >
+                     <Button
+                        variant="ghost"
+                        size="icon"
+                        className="absolute -top-2 -right-2 h-7 w-7 text-black/40 hover:text-black rounded-full hover:bg-black/10 opacity-0 group-hover:opacity-100"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            deleteItem(shape.id, 'shape');
                         }}
                         onMouseDown={(e) => e.stopPropagation()}
                     >
