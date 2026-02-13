@@ -14,8 +14,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <Sidebar>
           <SidebarNav />
         </Sidebar>
-        <main className="flex-1">
-          <div className="p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 flex flex-col">
+          <div className="p-4 sm:p-6 lg:p-8 flex-1">
             <div className="md:hidden mb-4">
               <SidebarTrigger />
             </div>

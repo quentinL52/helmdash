@@ -139,7 +139,7 @@ export default function WhiteboardPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100svh-9rem)]">
+    <div className="flex flex-col h-full">
         <div className="flex items-center justify-between mb-4">
             <div>
             <h1 className="text-3xl font-bold tracking-tight">Whiteboard</h1>
