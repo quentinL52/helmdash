@@ -46,7 +46,7 @@ export default function WhiteboardPage() {
     if (notes && notes.length > 0) {
       setZIndexCounter(Math.max(0, ...notes.map(n => n.zIndex || 0)));
     }
-  }, []);
+  }, [notes]);
 
   const addNote = (e: MouseEvent) => {
     if (!whiteboardRef.current) return;
@@ -139,7 +139,7 @@ export default function WhiteboardPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-120px)]">
+    <div className="flex flex-col h-[calc(100svh-6.5rem)]">
         <div className="flex items-center justify-between mb-4">
             <div>
             <h1 className="text-3xl font-bold tracking-tight">Whiteboard</h1>
