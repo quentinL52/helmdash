@@ -139,8 +139,8 @@ export default function WhiteboardPage() {
   }
 
   return (
-    <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between mb-4">
+    <div className="flex flex-col h-full whiteboard-page">
+        <div className="flex items-center justify-between mb-4 px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8">
             <div>
             <h1 className="text-3xl font-bold tracking-tight">Whiteboard</h1>
             <p className="text-muted-foreground">Right-click on the board to add a new note. Drag to move.</p>
@@ -154,7 +154,7 @@ export default function WhiteboardPage() {
         <ContextMenu>
             <ContextMenuTrigger
                 ref={whiteboardRef}
-                className="relative flex-grow rounded-lg border-2 border-dashed border-border bg-card/50 overflow-hidden"
+                className="relative flex-grow rounded-lg border-2 border-dashed border-border bg-card/50 overflow-hidden mx-4 sm:mx-6 lg:mx-8 mb-4 sm:mb-6 lg:mb-8"
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
