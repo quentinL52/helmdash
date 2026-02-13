@@ -4,7 +4,8 @@ import {
   Briefcase,
   LayoutGrid,
   PenSquare,
-  CalendarCheck,
+  Repeat,
+  KanbanSquare,
   Sparkles,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -21,7 +22,8 @@ import { Button } from './ui/button';
 const navItems = [
   { href: '/lean-canvas', label: 'Lean Canvas', icon: LayoutGrid },
   { href: '/whiteboard', label: 'Whiteboard', icon: PenSquare },
-  { href: '/planner', label: 'Planner', icon: CalendarCheck },
+  { href: '/roadmap', label: 'Roadmap', icon: KanbanSquare },
+  { href: '/routine', label: 'Routine', icon: Repeat },
   { href: '/brainstorm', label: 'AI Brainstorm', icon: Sparkles },
 ];
 
