@@ -174,7 +174,7 @@ export default function RoutinePage() {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "12px" }}>
         {routine.map((day, dayIdx) => (
           <Card key={day.day} style={{
             borderTop: `3px solid ${dayColors[dayIdx % dayColors.length]}`, padding: "16px"
