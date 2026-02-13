@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Flame,
+  Briefcase,
   LayoutGrid,
   PenSquare,
   CalendarCheck,
@@ -33,9 +33,9 @@ export function SidebarNav() {
       <SidebarHeader>
         <Button variant="ghost" className="h-auto p-0" asChild>
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-            <Flame className="w-7 h-7 text-primary" />
+            <Briefcase className="w-7 h-7 text-primary" />
             <span className="text-primary-foreground group-data-[collapsible=icon]:hidden">
-              IgniteHQ
+              Entreprenarial Manager
             </span>
           </Link>
         </Button>

@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'IgniteHQ',
-  description: 'Your startup development headquarters.',
+  title: 'Entreprenarial Manager',
+  description: 'Your entreprenarial manager.',
 };
 
 export default function RootLayout({
