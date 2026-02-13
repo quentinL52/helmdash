@@ -115,18 +115,15 @@ export default function WhiteboardPage() {
 
   const handleMouseDown = (e: MouseEvent<HTMLDivElement>, id: string, type: 'note' | 'shape') => {
     const item = type === 'note' ? notes.find(n => n.id === id) : shapes.find(s => s.id === id);
-    if (!item || !whiteboardRef.current) return;
+    if (!item) return;
 
     bringToFront(id, type);
     
     setDraggingItem({ id, type });
-    const itemElement = e.currentTarget;
-    const itemRect = itemElement.getBoundingClientRect();
-    const whiteboardRect = whiteboardRef.current.getBoundingClientRect();
-    
+    const itemRect = e.currentTarget.getBoundingClientRect();
     setOffset({
-      x: e.clientX - (itemRect.left - whiteboardRect.left),
-      y: e.clientY - (itemRect.top - whiteboardRect.top),
+      x: e.clientX - itemRect.left,
+      y: e.clientY - itemRect.top,
     });
   };
 
@@ -135,8 +132,9 @@ export default function WhiteboardPage() {
     
     e.preventDefault();
     const whiteboardRect = whiteboardRef.current.getBoundingClientRect();
-    let newX = e.clientX - offset.x - whiteboardRect.left;
-    let newY = e.clientY - offset.y - whiteboardRect.top;
+    
+    let newX = e.clientX - whiteboardRect.left - offset.x;
+    let newY = e.clientY - whiteboardRect.top - offset.y;
     
     const item = draggingItem.type === 'note'
       ? notes.find(n => n.id === draggingItem.id)
@@ -215,7 +213,7 @@ export default function WhiteboardPage() {
         <ContextMenu>
             <ContextMenuTrigger
                 ref={whiteboardRef}
-                className="relative flex-grow overflow-hidden whiteboard-grid"
+                className="relative flex-grow overflow-hidden whiteboard-grid w-full"
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
