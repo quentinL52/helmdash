@@ -13,7 +13,9 @@ import {
     PenSquare,
     Sparkles,
     BookOpen,
-    Target
+    Target,
+    Megaphone,
+    Users
 } from 'lucide-react';
 
 const navItems = [
@@ -26,6 +28,8 @@ const navItems = [
     { href: '/whiteboard', label: 'Whiteboard', icon: PenSquare },
     { href: '/brainstorm', label: 'AI Brainstorm', icon: Sparkles },
     { href: '/okr', label: 'OKRs', icon: Target },
+    { href: '/content', label: 'Content', icon: Megaphone },
+    { href: '/crm', label: 'CRM', icon: Users },
     { href: '/journal', label: 'Journal', icon: BookOpen },
 ];
 
@@ -33,17 +37,17 @@ export function TopNav() {
     const pathname = usePathname();
 
     return (
-        <header className="h-[60px] border-b border-border flex items-center px-6 bg-background/80 backdrop-blur-md sticky top-0 z-50">
-            <div className="flex items-center gap-2.5 mr-8">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-lg text-white bg-gradient-to-br from-[#6c5ce7] to-[#4a3fb5]">
+        <header className="h-[50px] border-b border-border flex items-center px-4 bg-background/80 backdrop-blur-md sticky top-0 z-50">
+            <div className="flex items-center gap-2 mr-4 shrink-0">
+                <div className="w-6 h-6 rounded flex items-center justify-center font-bold text-sm text-white bg-gradient-to-br from-[#6c5ce7] to-[#4a3fb5]">
                     E
                 </div>
-                <h1 className="text-base font-bold tracking-tight text-foreground">
-                    Entrepreneurial OS <span className="opacity-50 font-normal">v0.1</span>
+                <h1 className="text-sm font-bold tracking-tight text-foreground hidden md:block">
+                    Entrepreneurial OS
                 </h1>
             </div>
 
-            <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+            <nav className="flex items-center gap-0.5 overflow-x-auto no-scrollbar mask-linear-fade">
                 {navItems.map((item) => {
                     const isActive = pathname.startsWith(item.href);
                     return (
@@ -51,13 +55,13 @@ export function TopNav() {
                             key={item.href}
                             href={item.href}
                             className={cn(
-                                "flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 whitespace-nowrap",
+                                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[12px] font-medium transition-all duration-200 whitespace-nowrap",
                                 isActive
                                     ? "bg-accent/10 text-accent"
                                     : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                             )}
                         >
-                            <item.icon className="w-4 h-4" />
+                            <item.icon className="w-3.5 h-3.5" />
                             {item.label}
                         </Link>
                     );

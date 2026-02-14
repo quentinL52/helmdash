@@ -118,6 +118,41 @@ export interface ContentIdea {
     updatedAt: string;
 }
 
+// Module 11: CRM Lite
+export type ContactStatus = 'lead' | 'contacted' | 'negotiation' | 'customer' | 'partner' | 'lost';
+
+export interface Contact {
+    id: string;
+    name: string;
+    role?: string;
+    company?: string;
+    email?: string;
+    linkedin?: string;
+    status: ContactStatus;
+    lastContactDate: string; // ISO Date
+    nextFollowUpDate?: string; // ISO Date
+    notes?: string;
+}
+
+// Module 12: Routine & Dashboard
+export interface RoutineTask {
+    id: string; // crypto.randomUUID()
+    text: string;
+    done: boolean;
+}
+
+export interface RoutineDay {
+    id: string; // e.g. "monday"
+    day: string; // "Lundi"
+    tasks: RoutineTask[];
+}
+
+export interface RoutineHistory {
+    date: string; // ISO Date YYYY-MM-DD
+    completedItemIds: string[];
+    completionRate: number; // 0-1
+}
+
 export interface FounderStore {
     // --- State ---
     hypotheses: Hypothesis[];
@@ -125,6 +160,9 @@ export interface FounderStore {
     journalEntries: JournalEntry[];
     objectives: Objective[];
     contentIdeas: ContentIdea[]; // NEW
+    contacts: Contact[]; // Module 11
+    routine: RoutineDay[]; // Module 12
+    routineHistory: RoutineHistory[]; // Module 12 - Routine Optimization
     leanCanvas: Record<string, string>;
 
     // --- Actions ---
@@ -160,6 +198,18 @@ export interface FounderStore {
     updateContentIdea: (id: string, updates: Partial<ContentIdea>) => void;
     deleteContentIdea: (id: string) => void;
 
+    // CRM
+    addContact: (contact: Omit<Contact, 'id'>) => void;
+    updateContact: (id: string, updates: Partial<Contact>) => void;
+    deleteContact: (id: string) => void;
+
+    // Routine
+    toggleRoutineTask: (dayId: string, taskId: string) => void;
+    addRoutineTask: (dayId: string, text: string) => void;
+    updateRoutineTask: (dayId: string, taskId: string, text: string) => void;
+    deleteRoutineTask: (dayId: string, taskId: string) => void;
+    resetRoutineWeek: () => void;
+
     // Canvas
     updateCanvasSection: (sectionId: string, content: string) => void;
 }
@@ -190,6 +240,41 @@ export const useFounderStore = create<FounderStore>()(
             journalEntries: [],
             objectives: [],
             contentIdeas: [],
+            contacts: [],
+            routine: [
+                {
+                    id: 'mon', day: 'Lundi', tasks: [
+                        { id: '1', text: 'Revue stratégie & mise à jour Lean Canvas', done: false },
+                        { id: '2', text: 'Définir les 3 priorités de la semaine', done: false }
+                    ]
+                },
+                {
+                    id: 'tue', day: 'Mardi', tasks: [
+                        { id: '3', text: 'Outreach : contacter 5-10 prospects', done: false },
+                        { id: '4', text: '1 interview utilisateur (15-20 min)', done: false }
+                    ]
+                },
+                {
+                    id: 'wed', day: 'Mercredi', tasks: [
+                        { id: '5', text: 'Rédiger 1 post LinkedIn (build in public)', done: false },
+                        { id: '6', text: 'Veille concurrence & écosystème IA', done: false }
+                    ]
+                },
+                {
+                    id: 'thu', day: 'Jeudi', tasks: [
+                        { id: '7', text: '1 appel réseau (mentor, fondateur, expert)', done: false },
+                        { id: '8', text: 'Avancement admin / finance / juridique', done: false }
+                    ]
+                },
+                {
+                    id: 'fri', day: 'Vendredi', tasks: [
+                        { id: '9', text: 'Synthèse feedback utilisateurs → décisions produit', done: false },
+                        { id: '10', text: 'Rétrospective perso : qu\'est-ce qui a marché ?', done: false },
+                        { id: '11', text: 'Mise à jour roadmap semaine suivante', done: false }
+                    ]
+                }
+            ],
+            routineHistory: [],
             leanCanvas: {},
 
             // Actions
@@ -467,6 +552,104 @@ export const useFounderStore = create<FounderStore>()(
                     ...state.leanCanvas,
                     [sectionId]: content,
                 },
+            })),
+
+            // CRM Actions
+            addContact: (contact) => set((state) => ({
+                contacts: [
+                    ...state.contacts,
+                    {
+                        ...contact,
+                        id: crypto.randomUUID(),
+                        lastContactDate: contact.lastContactDate || new Date().toISOString(),
+                    }
+                ]
+            })),
+
+            updateContact: (id, updates) => set((state) => ({
+                contacts: state.contacts.map(c =>
+                    c.id === id ? { ...c, ...updates } : c
+                )
+            })),
+
+            deleteContact: (id) => set((state) => ({
+                contacts: state.contacts.filter(c => c.id !== id)
+            })),
+
+            // Routine Actions
+            toggleRoutineTask: (dayId, taskId) => set((state) => {
+                const newRoutine = state.routine.map(day =>
+                    day.id === dayId ? {
+                        ...day,
+                        tasks: day.tasks.map(t => t.id === taskId ? { ...t, done: !t.done } : t)
+                    } : day
+                );
+
+                // Calculate progress
+                const totalTasks = newRoutine.reduce((acc, day) => acc + day.tasks.length, 0);
+                const completedTasks = newRoutine.reduce((acc, day) => acc + day.tasks.filter(t => t.done).length, 0);
+                const rate = totalTasks > 0 ? completedTasks / totalTasks : 0;
+
+                // Update History for Today
+                const today = new Date().toISOString().split('T')[0];
+                const existingHistoryIndex = state.routineHistory.findIndex(h => h.date === today);
+                let newHistory = [...state.routineHistory];
+
+                if (existingHistoryIndex >= 0) {
+                    newHistory[existingHistoryIndex] = {
+                        ...newHistory[existingHistoryIndex],
+                        completionRate: rate,
+                        completedItemIds: [] // We could track specific IDs here if needed
+                    };
+                } else {
+                    newHistory.push({
+                        date: today,
+                        completionRate: rate,
+                        completedItemIds: []
+                    });
+                }
+
+                // Keep history sorted or limited? Maybe just last 90 days.
+                if (newHistory.length > 365) newHistory = newHistory.slice(-365);
+
+                return {
+                    routine: newRoutine,
+                    routineHistory: newHistory
+                };
+            }),
+
+            addRoutineTask: (dayId, text) => set((state) => ({
+                routine: state.routine.map(day =>
+                    day.id === dayId ? {
+                        ...day,
+                        tasks: [...day.tasks, { id: crypto.randomUUID(), text, done: false }]
+                    } : day
+                )
+            })),
+
+            updateRoutineTask: (dayId, taskId, text) => set((state) => ({
+                routine: state.routine.map(day =>
+                    day.id === dayId ? {
+                        ...day,
+                        tasks: day.tasks.map(t => t.id === taskId ? { ...t, text } : t)
+                    } : day
+                )
+            })),
+
+            deleteRoutineTask: (dayId, taskId) => set((state) => ({
+                routine: state.routine.map(day =>
+                    day.id === dayId ? {
+                        ...day,
+                        tasks: day.tasks.filter(t => t.id !== taskId)
+                    } : day
+                )
+            })),
+
+            resetRoutineWeek: () => set((state) => ({
+                routine: state.routine.map(day => ({
+                    ...day,
+                    tasks: day.tasks.map(t => ({ ...t, done: false }))
+                }))
             })),
         }),
         {

@@ -1,6 +1,7 @@
 'use client';
 
 import { HypothesesBoard } from '@/components/hypotheses/hypotheses-board';
+import { HypothesesList } from '@/components/hypotheses/hypotheses-list';
 import { HypothesisDialog } from '@/components/hypotheses/create-hypothesis-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -17,10 +18,8 @@ export default function HypothesesPage() {
                 <TabsContent value="board" className="flex-1 overflow-hidden mt-0">
                     <HypothesesBoard />
                 </TabsContent>
-                <TabsContent value="list" className="h-full">
-                    <div className="flex items-center justify-center h-40 text-muted-foreground border border-[#282c3a] rounded-lg bg-[#181a24]">
-                        List view coming soon (Phase 2)
-                    </div>
+                <TabsContent value="list" className="h-full mt-0">
+                    <HypothesesList />
                 </TabsContent>
             </Tabs>
         </div>
