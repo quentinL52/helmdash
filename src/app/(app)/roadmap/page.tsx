@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import { useFounderStore } from '@/store/founder-store';
+import { translations } from '@/lib/translations';
 
 // --- ICONS (inline SVG) ---
 const Icons = {
   Plus: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
   ),
   Trash: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
   ),
 };
 
@@ -28,12 +30,6 @@ const COLORS = {
   danger: "#ff6b6b",
   teal: "#00b894",
 };
-
-const ROADMAP_STATUSES = [
-  { key: "todo", label: "À faire", color: COLORS.textMuted },
-  { key: "doing", label: "En cours", color: COLORS.warning },
-  { key: "done", label: "Terminé", color: COLORS.success },
-];
 
 // --- REUSABLE COMPONENTS ---
 const Button = ({ children, onClick, variant = "default", size = "md", style, ...props }: any) => {
@@ -114,6 +110,16 @@ export default function RoadmapPage() {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", description: "", status: "todo", priority: "medium", week: "" });
 
+  const { language } = useFounderStore();
+  const t = translations[language].roadmap;
+  const common = translations[language].common;
+
+  const ROADMAP_STATUSES = [
+    { key: "todo", label: t.status.todo, color: COLORS.textMuted },
+    { key: "doing", label: t.status.doing, color: COLORS.warning },
+    { key: "done", label: t.status.done, color: COLORS.success },
+  ];
+
   const add = () => {
     if (!form.title.trim()) return;
     setTasks([...tasks, { ...form, id: Date.now() }]);
@@ -125,7 +131,11 @@ export default function RoadmapPage() {
   const remove = (id: any) => setTasks(tasks.filter(t => t.id !== id));
 
   const priorityColors: Record<string, string> = { high: COLORS.danger, medium: COLORS.warning, low: COLORS.teal };
-  const priorityLabels: Record<string, string> = { high: "Haute", medium: "Moyenne", low: "Basse" };
+  const priorityLabels: Record<string, string> = {
+    high: t.priority.high,
+    medium: t.priority.medium,
+    low: t.priority.low
+  };
 
   const animationCSS = `
     @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -138,28 +148,28 @@ export default function RoadmapPage() {
     <div className="fade-in" style={{ fontFamily: "'DM Sans', sans-serif", color: COLORS.text, height: "100%", display: "flex", flexDirection: "column" }}>
       <style>{animationCSS}</style>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexShrink: 0 }}>
-        <h1 className="text-3xl font-bold tracking-tight">Roadmap</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
         <Button variant="primary" onClick={() => setShowForm(!showForm)}>
-          <Icons.Plus /> Nouvelle tâche
+          <Icons.Plus /> {t.new}
         </Button>
       </div>
 
       {showForm && (
         <Card className="scale-in" style={{ marginBottom: "20px", border: `1px solid ${COLORS.accent}33`, flexShrink: 0 }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-            <Input value={form.title} onChange={(e: any) => setForm({ ...form, title: e.target.value })} placeholder="Titre *" autoFocus />
-            <Input value={form.week} onChange={(e: any) => setForm({ ...form, week: e.target.value })} placeholder="Semaine (ex: S7, Fév)" />
+            <Input value={form.title} onChange={(e: any) => setForm({ ...form, title: e.target.value })} placeholder={`${t.form.title} *`} autoFocus />
+            <Input value={form.week} onChange={(e: any) => setForm({ ...form, week: e.target.value })} placeholder={t.form.week} />
             <div style={{ gridColumn: "1 / -1" }}>
-              <TextArea value={form.description} onChange={(e: any) => setForm({ ...form, description: e.target.value })} placeholder="Description..." />
+              <TextArea value={form.description} onChange={(e: any) => setForm({ ...form, description: e.target.value })} placeholder={`${t.form.description}...`} />
             </div>
             <select value={form.priority} onChange={(e: any) => setForm({ ...form, priority: e.target.value })} style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: "8px", padding: "8px 12px", color: COLORS.text, fontSize: "13px", fontFamily: "'DM Sans', sans-serif", outline: "none" }}>
-              <option value="high">Priorité haute</option>
-              <option value="medium">Priorité moyenne</option>
-              <option value="low">Priorité basse</option>
+              <option value="high">{t.priority.high}</option>
+              <option value="medium">{t.priority.medium}</option>
+              <option value="low">{t.priority.low}</option>
             </select>
             <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
-              <Button onClick={() => setShowForm(false)}>Annuler</Button>
-              <Button variant="primary" onClick={add}>Ajouter</Button>
+              <Button onClick={() => setShowForm(false)}>{common.cancel}</Button>
+              <Button variant="primary" onClick={add}>{common.add}</Button>
             </div>
           </div>
         </Card>

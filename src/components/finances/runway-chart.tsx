@@ -43,6 +43,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { translations } from '@/lib/translations';
 
 export type Timeframe = 'week' | 'month' | 'quarter' | 'year';
 
@@ -52,7 +53,9 @@ interface RunwayChartProps {
 }
 
 export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
-    const { finance } = useFounderStore();
+    const { finance, language } = useFounderStore();
+    const t = translations[language]?.finance;
+    const formT = translations[language]?.finance?.form;
     // const [timeframe, setTimeframe] = useState<Timeframe>('month'); // Removed internal state
 
     const data = useMemo(() => {
@@ -240,21 +243,21 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
         <Card className="col-span-4 bg-slate-900 border-slate-800">
             <CardHeader>
                 <CardTitle className="flex justify-between items-center text-white">
-                    <span>Cash Flow & Runway</span>
+                    <span>{t.chart.title}</span>
                     <div className="flex items-center gap-4">
                         <Select value={timeframe} onValueChange={(v) => setTimeframe(v as Timeframe)}>
                             <SelectTrigger className="w-[120px] bg-slate-800 border-slate-700 text-white">
-                                <SelectValue placeholder="Timeframe" />
+                                <SelectValue placeholder={t.chart.timeframe.month} />
                             </SelectTrigger>
                             <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                                <SelectItem value="week">Week</SelectItem>
-                                <SelectItem value="month">Month</SelectItem>
-                                <SelectItem value="quarter">Quarter</SelectItem>
-                                <SelectItem value="year">Year</SelectItem>
+                                <SelectItem value="week">{t.chart.timeframe.week}</SelectItem>
+                                <SelectItem value="month">{t.chart.timeframe.month}</SelectItem>
+                                <SelectItem value="quarter">{t.chart.timeframe.quarter}</SelectItem>
+                                <SelectItem value="year">{t.chart.timeframe.year}</SelectItem>
                             </SelectContent>
                         </Select>
                         <span className={`text-2xl font-bold ${Number(runwayMonths) < 3 && runwayMonths !== '∞' ? 'text-red-500' : 'text-green-500'}`}>
-                            {runwayMonths} months
+                            {runwayMonths} {t.chart.months}
                         </span>
                     </div>
                 </CardTitle>
@@ -294,19 +297,19 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                 labelStyle={{ color: '#94a3b8' }}
                             />
                             <Legend />
-                            <Bar yAxisId="left" dataKey="income" name="Income" fill="#22c55e" radius={[4, 4, 0, 0]} maxBarSize={50} />
-                            <Bar yAxisId="left" dataKey="expense" name="Expenses" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={50} />
+                            <Bar yAxisId="left" dataKey="income" name={formT.income} fill="#22c55e" radius={[4, 4, 0, 0]} maxBarSize={50} />
+                            <Bar yAxisId="left" dataKey="expense" name={formT.expense} fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={50} />
                             <Line
                                 yAxisId="right"
                                 type="monotone"
                                 dataKey="balance"
-                                name="Cash Balance"
+                                name={t.chart.cash}
                                 stroke="#3b82f6"
                                 strokeWidth={3}
                                 dot={{ r: 4, fill: '#3b82f6' }}
                                 activeDot={{ r: 6 }}
                             />
-                            <ReferenceLine yAxisId="left" x={todayLabel} stroke="#fbbf24" strokeDasharray="3 3" label={{ position: 'top', value: 'Today', fill: '#fbbf24', fontSize: 12 }} />
+                            <ReferenceLine yAxisId="left" x={todayLabel} stroke="#fbbf24" strokeDasharray="3 3" label={{ position: 'top', value: t.chart.today, fill: '#fbbf24', fontSize: 12 }} />
                             <ReferenceLine yAxisId="right" y={0} stroke="#ef4444" strokeDasharray="3 3" />
                         </ComposedChart>
                     </ResponsiveContainer>

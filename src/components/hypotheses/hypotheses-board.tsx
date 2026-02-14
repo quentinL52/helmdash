@@ -6,6 +6,7 @@ import { HypothesisColumn } from './hypothesis-column';
 import { HypothesisDialog } from './create-hypothesis-dialog';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import { translations } from '@/lib/translations';
 
 const COLORS = {
     bg: "#0f1117",
@@ -30,16 +31,11 @@ const COLUMN_COLORS: Record<HypothesisStatus, string> = {
     pivoted: COLORS.accent,
 }
 
-const columns: { id: HypothesisStatus; title: string }[] = [
-    { id: 'draft', title: 'Draft' },
-    { id: 'testing', title: 'In Testing' },
-    { id: 'validated', title: 'Validated' },
-    { id: 'invalidated', title: 'Invalidated' },
-    { id: 'pivoted', title: 'Pivoted' },
-];
-
 export function HypothesesBoard() {
-    const { hypotheses, addHypothesis } = useFounderStore();
+    const { hypotheses, addHypothesis, language } = useFounderStore();
+    const t = translations[language].hypotheses;
+    const common = translations[language].common;
+
     const [editingHypothesis, setEditingHypothesis] = useState<Hypothesis | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [showForm, setShowForm] = useState(false);
@@ -50,6 +46,14 @@ export function HypothesesBoard() {
         testMethod: '',
         successCriteria: ''
     });
+
+    const columns: { id: HypothesisStatus; title: string }[] = [
+        { id: 'draft', title: t.columns.draft },
+        { id: 'testing', title: t.columns.testing },
+        { id: 'validated', title: t.columns.validated },
+        { id: 'invalidated', title: t.columns.invalidated },
+        { id: 'pivoted', title: t.columns.pivoted },
+    ];
 
     const handleEdit = (hypothesis: Hypothesis) => {
         setEditingHypothesis(hypothesis);
@@ -101,16 +105,16 @@ export function HypothesesBoard() {
         <div className="flex flex-col h-full bg-background/50 text-foreground font-sans">
             <div className="flex items-center justify-between mb-6 flex-shrink-0">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-[#e8e9ed]">Hypotheses</h2>
+                    <h2 className="text-3xl font-bold tracking-tight text-[#e8e9ed]">{t.title}</h2>
                     <p className="text-[#8b8fa3]">
-                        Validate your risky assumptions.
+                        {t.subtitle}
                     </p>
                 </div>
                 <div
                     onClick={() => setShowForm(!showForm)}
                     className="inline-flex items-center gap-[6px] border-none rounded-[8px] cursor-pointer font-medium transition-all duration-200 text-[13px] px-[16px] py-[8px] bg-[#6c5ce7] text-white hover:opacity-85"
                 >
-                    <Plus className="h-4 w-4" /> New Hypothesis
+                    <Plus className="h-4 w-4" /> {t.new}
                 </div>
             </div>
 
@@ -129,7 +133,7 @@ export function HypothesesBoard() {
                                     ...inputStyle,
                                     borderColor: COLORS.accent
                                 }}
-                                placeholder="Hypothesis Statement *"
+                                placeholder={`${t.form.statement} *`}
                                 value={formData.statement}
                                 onChange={(e) => setFormData({ ...formData, statement: e.target.value })}
                                 autoFocus
@@ -158,13 +162,13 @@ export function HypothesesBoard() {
                         </select>
                         <input
                             style={inputStyle}
-                            placeholder="Test Method (e.g. Interview)"
+                            placeholder={t.form.method}
                             value={formData.testMethod}
                             onChange={(e) => setFormData({ ...formData, testMethod: e.target.value })}
                         />
                         <input
                             style={inputStyle}
-                            placeholder="Success Criteria (e.g. > 10%)"
+                            placeholder={t.form.criteria}
                             value={formData.successCriteria}
                             onChange={(e) => setFormData({ ...formData, successCriteria: e.target.value })}
                         />
@@ -175,13 +179,13 @@ export function HypothesesBoard() {
                             onClick={() => setShowForm(false)}
                             className="text-[#8b8fa3] hover:text-[#e8e9ed] hover:bg-[#282c3a]"
                         >
-                            Cancel
+                            {t.form.cancel}
                         </Button>
                         <Button
                             onClick={handleCreate}
                             className="bg-[#6c5ce7] hover:bg-[#5b4cc4] text-white"
                         >
-                            Add Hypothesis
+                            {t.form.submit}
                         </Button>
                     </div>
                 </div>

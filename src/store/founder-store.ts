@@ -212,6 +212,10 @@ export interface FounderStore {
 
     // Canvas
     updateCanvasSection: (sectionId: string, content: string) => void;
+
+    // --- Settings / i18n ---
+    language: 'fr' | 'en';
+    setLanguage: (lang: 'fr' | 'en') => void;
 }
 
 // Helper to calc progress
@@ -228,8 +232,10 @@ const calculateObjectiveProgress = (krs: KeyResult[]): number => {
 
 export const useFounderStore = create<FounderStore>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             // Initial State
+            language: 'fr',
+            setLanguage: (lang) => set({ language: lang }),
             hypotheses: [],
             finance: {
                 cashAvailable: 0,

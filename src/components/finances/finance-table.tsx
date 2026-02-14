@@ -50,6 +50,7 @@ import {
     endOfWeek,
 } from 'date-fns';
 import { Timeframe } from './runway-chart';
+import { translations } from '@/lib/translations';
 
 interface FlatEntry extends ExpenseItem {
     monthId: string;
@@ -64,7 +65,11 @@ interface FinanceTableProps {
 }
 
 export function FinanceTable({ timeframe }: FinanceTableProps) {
-    const { finance, deleteFinancialEntry, updateFinancialEntry } = useFounderStore();
+    const { finance, deleteFinancialEntry, updateFinancialEntry, language } = useFounderStore();
+    const t = translations[language].finance.table;
+    const common = translations[language].common;
+    const formT = translations[language].finance.form;
+
     const [deleteId, setDeleteId] = useState<{ monthId: string; entryId: string; type: 'expense' | 'revenue' } | null>(null);
     const [editingEntry, setEditingEntry] = useState<FlatEntry | null>(null);
 
@@ -167,12 +172,12 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                 <Table>
                     <TableHeader>
                         <TableRow className="border-slate-800 hover:bg-slate-900/50">
-                            <TableHead className="text-gray-400">Date</TableHead>
-                            <TableHead className="text-gray-400">Label</TableHead>
-                            <TableHead className="text-gray-400">Type</TableHead>
-                            <TableHead className="text-gray-400">Category</TableHead>
-                            <TableHead className="text-right text-gray-400">Amount</TableHead>
-                            <TableHead className="text-right text-gray-400">Actions</TableHead>
+                            <TableHead className="text-gray-400">{t.date}</TableHead>
+                            <TableHead className="text-gray-400">{t.description}</TableHead>
+                            <TableHead className="text-gray-400">{formT.type}</TableHead>
+                            <TableHead className="text-gray-400">{t.category}</TableHead>
+                            <TableHead className="text-right text-gray-400">{t.amount}</TableHead>
+                            <TableHead className="text-right text-gray-400">{t.actions}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -204,7 +209,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                                 ? 'bg-green-500/10 text-green-400'
                                                 : 'bg-red-500/10 text-red-400'
                                                 }`}>
-                                                {entry.type === 'revenue' ? 'Revenue' : 'Expense'}
+                                                {entry.type === 'revenue' ? formT.income : formT.expense}
                                             </span>
                                         </TableCell>
                                         <TableCell className="capitalize text-gray-300">{entry.category}</TableCell>
@@ -247,15 +252,15 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
             <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
                 <AlertDialogContent className="bg-slate-900 border-slate-800">
                     <AlertDialogHeader>
-                        <AlertDialogTitle className="text-white">Are you sure?</AlertDialogTitle>
+                        <AlertDialogTitle className="text-white">{translations.en.common.error}</AlertDialogTitle> {/* Using common error/confirmation title would be better if added, sticking to EN for generic title or add 'Confirmation' key */}
                         <AlertDialogDescription className="text-gray-300">
-                            This action cannot be undone. This will permanently delete this entry from your records.
+                            Cette action est irréversible.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel className="text-black bg-white hover:bg-gray-200">Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="text-black bg-white hover:bg-gray-200">{common.cancel}</AlertDialogCancel>
                         <AlertDialogAction onClick={handleDelete} className="bg-red-600 text-white hover:bg-red-700">
-                            Delete
+                            {common.delete || "Delete"}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -274,7 +279,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                         <form onSubmit={handleUpdate} className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="date" className="text-right text-gray-300">
-                                    Date
+                                    {t.date}
                                 </Label>
                                 <Input
                                     id="date"
@@ -286,7 +291,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="label" className="text-right text-gray-300">
-                                    Label
+                                    {t.description}
                                 </Label>
                                 <Input
                                     id="label"
@@ -297,7 +302,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="amount" className="text-right text-gray-300">
-                                    Amount
+                                    {t.amount}
                                 </Label>
                                 <Input
                                     id="amount"
@@ -309,7 +314,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="category" className="text-right text-gray-300">
-                                    Category
+                                    {t.category}
                                 </Label>
                                 <div className="col-span-3">
                                     <Select
@@ -333,7 +338,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button type="submit" className="bg-white text-black hover:bg-gray-200">Save changes</Button>
+                                <Button type="submit" className="bg-white text-black hover:bg-gray-200">{formT.submit}</Button>
                             </DialogFooter>
                         </form>
                     )}

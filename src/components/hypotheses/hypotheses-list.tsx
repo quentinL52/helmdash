@@ -14,27 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { HypothesisDialog } from './create-hypothesis-dialog';
 import { Edit, Trash2 } from 'lucide-react';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
-const COLORS = {
-    bg: "#0f1117",
-    surface: "#181a24",
-    surfaceHover: "#1e2130",
-    border: "#282c3a",
-    text: "#e8e9ed",
-    textMuted: "#8b8fa3",
-    textDim: "#5c6078",
-    accent: "#6c5ce7",
-    success: "#00cec9",
-    warning: "#fdcb6e",
-    danger: "#ff6b6b",
-    teal: "#00b894",
-};
+import { translations } from '@/lib/translations';
 
 const STATUS_COLORS: Record<HypothesisStatus, string> = {
     draft: "bg-slate-500/10 text-slate-500 hover:bg-slate-500/20",
@@ -52,7 +32,8 @@ const RISK_COLORS: Record<string, string> = {
 };
 
 export function HypothesesList() {
-    const { hypotheses, deleteHypothesis } = useFounderStore();
+    const { hypotheses, deleteHypothesis, language } = useFounderStore();
+    const t = translations[language].hypotheses.list;
     const [editingHypothesis, setEditingHypothesis] = useState<Hypothesis | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -79,19 +60,19 @@ export function HypothesesList() {
             <Table>
                 <TableHeader className="bg-[#1e2130]">
                     <TableRow className="border-b border-[#282c3a] hover:bg-[#1e2130]">
-                        <TableHead className="w-[100px] text-[#8b8fa3]">Status</TableHead>
-                        <TableHead className="text-[#8b8fa3]">Statement</TableHead>
-                        <TableHead className="w-[120px] text-[#8b8fa3]">Category</TableHead>
-                        <TableHead className="w-[100px] text-[#8b8fa3]">Risk</TableHead>
-                        <TableHead className="text-[#8b8fa3] hidden md:table-cell">Test Method</TableHead>
-                        <TableHead className="text-right text-[#8b8fa3]">Actions</TableHead>
+                        <TableHead className="w-[100px] text-[#8b8fa3]">{t.status}</TableHead>
+                        <TableHead className="text-[#8b8fa3]">{t.statement}</TableHead>
+                        <TableHead className="w-[120px] text-[#8b8fa3]">{t.category}</TableHead>
+                        <TableHead className="w-[100px] text-[#8b8fa3]">{t.risk}</TableHead>
+                        <TableHead className="text-[#8b8fa3] hidden md:table-cell">{t.method}</TableHead>
+                        <TableHead className="text-right text-[#8b8fa3]">{t.actions}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {hypotheses.length === 0 ? (
                         <TableRow>
                             <TableCell colSpan={6} className="h-24 text-center text-[#8b8fa3]">
-                                No hypotheses found. Add one from the board view or create button.
+                                {t.empty}
                             </TableCell>
                         </TableRow>
                     ) : (

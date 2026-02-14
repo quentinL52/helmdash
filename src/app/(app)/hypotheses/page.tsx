@@ -2,12 +2,14 @@
 
 import { HypothesesBoard } from '@/components/hypotheses/hypotheses-board';
 import { HypothesesList } from '@/components/hypotheses/hypotheses-list';
-import { HypothesisDialog } from '@/components/hypotheses/create-hypothesis-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { useFounderStore } from '@/store/founder-store';
+import { translations } from '@/lib/translations';
 
 export default function HypothesesPage() {
+    const { language } = useFounderStore();
+    const t = translations[language].common;
+
     return (
         <div className="flex flex-col h-full space-y-4 p-8 pt-6 font-sans text-[#e8e9ed]">
             <Tabs defaultValue="board" className="h-full flex flex-col">
