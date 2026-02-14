@@ -6,7 +6,16 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 // --- ICONS (inline SVG) ---
 const Icons = {
   Trash: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
+  ),
+  Edit: () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+  ),
+  Check: () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+  ),
+  X: () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
   ),
 };
 
@@ -26,6 +35,7 @@ const COLORS = {
   orange: "#e17055",
   pink: "#fd79a8",
   teal: "#00b894",
+  delete: "#ff4d4f", // Added for delete action
 };
 
 // --- REUSABLE COMPONENTS ---
@@ -41,6 +51,8 @@ const Button = ({ children, onClick, variant = "default", size = "sm", style, ..
   const variants: Record<string, React.CSSProperties> = {
     default: { background: COLORS.surfaceHover, color: COLORS.text, border: `1px solid ${COLORS.border}` },
     primary: { background: COLORS.accent, color: "#fff", border: "none" },
+    danger: { background: "rgba(255, 77, 79, 0.1)", color: COLORS.delete, border: `1px solid ${COLORS.delete}` }, // Added danger variant
+    ghost: { background: "transparent", color: COLORS.textMuted, border: "none" }, // Added ghost variant for icons
   };
   return (
     <button
@@ -80,27 +92,37 @@ const Card = ({ children, style, className = "" }: any) => (
 
 
 const DEFAULT_ROUTINE = [
-  { day: "Lundi", tasks: [
-    { text: "Revue stratégie & mise à jour Lean Canvas", done: false },
-    { text: "Définir les 3 priorités de la semaine", done: false },
-  ]},
-  { day: "Mardi", tasks: [
-    { text: "Outreach : contacter 5-10 prospects", done: false },
-    { text: "1 interview utilisateur (15-20 min)", done: false },
-  ]},
-  { day: "Mercredi", tasks: [
-    { text: "Rédiger 1 post LinkedIn (build in public)", done: false },
-    { text: "Veille concurrence & écosystème IA", done: false },
-  ]},
-  { day: "Jeudi", tasks: [
-    { text: "1 appel réseau (mentor, fondateur, expert)", done: false },
-    { text: "Avancement admin / finance / juridique", done: false },
-  ]},
-  { day: "Vendredi", tasks: [
-    { text: "Synthèse feedback utilisateurs → décisions produit", done: false },
-    { text: "Rétrospective perso : qu'est-ce qui a marché ?", done: false },
-    { text: "Mise à jour roadmap semaine suivante", done: false },
-  ]},
+  {
+    day: "Lundi", tasks: [
+      { text: "Revue stratégie & mise à jour Lean Canvas", done: false },
+      { text: "Définir les 3 priorités de la semaine", done: false },
+    ]
+  },
+  {
+    day: "Mardi", tasks: [
+      { text: "Outreach : contacter 5-10 prospects", done: false },
+      { text: "1 interview utilisateur (15-20 min)", done: false },
+    ]
+  },
+  {
+    day: "Mercredi", tasks: [
+      { text: "Rédiger 1 post LinkedIn (build in public)", done: false },
+      { text: "Veille concurrence & écosystème IA", done: false },
+    ]
+  },
+  {
+    day: "Jeudi", tasks: [
+      { text: "1 appel réseau (mentor, fondateur, expert)", done: false },
+      { text: "Avancement admin / finance / juridique", done: false },
+    ]
+  },
+  {
+    day: "Vendredi", tasks: [
+      { text: "Synthèse feedback utilisateurs → décisions produit", done: false },
+      { text: "Rétrospective perso : qu'est-ce qui a marché ?", done: false },
+      { text: "Mise à jour roadmap semaine suivante", done: false },
+    ]
+  },
 ];
 
 // --- ROUTINE PAGE ---
@@ -108,6 +130,10 @@ export default function RoutinePage() {
   const [routine, setRoutine] = useLocalStorage<any[]>("routine", DEFAULT_ROUTINE);
   const [addingTo, setAddingTo] = useState<number | null>(null);
   const [newTask, setNewTask] = useState("");
+
+  // State for editing task
+  const [editingTask, setEditingTask] = useState<{ dayIdx: number; taskIdx: number } | null>(null);
+  const [editedTaskText, setEditedTaskText] = useState("");
 
   const toggle = (dayIdx: number, taskIdx: number) => {
     const next = routine.map((d, di) => di === dayIdx ? {
@@ -133,6 +159,34 @@ export default function RoutinePage() {
     setRoutine(next);
   };
 
+  const startEditing = (dayIdx: number, taskIdx: number, currentText: string) => {
+    setEditingTask({ dayIdx, taskIdx });
+    setEditedTaskText(currentText);
+  };
+
+  const saveEditedTask = () => {
+    if (!editingTask) return;
+    if (!editedTaskText.trim()) {
+      // Option: If empty, remove the task or just cancel? Let's just cancel for now or warn.
+      // Better: prevent saving if empty.
+      return;
+    }
+
+    const { dayIdx, taskIdx } = editingTask;
+    const next = routine.map((d, di) => di === dayIdx ? {
+      ...d, tasks: d.tasks.map((t: any, ti: number) => ti === taskIdx ? { ...t, text: editedTaskText } : t),
+    } : d);
+
+    setRoutine(next);
+    setEditingTask(null);
+    setEditedTaskText("");
+  };
+
+  const cancelEditing = () => {
+    setEditingTask(null);
+    setEditedTaskText("");
+  };
+
   const resetWeek = () => {
     const next = routine.map(d => ({ ...d, tasks: d.tasks.map((t: any) => ({ ...t, done: false })) }));
     setRoutine(next);
@@ -150,8 +204,8 @@ export default function RoutinePage() {
   `;
 
   return (
-    <div className="fade-in" style={{fontFamily: "'DM Sans', sans-serif", color: COLORS.text}}>
-       <style>{animationCSS}</style>
+    <div className="fade-in" style={{ fontFamily: "'DM Sans', sans-serif", color: COLORS.text }}>
+      <style>{animationCSS}</style>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Routine Hebdo</h1>
@@ -187,49 +241,90 @@ export default function RoutinePage() {
               {day.day}
             </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              {day.tasks.map((task: any, taskIdx: number) => (
-                <div
-                  key={taskIdx}
-                  className="group/task"
-                  style={{
-                    display: "flex", alignItems: "flex-start", gap: "8px",
-                    padding: "6px 8px", borderRadius: "6px",
-                    background: task.done ? `${COLORS.success}08` : "transparent",
-                    transition: "background 0.2s",
-                  }}
-                >
+              {day.tasks.map((task: any, taskIdx: number) => {
+                const isEditing = editingTask?.dayIdx === dayIdx && editingTask?.taskIdx === taskIdx;
+
+                return (
                   <div
-                    onClick={() => toggle(dayIdx, taskIdx)}
+                    key={taskIdx}
+                    className="group/task"
                     style={{
-                      width: "18px", height: "18px", borderRadius: "4px", flexShrink: 0, marginTop: "1px",
-                      border: `2px solid ${task.done ? COLORS.success : COLORS.border}`,
-                      background: task.done ? COLORS.success : "transparent",
-                      cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                      transition: "all 0.2s",
+                      display: "flex", alignItems: "flex-start", gap: "8px",
+                      padding: "6px 8px", borderRadius: "6px",
+                      background: task.done ? `${COLORS.success}08` : "transparent",
+                      transition: "background 0.2s",
                     }}
                   >
-                    {task.done && (
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
+                    {isEditing ? (
+                      <div style={{ display: "flex", flexDirection: "column", width: "100%", gap: "4px" }}>
+                        <Input
+                          value={editedTaskText}
+                          onChange={(e: any) => setEditedTaskText(e.target.value)}
+                          onKeyDown={(e: any) => {
+                            if (e.key === "Enter") saveEditedTask();
+                            if (e.key === "Escape") cancelEditing();
+                          }}
+                          autoFocus
+                        />
+                        <div style={{ display: "flex", gap: "4px", justifyContent: "flex-end" }}>
+                          <Button variant="ghost" size="sm" onClick={cancelEditing} style={{ padding: "4px" }}>
+                            <Icons.X />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={saveEditedTask} style={{ color: COLORS.success, padding: "4px" }}>
+                            <Icons.Check />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div
+                          onClick={() => toggle(dayIdx, taskIdx)}
+                          style={{
+                            width: "18px", height: "18px", borderRadius: "4px", flexShrink: 0, marginTop: "1px",
+                            border: `2px solid ${task.done ? COLORS.success : COLORS.border}`,
+                            background: task.done ? COLORS.success : "transparent",
+                            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                            transition: "all 0.2s",
+                          }}
+                        >
+                          {task.done && (
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round">
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          )}
+                        </div>
+                        <span style={{
+                          fontSize: "12px", color: task.done ? COLORS.textDim : COLORS.text,
+                          textDecoration: task.done ? "line-through" : "none",
+                          lineHeight: 1.4, flex: 1, transition: "all 0.2s",
+                          cursor: "text"
+                        }}
+                          onDoubleClick={() => startEditing(dayIdx, taskIdx, task.text)}
+                        >
+                          {task.text}
+                        </span>
+
+                        <div className="opacity-0 group-hover/task:opacity-100 flex gap-1 transition-opacity duration-200">
+                          <button
+                            onClick={() => startEditing(dayIdx, taskIdx, task.text)}
+                            style={{ background: "none", border: "none", cursor: "pointer", color: COLORS.textMuted, padding: "0" }}
+                            title="Modifier"
+                          >
+                            <Icons.Edit />
+                          </button>
+                          <button
+                            onClick={() => removeTask(dayIdx, taskIdx)}
+                            style={{ background: "none", border: "none", cursor: "pointer", color: COLORS.delete, padding: "0" }}
+                            title="Supprimer"
+                          >
+                            <Icons.Trash />
+                          </button>
+                        </div>
+                      </>
                     )}
                   </div>
-                  <span style={{
-                    fontSize: "12px", color: task.done ? COLORS.textDim : COLORS.text,
-                    textDecoration: task.done ? "line-through" : "none",
-                    lineHeight: 1.4, flex: 1, transition: "all 0.2s",
-                  }}>
-                    {task.text}
-                  </span>
-                  <button
-                    onClick={() => removeTask(dayIdx, taskIdx)}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: COLORS.textDim, padding: "0", opacity: 0, flexShrink: 0, transition: 'opacity 0.2s' }}
-                    className="group-hover/task:opacity-40 hover:!opacity-100"
-                  >
-                    <Icons.Trash />
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
             {addingTo === dayIdx ? (
               <div style={{ display: "flex", gap: "6px", marginTop: "8px" }}>
@@ -237,7 +332,10 @@ export default function RoutinePage() {
                   value={newTask}
                   onChange={(e: any) => setNewTask(e.target.value)}
                   placeholder="Nouvelle tâche..."
-                  onKeyDown={(e: any) => e.key === "Enter" && addTask(dayIdx)}
+                  onKeyDown={(e: any) => {
+                    if (e.key === "Enter") addTask(dayIdx);
+                    if (e.key === "Escape") setAddingTo(null);
+                  }}
                   autoFocus
                 />
                 <Button size="sm" variant="primary" onClick={() => addTask(dayIdx)}>+</Button>

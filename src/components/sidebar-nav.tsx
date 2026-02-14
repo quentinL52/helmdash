@@ -7,6 +7,10 @@ import {
   Repeat,
   KanbanSquare,
   Sparkles,
+  LayoutDashboard,
+  FlaskConical,
+  PieChart,
+  Archive,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -20,11 +24,15 @@ import {
 import { Button } from './ui/button';
 
 const navItems = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/hypotheses', label: 'Hypothèses', icon: FlaskConical },
+  { href: '/finances', label: 'Finance', icon: PieChart },
   { href: '/lean-canvas', label: 'Lean Canvas', icon: LayoutGrid },
-  { href: '/whiteboard', label: 'Whiteboard', icon: PenSquare },
   { href: '/roadmap', label: 'Roadmap', icon: KanbanSquare },
   { href: '/routine', label: 'Routine', icon: Repeat },
+  { href: '/whiteboard', label: 'Whiteboard', icon: PenSquare },
   { href: '/brainstorm', label: 'AI Brainstorm', icon: Sparkles },
+  { href: '/legacy-dashboard', label: 'Legacy V0', icon: Archive },
 ];
 
 export function SidebarNav() {

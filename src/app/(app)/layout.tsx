@@ -1,26 +1,12 @@
-import {
-  Sidebar,
-  SidebarProvider,
-  SidebarTrigger,
-} from '@/components/ui/sidebar';
-import { SidebarNav } from '@/components/sidebar-nav';
+import { TopNav } from '@/components/top-nav';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <SidebarProvider>
-      <div className="md:flex h-screen">
-        <Sidebar>
-          <SidebarNav />
-        </Sidebar>
-        <main className="flex-1 flex flex-col overflow-hidden min-w-0">
-          <div className="p-4 sm:p-6 lg:p-8 flex-1 flex flex-col has-[.whiteboard-page]:p-0">
-            <div className="md:hidden mb-4">
-              <SidebarTrigger />
-            </div>
-            {children}
-          </div>
-        </main>
-      </div>
-    </SidebarProvider>
+    <div className="min-h-screen flex flex-col bg-background font-sans text-foreground">
+      <TopNav />
+      <main className="flex-1 w-full max-w-[1400px] mx-auto p-8">
+        {children}
+      </main>
+    </div>
   );
 }
