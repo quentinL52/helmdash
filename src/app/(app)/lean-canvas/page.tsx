@@ -33,28 +33,30 @@ export default function LeanCanvasPage() {
   const sections = LEAN_CANVAS_SECTIONS;
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Lean Canvas</h1>
-        <p className="text-muted-foreground">
-          A 1-page business plan that helps you deconstruct your idea into its
-          key assumptions.
-        </p>
+    <div className="flex h-full flex-col">
+      <div className='space-y-4'>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Lean Canvas</h1>
+          <p className="text-muted-foreground">
+            A 1-page business plan that helps you deconstruct your idea into its
+            key assumptions.
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="business-concept">
+            Core Business Concept
+          </Label>
+          <Input
+            id="business-concept"
+            placeholder="e.g., An AI-powered platform for personal finance management"
+            value={businessConcept}
+            onChange={(e) => setBusinessConcept(e.target.value)}
+          />
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="business-concept">
-          Core Business Concept
-        </Label>
-        <Input
-          id="business-concept"
-          placeholder="e.g., An AI-powered platform for personal finance management"
-          value={businessConcept}
-          onChange={(e) => setBusinessConcept(e.target.value)}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-10 gap-6">
+      <div className="mt-8 grid flex-1 grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-10">
         <div className="lg:col-span-4 md:col-span-1 h-full">
           <CanvasSection
             {...sections[0]}
