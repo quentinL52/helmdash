@@ -56,7 +56,7 @@ export default function LeanCanvasPage() {
         </div>
       </div>
 
-      <div className="mt-8 grid flex-1 grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-10">
+      <div className="mt-8 grid flex-1 grid-cols-1 grid-rows-9 gap-6 md:grid-cols-2 md:grid-rows-5 lg:grid-cols-10 lg:grid-rows-4">
         <div className="lg:col-span-4 md:col-span-1 h-full">
           <CanvasSection
             {...sections[0]}
