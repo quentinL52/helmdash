@@ -13,6 +13,7 @@ export const translations = {
             content: "Contenu",
             crm: "CRM",
             journal: "Journal",
+            competitiveWatch: "Veille",
         },
         dashboard: {
             weeklyCoach: "Coach Hebdo",
@@ -35,6 +36,10 @@ export const translations = {
                 invalidated: "Invalidée",
                 pivoted: "Pivotée",
             },
+            tabs: {
+                board: "Tableau Kanban",
+                list: "Vue Liste"
+            },
             form: {
                 statement: "Énoncé de l'hypothèse",
                 category: "Catégorie",
@@ -42,7 +47,25 @@ export const translations = {
                 method: "Méthode de Test",
                 criteria: "Critères de Succès",
                 cancel: "Annuler",
-                submit: "Ajouter"
+                submit: "Ajouter",
+                save: "Enregistrer",
+                editTitle: "Modifier l'hypothèse",
+                newTitle: "Nouvelle Hypothèse",
+                editDesc: "Mettez à jour les détails de votre hypothèse.",
+                newDesc: "Formulez une hypothèse risquée à tester."
+            },
+            categories: {
+                problem: "Problème",
+                solution: "Solution",
+                channel: "Canal",
+                revenue: "Revenu",
+                segment: "Segment"
+            },
+            risks: {
+                critical: "Critique",
+                high: "Élevé",
+                medium: "Moyen",
+                low: "Faible"
             },
             list: {
                 status: "Statut",
@@ -162,6 +185,113 @@ export const translations = {
                 costStructure: { title: "Structure de Coûts", desc: "Coûts fixes et variables." },
                 revenueStreams: { title: "Sources de Revenus", desc: "Vos sources de revenus." }
             }
+        },
+        crm: {
+            title: "CRM Lite",
+            subtitle: "Gérez votre réseau et vos relations.",
+            addContact: "Ajouter Contact",
+            searchPlaceholder: "Rechercher des contacts...",
+            columns: {
+                name: "Nom",
+                roleCompany: "Rôle / Entreprise",
+                status: "Statut",
+                lastContact: "Dernier Contact",
+                actions: "Actions",
+            },
+            statuses: {
+                lead: "Prospect",
+                contacted: "Contacté",
+                negotiation: "Négociation",
+                customer: "Client",
+                partner: "Partenaire",
+                lost: "Perdu",
+            },
+            generateFollowUp: "Générer suivi IA",
+            noContacts: "Aucun contact trouvé.",
+            edit: "Modifier",
+            delete: "Supprimer",
+        },
+        journal: {
+            title: "Journal",
+            newEntry: "Nouvelle Entrée",
+            feelingToday: "Comment vous sentez-vous aujourd'hui ?",
+            moods: {
+                great: "Génial",
+                good: "Bien",
+                neutral: "Neutre",
+                bad: "Mauvais",
+                terrible: "Terrible",
+            },
+            journalEntry: "Entrée du journal",
+            placeholder: "Qu'est-ce qui s'est passé aujourd'hui ? Des victoires ? Des difficultés ?",
+            blockers: "Blocages / Frustrations (Optionnel)",
+            blockersPlaceholder: "Qu'est-ce qui vous empêche d'avancer ?",
+            tags: "Tags (séparés par des virgules)",
+            tagsPlaceholder: "produit, ventes, levée de fonds...",
+            saveEntry: "Enregistrer l'entrée",
+        },
+        content: {
+            title: "Pipeline de Contenu",
+            selectDate: "Sélectionnez une date pour voir ou programmer du contenu. Les jours avec du contenu sont soulignés.",
+            noContentScheduled: "Aucun contenu programmé.",
+        },
+        competitiveWatch: {
+            nav: "Veille Stratégique",
+            title: "Veille Stratégique",
+            subtitle: "Analysez votre environnement concurrentiel.",
+            addCompetitor: "Ajouter Concurrent",
+            searchPlaceholder: "Rechercher des concurrents...",
+            tabs: {
+                overview: "Vue d'ensemble",
+                radar: "Radar",
+                swot: "SWOT",
+                signals: "Signaux",
+            },
+            competitor: {
+                name: "Nom",
+                website: "Site web",
+                description: "Description",
+                strengths: "Forces",
+                weaknesses: "Faiblesses",
+                pricing: "Tarification",
+                positioning: "Positionnement",
+            },
+            radarAxes: {
+                price: "Prix",
+                features: "Fonctionnalités",
+                ux: "UX",
+                market: "Marché",
+                innovation: "Innovation",
+                support: "Support",
+            },
+            swot: {
+                strengths: "Forces",
+                weaknesses: "Faiblesses",
+                opportunities: "Opportunités",
+                threats: "Menaces",
+            },
+            signals: {
+                title: "Signaux de Marché",
+                addSignal: "Ajouter Signal",
+                date: "Date",
+                description: "Description",
+                source: "Source",
+                impact: {
+                    positive: "Positif",
+                    negative: "Négatif",
+                    neutral: "Neutre",
+                },
+            },
+            noCompetitors: "Aucun concurrent ajouté.",
+            noSignals: "Aucun signal de marché.",
+            selectCompetitor: "Sélectionnez un concurrent pour l'analyse SWOT.",
+        },
+        weeklyCoachReport: {
+            generating: "Génération en cours...",
+            reportReady: "Rapport hebdo prêt",
+            reportDescription: "Votre coach IA a généré votre stratégie hebdomadaire.",
+            generationFailed: "Échec de la génération",
+            failedDescription: "Impossible de générer le rapport hebdo. Réessayez.",
         }
     },
     en: {
@@ -178,6 +308,7 @@ export const translations = {
             content: "Content",
             crm: "CRM",
             journal: "Journal",
+            competitiveWatch: "Watch",
         },
         dashboard: {
             weeklyCoach: "Weekly Coach",
@@ -200,6 +331,10 @@ export const translations = {
                 invalidated: "Invalidated",
                 pivoted: "Pivoted",
             },
+            tabs: {
+                board: "Kanban Board",
+                list: "List View"
+            },
             form: {
                 statement: "Hypothesis Statement",
                 category: "Category",
@@ -207,7 +342,25 @@ export const translations = {
                 method: "Test Method",
                 criteria: "Success Criteria",
                 cancel: "Cancel",
-                submit: "Add Hypothesis"
+                submit: "Add Hypothesis",
+                save: "Save",
+                editTitle: "Edit Hypothesis",
+                newTitle: "New Hypothesis",
+                editDesc: "Update your hypothesis details.",
+                newDesc: "Formulate a risky assumption to test."
+            },
+            categories: {
+                problem: "Problem",
+                solution: "Solution",
+                channel: "Channel",
+                revenue: "Revenue",
+                segment: "Segment"
+            },
+            risks: {
+                critical: "Critical",
+                high: "High",
+                medium: "Medium",
+                low: "Low"
             },
             list: {
                 status: "Status",
@@ -269,6 +422,15 @@ export const translations = {
             status: "Status",
             date: "Date",
             view: "View",
+            days: {
+                mon: "Monday",
+                tue: "Tuesday",
+                wed: "Wednesday",
+                thu: "Thursday",
+                fri: "Friday",
+                sat: "Saturday",
+                sun: "Sunday"
+            },
         },
         roadmap: {
             title: "Roadmap",
@@ -318,6 +480,113 @@ export const translations = {
                 costStructure: { title: "Cost Structure", desc: "List your fixed and variable costs." },
                 revenueStreams: { title: "Revenue Streams", desc: "List your sources of revenue." }
             }
+        },
+        crm: {
+            title: "CRM Lite",
+            subtitle: "Manage your network and relationships.",
+            addContact: "Add Contact",
+            searchPlaceholder: "Search contacts...",
+            columns: {
+                name: "Name",
+                roleCompany: "Role / Company",
+                status: "Status",
+                lastContact: "Last Contact",
+                actions: "Actions",
+            },
+            statuses: {
+                lead: "Lead",
+                contacted: "Contacted",
+                negotiation: "Negotiation",
+                customer: "Customer",
+                partner: "Partner",
+                lost: "Lost",
+            },
+            generateFollowUp: "Generate AI Follow-up",
+            noContacts: "No contacts found.",
+            edit: "Edit",
+            delete: "Delete",
+        },
+        journal: {
+            title: "Journal",
+            newEntry: "New Entry",
+            feelingToday: "How are you feeling today?",
+            moods: {
+                great: "Great",
+                good: "Good",
+                neutral: "Neutral",
+                bad: "Bad",
+                terrible: "Terrible",
+            },
+            journalEntry: "Journal Entry",
+            placeholder: "What happened today? Any wins? Any struggles?",
+            blockers: "Blockers / Frustrations (Optional)",
+            blockersPlaceholder: "What's stopping you from moving forward?",
+            tags: "Tags (comma separated)",
+            tagsPlaceholder: "product, sales, fundraising...",
+            saveEntry: "Save Entry",
+        },
+        content: {
+            title: "Content Pipeline",
+            selectDate: "Select a date to view or schedule content. Days with content are underlined.",
+            noContentScheduled: "No content scheduled.",
+        },
+        competitiveWatch: {
+            nav: "Competitive Watch",
+            title: "Competitive Watch",
+            subtitle: "Analyze your competitive landscape.",
+            addCompetitor: "Add Competitor",
+            searchPlaceholder: "Search competitors...",
+            tabs: {
+                overview: "Overview",
+                radar: "Radar",
+                swot: "SWOT",
+                signals: "Signals",
+            },
+            competitor: {
+                name: "Name",
+                website: "Website",
+                description: "Description",
+                strengths: "Strengths",
+                weaknesses: "Weaknesses",
+                pricing: "Pricing",
+                positioning: "Positioning",
+            },
+            radarAxes: {
+                price: "Price",
+                features: "Features",
+                ux: "UX",
+                market: "Market",
+                innovation: "Innovation",
+                support: "Support",
+            },
+            swot: {
+                strengths: "Strengths",
+                weaknesses: "Weaknesses",
+                opportunities: "Opportunities",
+                threats: "Threats",
+            },
+            signals: {
+                title: "Market Signals",
+                addSignal: "Add Signal",
+                date: "Date",
+                description: "Description",
+                source: "Source",
+                impact: {
+                    positive: "Positive",
+                    negative: "Negative",
+                    neutral: "Neutral",
+                },
+            },
+            noCompetitors: "No competitors added.",
+            noSignals: "No market signals.",
+            selectCompetitor: "Select a competitor for SWOT analysis.",
+        },
+        weeklyCoachReport: {
+            generating: "Generating...",
+            reportReady: "Weekly Report Ready",
+            reportDescription: "Your AI coach has generated your weekly strategy.",
+            generationFailed: "Generation Failed",
+            failedDescription: "Could not generate weekly report. Please try again.",
         }
     }
 };

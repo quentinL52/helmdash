@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { useFounderStore, Hypothesis, HypothesisStatus } from '@/store/founder-store';
-import { HypothesisColumn } from './hypothesis-column';
+import { useState, useCallback, useMemo } from 'react';
+import { useFounderStore, Hypothesis, HypothesisStatus, HypothesisCategory, HypothesisRisk } from '@/store/founder-store';
+import { HypothesisCard } from './hypothesis-card';
 import { HypothesisDialog } from './create-hypothesis-dialog';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -32,9 +32,10 @@ const COLUMN_COLORS: Record<HypothesisStatus, string> = {
 }
 
 export function HypothesesBoard() {
-    const { hypotheses, addHypothesis, language } = useFounderStore();
+    const hypotheses = useFounderStore(s => s.hypotheses);
+    const addHypothesis = useFounderStore(s => s.addHypothesis);
+    const language = useFounderStore(s => s.language);
     const t = translations[language].hypotheses;
-    const common = translations[language].common;
 
     const [editingHypothesis, setEditingHypothesis] = useState<Hypothesis | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -47,26 +48,26 @@ export function HypothesesBoard() {
         successCriteria: ''
     });
 
-    const columns: { id: HypothesisStatus; title: string }[] = [
+    const columns: { id: HypothesisStatus; title: string }[] = useMemo(() => [
         { id: 'draft', title: t.columns.draft },
         { id: 'testing', title: t.columns.testing },
         { id: 'validated', title: t.columns.validated },
         { id: 'invalidated', title: t.columns.invalidated },
         { id: 'pivoted', title: t.columns.pivoted },
-    ];
+    ], [t]);
 
-    const handleEdit = (hypothesis: Hypothesis) => {
+    const handleEdit = useCallback((hypothesis: Hypothesis) => {
         setEditingHypothesis(hypothesis);
         setIsDialogOpen(true);
-    };
+    }, []);
 
-    const handleCreate = () => {
+    const handleCreate = useCallback(() => {
         if (!formData.statement) return;
 
         addHypothesis({
             statement: formData.statement,
-            category: formData.category as any,
-            riskLevel: formData.riskLevel as any,
+            category: formData.category as HypothesisCategory,
+            riskLevel: formData.riskLevel as HypothesisRisk,
             testMethod: formData.testMethod,
             successCriteria: formData.successCriteria,
             status: 'draft',
@@ -80,14 +81,14 @@ export function HypothesesBoard() {
             successCriteria: ''
         });
         setShowForm(false);
-    };
+    }, [formData, addHypothesis]);
 
-    const handleDialogOpenChange = (open: boolean) => {
+    const handleDialogOpenChange = useCallback((open: boolean) => {
         setIsDialogOpen(open);
         if (!open) {
             setTimeout(() => setEditingHypothesis(null), 300);
         }
-    };
+    }, []);
 
     const inputStyle = {
         background: COLORS.surface,
@@ -110,12 +111,12 @@ export function HypothesesBoard() {
                         {t.subtitle}
                     </p>
                 </div>
-                <div
+                <Button
                     onClick={() => setShowForm(!showForm)}
-                    className="inline-flex items-center gap-[6px] border-none rounded-[8px] cursor-pointer font-medium transition-all duration-200 text-[13px] px-[16px] py-[8px] bg-[#6c5ce7] text-white hover:opacity-85"
+                    className="bg-[#6c5ce7] hover:bg-[#5b4cc4] text-white"
                 >
-                    <Plus className="h-4 w-4" /> {t.new}
-                </div>
+                    <Plus className="h-4 w-4 mr-1" /> {t.new}
+                </Button>
             </div>
 
             {showForm && (
@@ -144,21 +145,21 @@ export function HypothesesBoard() {
                             value={formData.category}
                             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                         >
-                            <option value="problem">Problem</option>
-                            <option value="solution">Solution</option>
-                            <option value="channel">Channel</option>
-                            <option value="revenue">Revenue</option>
-                            <option value="segment">Segment</option>
+                            <option value="problem">{t.categories.problem}</option>
+                            <option value="solution">{t.categories.solution}</option>
+                            <option value="channel">{t.categories.channel}</option>
+                            <option value="revenue">{t.categories.revenue}</option>
+                            <option value="segment">{t.categories.segment}</option>
                         </select>
                         <select
                             style={inputStyle}
                             value={formData.riskLevel}
                             onChange={(e) => setFormData({ ...formData, riskLevel: e.target.value })}
                         >
-                            <option value="critical">Critical Risk</option>
-                            <option value="high">High Risk</option>
-                            <option value="medium">Medium Risk</option>
-                            <option value="low">Low Risk</option>
+                            <option value="critical">{t.risks.critical}</option>
+                            <option value="high">{t.risks.high}</option>
+                            <option value="medium">{t.risks.medium}</option>
+                            <option value="low">{t.risks.low}</option>
                         </select>
                         <input
                             style={inputStyle}
@@ -197,7 +198,7 @@ export function HypothesesBoard() {
                         <div
                             className="flex items-center gap-2 mb-3 px-3 py-2 border backdrop-blur-sm"
                             style={{
-                                borderRadius: '8px', // Explicit 8px for roadmap match
+                                borderRadius: '8px',
                                 backgroundColor: `${COLUMN_COLORS[col.id]}11`,
                                 borderColor: `${COLUMN_COLORS[col.id]}22`,
                             }}
@@ -215,10 +216,9 @@ export function HypothesesBoard() {
                             {hypotheses
                                 .filter((h) => h.status === col.id)
                                 .map((hypothesis) => (
-                                    <HypothesisColumn
+                                    <HypothesisCard
                                         key={hypothesis.id}
-                                        column={col}
-                                        hypotheses={[hypothesis]} // Passing single hypothesis to reuse structure if simpler, or refactor Column to be just wrapper
+                                        hypothesis={hypothesis}
                                         onEdit={handleEdit}
                                         color={COLUMN_COLORS[col.id]}
                                     />
@@ -229,7 +229,6 @@ export function HypothesesBoard() {
             </div>
 
             <HypothesisDialog
-                key={editingHypothesis?.id || 'new'} // Refresh dialog on ID change to avoid stale state
                 open={isDialogOpen}
                 onOpenChange={handleDialogOpenChange}
                 hypothesisToEdit={editingHypothesis}

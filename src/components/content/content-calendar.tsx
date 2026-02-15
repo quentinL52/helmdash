@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 export function ContentCalendar() {
-    const { contentIdeas } = useFounderStore();
+    const contentIdeas = useFounderStore(s => s.contentIdeas);
     const [date, setDate] = useState<Date | undefined>(new Date());
 
     // Get ideas for the selected date
@@ -26,10 +26,10 @@ export function ContentCalendar() {
     const hasContent = (d: Date) => getIdeasForDate(d).length > 0;
 
     return (
-        <div className="flex h-full gap-8 p-4">
-            {/* Calendar Section - Focused and Centered */}
-            <div className="flex-1 flex flex-col items-center">
-                <div className="bg-[#181a24] border border-[#282c3a] rounded-xl p-8 shadow-sm">
+        <div className="flex flex-col lg:flex-row h-full gap-8 p-4">
+            {/* Calendar Section */}
+            <div className="flex-1 flex flex-col items-start">
+                <div className="bg-[#181a24] border border-[#282c3a] rounded-xl p-8 shadow-sm w-full max-w-[560px] flex justify-center">
                     <Calendar
                         mode="single"
                         selected={date}
@@ -53,7 +53,7 @@ export function ContentCalendar() {
             </div>
 
             {/* Selected Date Details - Side Panel */}
-            <div className="w-[400px] bg-[#181a24]/50 rounded-xl border border-[#282c3a] flex flex-col overflow-hidden">
+            <div className="w-full lg:w-[450px] xl:w-[500px] shrink-0 bg-[#181a24]/50 rounded-xl border border-[#282c3a] flex flex-col overflow-hidden h-auto lg:min-h-[500px]">
                 <div className="p-6 border-b border-[#282c3a] bg-[#181a24]">
                     <h3 className="text-xl font-semibold text-[#e8e9ed]">
                         {date ? date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) : 'Select a date'}

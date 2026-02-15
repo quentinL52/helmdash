@@ -6,7 +6,7 @@ import { useFounderStore } from '@/store/founder-store';
 import { ArrowDown, ArrowUp, DollarSign, Wallet } from 'lucide-react';
 
 export function RunwayWidget() {
-    const { finance } = useFounderStore();
+    const finance = useFounderStore(s => s.finance);
 
     const metrics = useMemo(() => {
         // Simple calculation similar to chart

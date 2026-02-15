@@ -1,17 +1,29 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useFounderStore } from '@/store/founder-store';
-import { JournalEditor } from '@/components/journal/journal-editor';
-import { MoodHeatmap } from '@/components/journal/mood-heatmap';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Calendar, Smile, AlertCircle, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { CardSkeleton, ChartSkeleton } from '@/components/ui/loading-skeleton';
+
+// Lazy load heavy components
+const JournalEditor = dynamic(
+    () => import('@/components/journal/journal-editor').then(m => m.JournalEditor),
+    { loading: () => <CardSkeleton /> }
+);
+const MoodHeatmap = dynamic(
+    () => import('@/components/journal/mood-heatmap').then(m => m.MoodHeatmap),
+    { loading: () => <ChartSkeleton /> }
+);
 
 export default function JournalPage() {
-    const { journalEntries, addJournalEntry, deleteJournalEntry } = useFounderStore();
+    const journalEntries = useFounderStore(s => s.journalEntries);
+    const addJournalEntry = useFounderStore(s => s.addJournalEntry);
+    const deleteJournalEntry = useFounderStore(s => s.deleteJournalEntry);
 
     // Sort entries: Newest first
     const sortedEntries = [...journalEntries].sort((a, b) =>

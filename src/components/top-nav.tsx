@@ -21,10 +21,24 @@ import {
     Languages
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useUser, useClerk } from '@clerk/nextjs';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { LogOut } from 'lucide-react';
 
 export function TopNav() {
     const pathname = usePathname();
-    const { language, setLanguage } = useFounderStore();
+    const language = useFounderStore(s => s.language);
+    const setLanguage = useFounderStore(s => s.setLanguage);
+    const { user } = useUser();
+    const { signOut, openUserProfile } = useClerk();
     const t = translations[language].nav;
 
     const navItems = [
@@ -49,13 +63,41 @@ export function TopNav() {
     return (
         <header className="h-[50px] border-b border-border flex items-center px-4 bg-background/80 backdrop-blur-md sticky top-0 z-50 justify-between">
             <div className="flex items-center flex-1 overflow-hidden">
-                <div className="flex items-center gap-2 mr-4 shrink-0">
-                    <div className="w-6 h-6 rounded flex items-center justify-center font-bold text-sm text-white bg-gradient-to-br from-[#6c5ce7] to-[#4a3fb5]">
-                        E
-                    </div>
-                    <h1 className="text-sm font-bold tracking-tight text-foreground hidden md:block">
-                        Entrepreneurial OS
-                    </h1>
+                <div className="mr-4 shrink-0">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="flex items-center gap-2 px-2 hover:bg-muted/50">
+                                <Avatar className="h-6 w-6">
+                                    <AvatarImage src={user?.imageUrl} />
+                                    <AvatarFallback className="bg-[#6c5ce7] text-white text-xs">
+                                        {user?.firstName?.charAt(0) || user?.username?.charAt(0) || "U"}
+                                    </AvatarFallback>
+                                </Avatar>
+                                <span className="text-sm font-semibold hidden md:block">
+                                    {user?.username || user?.firstName || "FoundersOS"}
+                                </span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-56 bg-[#181a24] border-[#2a2d3d] text-white">
+                            <DropdownMenuLabel className="text-[#8b8fa3]">Mon compte</DropdownMenuLabel>
+                            <DropdownMenuSeparator className="bg-[#2a2d3d]" />
+                            <DropdownMenuItem
+                                className="cursor-pointer hover:bg-[#1f212e] focus:bg-[#1f212e]"
+                                onClick={() => openUserProfile()}
+                            >
+                                <Users className="mr-2 h-4 w-4" />
+                                <span>Gérer mon compte</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="bg-[#2a2d3d]" />
+                            <DropdownMenuItem
+                                className="cursor-pointer text-red-400 hover:text-red-300 hover:bg-[#1f212e] focus:bg-[#1f212e]"
+                                onClick={() => signOut({ redirectUrl: '/' })}
+                            >
+                                <LogOut className="mr-2 h-4 w-4" />
+                                <span>Se déconnecter</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
 
                 <nav className="flex items-center gap-0.5 overflow-x-auto no-scrollbar mask-linear-fade">

@@ -24,7 +24,8 @@ const COLORS = {
 };
 
 export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDialogProps) {
-    const { addContact, updateContact } = useFounderStore();
+    const addContact = useFounderStore(s => s.addContact);
+    const updateContact = useFounderStore(s => s.updateContact);
     const [isLoading, setIsLoading] = useState(false);
 
     const [formData, setFormData] = useState<Partial<Contact>>({

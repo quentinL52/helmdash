@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useFounderStore } from '@/store/founder-store';
 import { generateRoutineAnalysis } from '@/lib/ai-service';
 import { Area, AreaChart, Tooltip, ResponsiveContainer } from 'recharts';
+import { translations } from '@/lib/translations';
 import {
   Dialog,
   DialogContent,
@@ -106,15 +107,17 @@ const Card = ({ children, style, className = "" }: any) => (
 
 // --- ROUTINE PAGE ---
 export default function RoutinePage() {
-  const {
-    routine,
-    routineHistory,
-    toggleRoutineTask,
-    addRoutineTask,
-    updateRoutineTask,
-    deleteRoutineTask,
-    resetRoutineWeek
-  } = useFounderStore();
+  const routine = useFounderStore(s => s.routine);
+  const routineHistory = useFounderStore(s => s.routineHistory);
+  const toggleRoutineTask = useFounderStore(s => s.toggleRoutineTask);
+  const addRoutineTask = useFounderStore(s => s.addRoutineTask);
+  const updateRoutineTask = useFounderStore(s => s.updateRoutineTask);
+  const deleteRoutineTask = useFounderStore(s => s.deleteRoutineTask);
+  const resetRoutineWeek = useFounderStore(s => s.resetRoutineWeek);
+  const language = useFounderStore(s => s.language);
+
+  const t = translations[language].routine;
+  const common = translations[language].common;
 
   const [addingTo, setAddingTo] = useState<string | null>(null);
   const [newTask, setNewTask] = useState("");
@@ -167,7 +170,7 @@ export default function RoutinePage() {
   const handleAnalyzeRoutine = async () => {
     setAiLoading(true);
     setIsDialogOpen(true);
-    setAnalysis("Analyzing your routine patterns...");
+    setAnalysis(t.coach.analyzing);
     try {
       const result = await generateRoutineAnalysis(routine, routineHistory);
       setAnalysis(result);
@@ -207,9 +210,9 @@ export default function RoutinePage() {
       <div className="shrink-0 p-8 pb-0">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Routine Hebdo</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-[#e8e9ed]">{t.title}</h1>
             <p style={{ fontSize: "14px", color: COLORS.textMuted, marginTop: "4px" }}>
-              {doneTasks}/{totalTasks} tâches complétées cette semaine
+              {doneTasks}/{totalTasks} {t.completedText}
             </p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -217,20 +220,20 @@ export default function RoutinePage() {
               <DialogTrigger asChild>
                 <Button variant="ai" onClick={handleAnalyzeRoutine}>
                   <Icons.Sparkles />
-                  Analyze Routine
+                  {t.analyze}
                 </Button>
               </DialogTrigger>
               <DialogContent className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] max-w-2xl">
                 <DialogHeader>
-                  <DialogTitle>AI Routine Coach</DialogTitle>
+                  <DialogTitle>{t.coach.title}</DialogTitle>
                   <DialogDescription className="text-gray-400">
-                    Insights based on your routine structure and consistency history.
+                    {t.coach.desc}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="mt-4 whitespace-pre-wrap leading-relaxed text-sm text-gray-300">
                   {aiLoading ? (
                     <div className="flex items-center gap-2">
-                      <span className="animate-spin">⏳</span> Analyzing...
+                      <span className="animate-spin">⏳</span> {t.coach.analyzing}
                     </div>
                   ) : analysis}
                 </div>
@@ -247,7 +250,7 @@ export default function RoutinePage() {
             <span style={{ fontSize: "12px", color: progress === 100 ? COLORS.success : COLORS.textMuted, fontFamily: "'Space Mono', monospace" }}>
               {Math.round(progress)}%
             </span>
-            <Button size="sm" onClick={resetRoutineWeek}>Reset semaine</Button>
+            <Button size="sm" onClick={resetRoutineWeek}>{t.reset}</Button>
           </div>
         </div>
 
@@ -274,36 +277,44 @@ export default function RoutinePage() {
       </div>
 
       {/* Columns */}
-      <div className="flex-1 overflow-y-auto p-8 pt-4">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: "12px", paddingBottom: "32px" }}>
+      <div className="flex-1 overflow-y-auto px-8 pb-8">
+        <div className="grid grid-cols-5 gap-4 pb-8">
           {safeRoutine.map((day, dayIdx) => (
-            <Card key={day.id} style={{
-              borderTop: `3px solid ${dayColors[dayIdx % dayColors.length]}`, padding: "16px"
-            }}>
-              <h4 style={{
-                fontSize: "13px", fontWeight: 700, color: dayColors[dayIdx % dayColors.length],
-                fontFamily: "'Space Mono', monospace", marginBottom: "12px",
-                textTransform: "uppercase", letterSpacing: "0.04em",
-              }}>
-                {day.day}
-              </h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div key={day.id} className="flex flex-col gap-3">
+              {/* 1. Styled Header Frame */}
+              <div
+                className="p-3 text-center rounded-xl border"
+                style={{
+                  backgroundColor: `${dayColors[dayIdx % dayColors.length]}10`, // Very light opacity
+                  borderColor: `${dayColors[dayIdx % dayColors.length]}40`,
+                  // color: dayColors[dayIdx % dayColors.length]
+                }}
+              >
+                <h4 style={{
+                  fontSize: "14px", fontWeight: 700,
+                  color: dayColors[dayIdx % dayColors.length],
+                  fontFamily: "'Space Mono', monospace",
+                  textTransform: "uppercase", letterSpacing: "0.04em",
+                }}>
+                  {(common.days as any)[day.id] || day.day}
+                </h4>
+              </div>
+
+              {/* 2. Tasks Frame (Separate) */}
+              <div className="flex flex-col gap-2">
                 {day.tasks.map((task: any) => {
                   const isEditing = editingTask?.dayId === day.id && editingTask?.taskId === task.id;
 
                   return (
                     <div
                       key={task.id}
-                      className="group/task"
+                      className="group/task relative p-3 rounded-xl border bg-[#181a24] border-[#282c3a] hover:border-[#3f445a] transition-all"
                       style={{
-                        display: "flex", alignItems: "flex-start", gap: "8px",
-                        padding: "6px 8px", borderRadius: "6px",
-                        background: task.done ? `${COLORS.success}08` : "transparent",
-                        transition: "background 0.2s",
+                        opacity: task.done ? 0.6 : 1,
                       }}
                     >
                       {isEditing ? (
-                        <div style={{ display: "flex", flexDirection: "column", width: "100%", gap: "4px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", width: "100%", gap: "8px" }}>
                           <Input
                             value={editedTaskText}
                             onChange={(e: any) => setEditedTaskText(e.target.value)}
@@ -323,86 +334,82 @@ export default function RoutinePage() {
                           </div>
                         </div>
                       ) : (
-                        <>
+                        <div className="flex items-start gap-3">
                           <div
                             onClick={() => handleToggle(day.id, task.id)}
+                            className="mt-0.5 w-5 h-5 rounded-md border-2 border-[#282c3a] flex items-center justify-center cursor-pointer transition-colors"
                             style={{
-                              width: "18px", height: "18px", borderRadius: "4px", flexShrink: 0, marginTop: "1px",
-                              border: `2px solid ${task.done ? COLORS.success : COLORS.border}`,
-                              background: task.done ? COLORS.success : "transparent",
-                              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                              transition: "all 0.2s",
+                              borderColor: task.done ? COLORS.success : COLORS.border,
+                              backgroundColor: task.done ? COLORS.success : "transparent",
                             }}
                           >
                             {task.done && (
-                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round">
                                 <polyline points="20 6 9 17 4 12" />
                               </svg>
                             )}
                           </div>
-                          <span style={{
-                            fontSize: "12px", color: task.done ? COLORS.textDim : COLORS.text,
-                            textDecoration: task.done ? "line-through" : "none",
-                            lineHeight: 1.4, flex: 1, transition: "all 0.2s",
-                            cursor: "text"
-                          }}
+
+                          <span
+                            className="text-sm leading-snug flex-1 cursor-text"
+                            style={{
+                              color: task.done ? COLORS.textDim : COLORS.text,
+                              textDecoration: task.done ? "line-through" : "none",
+                            }}
                             onDoubleClick={() => startEditing(day.id, task.id, task.text)}
                           >
                             {task.text}
                           </span>
 
-                          <div className="opacity-0 group-hover/task:opacity-100 flex gap-1 transition-opacity duration-200">
+                          <div className="absolute right-2 top-2 opacity-0 group-hover/task:opacity-100 flex gap-1 transition-opacity bg-[#181a24]/80 backdrop-blur-sm rounded-md p-1">
                             <button
                               onClick={() => startEditing(day.id, task.id, task.text)}
-                              style={{ background: "none", border: "none", cursor: "pointer", color: COLORS.textMuted, padding: "0" }}
-                              title="Modifier"
+                              className="p-1 hover:text-white text-[#8b8fa3] transition-colors"
+                              title={common.edit}
                             >
                               <Icons.Edit />
                             </button>
                             <button
                               onClick={() => handleRemoveTask(day.id, task.id)}
-                              style={{ background: "none", border: "none", cursor: "pointer", color: COLORS.delete, padding: "0" }}
-                              title="Supprimer"
+                              className="p-1 hover:text-[#ff4d4f] text-[#8b8fa3] transition-colors"
+                              title={common.delete}
                             >
                               <Icons.Trash />
                             </button>
                           </div>
-                        </>
+                        </div>
                       )}
                     </div>
                   );
                 })}
+
+                {/* 3. Add Button Frame */}
+                {addingTo === day.id ? (
+                  <div className="p-3 rounded-xl border bg-[#181a24] border-[#282c3a]">
+                    <div style={{ display: "flex", gap: "6px" }}>
+                      <Input
+                        value={newTask}
+                        onChange={(e: any) => setNewTask(e.target.value)}
+                        placeholder={`${t.add}...`}
+                        onKeyDown={(e: any) => {
+                          if (e.key === "Enter") handleAddTask(day.id);
+                          if (e.key === "Escape") setAddingTo(null);
+                        }}
+                        autoFocus
+                      />
+                      <Button size="sm" variant="primary" onClick={() => handleAddTask(day.id)}>+</Button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => { setAddingTo(day.id); setNewTask(""); }}
+                    className="w-full py-3 rounded-xl border-2 border-dashed border-[#282c3a] text-[#5c6078] hover:border-[#6c5ce7] hover:text-[#6c5ce7] hover:bg-[#6c5ce7]/5 transition-all flex items-center justify-center gap-2 text-sm font-medium"
+                  >
+                    <span>+</span> {t.add}
+                  </button>
+                )}
               </div>
-              {addingTo === day.id ? (
-                <div style={{ display: "flex", gap: "6px", marginTop: "8px" }}>
-                  <Input
-                    value={newTask}
-                    onChange={(e: any) => setNewTask(e.target.value)}
-                    placeholder="Nouvelle tâche..."
-                    onKeyDown={(e: any) => {
-                      if (e.key === "Enter") handleAddTask(day.id);
-                      if (e.key === "Escape") setAddingTo(null);
-                    }}
-                    autoFocus
-                  />
-                  <Button size="sm" variant="primary" onClick={() => handleAddTask(day.id)}>+</Button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => { setAddingTo(day.id); setNewTask(""); }}
-                  style={{
-                    marginTop: "8px", background: "none", border: `1px dashed ${COLORS.border}`,
-                    borderRadius: "6px", padding: "6px", width: "100%", cursor: "pointer",
-                    color: COLORS.textDim, fontSize: "11px", fontFamily: "'DM Sans', sans-serif",
-                    transition: "all 0.2s",
-                  }}
-                  onMouseEnter={(e: any) => { e.target.style.borderColor = COLORS.accent; e.target.style.color = COLORS.accent; }}
-                  onMouseLeave={(e: any) => { e.target.style.borderColor = COLORS.border; e.target.style.color = COLORS.textDim; }}
-                >
-                  + Ajouter
-                </button>
-              )}
-            </Card>
+            </div>
           ))}
         </div>
       </div>

@@ -53,7 +53,8 @@ interface RunwayChartProps {
 }
 
 export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
-    const { finance, language } = useFounderStore();
+    const finance = useFounderStore(s => s.finance);
+    const language = useFounderStore(s => s.language);
     const t = translations[language]?.finance;
     const formT = translations[language]?.finance?.form;
     // const [timeframe, setTimeframe] = useState<Timeframe>('month'); // Removed internal state

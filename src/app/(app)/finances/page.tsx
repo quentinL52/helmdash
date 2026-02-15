@@ -1,15 +1,29 @@
 'use client';
 
 import { useState } from 'react';
-import { RunwayChart, Timeframe } from '@/components/finances/runway-chart';
-import { FinanceEntryForm } from '@/components/finances/finance-entry-form';
-import { FinanceTable } from '@/components/finances/finance-table';
+import dynamic from 'next/dynamic';
 import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
+import { ChartSkeleton, TableSkeleton, CardSkeleton } from '@/components/ui/loading-skeleton';
+import type { Timeframe } from '@/components/finances/runway-chart';
+
+// Lazy load heavy components (recharts, complex tables)
+const RunwayChart = dynamic(
+    () => import('@/components/finances/runway-chart').then(m => m.RunwayChart),
+    { loading: () => <ChartSkeleton /> }
+);
+const FinanceEntryForm = dynamic(
+    () => import('@/components/finances/finance-entry-form').then(m => m.FinanceEntryForm),
+    { loading: () => <CardSkeleton /> }
+);
+const FinanceTable = dynamic(
+    () => import('@/components/finances/finance-table').then(m => m.FinanceTable),
+    { loading: () => <TableSkeleton /> }
+);
 
 export default function FinancesPage() {
     const [timeframe, setTimeframe] = useState<Timeframe>('month');
-    const { language } = useFounderStore();
+    const language = useFounderStore(s => s.language);
     const t = translations[language].finance;
 
     return (

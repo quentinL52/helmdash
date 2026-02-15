@@ -32,7 +32,9 @@ const RISK_COLORS: Record<string, string> = {
 };
 
 export function HypothesesList() {
-    const { hypotheses, deleteHypothesis, language } = useFounderStore();
+    const hypotheses = useFounderStore(s => s.hypotheses);
+    const deleteHypothesis = useFounderStore(s => s.deleteHypothesis);
+    const language = useFounderStore(s => s.language);
     const t = translations[language].hypotheses.list;
     const [editingHypothesis, setEditingHypothesis] = useState<Hypothesis | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);

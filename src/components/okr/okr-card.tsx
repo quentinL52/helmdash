@@ -14,7 +14,11 @@ interface OkrCardProps {
 }
 
 export function OkrCard({ objective }: OkrCardProps) {
-    const { updateObjective, deleteObjective, addKeyResult, updateKeyResult, deleteKeyResult } = useFounderStore();
+    const updateObjective = useFounderStore(s => s.updateObjective);
+    const deleteObjective = useFounderStore(s => s.deleteObjective);
+    const addKeyResult = useFounderStore(s => s.addKeyResult);
+    const updateKeyResult = useFounderStore(s => s.updateKeyResult);
+    const deleteKeyResult = useFounderStore(s => s.deleteKeyResult);
     const [isExpanded, setIsExpanded] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [showAddKr, setShowAddKr] = useState(false);

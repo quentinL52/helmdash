@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Hypothesis, useFounderStore, HypothesisStatus } from '@/store/founder-store';
 import { formatDistanceToNow } from 'date-fns';
+import { translations } from '@/lib/translations';
 
 interface HypothesisCardProps {
     hypothesis: Hypothesis;
@@ -38,8 +40,12 @@ const COLORS = {
     green: "#00cec9"
 };
 
-export function HypothesisCard({ hypothesis, onEdit, color }: HypothesisCardProps) {
-    const { deleteHypothesis, updateHypothesis } = useFounderStore();
+export const HypothesisCard = memo(function HypothesisCard({ hypothesis, onEdit, color }: HypothesisCardProps) {
+    const deleteHypothesis = useFounderStore(s => s.deleteHypothesis);
+    const updateHypothesis = useFounderStore(s => s.updateHypothesis);
+    const language = useFounderStore(s => s.language);
+    const t = translations[language].hypotheses;
+    const common = translations[language].common;
 
     const riskColor = {
         low: COLORS.teal,
@@ -49,11 +55,11 @@ export function HypothesisCard({ hypothesis, onEdit, color }: HypothesisCardProp
     }[hypothesis.riskLevel];
 
     const statusOptions: { value: HypothesisStatus; label: string }[] = [
-        { value: 'draft', label: 'Draft' },
-        { value: 'testing', label: 'In Testing' },
-        { value: 'validated', label: 'Validated' },
-        { value: 'invalidated', label: 'Invalidated' },
-        { value: 'pivoted', label: 'Pivoted' },
+        { value: 'draft', label: t.columns.draft },
+        { value: 'testing', label: t.columns.testing },
+        { value: 'validated', label: t.columns.validated },
+        { value: 'invalidated', label: t.columns.invalidated },
+        { value: 'pivoted', label: t.columns.pivoted },
     ];
 
     return (
@@ -62,8 +68,6 @@ export function HypothesisCard({ hypothesis, onEdit, color }: HypothesisCardProp
             style={{
                 backgroundColor: COLORS.surface,
                 borderColor: COLORS.border,
-                borderLeftWidth: '3px',
-                borderLeftColor: color,
             }}
         >
             <CardContent className="p-3">
@@ -88,7 +92,7 @@ export function HypothesisCard({ hypothesis, onEdit, color }: HypothesisCardProp
                                 onEdit(hypothesis);
                             }} className="text-xs">
                                 <Edit className="mr-2 h-3 w-3" />
-                                Edit
+                                {common.edit}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 className="text-red-500 focus:text-red-500 text-xs"
@@ -98,7 +102,7 @@ export function HypothesisCard({ hypothesis, onEdit, color }: HypothesisCardProp
                                 }}
                             >
                                 <Trash2 className="mr-2 h-3 w-3" />
-                                Delete
+                                {common.delete}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -120,7 +124,7 @@ export function HypothesisCard({ hypothesis, onEdit, color }: HypothesisCardProp
                                 backgroundColor: `${riskColor}15`,
                             }}
                         >
-                            {hypothesis.riskLevel}
+                            {t.risks[hypothesis.riskLevel]}
                         </Badge>
                         <span className="text-[10px] text-[#5c6078] hidden sm:inline-block">
                             {formatDistanceToNow(new Date(hypothesis.updatedAt), { addSuffix: true })}
@@ -148,4 +152,4 @@ export function HypothesisCard({ hypothesis, onEdit, color }: HypothesisCardProp
             </CardContent>
         </Card>
     );
-}
+});

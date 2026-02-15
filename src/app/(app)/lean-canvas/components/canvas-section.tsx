@@ -18,6 +18,7 @@ interface CanvasSectionProps {
   content: string;
   onContentChange: (content: string) => void;
   businessConcept: string;
+  placeholder?: string;
 }
 
 export function CanvasSection({
@@ -27,6 +28,7 @@ export function CanvasSection({
   content,
   onContentChange,
   businessConcept,
+  placeholder,
 }: CanvasSectionProps) {
   const handleSelectSuggestion = (suggestion: string) => {
     onContentChange(content ? `${content}\n- ${suggestion}` : `- ${suggestion}`);
@@ -43,7 +45,7 @@ export function CanvasSection({
           value={content}
           onChange={(e) => onContentChange(e.target.value)}
           className="h-full min-h-[150px] resize-none"
-          placeholder={`Ideas for ${title}...`}
+          placeholder={placeholder || `Ideas for ${title}...`}
         />
       </CardContent>
       <AISuggestionModal

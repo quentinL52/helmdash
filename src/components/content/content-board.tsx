@@ -40,7 +40,10 @@ const COLUMNS: { id: ContentStatus; label: string; icon: any }[] = [
 ];
 
 export function ContentBoard() {
-    const { contentIdeas, addContentIdea, deleteContentIdea, updateContentIdea } = useFounderStore();
+    const contentIdeas = useFounderStore(s => s.contentIdeas);
+    const addContentIdea = useFounderStore(s => s.addContentIdea);
+    const deleteContentIdea = useFounderStore(s => s.deleteContentIdea);
+    const updateContentIdea = useFounderStore(s => s.updateContentIdea);
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({
         title: '',

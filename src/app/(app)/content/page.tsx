@@ -1,8 +1,18 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ContentBoard } from '@/components/content/content-board';
-import { ContentCalendar } from '@/components/content/content-calendar';
+import { BoardSkeleton, CardSkeleton } from '@/components/ui/loading-skeleton';
+
+// Lazy load heavy board and calendar components
+const ContentBoard = dynamic(
+    () => import('@/components/content/content-board').then(m => m.ContentBoard),
+    { loading: () => <BoardSkeleton /> }
+);
+const ContentCalendar = dynamic(
+    () => import('@/components/content/content-calendar').then(m => m.ContentCalendar),
+    { loading: () => <CardSkeleton /> }
+);
 
 export default function ContentPage() {
     return (

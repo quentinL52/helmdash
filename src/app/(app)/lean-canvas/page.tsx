@@ -5,6 +5,8 @@ import { LEAN_CANVAS_SECTIONS, type LeanCanvasSectionId } from '@/lib/constants'
 import { CanvasSection } from './components/canvas-section';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useFounderStore } from '@/store/founder-store';
+import { translations } from '@/lib/translations';
 
 type CanvasData = Record<LeanCanvasSectionId, string>;
 const initialCanvasData: CanvasData = LEAN_CANVAS_SECTIONS.reduce(
@@ -26,30 +28,67 @@ export default function LeanCanvasPage() {
     ''
   );
 
+  const language = useFounderStore(s => s.language);
+  const t = translations[language].leanCanvas;
+
   const handleContentChange = (id: LeanCanvasSectionId, content: string) => {
     setCanvasData((prev) => ({ ...prev, [id]: content }));
   };
 
   const sections = LEAN_CANVAS_SECTIONS;
 
+  const getSectionTranslation = (id: LeanCanvasSectionId) => {
+    switch (id) {
+      case 'Problem': return t.sections.problem;
+      case 'Solution': return t.sections.solution;
+      case 'Key Metrics': return t.sections.keyMetrics;
+      case 'Unique Value Proposition': return t.sections.uvp;
+      case 'Unfair Advantage': return t.sections.unfairAdvantage;
+      case 'Channels': return t.sections.channels;
+      case 'Customer Segments': return t.sections.customerSegments;
+      case 'Cost Structure': return t.sections.costStructure;
+      case 'Revenue Streams': return t.sections.revenueStreams;
+      default: return { title: id, desc: '' };
+    }
+  };
+
+  const renderSection = (sectionIndex: number, className: string) => {
+    const section = sections[sectionIndex];
+    const tr = getSectionTranslation(section.id);
+    return (
+      <div className={className}>
+        <CanvasSection
+          {...section}
+          title={tr.title}
+          description={tr.desc}
+          placeholder={`${language === 'fr' ? 'Idées pour' : 'Ideas for'} ${tr.title}...`}
+          content={canvasData[section.id]}
+          onContentChange={(content) =>
+            handleContentChange(section.id, content)
+          }
+          businessConcept={businessConcept}
+        />
+      </div>
+    );
+  };
+
   return (
     <div className="flex h-full flex-col">
       <div className='space-y-4'>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Lean Canvas</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
           <p className="text-muted-foreground">
-            A 1-page business plan that helps you deconstruct your idea into its
-            key assumptions.
+            {t.subtitle}
           </p>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="business-concept">
-            Core Business Concept
+            {t.concept}
           </Label>
           <Input
             id="business-concept"
-            placeholder="e.g., An AI-powered platform for personal finance management"
+            placeholder={t.conceptPlaceholder}
             value={businessConcept}
             onChange={(e) => setBusinessConcept(e.target.value)}
           />
@@ -57,99 +96,15 @@ export default function LeanCanvasPage() {
       </div>
 
       <div className="mt-8 grid flex-1 grid-cols-1 grid-rows-9 gap-6 md:grid-cols-2 md:grid-rows-5 lg:grid-cols-10 lg:grid-rows-4">
-        <div className="lg:col-span-4 md:col-span-1 h-full">
-          <CanvasSection
-            {...sections[0]}
-            content={canvasData[sections[0].id]}
-            onContentChange={(content) =>
-              handleContentChange(sections[0].id, content)
-            }
-            businessConcept={businessConcept}
-          />
-        </div>
-        <div className="lg:col-span-6 md:col-span-1 h-full">
-          <CanvasSection
-            {...sections[6]}
-            content={canvasData[sections[6].id]}
-            onContentChange={(content) =>
-              handleContentChange(sections[6].id, content)
-            }
-            businessConcept={businessConcept}
-          />
-        </div>
-
-        <div className="lg:col-span-4 md:col-span-1 h-full">
-          <CanvasSection
-            {...sections[1]}
-            content={canvasData[sections[1].id]}
-            onContentChange={(content) =>
-              handleContentChange(sections[1].id, content)
-            }
-            businessConcept={businessConcept}
-          />
-        </div>
-        <div className="lg:col-span-6 md:col-span-1 h-full">
-           <CanvasSection
-            {...sections[3]}
-            content={canvasData[sections[3].id]}
-            onContentChange={(content) =>
-              handleContentChange(sections[3].id, content)
-            }
-            businessConcept={businessConcept}
-          />
-        </div>
-
-        <div className="lg:col-span-4 md:col-span-1 h-full">
-          <CanvasSection
-            {...sections[5]}
-            content={canvasData[sections[5].id]}
-            onContentChange={(content) =>
-              handleContentChange(sections[5].id, content)
-            }
-            businessConcept={businessConcept}
-          />
-        </div>
-        <div className="lg:col-span-3 md:col-span-1 h-full">
-          <CanvasSection
-            {...sections[2]}
-            content={canvasData[sections[2].id]}
-            onContentChange={(content) =>
-              handleContentChange(sections[2].id, content)
-            }
-            businessConcept={businessConcept}
-          />
-        </div>
-        <div className="lg:col-span-3 md:col-span-2 h-full">
-          <CanvasSection
-            {...sections[4]}
-            content={canvasData[sections[4].id]}
-            onContentChange={(content) =>
-              handleContentChange(sections[4].id, content)
-            }
-            businessConcept={businessConcept}
-          />
-        </div>
-
-        <div className="lg:col-span-5 md:col-span-1 h-full">
-          <CanvasSection
-            {...sections[7]}
-            content={canvasData[sections[7].id]}
-            onContentChange={(content) =>
-              handleContentChange(sections[7].id, content)
-            }
-            businessConcept={businessConcept}
-          />
-        </div>
-        <div className="lg:col-span-5 md:col-span-1 h-full">
-          <CanvasSection
-            {...sections[8]}
-            content={canvasData[sections[8].id]}
-            onContentChange={(content) =>
-              handleContentChange(sections[8].id, content)
-            }
-            businessConcept={businessConcept}
-          />
-        </div>
+        {renderSection(0, "lg:col-span-4 md:col-span-1 h-full")}
+        {renderSection(6, "lg:col-span-6 md:col-span-1 h-full")}
+        {renderSection(1, "lg:col-span-4 md:col-span-1 h-full")}
+        {renderSection(3, "lg:col-span-6 md:col-span-1 h-full")}
+        {renderSection(5, "lg:col-span-4 md:col-span-1 h-full")}
+        {renderSection(2, "lg:col-span-3 md:col-span-1 h-full")}
+        {renderSection(4, "lg:col-span-3 md:col-span-2 h-full")}
+        {renderSection(7, "lg:col-span-5 md:col-span-1 h-full")}
+        {renderSection(8, "lg:col-span-5 md:col-span-1 h-full")}
       </div>
     </div>
   );

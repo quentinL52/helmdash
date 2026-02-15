@@ -92,7 +92,8 @@ const Select = ({ value, onChange, options, style }: any) => (
 );
 
 export default function OkrPage() {
-    const { objectives, addObjective } = useFounderStore();
+    const objectives = useFounderStore(s => s.objectives);
+    const addObjective = useFounderStore(s => s.addObjective);
     const [showForm, setShowForm] = useState(false);
     const [newTitle, setNewTitle] = useState('');
     const [newQuarter, setNewQuarter] = useState('Q1 2026');

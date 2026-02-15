@@ -6,7 +6,7 @@ import { useFounderStore } from '@/store/founder-store';
 import { Beaker, FlaskConical, CheckCircle2 } from 'lucide-react';
 
 export function HypothesesWidget() {
-    const { hypotheses } = useFounderStore();
+    const hypotheses = useFounderStore(s => s.hypotheses);
 
     const metrics = useMemo(() => {
         const testing = hypotheses.filter((h) => h.status === 'testing').length;

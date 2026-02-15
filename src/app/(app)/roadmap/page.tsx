@@ -13,6 +13,9 @@ const Icons = {
   Trash: () => (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
   ),
+  Edit: () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+  ),
 };
 
 // --- COLOR PALETTE ---
@@ -107,10 +110,11 @@ const Card = ({ children, style, className = "" }: any) => (
 // --- ROADMAP PAGE ---
 export default function RoadmapPage() {
   const [tasks, setTasks] = useLocalStorage<any[]>("roadmap", []);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", description: "", status: "todo", priority: "medium", week: "" });
 
-  const { language } = useFounderStore();
+  const language = useFounderStore(s => s.language);
   const t = translations[language].roadmap;
   const common = translations[language].common;
 
@@ -122,8 +126,27 @@ export default function RoadmapPage() {
 
   const add = () => {
     if (!form.title.trim()) return;
-    setTasks([...tasks, { ...form, id: Date.now() }]);
+
+    if (editingId) {
+      setTasks(tasks.map(t => t.id === editingId ? { ...t, ...form } : t));
+      setEditingId(null);
+    } else {
+      setTasks([...tasks, { ...form, id: Date.now() }]);
+    }
+
     setForm({ title: "", description: "", status: "todo", priority: "medium", week: "" });
+    setShowForm(false);
+  };
+
+  const edit = (task: any) => {
+    setForm(task);
+    setEditingId(task.id);
+    setShowForm(true);
+  };
+
+  const cancel = () => {
+    setForm({ title: "", description: "", status: "todo", priority: "medium", week: "" });
+    setEditingId(null);
     setShowForm(false);
   };
 
@@ -149,7 +172,7 @@ export default function RoadmapPage() {
       <style>{animationCSS}</style>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexShrink: 0 }}>
         <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
-        <Button variant="primary" onClick={() => setShowForm(!showForm)}>
+        <Button variant="primary" onClick={() => { setShowForm(!showForm); setEditingId(null); setForm({ title: "", description: "", status: "todo", priority: "medium", week: "" }); }}>
           <Icons.Plus /> {t.new}
         </Button>
       </div>
@@ -168,8 +191,8 @@ export default function RoadmapPage() {
               <option value="low">{t.priority.low}</option>
             </select>
             <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end" }}>
-              <Button onClick={() => setShowForm(false)}>{common.cancel}</Button>
-              <Button variant="primary" onClick={add}>{common.add}</Button>
+              <Button onClick={cancel}>{common.cancel}</Button>
+              <Button variant="primary" onClick={add}>{editingId ? common.save || 'Save' : common.add}</Button>
             </div>
           </div>
         </Card>
@@ -199,9 +222,14 @@ export default function RoadmapPage() {
                         <p style={{ fontSize: "13px", fontWeight: 600, color: COLORS.text }}>{task.title}</p>
                         {task.description && <p style={{ fontSize: "11px", color: COLORS.textMuted, marginTop: "4px", lineHeight: 1.4 }}>{task.description}</p>}
                       </div>
-                      <button onClick={() => remove(task.id)} style={{ background: "none", border: "none", cursor: "pointer", color: COLORS.textDim, padding: "2px", flexShrink: 0 }}>
-                        <Icons.Trash />
-                      </button>
+                      <div style={{ display: "flex", gap: "4px" }}>
+                        <button onClick={() => edit(task)} style={{ background: "none", border: "none", cursor: "pointer", color: COLORS.textDim, padding: "2px", flexShrink: 0 }}>
+                          <Icons.Edit />
+                        </button>
+                        <button onClick={() => remove(task.id)} style={{ background: "none", border: "none", cursor: "pointer", color: COLORS.textDim, padding: "2px", flexShrink: 0 }}>
+                          <Icons.Trash />
+                        </button>
+                      </div>
                     </div>
                     <div style={{ display: "flex", gap: "6px", alignItems: "center", marginTop: "8px", flexWrap: "wrap" }}>
                       <Badge color={priorityColors[task.priority]}>{priorityLabels[task.priority]}</Badge>

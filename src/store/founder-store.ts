@@ -153,6 +153,59 @@ export interface RoutineHistory {
     completionRate: number; // 0-1
 }
 
+// Module 14: Competitive Watch
+export interface CompetitorRadarScores {
+    price: number; // 1-10
+    features: number; // 1-10
+    ux: number; // 1-10
+    market: number; // 1-10
+    innovation: number; // 1-10
+    support: number; // 1-10
+}
+
+export interface CompetitorSWOT {
+    strengths: string;
+    weaknesses: string;
+    opportunities: string;
+    threats: string;
+}
+
+export interface Competitor {
+    id: string;
+    name: string;
+    website?: string;
+    description?: string;
+    strengths?: string;
+    weaknesses?: string;
+    pricing?: string;
+    positioning?: string;
+    radarScores: CompetitorRadarScores;
+    swot: CompetitorSWOT;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export type MarketSignalImpact = 'positive' | 'negative' | 'neutral';
+
+export interface MarketSignal {
+    id: string;
+    date: string;
+    title: string;
+    description?: string;
+    source?: string;
+    impact: MarketSignalImpact;
+    createdAt: string;
+}
+
+// Module 13: Weekly AI Coach
+export interface WeeklyReport {
+    id: string;
+    date: string; // ISO Date of generation (Monday)
+    content: string; // Markdown
+    status: 'pending' | 'generated' | 'failed';
+    createdAt: string; // ISO String
+}
+
 export interface FounderStore {
     // --- State ---
     hypotheses: Hypothesis[];
@@ -164,6 +217,9 @@ export interface FounderStore {
     routine: RoutineDay[]; // Module 12
     routineHistory: RoutineHistory[]; // Module 12 - Routine Optimization
     leanCanvas: Record<string, string>;
+    weeklyReport: WeeklyReport | null; // Module 13
+    competitors: Competitor[]; // Module 14
+    marketSignals: MarketSignal[]; // Module 14
 
     // --- Actions ---
 
@@ -210,12 +266,23 @@ export interface FounderStore {
     deleteRoutineTask: (dayId: string, taskId: string) => void;
     resetRoutineWeek: () => void;
 
+    // Weekly Coach
+    setWeeklyReport: (report: WeeklyReport | null) => void;
+
+    // Competitive Watch
+    addCompetitor: (competitor: Omit<Competitor, 'id' | 'createdAt' | 'updatedAt'>) => void;
+    updateCompetitor: (id: string, updates: Partial<Competitor>) => void;
+    deleteCompetitor: (id: string) => void;
+    addMarketSignal: (signal: Omit<MarketSignal, 'id' | 'createdAt'>) => void;
+    deleteMarketSignal: (id: string) => void;
+
     // Canvas
     updateCanvasSection: (sectionId: string, content: string) => void;
 
     // --- Settings / i18n ---
     language: 'fr' | 'en';
     setLanguage: (lang: 'fr' | 'en') => void;
+    hydrate: (state: Partial<FounderStore>) => void;
 }
 
 // Helper to calc progress
@@ -282,6 +349,9 @@ export const useFounderStore = create<FounderStore>()(
             ],
             routineHistory: [],
             leanCanvas: {},
+            weeklyReport: null,
+            competitors: [],
+            marketSignals: [],
 
             // Actions
             addHypothesis: (hypothesis) => set((state) => ({
@@ -553,6 +623,46 @@ export const useFounderStore = create<FounderStore>()(
             })),
 
 
+            // Competitive Watch Actions
+            addCompetitor: (competitor) => set((state) => ({
+                competitors: [
+                    ...state.competitors,
+                    {
+                        ...competitor,
+                        id: crypto.randomUUID(),
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                    },
+                ],
+            })),
+
+            updateCompetitor: (id, updates) => set((state) => ({
+                competitors: state.competitors.map((c) =>
+                    c.id === id
+                        ? { ...c, ...updates, updatedAt: new Date().toISOString() }
+                        : c
+                ),
+            })),
+
+            deleteCompetitor: (id) => set((state) => ({
+                competitors: state.competitors.filter((c) => c.id !== id),
+            })),
+
+            addMarketSignal: (signal) => set((state) => ({
+                marketSignals: [
+                    ...state.marketSignals,
+                    {
+                        ...signal,
+                        id: crypto.randomUUID(),
+                        createdAt: new Date().toISOString(),
+                    },
+                ],
+            })),
+
+            deleteMarketSignal: (id) => set((state) => ({
+                marketSignals: state.marketSignals.filter((s) => s.id !== id),
+            })),
+
             updateCanvasSection: (sectionId, content) => set((state) => ({
                 leanCanvas: {
                     ...state.leanCanvas,
@@ -656,6 +766,14 @@ export const useFounderStore = create<FounderStore>()(
                     ...day,
                     tasks: day.tasks.map(t => ({ ...t, done: false }))
                 }))
+            })),
+
+            setWeeklyReport: (report) => set({ weeklyReport: report }),
+
+            hydrate: (newState) => set((state) => ({
+                ...state,
+                ...newState,
+                // Ensure deep merge if necessary, but top-level replacement is fine for now as we sync whole store
             })),
         }),
         {

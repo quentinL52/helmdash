@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { useFounderStore, Contact } from '@/store/founder-store';
+import { useState, useMemo, useCallback } from 'react';
+import { useFounderStore, Contact, ContactStatus } from '@/store/founder-store';
 import { ContactDialog } from '@/components/crm/contact-dialog';
-import { Input } from '@/components/ui/input';
+import { generateFollowUp } from '@/lib/ai-service';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import {
     Table,
@@ -13,87 +14,81 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Plus, Search, MoreHorizontal, Mail, Linkedin, ExternalLink, RefreshCw } from 'lucide-react';
-import { generateFollowUp } from '@/lib/ai-service';
+} from '@/components/ui/dropdown-menu';
+import { Plus, Search, Mail, Linkedin, RefreshCw, MoreHorizontal } from 'lucide-react';
+import { translations } from '@/lib/translations';
 
-const COLORS = {
-    accent: '#6c5ce7',
-    surface: '#181a24',
-    border: '#282c3a',
-    text: '#e8e9ed',
-    muted: '#8b8fa3'
-};
-
-const STATUS_COLORS: Record<string, string> = {
-    lead: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-    contacted: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
-    negotiation: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
-    customer: 'bg-green-500/10 text-green-500 border-green-500/20',
-    partner: 'bg-purple-500/10 text-purple-500 border-purple-500/20',
-    lost: 'bg-red-500/10 text-red-500 border-red-500/20',
+const STATUS_COLORS: Record<ContactStatus, string> = {
+    lead: 'border-blue-500/50 text-blue-400',
+    contacted: 'border-yellow-500/50 text-yellow-400',
+    negotiation: 'border-orange-500/50 text-orange-400',
+    customer: 'border-green-500/50 text-green-400',
+    partner: 'border-purple-500/50 text-purple-400',
+    lost: 'border-red-500/50 text-red-400',
 };
 
 export default function CRMPage() {
-    const { contacts, deleteContact } = useFounderStore();
+    const contacts = useFounderStore(s => s.contacts);
+    const deleteContact = useFounderStore(s => s.deleteContact);
+    const language = useFounderStore(s => s.language);
+    const t = (translations[language] as any).crm || {};
+    const common = translations[language].common;
+
     const [searchTerm, setSearchTerm] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
     const [aiLoading, setAiLoading] = useState(false);
-    const [aiSuggestedAction, setAiSuggestedAction] = useState<string | null>(null);
 
-    const filteredContacts = contacts.filter(c =>
+    const filteredContacts = useMemo(() => contacts.filter(c =>
         c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         c.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         c.role?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    ), [contacts, searchTerm]);
 
-    const handleEdit = (contact: Contact) => {
+    const handleEdit = useCallback((contact: Contact) => {
         setSelectedContact(contact);
         setIsDialogOpen(true);
-    };
+    }, []);
 
-    const handleNew = () => {
+    const handleNew = useCallback(() => {
         setSelectedContact(null);
         setIsDialogOpen(true);
-    };
+    }, []);
 
-    // AI Follow-up Logic
-    const handleGenerateFollowUp = async (contact: Contact) => {
+    const handleGenerateFollowUp = useCallback(async (contact: Contact) => {
         setAiLoading(true);
         try {
             const response = await generateFollowUp(contact);
             alert(response);
         } catch (e) {
             console.error(e);
-            alert("Failed to generate AI draft.");
+            alert(language === 'fr' ? "Échec de la génération IA." : "Failed to generate AI draft.");
         } finally {
             setAiLoading(false);
         }
-    };
-
+    }, [language]);
 
     return (
         <div className="h-full flex flex-col p-8 max-w-7xl mx-auto space-y-8">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-[#e8e9ed]">CRM Lite</h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-[#e8e9ed]">{t.title || 'CRM Lite'}</h1>
                     <p className="text-[#8b8fa3]">
-                        Manage your network and relationships.
+                        {t.subtitle || 'Manage your network and relationships.'}
                     </p>
                 </div>
                 <Button
                     onClick={handleNew}
                     className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white"
                 >
-                    <Plus className="mr-2 h-4 w-4" /> Add Contact
+                    <Plus className="mr-2 h-4 w-4" /> {t.addContact || 'Add Contact'}
                 </Button>
             </div>
 
@@ -102,13 +97,12 @@ export default function CRMPage() {
                 <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b8fa3]" />
                     <Input
-                        placeholder="Search contacts..."
+                        placeholder={t.searchPlaceholder || "Search contacts..."}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-9 bg-[#181a24] border-[#282c3a] text-[#e8e9ed] focus:ring-[#6c5ce7]"
                     />
                 </div>
-                {/* Additional filters can go here */}
             </div>
 
             {/* Content */}
@@ -116,18 +110,18 @@ export default function CRMPage() {
                 <Table>
                     <TableHeader className="bg-[#181a24]">
                         <TableRow className="border-[#282c3a] hover:bg-[#181a24]">
-                            <TableHead className="text-[#8b8fa3]">Name</TableHead>
-                            <TableHead className="text-[#8b8fa3]">Role & Company</TableHead>
-                            <TableHead className="text-[#8b8fa3]">Status</TableHead>
-                            <TableHead className="text-[#8b8fa3]">Last Contact</TableHead>
-                            <TableHead className="text-right text-[#8b8fa3]">Actions</TableHead>
+                            <TableHead className="text-[#8b8fa3]">{t.columns?.name || 'Name'}</TableHead>
+                            <TableHead className="text-[#8b8fa3]">{t.columns?.roleCompany || 'Role & Company'}</TableHead>
+                            <TableHead className="text-[#8b8fa3]">{t.columns?.status || common.status}</TableHead>
+                            <TableHead className="text-[#8b8fa3]">{t.columns?.lastContact || 'Last Contact'}</TableHead>
+                            <TableHead className="text-right text-[#8b8fa3]">{t.columns?.actions || 'Actions'}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {filteredContacts.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={5} className="h-24 text-center text-[#8b8fa3]">
-                                    No contacts found.
+                                    {t.noContacts || 'No contacts found.'}
                                 </TableCell>
                             </TableRow>
                         ) : (
@@ -151,11 +145,11 @@ export default function CRMPage() {
                                     </TableCell>
                                     <TableCell>
                                         <Badge variant="outline" className={`capitalize font-medium border ${STATUS_COLORS[contact.status] || 'border-[#282c3a]'}`}>
-                                            {contact.status}
+                                            {t.statuses?.[contact.status] || contact.status}
                                         </Badge>
                                     </TableCell>
                                     <TableCell className="text-[#8b8fa3] text-sm">
-                                        {new Date(contact.lastContactDate).toLocaleDateString()}
+                                        {new Date(contact.lastContactDate).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US')}
                                     </TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -173,7 +167,7 @@ export default function CRMPage() {
                                                 className="h-8 w-8 text-[#8b8fa3] hover:text-[#6c5ce7]"
                                                 onClick={() => handleGenerateFollowUp(contact)}
                                                 disabled={aiLoading}
-                                                title="Generate AI Follow-up"
+                                                title={t.generateFollowUp || "Generate AI Follow-up"}
                                             >
                                                 <RefreshCw className={`h-4 w-4 ${aiLoading ? 'animate-spin' : ''}`} />
                                             </Button>
@@ -185,8 +179,12 @@ export default function CRMPage() {
                                                     </Button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
-                                                    <DropdownMenuItem onClick={() => handleEdit(contact)} className="hover:bg-[#282c3a]">Edit</DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => deleteContact(contact.id)} className="text-red-400 hover:bg-red-500/10 hover:text-red-400">Delete</DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => handleEdit(contact)} className="hover:bg-[#282c3a]">
+                                                        {common.edit}
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => deleteContact(contact.id)} className="text-red-400 hover:bg-red-500/10 hover:text-red-400">
+                                                        {common.delete}
+                                                    </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>

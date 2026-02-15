@@ -65,7 +65,10 @@ interface FinanceTableProps {
 }
 
 export function FinanceTable({ timeframe }: FinanceTableProps) {
-    const { finance, deleteFinancialEntry, updateFinancialEntry, language } = useFounderStore();
+    const finance = useFounderStore(s => s.finance);
+    const deleteFinancialEntry = useFounderStore(s => s.deleteFinancialEntry);
+    const updateFinancialEntry = useFounderStore(s => s.updateFinancialEntry);
+    const language = useFounderStore(s => s.language);
     const t = translations[language].finance.table;
     const common = translations[language].common;
     const formT = translations[language].finance.form;

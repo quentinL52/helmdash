@@ -58,7 +58,7 @@ interface CreateContentDialogProps {
 }
 
 export function CreateContentDialog({ trigger }: CreateContentDialogProps) {
-    const { addContentIdea } = useFounderStore();
+    const addContentIdea = useFounderStore(s => s.addContentIdea);
     const [open, setOpen] = useState(false);
 
     const form = useForm<z.infer<typeof formSchema>>({

@@ -1,11 +1,14 @@
-import { TopNav } from '@/components/top-nav';
+import { AppSidebar } from '@/components/app-sidebar';
+import { StoreReadyGate } from '@/components/store-ready-gate';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans text-foreground">
-      <TopNav />
-      <main className="flex-1 w-full max-w-[1400px] mx-auto p-8">
-        {children}
+      <AppSidebar />
+      <main className="flex-1 w-full max-w-[1600px] mx-auto p-8">
+        <StoreReadyGate>
+          {children}
+        </StoreReadyGate>
       </main>
     </div>
   );

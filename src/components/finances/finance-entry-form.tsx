@@ -45,7 +45,11 @@ const expenseSchema = z.object({
 });
 
 export function FinanceEntryForm() {
-    const { finance, updateCashAvailable, addMonthlyEntry, updateMonthlyEntry, language } = useFounderStore();
+    const finance = useFounderStore(s => s.finance);
+    const updateCashAvailable = useFounderStore(s => s.updateCashAvailable);
+    const addMonthlyEntry = useFounderStore(s => s.addMonthlyEntry);
+    const updateMonthlyEntry = useFounderStore(s => s.updateMonthlyEntry);
+    const language = useFounderStore(s => s.language);
     const t = translations[language].finance.form;
     const [cashInput, setCashInput] = useState(finance.cashAvailable.toString());
 
@@ -63,15 +67,15 @@ export function FinanceEntryForm() {
             amount: 0,
             category: 'other',
             type: 'expense',
-            date: new Date().toISOString().split('T')[0], // Default to today
+            date: format(new Date(), 'yyyy-MM-dd'), // Default to today (local time)
         },
     });
 
     const onSubmit = (values: z.infer<typeof expenseSchema>) => {
-        const dateObj = new Date(values.date);
-        const month = dateObj.getMonth() + 1;
-        const year = dateObj.getFullYear();
-        const currentMonthKey = `${year}-${month.toString().padStart(2, '0')}`;
+        // Parse date string directly to avoid timezone issues
+        const [year, monthStr] = values.date.split('-');
+        const month = parseInt(monthStr, 10);
+        const currentMonthKey = `${year}-${monthStr}`;
 
         // Check if entry exists for this month
         const existingEntry = finance.monthlyEntries.find(e => e.month === currentMonthKey);

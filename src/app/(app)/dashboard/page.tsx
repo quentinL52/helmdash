@@ -1,15 +1,28 @@
 'use client';
 
-import { WeeklyCoachWidget } from '@/components/dashboard/weekly-coach-widget';
-import { RunwayWidget } from '@/components/dashboard/runway-widget';
-import { HypothesesWidget } from '@/components/dashboard/hypotheses-widget';
+import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, Target } from 'lucide-react';
 import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
+import { CardSkeleton } from '@/components/ui/loading-skeleton';
+
+// Lazy load heavy widgets (recharts, AI, etc.)
+const WeeklyCoachWidget = dynamic(
+    () => import('@/components/dashboard/weekly-coach-widget').then(m => m.WeeklyCoachWidget),
+    { loading: () => <CardSkeleton /> }
+);
+const RunwayWidget = dynamic(
+    () => import('@/components/dashboard/runway-widget').then(m => m.RunwayWidget),
+    { loading: () => <CardSkeleton /> }
+);
+const HypothesesWidget = dynamic(
+    () => import('@/components/dashboard/hypotheses-widget').then(m => m.HypothesesWidget),
+    { loading: () => <CardSkeleton /> }
+);
 
 export default function DashboardPage() {
-    const { language } = useFounderStore();
+    const language = useFounderStore(s => s.language);
     const t = translations[language].dashboard;
 
     return (

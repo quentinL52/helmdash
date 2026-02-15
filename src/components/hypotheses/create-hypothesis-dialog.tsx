@@ -33,6 +33,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { useFounderStore, HypothesisCategory, HypothesisRisk, Hypothesis } from '@/store/founder-store';
+import { translations } from '@/lib/translations';
 
 const COLORS = {
     bg: "#0f1117",
@@ -71,7 +72,10 @@ export function HypothesisDialog({
     trigger
 }: HypothesisDialogProps) {
     const [internalOpen, setInternalOpen] = useState(false);
-    const { addHypothesis, updateHypothesis } = useFounderStore();
+    const addHypothesis = useFounderStore(s => s.addHypothesis);
+    const updateHypothesis = useFounderStore(s => s.updateHypothesis);
+    const language = useFounderStore(s => s.language);
+    const t = translations[language].hypotheses;
 
     const isControlled = controlledOpen !== undefined;
     const open = isControlled ? controlledOpen : internalOpen;
@@ -162,9 +166,9 @@ export function HypothesisDialog({
                 }}
             >
                 <DialogHeader>
-                    <DialogTitle style={{ color: COLORS.text, fontFamily: "'DM Sans', sans-serif" }}>{isEditing ? 'Edit Hypothesis' : 'New Hypothesis'}</DialogTitle>
+                    <DialogTitle style={{ color: COLORS.text, fontFamily: "'DM Sans', sans-serif" }}>{isEditing ? t.form.editTitle : t.form.newTitle}</DialogTitle>
                     <DialogDescription style={{ color: COLORS.textMuted, fontFamily: "'DM Sans', sans-serif" }}>
-                        {isEditing ? 'Update your hypothesis details.' : 'Formulate a risky assumption to test.'}
+                        {isEditing ? t.form.editDesc : t.form.newDesc}
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -174,7 +178,7 @@ export function HypothesisDialog({
                             name="statement"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel style={labelStyle}>Statement</FormLabel>
+                                    <FormLabel style={labelStyle}>{t.form.statement}</FormLabel>
                                     <FormControl>
                                         <Textarea
                                             placeholder="We believe that..."
@@ -193,7 +197,7 @@ export function HypothesisDialog({
                                 name="category"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel style={labelStyle}>Category</FormLabel>
+                                        <FormLabel style={labelStyle}>{t.form.category}</FormLabel>
                                         <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
                                                 <SelectTrigger style={inputStyle} className="focus:ring-0 focus:border-[#6c5ce7]">
@@ -201,11 +205,11 @@ export function HypothesisDialog({
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent style={{ backgroundColor: COLORS.bg, borderColor: COLORS.border, color: COLORS.text }}>
-                                                <SelectItem value="problem">Problem</SelectItem>
-                                                <SelectItem value="solution">Solution</SelectItem>
-                                                <SelectItem value="channel">Channel</SelectItem>
-                                                <SelectItem value="revenue">Revenue</SelectItem>
-                                                <SelectItem value="segment">Segment</SelectItem>
+                                                <SelectItem value="problem">{t.categories.problem}</SelectItem>
+                                                <SelectItem value="solution">{t.categories.solution}</SelectItem>
+                                                <SelectItem value="channel">{t.categories.channel}</SelectItem>
+                                                <SelectItem value="revenue">{t.categories.revenue}</SelectItem>
+                                                <SelectItem value="segment">{t.categories.segment}</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -217,7 +221,7 @@ export function HypothesisDialog({
                                 name="riskLevel"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel style={labelStyle}>Risk Level</FormLabel>
+                                        <FormLabel style={labelStyle}>{t.form.risk}</FormLabel>
                                         <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
                                                 <SelectTrigger style={inputStyle} className="focus:ring-0 focus:border-[#6c5ce7]">
@@ -225,10 +229,10 @@ export function HypothesisDialog({
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent style={{ backgroundColor: COLORS.bg, borderColor: COLORS.border, color: COLORS.text }}>
-                                                <SelectItem value="critical">Critical</SelectItem>
-                                                <SelectItem value="high">High</SelectItem>
-                                                <SelectItem value="medium">Medium</SelectItem>
-                                                <SelectItem value="low">Low</SelectItem>
+                                                <SelectItem value="critical">{t.risks.critical}</SelectItem>
+                                                <SelectItem value="high">{t.risks.high}</SelectItem>
+                                                <SelectItem value="medium">{t.risks.medium}</SelectItem>
+                                                <SelectItem value="low">{t.risks.low}</SelectItem>
                                             </SelectContent>
                                         </Select>
                                         <FormMessage />
@@ -241,7 +245,7 @@ export function HypothesisDialog({
                             name="testMethod"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel style={labelStyle}>Test Method</FormLabel>
+                                    <FormLabel style={labelStyle}>{t.form.method}</FormLabel>
                                     <FormControl>
                                         <Input
                                             placeholder="Landing page, Interview..."
@@ -259,7 +263,7 @@ export function HypothesisDialog({
                             name="successCriteria"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel style={labelStyle}>Success Criteria</FormLabel>
+                                    <FormLabel style={labelStyle}>{t.form.criteria}</FormLabel>
                                     <FormControl>
                                         <Input
                                             placeholder="e.g. Conversion rate > 5%"
@@ -287,7 +291,7 @@ export function HypothesisDialog({
                                 }}
                                 className="hover:opacity-85"
                             >
-                                {isEditing ? 'Save' : 'Add'}
+                                {isEditing ? t.form.save : t.form.submit}
                             </Button>
                         </DialogFooter>
                     </form>
