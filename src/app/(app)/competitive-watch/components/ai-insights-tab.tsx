@@ -297,8 +297,8 @@ export function AiInsightsTab() {
                                 <div className="flex items-center gap-2 mb-2">
                                     <span className="text-sm font-medium text-[#e8e9ed]">{update.competitorName}</span>
                                     <Badge variant="outline" className={`text-xs ${update.suggestedMomentum === 'rising' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
-                                            update.suggestedMomentum === 'declining' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
-                                                'bg-gray-500/20 text-gray-400 border-gray-500/30'
+                                        update.suggestedMomentum === 'declining' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
+                                            'bg-gray-500/20 text-gray-400 border-gray-500/30'
                                         }`}>
                                         {t.momentum?.[update.suggestedMomentum] || update.suggestedMomentum}
                                     </Badge>
@@ -460,14 +460,14 @@ export function AiInsightsTab() {
                                     <span className="text-[#8b8fa3] text-sm w-24 shrink-0">{t.radarAxes[axis]}</span>
                                     <Slider
                                         min={1} max={10} step={1}
-                                        value={[mySolution.radarScores[axis]]}
+                                        value={[mySolution.radarScores?.[axis] ?? 5]}
                                         onValueChange={(val) => updateMySolution({
-                                            radarScores: { ...mySolution.radarScores, [axis]: val[0] }
+                                            radarScores: { ...(mySolution.radarScores || {}), [axis]: val[0] }
                                         })}
                                         className="flex-1"
                                     />
                                     <span className="text-[#e8e9ed] text-sm w-6 text-right font-mono">
-                                        {mySolution.radarScores[axis]}
+                                        {mySolution.radarScores?.[axis] ?? 5}
                                     </span>
                                 </div>
                             ))}

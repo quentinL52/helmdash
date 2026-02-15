@@ -13,6 +13,7 @@ import {
 import { HealthScoreGauge } from './health-score-gauge';
 import { AlertFeed } from './alert-feed';
 import { CompetitorDialog } from './competitor-dialog';
+import { toast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -42,7 +43,11 @@ import {
     ExternalLink,
 } from 'lucide-react';
 
-export function IntelligenceDashboardTab() {
+interface IntelligenceDashboardTabProps {
+    onTabChange?: (tab: string) => void;
+}
+
+export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardTabProps) {
     // --- Store selectors ---
     const competitors = useFounderStore(s => s.competitors);
     const mySolution = useFounderStore(s => s.mySolution);
@@ -110,6 +115,12 @@ export function IntelligenceDashboardTab() {
                 radarScores: { ...competitor.radarScores },
                 overallThreatLevel: competitor.threatLevel ?? 0,
             });
+        });
+        toast({
+            title: language === 'fr' ? 'Snapshot enregistré' : 'Snapshot saved',
+            description: language === 'fr'
+                ? 'Les positions actuelles ont été sauvegardées dans l\'historique.'
+                : 'Current positions have been saved to history.',
         });
     };
 
@@ -212,14 +223,12 @@ export function IntelligenceDashboardTab() {
                     <CardContent className="flex flex-col items-center justify-center pt-6 pb-4 gap-2">
                         <div className="flex items-center gap-2">
                             <Shield
-                                className={`h-6 w-6 ${
-                                    activeThreatsCount > 0 ? 'text-red-400' : 'text-[#8b8fa3]'
-                                }`}
+                                className={`h-6 w-6 ${activeThreatsCount > 0 ? 'text-red-400' : 'text-[#8b8fa3]'
+                                    }`}
                             />
                             <span
-                                className={`text-3xl font-bold ${
-                                    activeThreatsCount > 0 ? 'text-red-400' : 'text-[#e8e9ed]'
-                                }`}
+                                className={`text-3xl font-bold ${activeThreatsCount > 0 ? 'text-red-400' : 'text-[#e8e9ed]'
+                                    }`}
                             >
                                 {activeThreatsCount}
                             </span>
@@ -305,6 +314,7 @@ export function IntelligenceDashboardTab() {
                         <CardContent className="flex flex-col gap-3">
                             <Button
                                 className="w-full bg-gradient-to-r from-[#6c5ce7] to-[#a29bfe] text-white hover:opacity-90 transition-opacity"
+                                onClick={() => onTabChange?.('ai-strategy')}
                             >
                                 <Brain className="mr-2 h-4 w-4" />
                                 {t.intelligence.runAnalysis}
@@ -312,6 +322,7 @@ export function IntelligenceDashboardTab() {
                             <Button
                                 variant="outline"
                                 className="w-full border-[#2b2d36] text-[#e8e9ed] hover:bg-[#2b2d36]/50"
+                                onClick={() => onTabChange?.('signals')}
                             >
                                 <Scan className="mr-2 h-4 w-4" />
                                 {t.intelligence.scanNews}
@@ -327,6 +338,7 @@ export function IntelligenceDashboardTab() {
                             <Button
                                 variant="outline"
                                 className="w-full border-[#2b2d36] text-[#e8e9ed] hover:bg-[#2b2d36]/50"
+                                onClick={() => onTabChange?.('ai-strategy')}
                             >
                                 <Eye className="mr-2 h-4 w-4" />
                                 {t.intelligence.viewScenarios}

@@ -236,8 +236,8 @@ export function PositioningMapTab() {
                                     renderNode(
                                         c.id,
                                         c.name,
-                                        c.radarScores[xAxis] ?? 5,
-                                        c.radarScores[yAxis] ?? 5,
+                                        c.radarScores?.[xAxis] ?? 5,
+                                        c.radarScores?.[yAxis] ?? 5,
                                         ['#00cec9', '#fd79a8', '#fdcb6e', '#e17055', '#0984e3'][i % 5]
                                     )
                                 ))}

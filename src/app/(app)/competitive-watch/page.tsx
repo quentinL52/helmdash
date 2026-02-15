@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,6 +16,7 @@ import { AiInsightsTab } from './components/ai-insights-tab';
 export default function CompetitiveWatchPage() {
     const language = useFounderStore(s => s.language);
     const t = (translations[language] as any).competitiveWatch;
+    const [activeTab, setActiveTab] = useState('dashboard');
 
     return (
         <div className="h-full flex flex-col p-8 max-w-7xl mx-auto space-y-6">
@@ -22,7 +25,7 @@ export default function CompetitiveWatchPage() {
                 <p className="text-[#8b8fa3]">{t.subtitle}</p>
             </div>
 
-            <Tabs defaultValue="dashboard" className="flex-1 flex flex-col">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
                 <TabsList className="grid w-full max-w-[900px] grid-cols-6 bg-[#181a24] text-[#8b8fa3] mb-6">
                     <TabsTrigger
                         value="dashboard"
@@ -69,7 +72,7 @@ export default function CompetitiveWatchPage() {
                 </TabsList>
 
                 <TabsContent value="dashboard" className="flex-1 mt-0">
-                    <IntelligenceDashboardTab />
+                    <IntelligenceDashboardTab onTabChange={setActiveTab} />
                 </TabsContent>
                 <TabsContent value="analysis" className="flex-1 mt-0">
                     <AnalysisTab />
