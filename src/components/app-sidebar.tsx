@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useFounderStore } from '@/store/founder-store';
@@ -105,7 +106,14 @@ export function AppSidebar() {
                 {/* Logo */}
                 <div className="p-4 border-b border-[#282c3a]">
                     <div className="flex items-center gap-3 px-2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-[#6c5ce7] to-[#a29bfe] rounded-lg shrink-0" />
+                        <div className="relative w-8 h-8 shrink-0">
+                            <Image
+                                src="/logo.png"
+                                alt="FounderOS Logo"
+                                fill
+                                className="object-contain"
+                            />
+                        </div>
                         <span className="text-base font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
                             FounderOS
                         </span>
