@@ -109,8 +109,23 @@ export function FeatureMatrixTab() {
     const [heatmapMode, setHeatmapMode] = useState(false);
 
     const handleAddFeature = () => {
-        if (!newFeature.trim()) return;
-        addComparisonCriterion(newFeature.trim());
+        const trimmed = newFeature.trim();
+        if (!trimmed) return;
+
+        // 1. Find canonical name if it exists (case-insensitive)
+        const canonicalName = allFeatures.find(f => f.toLowerCase() === trimmed.toLowerCase()) || trimmed;
+
+        // 2. Add to list (if not present)
+        addComparisonCriterion(canonicalName);
+
+        // 3. Mark as "Yes" for My Solution
+        updateMySolution({
+            featureAnalysis: {
+                ...mySolution.featureAnalysis,
+                [canonicalName]: 'yes'
+            }
+        });
+
         setNewFeature('');
     };
 
