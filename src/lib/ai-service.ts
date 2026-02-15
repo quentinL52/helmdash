@@ -96,3 +96,68 @@ export async function generateStrategicRecommendations(data: {
 
     return response.json();
 }
+
+/**
+ * Generates comprehensive competitive intelligence analysis.
+ */
+export async function generateCompetitiveIntelligence(data: {
+    mySolution: any;
+    competitors: any[];
+    marketSignals: any[];
+    leanCanvas: any;
+    roadmap: any;
+    hypotheses: any[];
+    financeSummary?: any;
+    previousIntelligence?: any;
+    language: string;
+}) {
+    const response = await fetch('/api/ai/competitive-intelligence', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to generate competitive intelligence');
+    }
+
+    return response.json();
+}
+
+/**
+ * Scans the web for market signals about competitors.
+ */
+export async function scanMarketSignals(data: {
+    competitors: { id: string; name: string }[];
+    existingSignalTitles: string[];
+    language: string;
+}) {
+    const response = await fetch('/api/ai/market-scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to scan market signals');
+    }
+
+    return response.json();
+}
+
+/**
+ * Auto-fills competitor data from a URL.
+ */
+export async function autoFillCompetitorFromUrl(url: string, language: string) {
+    const response = await fetch('/api/ai/competitor-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url, language }),
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to extract competitor profile');
+    }
+
+    return response.json();
+}

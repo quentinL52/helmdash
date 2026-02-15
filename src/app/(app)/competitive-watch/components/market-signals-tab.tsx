@@ -1,26 +1,141 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useFounderStore, MarketSignalImpact } from '@/store/founder-store';
+import { useFounderStore, MarketSignalImpact, MarketSignalCategory, MarketSignalUrgency } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
+import { scanMarketSignals } from '@/lib/ai-service';
+import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Signal, TrendingUp, TrendingDown, Minus, Trash2 } from 'lucide-react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
+    Plus,
+    Signal,
+    TrendingUp,
+    TrendingDown,
+    Minus,
+    Trash2,
+    Search,
+    Loader2,
+    ExternalLink,
+    Filter,
+    BarChart3,
+    Sparkles,
+} from 'lucide-react';
 import { SignalDialog } from './signal-dialog';
 
 export function MarketSignalsTab() {
     const marketSignals = useFounderStore(s => s.marketSignals);
+    const competitors = useFounderStore(s => s.competitors);
+    const addMarketSignal = useFounderStore(s => s.addMarketSignal);
     const deleteMarketSignal = useFounderStore(s => s.deleteMarketSignal);
     const language = useFounderStore(s => s.language);
     const t = (translations[language] as any).competitiveWatch;
 
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isScanning, setIsScanning] = useState(false);
+    const [showFilters, setShowFilters] = useState(false);
 
-    const sortedSignals = useMemo(
-        () => [...marketSignals].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
-        [marketSignals]
-    );
+    // Filters
+    const [filterCategory, setFilterCategory] = useState<string>('all');
+    const [filterImpact, setFilterImpact] = useState<string>('all');
+    const [filterUrgency, setFilterUrgency] = useState<string>('all');
+    const [filterCompetitor, setFilterCompetitor] = useState<string>('all');
+
+    const filteredSignals = useMemo(() => {
+        let signals = [...marketSignals];
+
+        if (filterCategory !== 'all') signals = signals.filter(s => s.category === filterCategory);
+        if (filterImpact !== 'all') signals = signals.filter(s => s.impact === filterImpact);
+        if (filterUrgency !== 'all') signals = signals.filter(s => s.urgency === filterUrgency);
+        if (filterCompetitor !== 'all') signals = signals.filter(s => s.competitorId === filterCompetitor);
+
+        return signals.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }, [marketSignals, filterCategory, filterImpact, filterUrgency, filterCompetitor]);
+
+    // Stats
+    const stats = useMemo(() => {
+        const total = marketSignals.length;
+        const positive = marketSignals.filter(s => s.impact === 'positive').length;
+        const negative = marketSignals.filter(s => s.impact === 'negative').length;
+        const critical = marketSignals.filter(s => s.urgency === 'critical' || s.urgency === 'high').length;
+        const thisWeek = marketSignals.filter(s => {
+            const d = new Date(s.date);
+            const now = new Date();
+            const diffDays = (now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24);
+            return diffDays <= 7;
+        }).length;
+        return { total, positive, negative, critical, thisWeek };
+    }, [marketSignals]);
+
+    const handleScan = async () => {
+        if (competitors.length === 0) {
+            toast({
+                title: language === 'fr' ? 'Aucun concurrent' : 'No competitors',
+                description: language === 'fr'
+                    ? 'Ajoutez des concurrents pour scanner les actualités.'
+                    : 'Add competitors to scan news.',
+                variant: 'destructive',
+            });
+            return;
+        }
+        setIsScanning(true);
+        try {
+            const result = await scanMarketSignals({
+                competitors: competitors.map(c => ({ id: c.id, name: c.name })),
+                existingSignalTitles: marketSignals.map(s => s.title),
+                language,
+            });
+
+            if (result.signals?.length > 0) {
+                result.signals.forEach((signal: any) => {
+                    addMarketSignal({
+                        title: signal.title,
+                        date: signal.date || new Date().toISOString().split('T')[0],
+                        description: signal.description,
+                        source: signal.source,
+                        sourceUrl: signal.sourceUrl,
+                        impact: signal.impact || 'neutral',
+                        category: signal.category,
+                        urgency: signal.urgency,
+                        competitorId: signal.competitorId,
+                        isAutoGenerated: true,
+                        aiSummary: signal.aiSummary,
+                    });
+                });
+                toast({
+                    title: language === 'fr' ? 'Scan terminé' : 'Scan complete',
+                    description: language === 'fr'
+                        ? `${result.signals.length} nouveaux signaux détectés.`
+                        : `${result.signals.length} new signals detected.`,
+                });
+            } else {
+                toast({
+                    title: language === 'fr' ? 'Aucun nouveau signal' : 'No new signals',
+                    description: language === 'fr'
+                        ? 'Aucune actualité récente détectée pour vos concurrents.'
+                        : 'No recent news detected for your competitors.',
+                });
+            }
+        } catch {
+            toast({
+                title: language === 'fr' ? 'Erreur' : 'Error',
+                description: language === 'fr'
+                    ? 'Impossible de scanner les actualités.'
+                    : 'Could not scan market news.',
+                variant: 'destructive',
+            });
+        } finally {
+            setIsScanning(false);
+        }
+    };
 
     const impactConfig: Record<MarketSignalImpact, { color: string; icon: React.ReactNode; label: string }> = {
         positive: {
@@ -40,6 +155,18 @@ export function MarketSignalsTab() {
         },
     };
 
+    const urgencyColors: Record<string, string> = {
+        critical: 'bg-red-500/20 text-red-400 border-red-500/30',
+        high: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+        medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+        low: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+    };
+
+    const getCompetitorName = (id?: string) => {
+        if (!id) return null;
+        return competitors.find(c => c.id === id)?.name;
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -47,53 +174,204 @@ export function MarketSignalsTab() {
                     <h2 className="text-xl font-semibold text-[#e8e9ed]">{t.signals.title}</h2>
                     <p className="text-[#8b8fa3] text-sm">
                         {language === 'fr'
-                            ? 'Suivez les signaux importants de votre marche.'
+                            ? 'Suivez les signaux importants de votre marché.'
                             : 'Track important signals from your market.'}
                     </p>
                 </div>
-                <Button onClick={() => setIsDialogOpen(true)} className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white">
-                    <Plus className="mr-2 h-4 w-4" /> {t.signals.addSignal}
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleScan}
+                        disabled={isScanning}
+                        className="border-[#6c5ce7]/30 text-[#a29bfe] hover:bg-[#6c5ce7]/10"
+                    >
+                        {isScanning ? (
+                            <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> {language === 'fr' ? 'Scan...' : 'Scanning...'}</>
+                        ) : (
+                            <><Search className="h-4 w-4 mr-1" /> {language === 'fr' ? 'Scanner Actualités' : 'Scan News'}</>
+                        )}
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowFilters(!showFilters)}
+                        className={`border-[#282c3a] ${showFilters ? 'bg-[#282c3a] text-[#e8e9ed]' : 'text-[#8b8fa3] hover:text-[#e8e9ed]'}`}
+                    >
+                        <Filter className="h-4 w-4 mr-1" />
+                        {language === 'fr' ? 'Filtres' : 'Filters'}
+                    </Button>
+                    <Button onClick={() => setIsDialogOpen(true)} className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white">
+                        <Plus className="mr-1 h-4 w-4" /> {t.signals.addSignal}
+                    </Button>
+                </div>
             </div>
 
-            {sortedSignals.length === 0 ? (
+            {/* Stats Summary */}
+            <div className="grid grid-cols-5 gap-3">
+                <Card className="bg-[#181a24] border-[#282c3a]">
+                    <CardContent className="p-3 text-center">
+                        <p className="text-2xl font-bold text-[#e8e9ed]">{stats.total}</p>
+                        <p className="text-xs text-[#8b8fa3]">{language === 'fr' ? 'Total' : 'Total'}</p>
+                    </CardContent>
+                </Card>
+                <Card className="bg-[#181a24] border-[#282c3a]">
+                    <CardContent className="p-3 text-center">
+                        <p className="text-2xl font-bold text-green-400">{stats.positive}</p>
+                        <p className="text-xs text-[#8b8fa3]">{t.signals.impact.positive}</p>
+                    </CardContent>
+                </Card>
+                <Card className="bg-[#181a24] border-[#282c3a]">
+                    <CardContent className="p-3 text-center">
+                        <p className="text-2xl font-bold text-red-400">{stats.negative}</p>
+                        <p className="text-xs text-[#8b8fa3]">{t.signals.impact.negative}</p>
+                    </CardContent>
+                </Card>
+                <Card className="bg-[#181a24] border-[#282c3a]">
+                    <CardContent className="p-3 text-center">
+                        <p className="text-2xl font-bold text-orange-400">{stats.critical}</p>
+                        <p className="text-xs text-[#8b8fa3]">{language === 'fr' ? 'Urgents' : 'Urgent'}</p>
+                    </CardContent>
+                </Card>
+                <Card className="bg-[#181a24] border-[#282c3a]">
+                    <CardContent className="p-3 text-center">
+                        <p className="text-2xl font-bold text-[#6c5ce7]">{stats.thisWeek}</p>
+                        <p className="text-xs text-[#8b8fa3]">{language === 'fr' ? 'Cette semaine' : 'This week'}</p>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Filters */}
+            {showFilters && (
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-[#181a24] border border-[#282c3a]">
+                    <Select value={filterCategory} onValueChange={setFilterCategory}>
+                        <SelectTrigger className="w-[160px] bg-[#0f1117] border-[#282c3a] text-[#e8e9ed] text-sm">
+                            <SelectValue placeholder={language === 'fr' ? 'Catégorie' : 'Category'} />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+                            <SelectItem value="all" className="hover:bg-[#282c3a]">{language === 'fr' ? 'Toutes' : 'All'}</SelectItem>
+                            {(['funding', 'product_launch', 'pricing_change', 'partnership', 'hiring', 'acquisition', 'market_entry', 'regulation', 'technology', 'leadership', 'other'] as MarketSignalCategory[]).map(cat => (
+                                <SelectItem key={cat} value={cat} className="hover:bg-[#282c3a]">
+                                    {t.signals.categories?.[cat] || cat}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Select value={filterImpact} onValueChange={setFilterImpact}>
+                        <SelectTrigger className="w-[130px] bg-[#0f1117] border-[#282c3a] text-[#e8e9ed] text-sm">
+                            <SelectValue placeholder="Impact" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+                            <SelectItem value="all" className="hover:bg-[#282c3a]">{language === 'fr' ? 'Tous' : 'All'}</SelectItem>
+                            <SelectItem value="positive" className="hover:bg-[#282c3a]">{t.signals.impact.positive}</SelectItem>
+                            <SelectItem value="negative" className="hover:bg-[#282c3a]">{t.signals.impact.negative}</SelectItem>
+                            <SelectItem value="neutral" className="hover:bg-[#282c3a]">{t.signals.impact.neutral}</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Select value={filterUrgency} onValueChange={setFilterUrgency}>
+                        <SelectTrigger className="w-[130px] bg-[#0f1117] border-[#282c3a] text-[#e8e9ed] text-sm">
+                            <SelectValue placeholder={language === 'fr' ? 'Urgence' : 'Urgency'} />
+                        </SelectTrigger>
+                        <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+                            <SelectItem value="all" className="hover:bg-[#282c3a]">{language === 'fr' ? 'Toutes' : 'All'}</SelectItem>
+                            {(['critical', 'high', 'medium', 'low'] as MarketSignalUrgency[]).map(u => (
+                                <SelectItem key={u} value={u} className="hover:bg-[#282c3a]">
+                                    {t.signals.urgency?.[u] || u}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    {competitors.length > 0 && (
+                        <Select value={filterCompetitor} onValueChange={setFilterCompetitor}>
+                            <SelectTrigger className="w-[160px] bg-[#0f1117] border-[#282c3a] text-[#e8e9ed] text-sm">
+                                <SelectValue placeholder={language === 'fr' ? 'Concurrent' : 'Competitor'} />
+                            </SelectTrigger>
+                            <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+                                <SelectItem value="all" className="hover:bg-[#282c3a]">{language === 'fr' ? 'Tous' : 'All'}</SelectItem>
+                                {competitors.map(c => (
+                                    <SelectItem key={c.id} value={c.id} className="hover:bg-[#282c3a]">{c.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    )}
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => { setFilterCategory('all'); setFilterImpact('all'); setFilterUrgency('all'); setFilterCompetitor('all'); }}
+                        className="text-[#8b8fa3] hover:text-[#e8e9ed] ml-auto"
+                    >
+                        {language === 'fr' ? 'Réinitialiser' : 'Reset'}
+                    </Button>
+                </div>
+            )}
+
+            {filteredSignals.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-[300px] text-[#8b8fa3] space-y-2">
                     <Signal className="h-12 w-12 opacity-40" />
-                    <p>{t.noSignals}</p>
+                    <p>{marketSignals.length === 0 ? t.noSignals : (language === 'fr' ? 'Aucun signal ne correspond aux filtres.' : 'No signals match the filters.')}</p>
                 </div>
             ) : (
                 <div className="space-y-3">
-                    {sortedSignals.map((signal) => {
+                    {filteredSignals.map((signal) => {
                         const config = impactConfig[signal.impact];
+                        const competitorName = getCompetitorName(signal.competitorId);
                         return (
                             <Card key={signal.id} className="bg-[#181a24] border-[#282c3a] hover:border-[#3a3f52] transition-colors">
                                 <CardContent className="p-4">
                                     <div className="flex items-start justify-between gap-4">
                                         <div className="flex items-start gap-3 flex-1 min-w-0">
-                                            {/* Impact indicator */}
                                             <div className={`mt-1 p-1.5 rounded-md border ${config.color}`}>
                                                 {config.icon}
                                             </div>
                                             <div className="flex-1 min-w-0 space-y-1">
                                                 <div className="flex items-center gap-2 flex-wrap">
                                                     <h3 className="text-[#e8e9ed] font-medium">{signal.title}</h3>
-                                                    <Badge
-                                                        variant="outline"
-                                                        className={`text-xs border ${config.color}`}
-                                                    >
+                                                    <Badge variant="outline" className={`text-xs border ${config.color}`}>
                                                         {config.label}
                                                     </Badge>
+                                                    {signal.urgency && (
+                                                        <Badge variant="outline" className={`text-xs ${urgencyColors[signal.urgency] || ''}`}>
+                                                            {t.signals.urgency?.[signal.urgency] || signal.urgency}
+                                                        </Badge>
+                                                    )}
+                                                    {signal.category && signal.category !== 'other' && (
+                                                        <Badge variant="outline" className="text-xs bg-[#282c3a]/50 text-[#8b8fa3] border-[#282c3a]">
+                                                            {t.signals.categories?.[signal.category] || signal.category}
+                                                        </Badge>
+                                                    )}
+                                                    {signal.isAutoGenerated && (
+                                                        <Sparkles className="h-3 w-3 text-[#6c5ce7]" />
+                                                    )}
                                                 </div>
                                                 {signal.description && (
                                                     <p className="text-[#8b8fa3] text-sm">{signal.description}</p>
                                                 )}
+                                                {signal.aiSummary && (
+                                                    <p className="text-[#a29bfe] text-xs italic border-l-2 border-[#6c5ce7]/30 pl-2">{signal.aiSummary}</p>
+                                                )}
                                                 <div className="flex items-center gap-3 text-xs text-[#8b8fa3]">
                                                     <span>{new Date(signal.date).toLocaleDateString()}</span>
+                                                    {competitorName && (
+                                                        <>
+                                                            <span className="text-[#282c3a]">|</span>
+                                                            <span className="text-[#6c5ce7]">{competitorName}</span>
+                                                        </>
+                                                    )}
                                                     {signal.source && (
                                                         <>
                                                             <span className="text-[#282c3a]">|</span>
                                                             <span>{signal.source}</span>
                                                         </>
+                                                    )}
+                                                    {signal.sourceUrl && (
+                                                        <a
+                                                            href={signal.sourceUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-[#6c5ce7] hover:text-[#a29bfe] flex items-center gap-0.5"
+                                                        >
+                                                            <ExternalLink className="h-3 w-3" />
+                                                        </a>
                                                     )}
                                                 </div>
                                             </div>

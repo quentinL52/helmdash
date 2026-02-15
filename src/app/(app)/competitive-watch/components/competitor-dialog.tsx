@@ -23,7 +23,8 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Sparkles, Loader2 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 const DEFAULT_RADAR_SCORES: CompetitorRadarScores = {
     price: 5,
@@ -78,6 +79,54 @@ export function CompetitorDialog({
     const [yearFounded, setYearFounded] = useState('');
     const [geography, setGeography] = useState('');
     const [showAdvanced, setShowAdvanced] = useState(false);
+    const [isAutoFilling, setIsAutoFilling] = useState(false);
+
+    const handleAutoFill = async () => {
+        if (!website.trim()) return;
+        setIsAutoFilling(true);
+        try {
+            const response = await fetch('/api/ai/competitor-profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: website.trim(), language }),
+            });
+            if (!response.ok) throw new Error('Failed');
+            const profile = await response.json();
+
+            if (profile.name && !name.trim()) setName(profile.name);
+            if (profile.description) setDescription(profile.description);
+            if (profile.strengths) setStrengths(profile.strengths);
+            if (profile.weaknesses) setWeaknesses(profile.weaknesses);
+            if (profile.pricing) setPricing(profile.pricing);
+            if (profile.positioning) setPositioning(profile.positioning);
+            if (profile.targetSegment) setTargetSegment(profile.targetSegment);
+            if (profile.businessModel) setBusinessModel(profile.businessModel);
+            if (profile.teamSize) setTeamSize(profile.teamSize);
+            if (profile.fundingStage) setFundingStage(profile.fundingStage);
+            if (profile.fundingAmount) setFundingAmount(profile.fundingAmount);
+            if (profile.keyFeatures?.length) setKeyFeatures(profile.keyFeatures.join(', '));
+            if (profile.differentiators?.length) setDifferentiators(profile.differentiators.join(', '));
+            if (profile.pricingModel) setPricingModel(profile.pricingModel);
+            if (profile.pricingRange) setPricingRange(profile.pricingRange);
+            if (profile.yearFounded) setYearFounded(profile.yearFounded);
+            if (profile.geography) setGeography(profile.geography);
+            if (profile.radarScores) setRadarScores(profile.radarScores);
+
+            setShowAdvanced(true);
+            toast({
+                title: t.autoFillSuccess || 'Data extracted successfully',
+                duration: 3000,
+            });
+        } catch {
+            toast({
+                title: t.autoFillError || 'Could not extract data',
+                variant: 'destructive',
+                duration: 3000,
+            });
+        } finally {
+            setIsAutoFilling(false);
+        }
+    };
 
     // Helper to populate form from a competitor (edit mode) or reset to empty (add mode)
     const populateForm = useCallback((competitor: Competitor | null) => {
@@ -201,15 +250,31 @@ export function CompetitorDialog({
                             className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]"
                         />
                     </div>
-                    {/* Website */}
+                    {/* Website + Auto-fill */}
                     <div className="space-y-2">
                         <Label className="text-[#e8e9ed]">{t.competitor.website}</Label>
-                        <Input
-                            value={website}
-                            onChange={(e) => setWebsite(e.target.value)}
-                            placeholder="https://..."
-                            className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]"
-                        />
+                        <div className="flex gap-2">
+                            <Input
+                                value={website}
+                                onChange={(e) => setWebsite(e.target.value)}
+                                placeholder="https://..."
+                                className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] flex-1"
+                            />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={handleAutoFill}
+                                disabled={!website.trim() || isAutoFilling}
+                                className="border-[#6c5ce7]/50 text-[#a29bfe] hover:bg-[#6c5ce7]/10 shrink-0"
+                            >
+                                {isAutoFilling ? (
+                                    <><Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> {t.autoFilling || 'Analyzing...'}</>
+                                ) : (
+                                    <><Sparkles className="mr-1.5 h-3.5 w-3.5" /> {t.autoFillFromUrl || 'Auto-fill'}</>
+                                )}
+                            </Button>
+                        </div>
                     </div>
                     {/* Description */}
                     <div className="space-y-2">

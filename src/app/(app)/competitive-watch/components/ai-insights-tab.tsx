@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useFounderStore, PricingModelType } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
-import { generateStrategicRecommendations } from '@/lib/ai-service';
+import { generateStrategicRecommendations, generateCompetitiveIntelligence } from '@/lib/ai-service';
+import { generateCompetitiveAnalysis, type CompetitiveAnalysisOutput } from '@/ai/flows/competitive-analysis-flow';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,37 +31,99 @@ import {
     XCircle,
     Lightbulb,
     Swords,
+    Zap,
 } from 'lucide-react';
+import { ActionItemsPanel } from './action-items-panel';
+import { ScenarioPanel } from './scenario-panel';
 
 export function AiInsightsTab() {
     const competitors = useFounderStore(s => s.competitors);
     const mySolution = useFounderStore(s => s.mySolution);
     const updateMySolution = useFounderStore(s => s.updateMySolution);
     const leanCanvas = useFounderStore(s => s.leanCanvas);
+    const marketSignals = useFounderStore(s => s.marketSignals);
+    const competitiveIntelligence = useFounderStore(s => s.competitiveIntelligence);
+    const setCompetitiveIntelligence = useFounderStore(s => s.setCompetitiveIntelligence);
     const setStrategicRecommendations = useFounderStore(s => s.setStrategicRecommendations);
     const language = useFounderStore(s => s.language);
     const t = (translations[language] as any).competitiveWatch;
 
-    // Additional stores for context
-    const roadmap = { objectives: useFounderStore(s => s.objectives) }; // Simplified for now
+    const roadmap = { objectives: useFounderStore(s => s.objectives) };
     const hypotheses = useFounderStore(s => s.hypotheses);
+    const finance = useFounderStore(s => s.finance);
+    const roadmapItems = useFounderStore(s => s.roadmap);
 
     const [isAnalyzing, setIsAnalyzing] = useState(false);
-    const [isLoading, setIsLoading] = useState(false); // For strategic analysis
+    const [isRunningIntelligence, setIsRunningIntelligence] = useState(false);
     const [analysis, setAnalysis] = useState<CompetitiveAnalysisOutput | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [featuresInput, setFeaturesInput] = useState(mySolution.keyFeatures?.join(', ') || '');
     const [diffInput, setDiffInput] = useState(mySolution.differentiators?.join(', ') || '');
 
+    // Intelligence results (from the competitive-intelligence API)
+    const [intelligenceResult, setIntelligenceResult] = useState<any>(null);
+
     const radarAxesKeys = ['price', 'features', 'ux', 'market', 'innovation', 'support'] as const;
 
-    const canAnalyze = mySolution.name.trim() && competitors.length > 0;
+    const canAnalyze = (mySolution.name || '').trim() && competitors.length > 0;
 
     const handleSaveSolution = () => {
         updateMySolution({
-            keyFeatures: featuresInput.trim() ? featuresInput.split(',').map(s => s.trim()).filter(Boolean) : undefined,
-            differentiators: diffInput.trim() ? diffInput.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+            keyFeatures: featuresInput.trim() ? featuresInput.split(',').map((s: string) => s.trim()).filter(Boolean) : undefined,
+            differentiators: diffInput.trim() ? diffInput.split(',').map((s: string) => s.trim()).filter(Boolean) : undefined,
         });
+    };
+
+    const handleRunIntelligence = async () => {
+        if (!canAnalyze) return;
+        setIsRunningIntelligence(true);
+        setError(null);
+        handleSaveSolution();
+
+        try {
+            const result = await generateCompetitiveIntelligence({
+                mySolution: {
+                    ...mySolution,
+                    keyFeatures: featuresInput.trim() ? featuresInput.split(',').map((s: string) => s.trim()).filter(Boolean) : undefined,
+                    differentiators: diffInput.trim() ? diffInput.split(',').map((s: string) => s.trim()).filter(Boolean) : undefined,
+                },
+                competitors,
+                marketSignals,
+                leanCanvas,
+                roadmap: roadmapItems,
+                hypotheses,
+                financeSummary: {
+                    cashAvailable: finance.cashAvailable,
+                    monthlyEntries: finance.monthlyEntries.length,
+                },
+                previousIntelligence: competitiveIntelligence || undefined,
+                language,
+            });
+
+            setIntelligenceResult(result);
+
+            // Persist health score and alerts to store
+            if (result.healthScore !== undefined) {
+                setCompetitiveIntelligence({
+                    lastAnalyzedAt: result.lastAnalyzedAt || new Date().toISOString(),
+                    healthScore: result.healthScore,
+                    healthBreakdown: result.healthBreakdown,
+                    alerts: result.alerts || [],
+                    trendSummary: result.trendSummary,
+                });
+            }
+
+            toast({
+                title: language === 'fr' ? 'Analyse Intelligence terminée' : 'Intelligence Analysis complete',
+                description: language === 'fr'
+                    ? `Score de santé : ${result.healthScore}/100`
+                    : `Health score: ${result.healthScore}/100`,
+            });
+        } catch (e) {
+            setError(language === 'fr' ? 'Échec de l\'analyse d\'intelligence.' : 'Intelligence analysis failed.');
+        } finally {
+            setIsRunningIntelligence(false);
+        }
     };
 
     const handleAnalyze = async () => {
@@ -73,8 +136,8 @@ export function AiInsightsTab() {
             const result = await generateCompetitiveAnalysis({
                 mySolution: {
                     ...mySolution,
-                    keyFeatures: featuresInput.trim() ? featuresInput.split(',').map(s => s.trim()).filter(Boolean) : undefined,
-                    differentiators: diffInput.trim() ? diffInput.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+                    keyFeatures: featuresInput.trim() ? featuresInput.split(',').map((s: string) => s.trim()).filter(Boolean) : undefined,
+                    differentiators: diffInput.trim() ? diffInput.split(',').map((s: string) => s.trim()).filter(Boolean) : undefined,
                 },
                 competitors: competitors.map(c => ({
                     name: c.name,
@@ -114,13 +177,13 @@ export function AiInsightsTab() {
     };
 
     const handleGenerateStrategy = async () => {
-        setIsLoading(true);
+        setIsAnalyzing(true);
         try {
             const recommendations = await generateStrategicRecommendations({
                 mySolution,
                 competitors,
                 leanCanvas,
-                roadmap: roadmap.objectives, // Using objectives as roadmap proxy
+                roadmap: roadmap.objectives,
                 hypotheses,
                 language
             });
@@ -144,16 +207,123 @@ export function AiInsightsTab() {
                 variant: 'destructive'
             });
         } finally {
-            setIsLoading(false);
+            setIsAnalyzing(false);
         }
     };
 
     return (
         <div className="space-y-8">
-            {/* Strategic Analysis Section */}
+            {/* Intelligence Engine - Primary CTA */}
+            <Card className="bg-gradient-to-r from-[#6c5ce7]/10 to-[#a29bfe]/10 border-[#6c5ce7]/30">
+                <CardContent className="p-6">
+                    <div className="flex items-start justify-between gap-4">
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2">
+                                <Zap className="h-5 w-5 text-[#6c5ce7]" />
+                                <h3 className="text-lg font-semibold text-[#e8e9ed]">
+                                    {language === 'fr' ? 'Moteur d\'Intelligence Stratégique' : 'Strategic Intelligence Engine'}
+                                </h3>
+                            </div>
+                            <p className="text-sm text-[#8b8fa3] max-w-xl">
+                                {language === 'fr'
+                                    ? 'Analyse complète cross-module : santé concurrentielle, gaps features, pricing, tendances marché, et recommandations actionnables.'
+                                    : 'Comprehensive cross-module analysis: competitive health, feature gaps, pricing, market trends, and actionable recommendations.'}
+                            </p>
+                            {competitiveIntelligence?.lastAnalyzedAt && (
+                                <p className="text-xs text-[#8b8fa3]">
+                                    {language === 'fr' ? 'Dernière analyse' : 'Last analysis'}: {new Date(competitiveIntelligence.lastAnalyzedAt).toLocaleString(language)}
+                                    {' — '}Score: <span className="text-[#e8e9ed] font-medium">{competitiveIntelligence.healthScore}/100</span>
+                                </p>
+                            )}
+                        </div>
+                        <Button
+                            onClick={handleRunIntelligence}
+                            disabled={!canAnalyze || isRunningIntelligence}
+                            className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white shrink-0 px-6"
+                        >
+                            {isRunningIntelligence ? (
+                                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {language === 'fr' ? 'Analyse...' : 'Analyzing...'}</>
+                            ) : (
+                                <><Brain className="mr-2 h-4 w-4" /> {language === 'fr' ? 'Lancer l\'Analyse AI' : 'Run AI Analysis'}</>
+                            )}
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Action Items Panel (from intelligence results) */}
+            <ActionItemsPanel
+                featureGaps={intelligenceResult?.featureGapPrioritization}
+                crossModuleRecs={intelligenceResult?.crossModuleRecommendations}
+                pricingIntelligence={intelligenceResult?.pricingIntelligence}
+            />
+
+            {/* Scenario Panel */}
+            <ScenarioPanel
+                aiSuggestions={intelligenceResult?.scenarioSuggestions}
+            />
+
+            {/* Trend Summary (from intelligence) */}
+            {intelligenceResult?.trendSummary && (
+                <Card className="bg-[#181a24] border-[#282c3a]">
+                    <CardHeader className="pb-2">
+                        <div className="flex items-center gap-2">
+                            <Sparkles className="h-5 w-5 text-[#a29bfe]" />
+                            <CardTitle className="text-base text-[#e8e9ed]">
+                                {language === 'fr' ? 'Tendances Marché' : 'Market Trends'}
+                            </CardTitle>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-sm text-[#dfe1e6] leading-relaxed">{intelligenceResult.trendSummary}</p>
+                    </CardContent>
+                </Card>
+            )}
+
+            {/* Competitor Updates from intelligence */}
+            {intelligenceResult?.competitorUpdates?.length > 0 && (
+                <Card className="bg-[#181a24] border-[#282c3a]">
+                    <CardHeader className="pb-2">
+                        <div className="flex items-center gap-2">
+                            <Target className="h-5 w-5 text-[#00cec9]" />
+                            <CardTitle className="text-base text-[#e8e9ed]">
+                                {language === 'fr' ? 'Actualités Concurrents' : 'Competitor Updates'}
+                            </CardTitle>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                        {intelligenceResult.competitorUpdates.map((update: any, i: number) => (
+                            <div key={i} className="rounded-lg bg-[#0f1117] border border-[#282c3a] p-3">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-sm font-medium text-[#e8e9ed]">{update.competitorName}</span>
+                                    <Badge variant="outline" className={`text-xs ${update.suggestedMomentum === 'rising' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                                            update.suggestedMomentum === 'declining' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
+                                                'bg-gray-500/20 text-gray-400 border-gray-500/30'
+                                        }`}>
+                                        {t.momentum?.[update.suggestedMomentum] || update.suggestedMomentum}
+                                    </Badge>
+                                    <span className="text-xs text-[#8b8fa3] ml-auto">
+                                        {t.threatLevel}: {update.suggestedThreatLevel}/100
+                                    </span>
+                                </div>
+                                {update.recentNews?.map((news: any, j: number) => (
+                                    <div key={j} className="ml-2 mb-1">
+                                        <p className="text-xs text-[#dfe1e6]">{news.title}</p>
+                                        <p className="text-xs text-[#8b8fa3]">{news.summary}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </CardContent>
+                </Card>
+            )}
+
+            <hr className="border-[#282c3a]" />
+
+            {/* Legacy: Strategic Analysis + Competitive Analysis Sections */}
             <Card className="bg-[#181a24] border-[#282c3a] p-4">
                 <h3 className="text-[#e8e9ed] font-semibold mb-2">
-                    {language === 'fr' ? 'Analyse Stratégique' : 'Strategic Analysis'}
+                    {language === 'fr' ? 'Analyse Stratégique Complète' : 'Full Strategic Analysis'}
                 </h3>
                 <p className="text-xs text-[#8b8fa3] mb-4">
                     {language === 'fr'
@@ -162,10 +332,10 @@ export function AiInsightsTab() {
                 </p>
                 <Button
                     onClick={handleGenerateStrategy}
-                    disabled={isLoading}
+                    disabled={isAnalyzing}
                     className="w-full bg-gradient-to-r from-[#6c5ce7] to-[#a29bfe] hover:opacity-90 text-white"
                 >
-                    {isLoading ? (
+                    {isAnalyzing ? (
                         <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {language === 'fr' ? 'Analyse...' : 'Analyzing...'}</>
                     ) : (
                         <><Brain className="mr-2 h-4 w-4" /> {language === 'fr' ? 'Générer le Plan Stratégique' : 'Generate Strategic Plan'}</>
@@ -306,7 +476,7 @@ export function AiInsightsTab() {
                 </CardContent>
             </Card>
 
-            {/* Analyze Button */}
+            {/* Competitive Analysis Button */}
             <div className="flex items-center gap-4">
                 <Button
                     onClick={handleAnalyze}
@@ -319,10 +489,10 @@ export function AiInsightsTab() {
                         <><Brain className="mr-2 h-4 w-4" /> {t.aiInsights.analyze}</>
                     )}
                 </Button>
-                {!mySolution.name.trim() && (
+                {!(mySolution.name || '').trim() && (
                     <p className="text-sm text-yellow-400/80">{t.aiInsights.needSolution}</p>
                 )}
-                {mySolution.name.trim() && competitors.length === 0 && (
+                {(mySolution.name || '').trim() && competitors.length === 0 && (
                     <p className="text-sm text-yellow-400/80">{t.aiInsights.needCompetitors}</p>
                 )}
             </div>

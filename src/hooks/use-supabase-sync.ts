@@ -69,6 +69,9 @@ export function useSupabaseSync() {
                         name: '',
                         radarScores: { price: 5, features: 5, ux: 5, market: 5, innovation: 5, support: 5 },
                     },
+                    competitiveIntelligence: data.competitive_intelligence || null,
+                    competitiveSnapshots: data.competitive_snapshots || [],
+                    scenarioAnalyses: data.scenario_analyses || [],
                 };
                 useFounderStore.getState().hydrate(stateToHydrate);
             }
@@ -108,6 +111,9 @@ export function useSupabaseSync() {
                     market_signals: state.marketSignals,
                     roadmap: state.roadmap,
                     my_solution: state.mySolution,
+                    competitive_intelligence: state.competitiveIntelligence,
+                    competitive_snapshots: state.competitiveSnapshots,
+                    scenario_analyses: state.scenarioAnalyses,
                     updated_at: new Date().toISOString(),
                 };
 
