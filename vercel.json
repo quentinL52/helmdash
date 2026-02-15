@@ -4,10 +4,7 @@
         "cdg1"
     ],
     "functions": {
-        "src/app/**/*": {
-            "maxDuration": 60
-        },
-        "src/ai/**/*": {
+        "src/app/api/**/*.ts": {
             "maxDuration": 60
         }
     }
