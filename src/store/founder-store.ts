@@ -339,6 +339,7 @@ export interface ScenarioAnalysis {
 
 export interface FounderStore {
     // --- State ---
+    userId: string | null; // For data isolation check
     hypotheses: Hypothesis[];
     finance: FinanceData;
     journalEntries: JournalEntry[];
@@ -447,6 +448,8 @@ export interface FounderStore {
     language: 'fr' | 'en';
     setLanguage: (lang: 'fr' | 'en') => void;
     hydrate: (state: Partial<FounderStore>) => void;
+    setUserId: (id: string | null) => void;
+    reset: () => void;
 }
 
 // Helper to calc progress
@@ -461,90 +464,97 @@ const calculateObjectiveProgress = (krs: KeyResult[]): number => {
 
 // --- Store Implementation ---
 
+const initialState = {
+    userId: null,
+    language: 'fr' as const,
+    hypotheses: [],
+    finance: {
+        cashAvailable: 0,
+        lastUpdated: new Date().toISOString(),
+        monthlyEntries: [],
+        oneTimeEntries: [],
+    },
+    journalEntries: [],
+    objectives: [],
+    contentIdeas: [],
+    contacts: [],
+    routine: [
+        {
+            id: 'mon', day: 'Lundi', tasks: [
+                { id: '1', text: 'Revue stratégie & mise à jour Lean Canvas', done: false },
+                { id: '2', text: 'Définir les 3 priorités de la semaine', done: false }
+            ]
+        },
+        {
+            id: 'tue', day: 'Mardi', tasks: [
+                { id: '3', text: 'Outreach : contacter 5-10 prospects', done: false },
+                { id: '4', text: '1 interview utilisateur (15-20 min)', done: false }
+            ]
+        },
+        {
+            id: 'wed', day: 'Mercredi', tasks: [
+                { id: '5', text: 'Rédiger 1 post LinkedIn (build in public)', done: false },
+                { id: '6', text: 'Veille concurrence & écosystème IA', done: false }
+            ]
+        },
+        {
+            id: 'thu', day: 'Jeudi', tasks: [
+                { id: '7', text: '1 appel réseau (mentor, fondateur, expert)', done: false },
+                { id: '8', text: 'Avancement admin / finance / juridique', done: false }
+            ]
+        },
+        {
+            id: 'fri', day: 'Vendredi', tasks: [
+                { id: '9', text: 'Synthèse feedback utilisateurs → décisions produit', done: false },
+                { id: '10', text: 'Rétrospective perso : qu\'est-ce qui a marché ?', done: false },
+                { id: '11', text: 'Mise à jour roadmap semaine suivante', done: false }
+            ]
+        }
+    ],
+    routineHistory: [],
+    leanCanvas: {},
+    roadmap: [], // Initial empty state
+    weeklyReport: null,
+    competitors: [],
+    marketSignals: [],
+    mySolution: {
+        name: '',
+        website: '',
+        description: '',
+        radarScores: {
+            price: 5,
+            features: 5,
+            ux: 5,
+            market: 5,
+            innovation: 5,
+            support: 5,
+        },
+        swot: {
+            strengths: '',
+            weaknesses: '',
+            opportunities: '',
+            threats: '',
+        },
+        featureAnalysis: {},
+        comparisonCriteria: ['Mobile App', 'API Access', '24/7 Support', 'Custom Branding', 'Analytics'], // Defaults
+    },
+    strategicRecommendations: null,
+    competitiveIntelligence: null,
+    competitiveSnapshots: [],
+    scenarioAnalyses: [],
+    showStrategicRecommendations: true, // Default to true
+};
+
 export const useFounderStore = create<FounderStore>()(
     persist(
         (set, get) => ({
-            // Initial State
-            language: 'fr',
-            setLanguage: (lang) => set({ language: lang }),
-            hypotheses: [],
-            finance: {
-                cashAvailable: 0,
-                lastUpdated: new Date().toISOString(),
-                monthlyEntries: [],
-                oneTimeEntries: [],
-            },
-            journalEntries: [],
-            objectives: [],
-            contentIdeas: [],
-            contacts: [],
-            routine: [
-                {
-                    id: 'mon', day: 'Lundi', tasks: [
-                        { id: '1', text: 'Revue stratégie & mise à jour Lean Canvas', done: false },
-                        { id: '2', text: 'Définir les 3 priorités de la semaine', done: false }
-                    ]
-                },
-                {
-                    id: 'tue', day: 'Mardi', tasks: [
-                        { id: '3', text: 'Outreach : contacter 5-10 prospects', done: false },
-                        { id: '4', text: '1 interview utilisateur (15-20 min)', done: false }
-                    ]
-                },
-                {
-                    id: 'wed', day: 'Mercredi', tasks: [
-                        { id: '5', text: 'Rédiger 1 post LinkedIn (build in public)', done: false },
-                        { id: '6', text: 'Veille concurrence & écosystème IA', done: false }
-                    ]
-                },
-                {
-                    id: 'thu', day: 'Jeudi', tasks: [
-                        { id: '7', text: '1 appel réseau (mentor, fondateur, expert)', done: false },
-                        { id: '8', text: 'Avancement admin / finance / juridique', done: false }
-                    ]
-                },
-                {
-                    id: 'fri', day: 'Vendredi', tasks: [
-                        { id: '9', text: 'Synthèse feedback utilisateurs → décisions produit', done: false },
-                        { id: '10', text: 'Rétrospective perso : qu\'est-ce qui a marché ?', done: false },
-                        { id: '11', text: 'Mise à jour roadmap semaine suivante', done: false }
-                    ]
-                }
-            ],
-            routineHistory: [],
-            leanCanvas: {},
-            roadmap: [], // Initial empty state
-            weeklyReport: null,
-            competitors: [],
-            marketSignals: [],
-            mySolution: {
-                name: '',
-                website: '',
-                description: '',
-                radarScores: {
-                    price: 5,
-                    features: 5,
-                    ux: 5,
-                    market: 5,
-                    innovation: 5,
-                    support: 5,
-                },
-                swot: {
-                    strengths: '',
-                    weaknesses: '',
-                    opportunities: '',
-                    threats: '',
-                },
-                featureAnalysis: {},
-                comparisonCriteria: ['Mobile App', 'API Access', '24/7 Support', 'Custom Branding', 'Analytics'], // Defaults
-            },
-            strategicRecommendations: null,
-            competitiveIntelligence: null,
-            competitiveSnapshots: [],
-            scenarioAnalyses: [],
-            showStrategicRecommendations: true, // Default to true
+            ...initialState,
+            language: 'fr', // Explicit override if needed, but initialState has it
 
-            // Actions
+            setUserId: (id) => set({ userId: id }),
+            setLanguage: (lang) => set({ language: lang }),
+            reset: () => set(initialState),
+            hydrate: (state) => set({ ...state }),
             addHypothesis: (hypothesis) => set((state) => ({
                 hypotheses: [
                     ...state.hypotheses,
@@ -1062,11 +1072,7 @@ export const useFounderStore = create<FounderStore>()(
             setStrategicRecommendations: (recommendations) => set({ strategicRecommendations: recommendations }),
             toggleStrategicRecommendations: () => set((state) => ({ showStrategicRecommendations: !state.showStrategicRecommendations })),
 
-            hydrate: (newState) => set((state) => ({
-                ...state,
-                ...newState,
-                // Ensure deep merge if necessary, but top-level replacement is fine for now as we sync whole store
-            })),
+
         }),
         {
             name: 'founder-os-store', // name of the item in the storage (must be unique)

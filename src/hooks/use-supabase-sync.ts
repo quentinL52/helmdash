@@ -24,8 +24,27 @@ export function useSupabaseSync() {
 
     // 1. Load Data on Mount/Login
     useEffect(() => {
+        // --- Data Isolation & Reset Logic ---
+        const currentUserId = user?.id;
+        const storedUserId = useFounderStore.getState().userId;
+
+        if (currentUserId && currentUserId !== storedUserId) {
+            console.log('User changed (or first login), resetting store to isolation state.');
+            useFounderStore.getState().reset();
+            useFounderStore.getState().setUserId(currentUserId);
+            isLoadedRef.current = false; // Ensure we don't save empty state immediately
+        } else if (!currentUserId && storedUserId) {
+            console.log('User logged out, clearing store.');
+            useFounderStore.getState().reset();
+            useFounderStore.getState().setUserId(null);
+            isLoadedRef.current = false;
+        }
+
         async function loadData() {
             if (!user || !session) return;
+
+            // If we just reset, we are loading.
+            // If we didn't reset, we might still be loading if it's a refresh.
 
             const supabase = createClerkSupabaseClient(getToken);
 
@@ -44,7 +63,7 @@ export function useSupabaseSync() {
                         variant: "destructive",
                     });
                 }
-                // Mark as loaded even if error (empty state)
+                // Even if no data found (new user), we are "loaded" (empty state from reset is valid)
                 isLoadedRef.current = true;
                 return;
             }
@@ -72,6 +91,7 @@ export function useSupabaseSync() {
                     competitiveIntelligence: data.competitive_intelligence || null,
                     competitiveSnapshots: data.competitive_snapshots || [],
                     scenarioAnalyses: data.scenario_analyses || [],
+                    userId: user.id, // Ensure ID is set in hydrator
                 };
                 useFounderStore.getState().hydrate(stateToHydrate);
             }
@@ -94,6 +114,8 @@ export function useSupabaseSync() {
 
             saveTimerRef.current = setTimeout(async () => {
                 const state = store.getState();
+                const now = new Date().toISOString();
+
                 const payload = {
                     user_id: user.id,
                     hypotheses: state.hypotheses,
@@ -114,14 +136,28 @@ export function useSupabaseSync() {
                     competitive_intelligence: state.competitiveIntelligence,
                     competitive_snapshots: state.competitiveSnapshots,
                     scenario_analyses: state.scenarioAnalyses,
-                    updated_at: new Date().toISOString(),
+                    updated_at: now,
                 };
 
                 const supabase = createClerkSupabaseClient(getToken);
 
-                const { error } = await supabase
+                // Parallel save: Founder Data + User Profile
+                const saveFounderData = supabase
                     .from('founder_data')
                     .upsert(payload, { onConflict: 'user_id' });
+
+                const saveUserProfile = supabase
+                    .from('users')
+                    .upsert({
+                        id: user.id,
+                        email: user.primaryEmailAddress?.emailAddress,
+                        full_name: user.fullName,
+                        avatar_url: user.imageUrl,
+                        updated_at: now,
+                    }, { onConflict: 'id' });
+
+                const [founderRes, userRes] = await Promise.all([saveFounderData, saveUserProfile]);
+                const error = founderRes.error || userRes.error;
 
                 if (error) {
                     console.error('Supabase Save Error:', error.message);
