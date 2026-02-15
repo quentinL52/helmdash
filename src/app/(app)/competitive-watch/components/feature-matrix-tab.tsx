@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useFounderStore, FeatureStatus } from '@/store/founder-store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +32,45 @@ export function FeatureMatrixTab() {
     const updateCompetitor = useFounderStore(s => s.updateCompetitor);
     const updateMySolution = useFounderStore(s => s.updateMySolution);
     const comparisonCriteria = mySolution.comparisonCriteria || [];
+
+    // Merge comparisonCriteria with keyFeatures from all competitors and mySolution
+    const allFeatures = useMemo(() => {
+        const set = new Set(comparisonCriteria.map(f => f.toLowerCase()));
+        const result = [...comparisonCriteria];
+
+        // Add mySolution keyFeatures
+        (mySolution.keyFeatures || []).forEach(f => {
+            if (!set.has(f.toLowerCase())) {
+                set.add(f.toLowerCase());
+                result.push(f);
+            }
+        });
+
+        // Add each competitor's keyFeatures
+        competitors.forEach(c => {
+            (c.keyFeatures || []).forEach(f => {
+                if (!set.has(f.toLowerCase())) {
+                    set.add(f.toLowerCase());
+                    result.push(f);
+                }
+            });
+        });
+
+        return result;
+    }, [comparisonCriteria, mySolution.keyFeatures, competitors]);
+
+    // Build effective featureAnalysis: merge explicit featureAnalysis with keyFeatures→'yes'
+    const getEffectiveStatus = (
+        featureAnalysis: Record<string, import('@/store/founder-store').FeatureStatus> | undefined,
+        keyFeats: string[] | undefined,
+        feature: string
+    ): import('@/store/founder-store').FeatureStatus | undefined => {
+        // Explicit status takes priority
+        if (featureAnalysis?.[feature]) return featureAnalysis[feature];
+        // If this feature matches a keyFeature (case-insensitive), treat as 'yes'
+        if (keyFeats?.some(kf => kf.toLowerCase() === feature.toLowerCase())) return 'yes';
+        return undefined;
+    };
     const addComparisonCriterion = useFounderStore(s => s.addComparisonCriterion);
     const deleteComparisonCriterion = useFounderStore(s => s.deleteComparisonCriterion);
     const language = useFounderStore(s => s.language);
@@ -136,22 +175,25 @@ export function FeatureMatrixTab() {
     };
 
     // Calculate coverage per entity (% of features marked as "yes")
-    const calcCoverage = (featureAnalysis: Record<string, FeatureStatus> | undefined) => {
-        if (!comparisonCriteria.length) return 0;
-        const yesCount = comparisonCriteria.filter(f => featureAnalysis?.[f] === 'yes').length;
-        const partialCount = comparisonCriteria.filter(f => featureAnalysis?.[f] === 'partial').length;
-        return Math.round(((yesCount + partialCount * 0.5) / comparisonCriteria.length) * 100);
+    const calcCoverage = (
+        featureAnalysis: Record<string, FeatureStatus> | undefined,
+        keyFeats?: string[]
+    ) => {
+        if (!allFeatures.length) return 0;
+        const yesCount = allFeatures.filter(f => getEffectiveStatus(featureAnalysis, keyFeats, f) === 'yes').length;
+        const partialCount = allFeatures.filter(f => getEffectiveStatus(featureAnalysis, keyFeats, f) === 'partial').length;
+        return Math.round(((yesCount + partialCount * 0.5) / allFeatures.length) * 100);
     };
 
     // Determine gap per feature: "advantage" | "parity" | "disadvantage"
     const getFeatureGap = (feature: string) => {
-        const myStatus = mySolution.featureAnalysis?.[feature];
+        const myStatus = getEffectiveStatus(mySolution.featureAnalysis, mySolution.keyFeatures, feature);
         const myScore = myStatus === 'yes' ? 2 : myStatus === 'partial' ? 1 : myStatus === 'planned' ? 0.5 : 0;
 
         let competitorsBetter = 0;
         let competitorsWorse = 0;
         competitors.forEach(c => {
-            const cStatus = c.featureAnalysis?.[feature];
+            const cStatus = getEffectiveStatus(c.featureAnalysis, c.keyFeatures, feature);
             const cScore = cStatus === 'yes' ? 2 : cStatus === 'partial' ? 1 : cStatus === 'planned' ? 0.5 : 0;
             if (cScore > myScore) competitorsBetter++;
             if (cScore < myScore) competitorsWorse++;
@@ -175,7 +217,7 @@ export function FeatureMatrixTab() {
         disadvantage: 'bg-red-500/5',
     };
 
-    const myCoverage = calcCoverage(mySolution.featureAnalysis);
+    const myCoverage = calcCoverage(mySolution.featureAnalysis, mySolution.keyFeatures);
 
     return (
         <div className="space-y-6">
@@ -225,7 +267,7 @@ export function FeatureMatrixTab() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {comparisonCriteria.length === 0 ? (
+                        {allFeatures.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={competitors.length + 4} className="h-32 text-center text-[#8b8fa3]">
                                     {t.noFeatures} <br /> {t.addPrompt}
@@ -233,7 +275,7 @@ export function FeatureMatrixTab() {
                             </TableRow>
                         ) : (
                             <>
-                                {comparisonCriteria.map((feature) => {
+                                {allFeatures.map((feature) => {
                                     const gap = getFeatureGap(feature);
                                     return (
                                         <TableRow
@@ -246,59 +288,65 @@ export function FeatureMatrixTab() {
 
                                             {/* My Solution Status */}
                                             <TableCell className={`text-center p-2 ${heatmapMode ? '' : 'bg-[#6c5ce7]/5'}`}>
-                                                <button
-                                                    onClick={() => toggleStatus('mySolution', null, feature, mySolution.featureAnalysis?.[feature])}
-                                                    className={`p-1 rounded transition-colors ${
-                                                        heatmapMode
-                                                            ? `${getHeatmapColor(mySolution.featureAnalysis?.[feature])} w-full py-1.5 text-xs font-medium text-[#e8e9ed]`
-                                                            : 'rounded-full hover:bg-[#282c3a]'
-                                                    }`}
-                                                >
-                                                    {heatmapMode ? (
-                                                        getHeatmapLabel(mySolution.featureAnalysis?.[feature])
-                                                    ) : (
-                                                        <TooltipProvider>
-                                                            <Tooltip>
-                                                                <TooltipTrigger asChild>
-                                                                    {getStatusIcon(mySolution.featureAnalysis?.[feature])}
-                                                                </TooltipTrigger>
-                                                                <TooltipContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
-                                                                    <p>{t.status[mySolution.featureAnalysis?.[feature] || 'unknown']}</p>
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                        </TooltipProvider>
-                                                    )}
-                                                </button>
+                                                {(() => {
+                                                    const effectiveMyStatus = getEffectiveStatus(mySolution.featureAnalysis, mySolution.keyFeatures, feature);
+                                                    return (
+                                                        <button
+                                                            onClick={() => toggleStatus('mySolution', null, feature, mySolution.featureAnalysis?.[feature])}
+                                                            className={`p-1 rounded transition-colors ${heatmapMode
+                                                                ? `${getHeatmapColor(effectiveMyStatus)} w-full py-1.5 text-xs font-medium text-[#e8e9ed]`
+                                                                : 'rounded-full hover:bg-[#282c3a]'
+                                                                }`}
+                                                        >
+                                                            {heatmapMode ? (
+                                                                getHeatmapLabel(effectiveMyStatus)
+                                                            ) : (
+                                                                <TooltipProvider>
+                                                                    <Tooltip>
+                                                                        <TooltipTrigger asChild>
+                                                                            {getStatusIcon(effectiveMyStatus)}
+                                                                        </TooltipTrigger>
+                                                                        <TooltipContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+                                                                            <p>{t.status[effectiveMyStatus || 'unknown']}</p>
+                                                                        </TooltipContent>
+                                                                    </Tooltip>
+                                                                </TooltipProvider>
+                                                            )}
+                                                        </button>
+                                                    );
+                                                })()}
                                             </TableCell>
 
                                             {/* Competitors Status */}
-                                            {competitors.map((c) => (
-                                                <TableCell key={c.id} className="text-center p-2">
-                                                    <button
-                                                        onClick={() => toggleStatus('competitor', c.id, feature, c.featureAnalysis?.[feature])}
-                                                        className={`p-1 rounded transition-colors ${
-                                                            heatmapMode
-                                                                ? `${getHeatmapColor(c.featureAnalysis?.[feature])} w-full py-1.5 text-xs font-medium text-[#e8e9ed]`
+                                            {competitors.map((c) => {
+                                                const effectiveCStatus = getEffectiveStatus(c.featureAnalysis, c.keyFeatures, feature);
+                                                return (
+                                                    <TableCell key={c.id} className="text-center p-2">
+                                                        <button
+                                                            onClick={() => toggleStatus('competitor', c.id, feature, c.featureAnalysis?.[feature])}
+                                                            className={`p-1 rounded transition-colors ${heatmapMode
+                                                                ? `${getHeatmapColor(effectiveCStatus)} w-full py-1.5 text-xs font-medium text-[#e8e9ed]`
                                                                 : 'rounded-full hover:bg-[#282c3a]'
-                                                        }`}
-                                                    >
-                                                        {heatmapMode ? (
-                                                            getHeatmapLabel(c.featureAnalysis?.[feature])
-                                                        ) : (
-                                                            <TooltipProvider>
-                                                                <Tooltip>
-                                                                    <TooltipTrigger asChild>
-                                                                        {getStatusIcon(c.featureAnalysis?.[feature])}
-                                                                    </TooltipTrigger>
-                                                                    <TooltipContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
-                                                                        <p>{t.status[c.featureAnalysis?.[feature] || 'unknown']}</p>
-                                                                    </TooltipContent>
-                                                                </Tooltip>
-                                                            </TooltipProvider>
-                                                        )}
-                                                    </button>
-                                                </TableCell>
-                                            ))}
+                                                                }`}
+                                                        >
+                                                            {heatmapMode ? (
+                                                                getHeatmapLabel(effectiveCStatus)
+                                                            ) : (
+                                                                <TooltipProvider>
+                                                                    <Tooltip>
+                                                                        <TooltipTrigger asChild>
+                                                                            {getStatusIcon(effectiveCStatus)}
+                                                                        </TooltipTrigger>
+                                                                        <TooltipContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+                                                                            <p>{t.status[effectiveCStatus || 'unknown']}</p>
+                                                                        </TooltipContent>
+                                                                    </Tooltip>
+                                                                </TooltipProvider>
+                                                            )}
+                                                        </button>
+                                                    </TableCell>
+                                                );
+                                            })}
 
                                             {/* Gap indicator */}
                                             <TableCell className="text-center">
@@ -330,26 +378,24 @@ export function FeatureMatrixTab() {
                                     <TableCell className="text-center bg-[#6c5ce7]/5">
                                         <Badge
                                             variant="outline"
-                                            className={`text-xs ${
-                                                myCoverage >= 70 ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                                            className={`text-xs ${myCoverage >= 70 ? 'bg-green-500/20 text-green-400 border-green-500/30' :
                                                 myCoverage >= 40 ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
-                                                'bg-red-500/20 text-red-400 border-red-500/30'
-                                            }`}
+                                                    'bg-red-500/20 text-red-400 border-red-500/30'
+                                                }`}
                                         >
                                             {myCoverage}%
                                         </Badge>
                                     </TableCell>
                                     {competitors.map((c) => {
-                                        const cov = calcCoverage(c.featureAnalysis);
+                                        const cov = calcCoverage(c.featureAnalysis, c.keyFeatures);
                                         return (
                                             <TableCell key={c.id} className="text-center">
                                                 <Badge
                                                     variant="outline"
-                                                    className={`text-xs ${
-                                                        cov >= 70 ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                                                    className={`text-xs ${cov >= 70 ? 'bg-green-500/20 text-green-400 border-green-500/30' :
                                                         cov >= 40 ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
-                                                        'bg-red-500/20 text-red-400 border-red-500/30'
-                                                    }`}
+                                                            'bg-red-500/20 text-red-400 border-red-500/30'
+                                                        }`}
                                                 >
                                                     {cov}%
                                                 </Badge>

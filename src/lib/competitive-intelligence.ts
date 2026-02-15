@@ -63,6 +63,26 @@ export function computeHealthScore(breakdown: CompetitiveHealthBreakdown): numbe
 }
 
 /**
+ * Lean sub-scores: groups the 5 internal dimensions into 3 founder-friendly categories.
+ * - Produit: (featureParity + differentiationStrength) / 2
+ * - Marché:  (marketMomentum + threatExposure) / 2
+ * - Business: pricingPosition
+ */
+export interface LeanSubScores {
+    produit: number;   // 0-100
+    marche: number;    // 0-100
+    business: number;  // 0-100
+}
+
+export function computeLeanSubScores(breakdown: CompetitiveHealthBreakdown): LeanSubScores {
+    return {
+        produit: Math.round((breakdown.featureParity + breakdown.differentiationStrength) / 2),
+        marche: Math.round((breakdown.marketMomentum + breakdown.threatExposure) / 2),
+        business: Math.round(breakdown.pricingPosition),
+    };
+}
+
+/**
  * Feature parity: % of comparison criteria where mySolution has 'yes',
  * relative to the best competitor coverage.
  */
