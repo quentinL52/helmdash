@@ -170,6 +170,8 @@ export interface CompetitorSWOT {
     threats: string;
 }
 
+export type PricingModelType = 'free' | 'freemium' | 'subscription' | 'usage' | 'enterprise' | 'other';
+
 export interface Competitor {
     id: string;
     name: string;
@@ -179,10 +181,37 @@ export interface Competitor {
     weaknesses?: string;
     pricing?: string;
     positioning?: string;
+    // Structured fields for strategic analysis
+    targetSegment?: string;
+    businessModel?: string;
+    teamSize?: string;
+    fundingStage?: string;
+    fundingAmount?: string;
+    keyFeatures?: string[];
+    differentiators?: string[];
+    pricingModel?: PricingModelType;
+    pricingRange?: string;
+    yearFounded?: string;
+    geography?: string;
     radarScores: CompetitorRadarScores;
     swot: CompetitorSWOT;
     createdAt: string;
     updatedAt: string;
+}
+
+export interface MySolution {
+    name: string;
+    description?: string;
+    targetSegment?: string;
+    businessModel?: string;
+    teamSize?: string;
+    fundingStage?: string;
+    keyFeatures?: string[];
+    differentiators?: string[];
+    pricingModel?: PricingModelType;
+    pricingRange?: string;
+    positioning?: string;
+    radarScores: CompetitorRadarScores;
 }
 
 export type MarketSignalImpact = 'positive' | 'negative' | 'neutral';
@@ -220,6 +249,7 @@ export interface FounderStore {
     weeklyReport: WeeklyReport | null; // Module 13
     competitors: Competitor[]; // Module 14
     marketSignals: MarketSignal[]; // Module 14
+    mySolution: MySolution; // Module 14 - User's own solution for benchmarking
 
     // --- Actions ---
 
@@ -275,6 +305,7 @@ export interface FounderStore {
     deleteCompetitor: (id: string) => void;
     addMarketSignal: (signal: Omit<MarketSignal, 'id' | 'createdAt'>) => void;
     deleteMarketSignal: (id: string) => void;
+    updateMySolution: (updates: Partial<MySolution>) => void;
 
     // Canvas
     updateCanvasSection: (sectionId: string, content: string) => void;
@@ -352,6 +383,10 @@ export const useFounderStore = create<FounderStore>()(
             weeklyReport: null,
             competitors: [],
             marketSignals: [],
+            mySolution: {
+                name: '',
+                radarScores: { price: 5, features: 5, ux: 5, market: 5, innovation: 5, support: 5 },
+            },
 
             // Actions
             addHypothesis: (hypothesis) => set((state) => ({
@@ -661,6 +696,10 @@ export const useFounderStore = create<FounderStore>()(
 
             deleteMarketSignal: (id) => set((state) => ({
                 marketSignals: state.marketSignals.filter((s) => s.id !== id),
+            })),
+
+            updateMySolution: (updates) => set((state) => ({
+                mySolution: { ...state.mySolution, ...updates },
             })),
 
             updateCanvasSection: (sectionId, content) => set((state) => ({

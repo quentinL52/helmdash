@@ -1,0 +1,14 @@
+{
+    "framework": "nextjs",
+    "regions": [
+        "cdg1"
+    ],
+    "functions": {
+        "src/app/**/*": {
+            "maxDuration": 60
+        },
+        "src/ai/**/*": {
+            "maxDuration": 60
+        }
+    }
+}
