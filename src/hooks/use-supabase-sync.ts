@@ -1,24 +1,33 @@
-import { useEffect, useRef } from 'react';
-import { useUser, useAuth } from '@clerk/nextjs';
-import { createSupabaseClient } from '@/lib/supabase';
+import { useEffect, useRef, useCallback } from 'react';
+import { useUser, useSession } from '@clerk/nextjs';
+import { createClerkSupabaseClient } from '@/lib/supabase';
 import { useFounderStore } from '@/store/founder-store';
 import { useToast } from '@/hooks/use-toast';
 
+/**
+ * Synchronizes founder data between the Zustand store and Supabase.
+ * Uses the native Clerk-Supabase integration (Third-Party Auth / JWKS).
+ * @see https://clerk.com/docs/integrations/databases/supabase
+ */
 export function useSupabaseSync() {
     const { user } = useUser();
-    const { getToken } = useAuth();
+    const { session } = useSession();
     const store = useFounderStore;
     const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const isLoadedRef = useRef(false);
     const { toast } = useToast();
 
+    // Stable reference for the Supabase client via session token
+    const getToken = useCallback(async () => {
+        return session?.getToken() ?? null;
+    }, [session]);
+
     // 1. Load Data on Mount/Login
     useEffect(() => {
         async function loadData() {
-            if (!user) return;
+            if (!user || !session) return;
 
-            const token = await getToken({ template: 'supabase' });
-            const supabase = createSupabaseClient(token || undefined);
+            const supabase = createClerkSupabaseClient(getToken);
 
             const { data, error } = await supabase
                 .from('founder_data')
@@ -28,18 +37,12 @@ export function useSupabaseSync() {
 
             if (error) {
                 if (error.code !== 'PGRST116') {
-                    console.error('Supabase Load Error:', error);
+                    console.error('Supabase Load Error:', error.message);
                     toast({
                         title: "Error loading data",
                         description: error.message,
                         variant: "destructive",
                     });
-                } else {
-                    // New user, no data yet
-                    // toast({
-                    //     title: "Welcome!",
-                    //     description: "Initializing your dashboard.",
-                    // });
                 }
                 // Mark as loaded even if error (empty state)
                 isLoadedRef.current = true;
@@ -57,32 +60,27 @@ export function useSupabaseSync() {
                     routineHistory: data.routine_history || [],
                     leanCanvas: data.lean_canvas || {},
                     weeklyReport: data.weekly_report || null,
-                    strategicRecommendations: data.strategic_recommendations || null, // Hydrate recommendations
-                    // New fields
-                    routine: data.routine || [], // Fix: Load routine customization
+                    strategicRecommendations: data.strategic_recommendations || null,
+                    routine: data.routine || [],
                     competitors: data.competitors || [],
                     marketSignals: data.market_signals || [],
-                    roadmap: data.roadmap || [], // Load roadmap
+                    roadmap: data.roadmap || [],
                     mySolution: data.my_solution || {
                         name: '',
                         radarScores: { price: 5, features: 5, ux: 5, market: 5, innovation: 5, support: 5 },
                     },
                 };
                 useFounderStore.getState().hydrate(stateToHydrate);
-                // toast({
-                //     title: "Data loaded",
-                //     description: "Your dashboard is ready.",
-                // });
             }
             isLoadedRef.current = true;
         }
 
         loadData();
-    }, [user?.id]);
+    }, [user?.id, session]);
 
-    // 2. Subscribe to store changes and save with debounce (no re-renders)
+    // 2. Subscribe to store changes and save with debounce
     useEffect(() => {
-        if (!user) return;
+        if (!user || !session) return;
 
         const unsubscribe = store.subscribe(() => {
             if (!isLoadedRef.current) return;
@@ -105,17 +103,15 @@ export function useSupabaseSync() {
                     routine_history: state.routineHistory,
                     lean_canvas: state.leanCanvas,
                     weekly_report: state.weeklyReport,
-                    strategic_recommendations: state.strategicRecommendations, // Persist AI recommendations
-                    // New fields
+                    strategic_recommendations: state.strategicRecommendations,
                     competitors: state.competitors,
                     market_signals: state.marketSignals,
-                    roadmap: state.roadmap, // Persist roadmap
+                    roadmap: state.roadmap,
                     my_solution: state.mySolution,
                     updated_at: new Date().toISOString(),
                 };
 
-                const token = await getToken({ template: 'supabase' });
-                const supabase = createSupabaseClient(token || undefined);
+                const supabase = createClerkSupabaseClient(getToken);
 
                 const { error } = await supabase
                     .from('founder_data')
@@ -129,14 +125,13 @@ export function useSupabaseSync() {
                         variant: "destructive",
                     });
                 } else {
-                    // Optional: success toast (can be noisy if too frequent)
                     toast({
                         title: "Saved",
                         description: "Your changes have been saved.",
                         duration: 2000,
                     });
                 }
-            }, 2000); // 2 seconds debounce
+            }, 2000);
         });
 
         return () => {
@@ -145,5 +140,5 @@ export function useSupabaseSync() {
                 clearTimeout(saveTimerRef.current);
             }
         };
-    }, [user?.id]);
+    }, [user?.id, session]);
 }
