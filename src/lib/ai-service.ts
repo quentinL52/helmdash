@@ -73,3 +73,26 @@ export async function generateRoutineAnalysis(routine: any[], history: any[]): P
         return 'Error analyzing routine.';
     }
 }
+/**
+ * Generates strategic recommendations based on the founder's data.
+ */
+export async function generateStrategicRecommendations(data: {
+    mySolution: any;
+    competitors: any[];
+    leanCanvas: any;
+    roadmap: any;
+    hypotheses: any[];
+    language: string;
+}) {
+    const response = await fetch('/api/ai/strategic-recommendations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to generate strategic recommendations');
+    }
+
+    return response.json();
+}

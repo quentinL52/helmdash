@@ -57,7 +57,6 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
     const language = useFounderStore(s => s.language);
     const t = translations[language]?.finance;
     const formT = translations[language]?.finance?.form;
-    // const [timeframe, setTimeframe] = useState<Timeframe>('month'); // Removed internal state
 
     const data = useMemo(() => {
         // 1. Flatten all transactions with dates
@@ -76,7 +75,6 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
         });
 
         // 2. Define Time Range (e.g., Past 6 months to Future 12 months)
-        // Or dynamically based on data? Let's do dynamic but ensure at least +/- 6 months context
         const today = new Date();
         const start = subMonths(today, 6);
         const end = addMonths(today, 12);
@@ -132,7 +130,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                 .reduce((sum, t) => sum + t.amount, 0);
 
             return {
-                date: intervalStart,
+                date: intervalStart.getTime(), // Use timestamp for XAxis
                 label,
                 expense: expenseSum,
                 income: incomeSum,
@@ -140,54 +138,28 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
             };
         });
 
-        // 5. Calculate Cash Balance (Backwards and Forwards from Today)
-        // Find interval containing today
-        let currentBalance = finance.cashAvailable;
-
-        // We need to distribute this balance.
-        // Actually, it's easier to sort chronologically (already sorted by intervals)
-        // and find the index of "now".
-
-        // But wait, "cashAvailable" is the CURRENT balance. 
-        // So for past intervals, Balance[prev] = Balance[curr] - NetFlow[curr] (reverse logic?)
-        // No, Balance[End of T] = Balance[Start of T] + NetFlow[T]
-
-        // Let's assume finance.cashAvailable is the balance at the START of 'today's' interval?
-        // Or roughly now.
-
-        // Let's create a running balance array.
-        // We'll walk forward from the earliest date, but we need an initial anchor.
-        // Anchor: The Balance at the moment of 'today' is finance.cashAvailable.
-
-        // Let's identify the interval closest to Today.
+        // 5. Calculate Cash Balance
+        // Use cumulative flow and adjust so that the interval containing "now" matches cashAvailable
         const now = new Date();
-        // Just use a simple accumulation and offset.
-
-        // Calculate cumulative Net Flow relative to start of array
         let cumulativeFlow = 0;
         const withCumulative = aggregated.map(item => {
             cumulativeFlow += item.netFlow;
             return { ...item, cumulativeRelative: cumulativeFlow };
         });
 
-        // Find the "cumulativeRelative" value for Today's interval
-        // We probably want the balance at the END of today's interval to match cashAvailable?
-        // Or start? Let's say end.
-
-        const todayIntervalIndex = aggregated.findIndex(item =>
-            timeframe === 'week' ? isSameWeek(item.date, now, { weekStartsOn: 1 }) :
-                timeframe === 'month' ? isSameMonth(item.date, now) :
-                    timeframe === 'quarter' ? isSameQuarter(item.date, now) :
-                        isSameYear(item.date, now)
-        );
+        const todayIntervalIndex = aggregated.findIndex(item => {
+            const itemDate = new Date(item.date);
+            return timeframe === 'week' ? isSameWeek(itemDate, now, { weekStartsOn: 1 }) :
+                timeframe === 'month' ? isSameMonth(itemDate, now) :
+                    timeframe === 'quarter' ? isSameQuarter(itemDate, now) :
+                        isSameYear(itemDate, now);
+        });
 
         let offset = 0;
         if (todayIntervalIndex >= 0) {
             const todayItem = withCumulative[todayIntervalIndex];
-            // We want: todayItem.cumulativeRelative + offset = finance.cashAvailable
             offset = finance.cashAvailable - todayItem.cumulativeRelative;
         } else {
-            // Fallback if today is out of range (unlikely with +/- logic)
             offset = finance.cashAvailable;
         }
 
@@ -198,16 +170,10 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
 
     }, [finance, timeframe]);
 
-    // Calculate Runway (Months) based on recent burn
+    // Calculate Runway (Months)
     const runwayMonths = useMemo(() => {
-        // Simple logic: Look at last 3 months average burn
-        // Or just use the global store logic if we had one.
-        // Let's use the 'month' aggregation from data if possible, or re-calculate
-
-        // Let's grab last month's data specifically
         const today = new Date();
         const lastMonthDate = subMonths(today, 1);
-        // We can reuse the flattened transactions logic broadly
         const transactions = finance.monthlyEntries.flatMap(month => {
             const expenses = (month.expenses || []).map(e => ({ amount: e.amount, date: new Date(e.date || `${month.month}-01`), type: 'expense' }));
             const incomes = (month.incomes || []).map(i => ({ amount: i.amount, date: new Date(i.date || `${month.month}-01`), type: 'income' }));
@@ -224,21 +190,16 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
 
     }, [finance]);
 
-    // Calculate Today's Label for ReferenceLine
-    const todayLabel = useMemo(() => {
-        const now = new Date();
+    // Format X axis tick based on timeframe
+    const formatXAxis = (tickItem: number) => {
+        const date = new Date(tickItem);
         switch (timeframe) {
-            case 'week':
-                const start = startOfWeek(now, { weekStartsOn: 1 });
-                return format(start, 'd MMM');
-            case 'month':
-                return format(now, 'MMM yy');
-            case 'quarter':
-                return `Q${Math.floor((now.getMonth() + 3) / 3)} ${format(now, 'yy')}`;
-            case 'year':
-                return format(now, 'yyyy');
+            case 'week': return format(date, 'd MMM');
+            case 'month': return format(date, 'MMM yy');
+            case 'quarter': return `Q${Math.floor((date.getMonth() + 3) / 3)} ${format(date, 'yy')}`;
+            case 'year': return format(date, 'yyyy');
         }
-    }, [timeframe]);
+    };
 
     return (
         <Card className="col-span-4 bg-slate-900 border-slate-800">
@@ -269,7 +230,11 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                         <ComposedChart data={data} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" />
                             <XAxis
-                                dataKey="label"
+                                dataKey="date"
+                                type="number"
+                                scale="time"
+                                domain={['auto', 'auto']}
+                                tickFormatter={formatXAxis}
                                 stroke="#94a3b8"
                                 fontSize={12}
                                 tickLine={false}
@@ -295,6 +260,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                             <Tooltip
                                 contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
                                 formatter={(value: number) => [`${value.toFixed(0)} €`, '']}
+                                labelFormatter={(label) => formatXAxis(label)}
                                 labelStyle={{ color: '#94a3b8' }}
                             />
                             <Legend />
@@ -310,7 +276,13 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                 dot={{ r: 4, fill: '#3b82f6' }}
                                 activeDot={{ r: 6 }}
                             />
-                            <ReferenceLine yAxisId="left" x={todayLabel} stroke="#fbbf24" strokeDasharray="3 3" label={{ position: 'top', value: t.chart.today, fill: '#fbbf24', fontSize: 12 }} />
+                            <ReferenceLine
+                                yAxisId="left"
+                                x={new Date().getTime()}
+                                stroke="#fbbf24"
+                                strokeDasharray="3 3"
+                                label={{ position: 'top', value: t.chart.today, fill: '#fbbf24', fontSize: 12 }}
+                            />
                             <ReferenceLine yAxisId="right" y={0} stroke="#ef4444" strokeDasharray="3 3" />
                         </ComposedChart>
                     </ResponsiveContainer>

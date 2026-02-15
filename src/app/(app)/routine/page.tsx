@@ -5,6 +5,9 @@ import { useFounderStore } from '@/store/founder-store';
 import { generateRoutineAnalysis } from '@/lib/ai-service';
 import { Area, AreaChart, Tooltip, ResponsiveContainer } from 'recharts';
 import { translations } from '@/lib/translations';
+import { RecommendationBanner } from '@/components/ui/recommendation-banner';
+import { Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -53,7 +56,11 @@ const COLORS = {
 };
 
 // --- REUSABLE COMPONENTS ---
-const Button = ({ children, onClick, variant = "default", size = "sm", style, ...props }: any) => {
+// --- REUSABLE COMPONENTS ---
+// Renamed to avoid collision with imported Button if any, but we are importing Button from ui/button in the replacement above? 
+// Actually the previous import of Button from ui/button might conflict with this local Button.
+// Let's RENAME the local Button to StyledButton to be safe.
+const StyledButton = ({ onClick, children, variant = "default", size = "md", style, ...props }: any) => {
   const base: React.CSSProperties = {
     display: "inline-flex", alignItems: "center", gap: "6px",
     border: "none", borderRadius: "8px", cursor: "pointer",
@@ -114,7 +121,12 @@ export default function RoutinePage() {
   const updateRoutineTask = useFounderStore(s => s.updateRoutineTask);
   const deleteRoutineTask = useFounderStore(s => s.deleteRoutineTask);
   const resetRoutineWeek = useFounderStore(s => s.resetRoutineWeek);
+
   const language = useFounderStore(s => s.language);
+
+  const recommendations = useFounderStore(s => s.strategicRecommendations?.routineOptimization);
+  const showRecommendations = useFounderStore(s => s.showStrategicRecommendations);
+  const toggleRecommendations = useFounderStore(s => s.toggleStrategicRecommendations);
 
   const t = translations[language].routine;
   const common = translations[language].common;
@@ -218,10 +230,10 @@ export default function RoutinePage() {
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant="ai" onClick={handleAnalyzeRoutine}>
+                <StyledButton variant="ai" onClick={handleAnalyzeRoutine}>
                   <Icons.Sparkles />
                   {t.analyze}
-                </Button>
+                </StyledButton>
               </DialogTrigger>
               <DialogContent className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] max-w-2xl">
                 <DialogHeader>
@@ -250,32 +262,58 @@ export default function RoutinePage() {
             <span style={{ fontSize: "12px", color: progress === 100 ? COLORS.success : COLORS.textMuted, fontFamily: "'Space Mono', monospace" }}>
               {Math.round(progress)}%
             </span>
-            <Button size="sm" onClick={resetRoutineWeek}>{t.reset}</Button>
+            <StyledButton size="sm" onClick={resetRoutineWeek}>{t.reset}</StyledButton>
           </div>
         </div>
 
-        {/* Consistency Chart */}
-        {historyData.length > 2 && (
-          <div className="h-[100px] w-full mb-8">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={historyData}>
-                <defs>
-                  <linearGradient id="colorRate" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={COLORS.accent} stopOpacity={0.3} />
-                    <stop offset="95%" stopColor={COLORS.accent} stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <Tooltip
-                  contentStyle={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: '8px' }}
-                  itemStyle={{ color: COLORS.text }}
-                />
-                <Area type="monotone" dataKey="rate" stroke={COLORS.accent} fillOpacity={1} fill="url(#colorRate)" strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-      </div>
 
+
+        {
+          showRecommendations && recommendations && recommendations.length > 0 && (
+            <div className="mb-6">
+              <RecommendationBanner
+                recommendations={recommendations}
+                type="routine"
+                onApply={(item) => {
+                  const isDaily = item.timeframe?.toLowerCase().includes('daily');
+                  if (isDaily) {
+                    ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].forEach(day => {
+                      addRoutineTask(day, item.suggestion);
+                    });
+                  } else {
+                    // Default to Monday for weekly tasks
+                    addRoutineTask('monday', item.suggestion);
+                  }
+                }}
+                onDismiss={toggleRecommendations}
+              />
+            </div>
+          )
+        }
+
+        {/* Consistency Chart */}
+        {
+          historyData.length > 2 && (
+            <div className="h-[100px] w-full mb-8">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={historyData}>
+                  <defs>
+                    <linearGradient id="colorRate" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={COLORS.accent} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={COLORS.accent} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <Tooltip
+                    contentStyle={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: '8px' }}
+                    itemStyle={{ color: COLORS.text }}
+                  />
+                  <Area type="monotone" dataKey="rate" stroke={COLORS.accent} fillOpacity={1} fill="url(#colorRate)" strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )
+        }
+      </div>
       {/* Columns */}
       <div className="flex-1 overflow-y-auto px-8 pb-8">
         <div className="grid grid-cols-5 gap-4 pb-8">
@@ -325,12 +363,12 @@ export default function RoutinePage() {
                             autoFocus
                           />
                           <div style={{ display: "flex", gap: "4px", justifyContent: "flex-end" }}>
-                            <Button variant="ghost" size="sm" onClick={cancelEditing} style={{ padding: "4px" }}>
+                            <StyledButton variant="ghost" size="sm" onClick={cancelEditing} style={{ padding: "4px" }}>
                               <Icons.X />
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={saveEditedTask} style={{ color: COLORS.success, padding: "4px" }}>
+                            </StyledButton>
+                            <StyledButton variant="ghost" size="sm" onClick={saveEditedTask} style={{ color: COLORS.success, padding: "4px" }}>
                               <Icons.Check />
-                            </Button>
+                            </StyledButton>
                           </div>
                         </div>
                       ) : (
@@ -397,7 +435,7 @@ export default function RoutinePage() {
                         }}
                         autoFocus
                       />
-                      <Button size="sm" variant="primary" onClick={() => handleAddTask(day.id)}>+</Button>
+                      <StyledButton size="sm" variant="primary" onClick={() => handleAddTask(day.id)}>+</StyledButton>
                     </div>
                   </div>
                 ) : (

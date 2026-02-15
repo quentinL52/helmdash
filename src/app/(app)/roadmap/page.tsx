@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from "react";
-import { useLocalStorage } from '@/hooks/use-local-storage';
-import { useFounderStore } from '@/store/founder-store';
+import { useFounderStore, RoadmapItem } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
+import { RecommendationBanner } from '@/components/ui/recommendation-banner';
+import { Sparkles } from 'lucide-react';
+import { COLORS } from '@/lib/constants';
 
 // --- ICONS (inline SVG) ---
 const Icons = {
@@ -18,21 +20,7 @@ const Icons = {
   ),
 };
 
-// --- COLOR PALETTE ---
-const COLORS = {
-  bg: "#0f1117",
-  surface: "#181a24",
-  surfaceHover: "#1e2130",
-  border: "#282c3a",
-  text: "#e8e9ed",
-  textMuted: "#8b8fa3",
-  textDim: "#5c6078",
-  accent: "#6c5ce7",
-  success: "#00cec9",
-  warning: "#fdcb6e",
-  danger: "#ff6b6b",
-  teal: "#00b894",
-};
+
 
 // --- REUSABLE COMPONENTS ---
 const Button = ({ children, onClick, variant = "default", size = "md", style, ...props }: any) => {
@@ -109,8 +97,16 @@ const Card = ({ children, style, className = "" }: any) => (
 
 // --- ROADMAP PAGE ---
 export default function RoadmapPage() {
-  const [tasks, setTasks] = useLocalStorage<any[]>("roadmap", []);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const tasks = useFounderStore(s => s.roadmap);
+  const addRoadmapItem = useFounderStore(s => s.addRoadmapItem);
+  const updateRoadmapItem = useFounderStore(s => s.updateRoadmapItem);
+  const deleteRoadmapItem = useFounderStore(s => s.deleteRoadmapItem);
+
+  const recommendations = useFounderStore(s => s.strategicRecommendations?.roadmapRecommendations);
+  const showRecommendations = useFounderStore(s => s.showStrategicRecommendations);
+  const toggleRecommendations = useFounderStore(s => s.toggleStrategicRecommendations);
+
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", description: "", status: "todo", priority: "medium", week: "" });
 
@@ -128,10 +124,10 @@ export default function RoadmapPage() {
     if (!form.title.trim()) return;
 
     if (editingId) {
-      setTasks(tasks.map(t => t.id === editingId ? { ...t, ...form } : t));
+      updateRoadmapItem(editingId, form as any);
       setEditingId(null);
     } else {
-      setTasks([...tasks, { ...form, id: Date.now() }]);
+      addRoadmapItem(form as any);
     }
 
     setForm({ title: "", description: "", status: "todo", priority: "medium", week: "" });
@@ -150,8 +146,8 @@ export default function RoadmapPage() {
     setShowForm(false);
   };
 
-  const updateStatus = (id: any, status: any) => setTasks(tasks.map(t => t.id === id ? { ...t, status } : t));
-  const remove = (id: any) => setTasks(tasks.filter(t => t.id !== id));
+  const updateStatus = (id: string, status: any) => updateRoadmapItem(id, { status });
+  const remove = (id: string) => deleteRoadmapItem(id);
 
   const priorityColors: Record<string, string> = { high: COLORS.danger, medium: COLORS.warning, low: COLORS.teal };
   const priorityLabels: Record<string, string> = {
@@ -172,10 +168,34 @@ export default function RoadmapPage() {
       <style>{animationCSS}</style>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexShrink: 0 }}>
         <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
-        <Button variant="primary" onClick={() => { setShowForm(!showForm); setEditingId(null); setForm({ title: "", description: "", status: "todo", priority: "medium", week: "" }); }}>
-          <Icons.Plus /> {t.new}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="default"
+            size="sm"
+            onClick={toggleRecommendations}
+            style={{ background: showRecommendations ? COLORS.accent + '22' : COLORS.surface, color: showRecommendations ? COLORS.accent : COLORS.textMuted }}
+          >
+            <Sparkles className="w-4 h-4" />
+          </Button>
+          <Button variant="primary" onClick={() => { setShowForm(!showForm); setEditingId(null); setForm({ title: "", description: "", status: "todo", priority: "medium", week: "" }); }}>
+            <Icons.Plus /> {t.new}
+          </Button>
+        </div>
       </div>
+
+      {showRecommendations && recommendations && recommendations.length > 0 && (
+        <RecommendationBanner
+          recommendations={recommendations}
+          type="roadmap"
+          onApply={(item) => addRoadmapItem({
+            title: item.title,
+            priority: item.priority as any,
+            status: 'todo',
+            week: item.timeframe
+          })}
+          onDismiss={toggleRecommendations}
+        />
+      )}
 
       {showForm && (
         <Card className="scale-in" style={{ marginBottom: "20px", border: `1px solid ${COLORS.accent}33`, flexShrink: 0 }}>

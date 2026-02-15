@@ -1,12 +1,15 @@
 "use client";
 
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { LEAN_CANVAS_SECTIONS, type LeanCanvasSectionId } from '@/lib/constants';
+import { LEAN_CANVAS_SECTIONS, type LeanCanvasSectionId, COLORS } from '@/lib/constants';
 import { CanvasSection } from './components/canvas-section';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
+import { RecommendationBanner } from '@/components/ui/recommendation-banner';
+import { Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 type CanvasData = Record<LeanCanvasSectionId, string>;
 const initialCanvasData: CanvasData = LEAN_CANVAS_SECTIONS.reduce(
@@ -18,10 +21,12 @@ const initialCanvasData: CanvasData = LEAN_CANVAS_SECTIONS.reduce(
 );
 
 export default function LeanCanvasPage() {
-  const [canvasData, setCanvasData] = useLocalStorage<CanvasData>(
-    'ignitehq-lean-canvas',
-    initialCanvasData
-  );
+  const canvasData = useFounderStore(s => s.leanCanvas || {});
+  const updateCanvasSection = useFounderStore(s => s.updateCanvasSection);
+
+  const recommendations = useFounderStore(s => s.strategicRecommendations?.leanCanvasRecommendations);
+  const showRecommendations = useFounderStore(s => s.showStrategicRecommendations);
+  const toggleRecommendations = useFounderStore(s => s.toggleStrategicRecommendations);
 
   const [businessConcept, setBusinessConcept] = useLocalStorage<string>(
     'ignitehq-business-concept',
@@ -32,7 +37,7 @@ export default function LeanCanvasPage() {
   const t = translations[language].leanCanvas;
 
   const handleContentChange = (id: LeanCanvasSectionId, content: string) => {
-    setCanvasData((prev) => ({ ...prev, [id]: content }));
+    updateCanvasSection(id, content);
   };
 
   const sections = LEAN_CANVAS_SECTIONS;
@@ -62,7 +67,7 @@ export default function LeanCanvasPage() {
           title={tr.title}
           description={tr.desc}
           placeholder={`${language === 'fr' ? 'Idées pour' : 'Ideas for'} ${tr.title}...`}
-          content={canvasData[section.id]}
+          content={canvasData[section.id] || ''}
           onContentChange={(content) =>
             handleContentChange(section.id, content)
           }
@@ -75,12 +80,53 @@ export default function LeanCanvasPage() {
   return (
     <div className="flex h-full flex-col">
       <div className='space-y-4'>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
-          <p className="text-muted-foreground">
-            {t.subtitle}
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
+            <p className="text-muted-foreground">
+              {t.subtitle}
+            </p>
+          </div>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={toggleRecommendations}
+            style={{ background: showRecommendations ? COLORS.accent + '22' : COLORS.surface, color: showRecommendations ? COLORS.accent : COLORS.textMuted }}
+          >
+            <Sparkles className="w-4 h-4" />
+          </Button>
         </div>
+
+        {showRecommendations && recommendations && recommendations.length > 0 && (
+          <RecommendationBanner
+            recommendations={recommendations}
+            type="lean-canvas"
+            onApply={(item) => {
+              // Find logical section for the suggestion
+              // simple mapping based on section name
+              const sectionMap: Record<string, LeanCanvasSectionId> = {
+                'Problem': 'Problem',
+                'Solution': 'Solution',
+                'Metrics': 'Key Metrics',
+                'UVP': 'Unique Value Proposition',
+                'Advantage': 'Unfair Advantage',
+                'Channels': 'Channels',
+                'Segments': 'Customer Segments',
+                'Costs': 'Cost Structure',
+                'Revenue': 'Revenue Streams'
+              };
+              const targetId = Object.keys(sectionMap).find(k => item.section.includes(k))
+                ? sectionMap[Object.keys(sectionMap).find(k => item.section.includes(k))!]
+                : item.section as LeanCanvasSectionId;
+
+              if (targetId) {
+                const current = canvasData[targetId] || '';
+                updateCanvasSection(targetId, current + (current ? '\n\n' : '') + `> ${item.suggestion}`);
+              }
+            }}
+            onDismiss={toggleRecommendations}
+          />
+        )}
 
         <div className="space-y-2">
           <Label htmlFor="business-concept">

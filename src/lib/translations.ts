@@ -345,6 +345,24 @@ export const translations = {
             reportDescription: "Votre coach IA a généré votre stratégie hebdomadaire.",
             generationFailed: "Échec de la génération",
             failedDescription: "Impossible de générer le rapport hebdo. Réessayez.",
+        },
+        strategicRecommendations: {
+            apply: "Appliquer",
+            applied: "Appliqué",
+            benefit: "Bénéfice :",
+            dismiss: "Masquer",
+            bannerTitle: {
+                leanCanvas: "Suggestions Stratégiques",
+                roadmap: "Éléments de Roadmap",
+                hypotheses: "Hypothèses à Tester",
+                routine: "Suggestions de Rythme"
+            },
+            bannerDesc: {
+                leanCanvas: "Pistes d'optimisation pour votre modèle.",
+                roadmap: "Tâches à fort impact suggérées.",
+                hypotheses: "Expériences pour valider votre modèle.",
+                routine: "Habitudes pour optimiser votre performance."
+            }
         }
     },
     en: {
@@ -693,6 +711,24 @@ export const translations = {
             reportDescription: "Your AI coach has generated your weekly strategy.",
             generationFailed: "Generation Failed",
             failedDescription: "Could not generate weekly report. Please try again.",
+        },
+        strategicRecommendations: {
+            apply: "Apply",
+            applied: "Applied",
+            benefit: "Benefit:",
+            dismiss: "Dismiss",
+            bannerTitle: {
+                leanCanvas: "Strategic Suggestions",
+                roadmap: "Roadmap Items",
+                hypotheses: "Hypotheses to Test",
+                routine: "Rhythm Suggestions"
+            },
+            bannerDesc: {
+                leanCanvas: "Optimization tips for your model.",
+                roadmap: "Suggested high-impact tasks.",
+                hypotheses: "Experiments to validate your model.",
+                routine: "Habits to optimize your performance."
+            }
         }
     }
 };

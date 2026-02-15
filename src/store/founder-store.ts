@@ -171,6 +171,7 @@ export interface CompetitorSWOT {
 }
 
 export type PricingModelType = 'free' | 'freemium' | 'subscription' | 'usage' | 'enterprise' | 'other';
+export type FeatureStatus = 'yes' | 'no' | 'partial' | 'planned';
 
 export interface Competitor {
     id: string;
@@ -195,23 +196,35 @@ export interface Competitor {
     geography?: string;
     radarScores: CompetitorRadarScores;
     swot: CompetitorSWOT;
+    featureAnalysis?: Record<string, FeatureStatus>;
     createdAt: string;
     updatedAt: string;
 }
 
 export interface MySolution {
     name: string;
-    description?: string;
-    targetSegment?: string;
-    businessModel?: string;
-    teamSize?: string;
-    fundingStage?: string;
-    keyFeatures?: string[];
-    differentiators?: string[];
-    pricingModel?: PricingModelType;
-    pricingRange?: string;
-    positioning?: string;
+    website: string;
+    description: string;
     radarScores: CompetitorRadarScores;
+    swot: {
+        strengths: string;
+        weaknesses: string;
+        opportunities: string;
+        threats: string;
+    };
+    featureAnalysis: Record<string, FeatureStatus>;
+    comparisonCriteria: string[];
+}
+
+export interface RoadmapItem {
+    id: string;
+    title: string;
+    description?: string;
+    status: 'todo' | 'doing' | 'done';
+    priority: 'high' | 'medium' | 'low';
+    week?: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export type MarketSignalImpact = 'positive' | 'negative' | 'neutral';
@@ -235,6 +248,17 @@ export interface WeeklyReport {
     createdAt: string; // ISO String
 }
 
+// Module 13: Strategic Recommendations (AI)
+export interface StrategicRecommendation {
+    generatedAt: string;
+    featureGaps: { feature: string; status: 'critical' | 'nice-to-have'; reason: string }[];
+    leanCanvasRecommendations: { section: string; suggestion: string }[];
+    roadmapRecommendations: { title: string; priority: 'high' | 'medium' | 'low'; timeframe: string }[];
+    hypothesisSuggestions: { statement: string; category: string; testMethod: string }[];
+    routineOptimization: { suggestion: string; benefit: string; timeframe: string }[];
+    marketNews: { title: string; url: string; summary: string; date?: string }[];
+}
+
 export interface FounderStore {
     // --- State ---
     hypotheses: Hypothesis[];
@@ -246,10 +270,12 @@ export interface FounderStore {
     routine: RoutineDay[]; // Module 12
     routineHistory: RoutineHistory[]; // Module 12 - Routine Optimization
     leanCanvas: Record<string, string>;
+    roadmap: RoadmapItem[];
     weeklyReport: WeeklyReport | null; // Module 13
     competitors: Competitor[]; // Module 14
     marketSignals: MarketSignal[]; // Module 14
     mySolution: MySolution; // Module 14 - User's own solution for benchmarking
+    strategicRecommendations: StrategicRecommendation | null;
 
     // --- Actions ---
 
@@ -307,8 +333,22 @@ export interface FounderStore {
     deleteMarketSignal: (id: string) => void;
     updateMySolution: (updates: Partial<MySolution>) => void;
 
+    // Feature Matrix Actions
+    addComparisonCriterion: (feature: string) => void;
+    deleteComparisonCriterion: (feature: string) => void;
+
+    // AI Actions
+    setStrategicRecommendations: (recommendations: StrategicRecommendation) => void;
+    showStrategicRecommendations: boolean;
+    toggleStrategicRecommendations: () => void;
+
     // Canvas
     updateCanvasSection: (sectionId: string, content: string) => void;
+
+    // Roadmap
+    addRoadmapItem: (item: Omit<RoadmapItem, 'id' | 'createdAt' | 'updatedAt'>) => void;
+    updateRoadmapItem: (id: string, updates: Partial<RoadmapItem>) => void;
+    deleteRoadmapItem: (id: string) => void;
 
     // --- Settings / i18n ---
     language: 'fr' | 'en';
@@ -380,13 +420,33 @@ export const useFounderStore = create<FounderStore>()(
             ],
             routineHistory: [],
             leanCanvas: {},
+            roadmap: [], // Initial empty state
             weeklyReport: null,
             competitors: [],
             marketSignals: [],
             mySolution: {
                 name: '',
-                radarScores: { price: 5, features: 5, ux: 5, market: 5, innovation: 5, support: 5 },
+                website: '',
+                description: '',
+                radarScores: {
+                    price: 5,
+                    features: 5,
+                    ux: 5,
+                    market: 5,
+                    innovation: 5,
+                    support: 5,
+                },
+                swot: {
+                    strengths: '',
+                    weaknesses: '',
+                    opportunities: '',
+                    threats: '',
+                },
+                featureAnalysis: {},
+                comparisonCriteria: ['Mobile App', 'API Access', '24/7 Support', 'Custom Branding', 'Analytics'], // Defaults
             },
+            strategicRecommendations: null,
+            showStrategicRecommendations: true, // Default to true
 
             // Actions
             addHypothesis: (hypothesis) => set((state) => ({
@@ -424,10 +484,11 @@ export const useFounderStore = create<FounderStore>()(
             addMonthlyEntry: (entry) => set((state) => {
                 // Ensure all items have a date. If not, default to 1st of month.
                 const defaultDate = `${entry.month}-01`;
-                const enrichItem = (item: ExpenseItem) => ({ ...item, date: item.date || defaultDate });
+                const enrichItem = (item: ExpenseItem) => ({ ...item, id: item.id || crypto.randomUUID(), date: item.date || defaultDate });
 
                 const enrichedEntry = {
                     ...entry,
+                    id: crypto.randomUUID(),
                     expenses: entry.expenses.map(enrichItem),
                     incomes: (entry.incomes || []).map(enrichItem)
                 };
@@ -468,7 +529,7 @@ export const useFounderStore = create<FounderStore>()(
             addOneTimeEntry: (entry) => set((state) => ({
                 finance: {
                     ...state.finance,
-                    oneTimeEntries: [...state.finance.oneTimeEntries, entry],
+                    oneTimeEntries: [...state.finance.oneTimeEntries, { ...entry, id: crypto.randomUUID() }],
                 },
             })),
 
@@ -702,11 +763,52 @@ export const useFounderStore = create<FounderStore>()(
                 mySolution: { ...state.mySolution, ...updates },
             })),
 
+            addComparisonCriterion: (feature) => set((state) => {
+                const currentCriteria = state.mySolution.comparisonCriteria || [];
+                if (currentCriteria.includes(feature)) return state;
+                return {
+                    mySolution: {
+                        ...state.mySolution,
+                        comparisonCriteria: [...currentCriteria, feature]
+                    }
+                };
+            }),
+
+            deleteComparisonCriterion: (feature) => set((state) => ({
+                mySolution: {
+                    ...state.mySolution,
+                    comparisonCriteria: (state.mySolution.comparisonCriteria || []).filter(f => f !== feature)
+                }
+            })),
+
             updateCanvasSection: (sectionId, content) => set((state) => ({
                 leanCanvas: {
                     ...state.leanCanvas,
                     [sectionId]: content,
                 },
+            })),
+
+            // Roadmap Actions
+            addRoadmapItem: (item) => set((state) => ({
+                roadmap: [
+                    ...state.roadmap,
+                    {
+                        ...item,
+                        id: crypto.randomUUID(),
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                    }
+                ]
+            })),
+
+            updateRoadmapItem: (id, updates) => set((state) => ({
+                roadmap: state.roadmap.map(item =>
+                    item.id === id ? { ...item, ...updates, updatedAt: new Date().toISOString() } : item
+                )
+            })),
+
+            deleteRoadmapItem: (id) => set((state) => ({
+                roadmap: state.roadmap.filter(item => item.id !== id)
             })),
 
             // CRM Actions
@@ -808,6 +910,10 @@ export const useFounderStore = create<FounderStore>()(
             })),
 
             setWeeklyReport: (report) => set({ weeklyReport: report }),
+
+            // AI Actions
+            setStrategicRecommendations: (recommendations) => set({ strategicRecommendations: recommendations }),
+            toggleStrategicRecommendations: () => set((state) => ({ showStrategicRecommendations: !state.showStrategicRecommendations })),
 
             hydrate: (newState) => set((state) => ({
                 ...state,
