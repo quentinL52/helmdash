@@ -32,7 +32,10 @@ export default function HypothesesPage() {
     return (
         <div className="flex flex-col h-full space-y-4 p-8 pt-6 font-sans text-[#e8e9ed]">
             <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
+                    <p className="text-[#8b8fa3] text-sm">{t.subtitle}</p>
+                </div>
                 <Button
                     variant="default"
                     size="sm"
@@ -50,7 +53,7 @@ export default function HypothesesPage() {
                     onApply={(item) => addHypothesis({
                         statement: item.statement,
                         category: item.category as HypothesisCategory,
-                        riskLevel: 'medium' as HypothesisRisk, // Default
+                        riskLevel: 'medium' as HypothesisRisk,
                         testMethod: item.testMethod,
                         successCriteria: 'TBD',
                         status: 'draft' as HypothesisStatus

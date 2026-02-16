@@ -27,7 +27,7 @@ export const translations = {
         },
         hypotheses: {
             title: "Hypothèses",
-            subtitle: "Validez vos hypothèses risquées.",
+            subtitle: "Cycle Build-Measure-Learn pour valider vos hypothèses.",
             new: "Nouvelle Hypothèse",
             columns: {
                 draft: "Brouillon",
@@ -37,7 +37,7 @@ export const translations = {
                 pivoted: "Pivotée",
             },
             tabs: {
-                board: "Tableau Kanban",
+                board: "Build-Measure-Learn",
                 list: "Vue Liste"
             },
             form: {
@@ -75,6 +75,33 @@ export const translations = {
                 method: "Méthode",
                 actions: "Actions",
                 empty: "Aucune hypothèse trouvée. Ajoutez-en une via le tableau."
+            },
+            bml: {
+                draftPool: "Pool d'hypothèses",
+                draftPoolDesc: "Ajoutez vos hypothèses ici",
+                build: "Build",
+                buildDesc: "Définissez votre expérimentation",
+                measure: "Measure",
+                measureDesc: "Collectez et notez vos données",
+                learn: "Learn",
+                learnDesc: "Décidez : Validé, Invalidé ou Pivot",
+                validated: "Validées",
+                invalidated: "Invalidées",
+                addDraft: "Ajouter une hypothèse...",
+                moveToBuild: "Passer en Build",
+                moveToMeasure: "Passer en Measure",
+                moveToLearn: "Passer en Learn",
+                validate: "Valider",
+                invalidate: "Invalider",
+                pivot: "Pivoter",
+                measurePlaceholder: "Notez vos observations, métriques, résultats...",
+                learningsPlaceholder: "Qu'avez-vous appris ?",
+                pivotNote: "L'hypothèse repart comme nouvelle hypothèse",
+                fromPivot: "Issu d'un pivot",
+                method: "Méthode",
+                criteria: "Critères",
+                deadline: "Deadline",
+                cost: "Coût estimé"
             }
         },
         finance: {
@@ -537,7 +564,7 @@ export const translations = {
         },
         hypotheses: {
             title: "Hypotheses",
-            subtitle: "Validate your risky assumptions.",
+            subtitle: "Build-Measure-Learn cycle to validate your hypotheses.",
             new: "New Hypothesis",
             columns: {
                 draft: "Draft",
@@ -547,7 +574,7 @@ export const translations = {
                 pivoted: "Pivoted",
             },
             tabs: {
-                board: "Kanban Board",
+                board: "Build-Measure-Learn",
                 list: "List View"
             },
             form: {
@@ -585,6 +612,33 @@ export const translations = {
                 method: "Test Method",
                 actions: "Actions",
                 empty: "No hypotheses found. Add one from the board view."
+            },
+            bml: {
+                draftPool: "Hypothesis Pool",
+                draftPoolDesc: "Add your hypotheses here",
+                build: "Build",
+                buildDesc: "Define your experiment",
+                measure: "Measure",
+                measureDesc: "Collect and note your data",
+                learn: "Learn",
+                learnDesc: "Decide: Validated, Invalidated or Pivot",
+                validated: "Validated",
+                invalidated: "Invalidated",
+                addDraft: "Add a hypothesis...",
+                moveToBuild: "Move to Build",
+                moveToMeasure: "Move to Measure",
+                moveToLearn: "Move to Learn",
+                validate: "Validate",
+                invalidate: "Invalidate",
+                pivot: "Pivot",
+                measurePlaceholder: "Note your observations, metrics, results...",
+                learningsPlaceholder: "What did you learn?",
+                pivotNote: "Hypothesis restarts as a new hypothesis",
+                fromPivot: "From a pivot",
+                method: "Method",
+                criteria: "Criteria",
+                deadline: "Deadline",
+                cost: "Estimated cost"
             }
         },
         finance: {

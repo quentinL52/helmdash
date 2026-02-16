@@ -13,15 +13,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { HypothesisDialog } from './create-hypothesis-dialog';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, RotateCcw } from 'lucide-react';
 import { translations } from '@/lib/translations';
 
-const STATUS_COLORS: Record<HypothesisStatus, string> = {
-    draft: "bg-slate-500/10 text-slate-500 hover:bg-slate-500/20",
-    testing: "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20",
-    validated: "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20",
-    invalidated: "bg-red-500/10 text-red-500 hover:bg-red-500/20",
-    pivoted: "bg-purple-500/10 text-purple-500 hover:bg-purple-500/20",
+const PHASE_COLORS: Record<string, string> = {
+    draft: "bg-slate-500/10 text-slate-500",
+    build: "bg-blue-500/10 text-blue-500",
+    measure: "bg-yellow-500/10 text-yellow-500",
+    learn: "bg-teal-500/10 text-teal-500",
+    validated: "bg-emerald-500/10 text-emerald-500",
+    invalidated: "bg-red-500/10 text-red-500",
+    pivoted: "bg-purple-500/10 text-purple-500",
 };
 
 const RISK_COLORS: Record<string, string> = {
@@ -31,11 +33,37 @@ const RISK_COLORS: Record<string, string> = {
     low: "text-emerald-500",
 };
 
+function getPhase(h: Hypothesis): string {
+    if (h.status === 'draft') return 'draft';
+    if (h.status === 'validated') return 'validated';
+    if (h.status === 'invalidated') return 'invalidated';
+    if (h.status === 'pivoted') return 'pivoted';
+    // testing status - determine BML phase
+    if (h.actualResult === 'learning') return 'learn';
+    if (h.actualResult === 'measuring') return 'measure';
+    return 'build';
+}
+
+function getPhaseLabel(phase: string, language: 'fr' | 'en'): string {
+    const t = translations[language].hypotheses;
+    const labels: Record<string, string> = {
+        draft: t.columns.draft,
+        build: 'Build',
+        measure: 'Measure',
+        learn: 'Learn',
+        validated: t.columns.validated,
+        invalidated: t.columns.invalidated,
+        pivoted: t.columns.pivoted,
+    };
+    return labels[phase] || phase;
+}
+
 export function HypothesesList() {
     const hypotheses = useFounderStore(s => s.hypotheses);
     const deleteHypothesis = useFounderStore(s => s.deleteHypothesis);
     const language = useFounderStore(s => s.language);
     const t = translations[language].hypotheses.list;
+    const tBml = translations[language].hypotheses.bml;
     const [editingHypothesis, setEditingHypothesis] = useState<Hypothesis | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -62,63 +90,79 @@ export function HypothesesList() {
             <Table>
                 <TableHeader className="bg-[#1e2130]">
                     <TableRow className="border-b border-[#282c3a] hover:bg-[#1e2130]">
-                        <TableHead className="w-[100px] text-[#8b8fa3]">{t.status}</TableHead>
+                        <TableHead className="w-[100px] text-[#8b8fa3]">Phase</TableHead>
                         <TableHead className="text-[#8b8fa3]">{t.statement}</TableHead>
                         <TableHead className="w-[120px] text-[#8b8fa3]">{t.category}</TableHead>
                         <TableHead className="w-[100px] text-[#8b8fa3]">{t.risk}</TableHead>
                         <TableHead className="text-[#8b8fa3] hidden md:table-cell">{t.method}</TableHead>
+                        <TableHead className="text-[#8b8fa3] hidden lg:table-cell">Measure</TableHead>
+                        <TableHead className="text-[#8b8fa3] hidden lg:table-cell">Learn</TableHead>
                         <TableHead className="text-right text-[#8b8fa3]">{t.actions}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {hypotheses.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={6} className="h-24 text-center text-[#8b8fa3]">
+                            <TableCell colSpan={8} className="h-24 text-center text-[#8b8fa3]">
                                 {t.empty}
                             </TableCell>
                         </TableRow>
                     ) : (
-                        hypotheses.map((hypothesis) => (
-                            <TableRow key={hypothesis.id} className="border-b border-[#282c3a] hover:bg-[#1e2130]/50 transition-colors">
-                                <TableCell>
-                                    <Badge variant="outline" className={`border-0 capitalize ${STATUS_COLORS[hypothesis.status]}`}>
-                                        {hypothesis.status}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell className="font-medium text-[#e8e9ed]">
-                                    {hypothesis.statement}
-                                </TableCell>
-                                <TableCell className="capitalize text-[#8b8fa3]">
-                                    {hypothesis.category}
-                                </TableCell>
-                                <TableCell className={`capitalize font-medium ${RISK_COLORS[hypothesis.riskLevel]}`}>
-                                    {hypothesis.riskLevel}
-                                </TableCell>
-                                <TableCell className="text-[#8b8fa3] hidden md:table-cell">
-                                    {hypothesis.testMethod || '-'}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2">
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => handleEdit(hypothesis)}
-                                            className="h-8 w-8 text-[#8b8fa3] hover:text-[#e8e9ed] hover:bg-[#282c3a]"
-                                        >
-                                            <Edit className="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => handleDelete(hypothesis.id)}
-                                            className="h-8 w-8 text-[#8b8fa3] hover:text-red-400 hover:bg-[#282c3a]"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ))
+                        hypotheses.map((hypothesis) => {
+                            const phase = getPhase(hypothesis);
+                            return (
+                                <TableRow key={hypothesis.id} className="border-b border-[#282c3a] hover:bg-[#1e2130]/50 transition-colors">
+                                    <TableCell>
+                                        <div className="flex items-center gap-1.5">
+                                            <Badge variant="outline" className={`border-0 capitalize text-[10px] ${PHASE_COLORS[phase]}`}>
+                                                {getPhaseLabel(phase, language)}
+                                            </Badge>
+                                            {hypothesis.pivotedFromId && (
+                                                <RotateCcw className="w-3 h-3 text-purple-400" />
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="font-medium text-[#e8e9ed]">
+                                        {hypothesis.statement}
+                                    </TableCell>
+                                    <TableCell className="capitalize text-[#8b8fa3]">
+                                        {hypothesis.category}
+                                    </TableCell>
+                                    <TableCell className={`capitalize font-medium ${RISK_COLORS[hypothesis.riskLevel]}`}>
+                                        {hypothesis.riskLevel}
+                                    </TableCell>
+                                    <TableCell className="text-[#8b8fa3] hidden md:table-cell">
+                                        {hypothesis.testMethod || '—'}
+                                    </TableCell>
+                                    <TableCell className="text-[#8b8fa3] hidden lg:table-cell max-w-[200px]">
+                                        <span className="text-[11px] line-clamp-2">{hypothesis.measureNotes || '—'}</span>
+                                    </TableCell>
+                                    <TableCell className="text-[#8b8fa3] hidden lg:table-cell max-w-[200px]">
+                                        <span className="text-[11px] line-clamp-2">{hypothesis.learnings || '—'}</span>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleEdit(hypothesis)}
+                                                className="h-8 w-8 text-[#8b8fa3] hover:text-[#e8e9ed] hover:bg-[#282c3a]"
+                                            >
+                                                <Edit className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => handleDelete(hypothesis.id)}
+                                                className="h-8 w-8 text-[#8b8fa3] hover:text-red-400 hover:bg-[#282c3a]"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })
                     )}
                 </TableBody>
             </Table>

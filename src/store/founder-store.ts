@@ -18,17 +18,23 @@ export interface Hypothesis {
     category: HypothesisCategory;
     riskLevel: HypothesisRisk;
 
-    // Test
+    // Build phase
     testMethod: string;
     successCriteria: string;
     deadline?: string;
-    cost?: number; // Estimated cost
+    cost?: number;
 
-    // Result
+    // Measure phase
+    measureNotes?: string;
+
+    // Learn phase
     status: HypothesisStatus;
     actualResult?: string;
     learnings?: string;
     nextAction?: string;
+
+    // Pivot tracking
+    pivotedFromId?: string; // ID of the hypothesis this was pivoted from
 }
 
 // Module 7: Finances
