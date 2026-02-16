@@ -448,6 +448,14 @@ export interface FounderStore {
     setStrategicRecommendations: (recommendations: StrategicRecommendation) => void;
     showStrategicRecommendations: boolean;
     toggleStrategicRecommendations: () => void;
+    removeStrategicRecommendation: (
+        type: 'swot' | 'lean' | 'roadmap',
+        content: string,
+        swotType?: 'strengths' | 'weaknesses' | 'opportunities' | 'threats'
+    ) => void;
+    addSwotItem: (type: 'strengths' | 'weaknesses' | 'opportunities' | 'threats', content: string) => void;
+    updateSwotItem: (type: 'strengths' | 'weaknesses' | 'opportunities' | 'threats', index: number, content: string) => void;
+    removeSwotItem: (type: 'strengths' | 'weaknesses' | 'opportunities' | 'threats', index: number) => void;
 
     // Canvas
     updateCanvasSection: (sectionId: string, content: string) => void;
@@ -1092,6 +1100,117 @@ export const useFounderStore = create<FounderStore>()(
             // AI Actions
             setStrategicRecommendations: (recommendations) => set({ strategicRecommendations: recommendations }),
             toggleStrategicRecommendations: () => set((state) => ({ showStrategicRecommendations: !state.showStrategicRecommendations })),
+            removeStrategicRecommendation: (type, content, swotType) => set((state) => {
+                const current = state.strategicRecommendations;
+                if (!current) return state;
+
+                const newState = { ...current };
+
+                if (type === 'roadmap') {
+                    newState.roadmapRecommendations = current.roadmapRecommendations.filter(r => r.title !== content);
+                } else if (type === 'lean') {
+                    newState.leanCanvasRecommendations = current.leanCanvasRecommendations.filter(r => r.suggestion !== content);
+                } else if (type === 'swot' && swotType && newState.swotAnalysis) {
+                    newState.swotAnalysis = {
+                        ...newState.swotAnalysis,
+                        [swotType]: newState.swotAnalysis[swotType].filter(s => s !== content)
+                    };
+                }
+
+                return { strategicRecommendations: newState };
+            }),
+
+            addSwotItem: (type, content) => set((state) => {
+                const current = state.strategicRecommendations;
+                // If no recommendations exist, create the structure
+                if (!current) {
+                    return {
+                        strategicRecommendations: {
+                            generatedAt: new Date().toISOString(),
+                            featureGaps: [],
+                            leanCanvasRecommendations: [],
+                            roadmapRecommendations: [],
+                            hypothesisSuggestions: [],
+                            routineOptimization: [],
+                            marketNews: [],
+                            swotAnalysis: {
+                                strengths: type === 'strengths' ? [content] : [],
+                                weaknesses: type === 'weaknesses' ? [content] : [],
+                                opportunities: type === 'opportunities' ? [content] : [],
+                                threats: type === 'threats' ? [content] : [],
+                            }
+                        }
+                    };
+                }
+
+                // If recommendations exist but no SWOT part
+                if (!current.swotAnalysis) {
+                    return {
+                        strategicRecommendations: {
+                            ...current,
+                            swotAnalysis: {
+                                strengths: type === 'strengths' ? [content] : [],
+                                weaknesses: type === 'weaknesses' ? [content] : [],
+                                opportunities: type === 'opportunities' ? [content] : [],
+                                threats: type === 'threats' ? [content] : [],
+                            }
+                        }
+                    };
+                }
+
+                const currentList = current.swotAnalysis[type] || [];
+                if (currentList.length >= 3) return state; // Constraint: Max 3
+
+                return {
+                    strategicRecommendations: {
+                        ...current,
+                        swotAnalysis: {
+                            ...current.swotAnalysis,
+                            [type]: [...currentList, content]
+                        }
+                    }
+                };
+            }),
+
+            updateSwotItem: (type, index, content) => set((state) => {
+                const current = state.strategicRecommendations;
+                if (!current?.swotAnalysis) return state;
+
+                const list = [...(current.swotAnalysis[type] || [])];
+                if (index < 0 || index >= list.length) return state;
+
+                list[index] = content;
+
+                return {
+                    strategicRecommendations: {
+                        ...current,
+                        swotAnalysis: {
+                            ...current.swotAnalysis,
+                            [type]: list
+                        }
+                    }
+                };
+            }),
+
+            removeSwotItem: (type, index) => set((state) => {
+                const current = state.strategicRecommendations;
+                if (!current?.swotAnalysis) return state;
+
+                const list = [...(current.swotAnalysis[type] || [])];
+                if (index < 0 || index >= list.length) return state;
+
+                list.splice(index, 1);
+
+                return {
+                    strategicRecommendations: {
+                        ...current,
+                        swotAnalysis: {
+                            ...current.swotAnalysis,
+                            [type]: list
+                        }
+                    }
+                };
+            }),
 
 
         }),
