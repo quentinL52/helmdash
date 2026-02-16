@@ -18,7 +18,6 @@ import { Eye } from 'lucide-react';
 
 // --- Color palette for radar chart lines ---
 const RADAR_COLORS = [
-    '#6c5ce7',
     '#00cec9',
     '#fd79a8',
     '#fdcb6e',
@@ -28,6 +27,7 @@ const RADAR_COLORS = [
     '#fab1a0',
     '#74b9ff',
     '#a29bfe',
+    '#b2bec3',
 ];
 
 export function RadarTab() {

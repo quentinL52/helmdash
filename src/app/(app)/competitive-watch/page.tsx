@@ -9,6 +9,7 @@ import { LayoutDashboard, BarChart3, Zap } from 'lucide-react';
 import { LeanDashboardTab } from './components/lean-dashboard-tab';
 import { LeanAnalysisTab } from './components/lean-analysis-tab';
 import { LeanActionsTab } from './components/lean-actions-tab';
+import { CompetitorInlineForm } from './components/competitor-inline-form';
 // Kept for future advanced mode reactivation
 // import { MarketSignalsTab } from './components/market-signals-tab';
 
@@ -23,13 +24,37 @@ export default function CompetitiveWatchPage() {
     const t = (translations[language] as any).competitiveWatch;
     const [activeTab, setActiveTab] = useState('dashboard');
 
+    const [showMySolutionForm, setShowMySolutionForm] = useState(false);
+    const mySolution = useFounderStore((s) => s.mySolution);
+
     return (
         <div className="h-full flex flex-col p-8 max-w-7xl mx-auto space-y-6">
             {/* Header */}
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight text-[#e8e9ed]">{t.title}</h1>
-                <p className="text-[#8b8fa3]">{t.subtitle}</p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight text-[#e8e9ed]">{t.title}</h1>
+                    <p className="text-[#8b8fa3]">{t.subtitle}</p>
+                </div>
+                <button
+                    onClick={() => setShowMySolutionForm(!showMySolutionForm)}
+                    className="flex items-center gap-2 px-4 py-2 bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white rounded-lg transition-colors font-medium text-sm"
+                >
+                    <LayoutDashboard className="h-4 w-4" />
+                    {language === 'fr' ? 'Ma Solution' : 'My Solution'}
+                </button>
             </div>
+
+            {/* My Solution Inline Form */}
+            {showMySolutionForm && (
+                <div className="mb-6 animate-in slide-in-from-top-4 fade-in duration-300">
+                    <CompetitorInlineForm
+                        onCancel={() => setShowMySolutionForm(false)}
+                        onSuccess={() => setShowMySolutionForm(false)}
+                        isMySolution={true}
+                        initialData={mySolution}
+                    />
+                </div>
+            )}
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
                 <TabsList className="grid w-full max-w-[600px] grid-cols-3 bg-[#181a24] text-[#8b8fa3] mb-6">

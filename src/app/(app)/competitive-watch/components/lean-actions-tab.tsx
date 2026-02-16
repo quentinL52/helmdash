@@ -17,6 +17,7 @@ import {
     Swords,
     Plus,
     Zap,
+    Sparkles,
 } from 'lucide-react';
 import { AiInsightsTab } from './ai-insights-tab';
 import { SwotTab } from './swot-tab';
@@ -36,11 +37,25 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
     const t = (translations[language] as any).competitiveWatch;
     const competitiveIntelligence = useFounderStore((s) => s.competitiveIntelligence);
     const strategicRecommendations = useFounderStore((s) => s.strategicRecommendations);
+    const setStrategicRecommendations = useFounderStore((s) => s.setStrategicRecommendations);
     const addRoadmapItem = useFounderStore((s) => s.addRoadmapItem);
     const addHypothesis = useFounderStore((s) => s.addHypothesis);
+    const mySolution = useFounderStore((s) => s.mySolution);
+    const competitors = useFounderStore((s) => s.competitors);
+    const leanCanvas = useFounderStore((s) => s.leanCanvas);
+    const roadmap = useFounderStore((s) => s.roadmap);
+    const hypotheses = useFounderStore((s) => s.hypotheses);
 
-    // --- Lean SWOT (auto-generated from alerts) ---
+    const [isGenerating, setIsGenerating] = useState(false);
+
+    // --- Lean SWOT (Hybrid: AI > Alerts) ---
     const leanSwot = useMemo(() => {
+        // If AI SWOT exists, use it
+        if (strategicRecommendations?.swotAnalysis) {
+            return strategicRecommendations.swotAnalysis;
+        }
+
+        // Fallback: derive from alerts (Legacy logic)
         const alerts = competitiveIntelligence?.alerts || [];
         const strengths: string[] = [];
         const weaknesses: string[] = [];
@@ -71,7 +86,7 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
             opportunities: opportunities.slice(0, 3),
             threats: threats.slice(0, 3),
         };
-    }, [competitiveIntelligence]);
+    }, [competitiveIntelligence, strategicRecommendations]);
 
     const hasSwotData = Object.values(leanSwot).some((arr) => arr.length > 0);
 
@@ -96,6 +111,42 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
                 status: 'draft',
             });
             toast({ title: t.leanDashboard.createHypothesis, description: text.slice(0, 80) });
+        }
+    };
+
+    const handleGenerateStrategy = async () => {
+        setIsGenerating(true);
+        try {
+            // Import dynamically to avoid circular dependencies if any, or just consistent usage
+            const { generateStrategicRecommendations } = await import('@/lib/ai-service');
+
+            const recommendations = await generateStrategicRecommendations({
+                mySolution,
+                competitors,
+                leanCanvas,
+                roadmap,
+                hypotheses,
+                language,
+            });
+
+            setStrategicRecommendations(recommendations);
+            toast({
+                title: language === 'fr' ? 'Stratégie générée' : 'Strategy generated',
+                description: language === 'fr'
+                    ? 'Nouvelles recommandations disponibles.'
+                    : 'New recommendations available.',
+            });
+        } catch (error) {
+            console.error(error);
+            toast({
+                title: language === 'fr' ? 'Erreur' : 'Error',
+                description: language === 'fr'
+                    ? 'Impossible de générer la stratégie.'
+                    : 'Could not generate strategy.',
+                variant: 'destructive',
+            });
+        } finally {
+            setIsGenerating(false);
         }
     };
 
@@ -143,9 +194,26 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
         );
     }
 
-    // --- Essential mode: Lean SWOT + Kill Sheet + AI Strategy summary ---
+    // --- Essential mode: Lean SWOT + AI Strategy summary ---
     return (
         <div className="space-y-6">
+            {/* Header with Generate Button */}
+            <div className="flex justify-end">
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateStrategy}
+                    disabled={isGenerating}
+                    className="border-[#6c5ce7]/30 text-[#a29bfe] hover:bg-[#6c5ce7]/10"
+                >
+                    {isGenerating ? (
+                        <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> {language === 'fr' ? 'Analyse en cours...' : 'Analyzing...'}</>
+                    ) : (
+                        <><Sparkles className="h-4 w-4 mr-1" /> {language === 'fr' ? 'Actualiser l\'IA Stratégique' : 'Refresh AI Strategy'}</>
+                    )}
+                </Button>
+            </div>
+
             {/* Lean SWOT */}
             <Card>
                 <CardHeader className="pb-3">
@@ -244,6 +312,20 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
                                     </div>
                                 </div>
                             ))}
+
+                            {/* NEW: Show Lean Canvas Recommendations if any */}
+                            {strategicRecommendations.leanCanvasRecommendations?.slice(0, 2).map((rec, i) => (
+                                <div key={`lc-${i}`} className="flex items-start gap-3 p-3 rounded-lg border bg-card border-violet-500/20">
+                                    <Lightbulb className="h-4 w-4 text-violet-400 shrink-0 mt-0.5" />
+                                    <div className="flex-1 min-w-0">
+                                        <span className="text-xs font-semibold text-violet-400 uppercase mb-1 block">
+                                            {rec.section}
+                                        </span>
+                                        <p className="text-sm text-muted-foreground">{rec.suggestion}</p>
+                                    </div>
+                                </div>
+                            ))}
+
                             {strategicRecommendations.generatedAt && (
                                 <p className="text-xs text-muted-foreground text-right">
                                     {language === 'fr' ? 'Dernière analyse' : 'Last analysis'}:{' '}
@@ -253,36 +335,15 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
                         </div>
                     ) : (
                         <div className="text-center py-6">
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-muted-foreground mb-3">
                                 {t.leanDashboard.noActions}
                             </p>
+                            <Button variant="outline" size="sm" onClick={handleGenerateStrategy} disabled={isGenerating}>
+                                {isGenerating ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Sparkles className="h-3 w-3 mr-2" />}
+                                {language === 'fr' ? 'Générer une stratégie' : 'Generate Strategy'}
+                            </Button>
                         </div>
                     )}
-                </CardContent>
-            </Card>
-
-            {/* Kill Sheet Card */}
-            <Card>
-                <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                        <Swords className="h-4 w-4 text-red-400" />
-                        <CardTitle className="text-base">{t.leanActions.killSheet}</CardTitle>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                        {t.leanActions.killSheetDesc}
-                    </p>
-                </CardHeader>
-                <CardContent>
-                    <div className="text-center py-4">
-                        <p className="text-sm text-muted-foreground mb-3">
-                            {language === 'fr'
-                                ? 'Passez en mode Avancé pour générer un Kill Sheet complet.'
-                                : 'Switch to Advanced mode to generate a full Kill Sheet.'}
-                        </p>
-                        <Badge variant="outline" className="text-xs">
-                            {t.leanMode.advanced}
-                        </Badge>
-                    </div>
                 </CardContent>
             </Card>
         </div>

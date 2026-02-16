@@ -71,7 +71,13 @@ export async function POST(req: Request) {
             "roadmapRecommendations": [{ "title": string, "priority": "high" | "medium" | "low", "timeframe": "Q1 2024" | "Q2 2024" etc }],
             "hypothesisSuggestions": [{ "statement": string, "category": "problem" | "solution" | "channel" | "revenue", "testMethod": string }],
             "routineOptimization": [{ "suggestion": string, "benefit": string, "timeframe": "daily" | "weekly" | "morning" | "evening" }],
-            "marketNews": [{ "title": string, "url": string, "summary": string, "date": string }]
+            "marketNews": [{ "title": string, "url": string, "summary": string, "date": string }],
+            "swotAnalysis": {
+                "strengths": [string],
+                "weaknesses": [string],
+                "opportunities": [string],
+                "threats": [string]
+            }
         }
         
         Prioritize:
@@ -79,6 +85,7 @@ export async function POST(req: Request) {
         2. Validation of Lean Canvas assumptions.
         3. Alignment of Roadmap with competitive landscape.
         4. New Hypotheses to test risky assumptions.
+        5. Comprehensive SWOT analysis based on the provided data.
         `;
 
         const userPrompt = `

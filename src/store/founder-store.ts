@@ -231,6 +231,13 @@ export interface MySolution {
     // Intelligence fields
     competitiveAdvantages?: string[];
     targetMarketSize?: string;
+    // Parity with Competitor for 1:1 comparison
+    teamSize?: string;
+    fundingStage?: string;
+    fundingAmount?: string;
+    yearFounded?: string;
+    geography?: string;
+    pricing?: string; // Text summary
 }
 
 export interface RoadmapItem {
@@ -282,6 +289,12 @@ export interface StrategicRecommendation {
     hypothesisSuggestions: { statement: string; category: string; testMethod: string }[];
     routineOptimization: { suggestion: string; benefit: string; timeframe: string }[];
     marketNews: { title: string; url: string; summary: string; date?: string }[];
+    swotAnalysis?: {
+        strengths: string[];
+        weaknesses: string[];
+        opportunities: string[];
+        threats: string[];
+    };
 }
 
 // Module 14+: Competitive Intelligence System
@@ -408,13 +421,13 @@ export interface FounderStore {
     // Weekly Coach
     setWeeklyReport: (report: WeeklyReport | null) => void;
 
-    // Competitive Watch
+    // Competitive Watch Actions
     addCompetitor: (competitor: Omit<Competitor, 'id' | 'createdAt' | 'updatedAt'>) => void;
     updateCompetitor: (id: string, updates: Partial<Competitor>) => void;
     deleteCompetitor: (id: string) => void;
-    addMarketSignal: (signal: Omit<MarketSignal, 'id' | 'createdAt'>) => void;
-    deleteMarketSignal: (id: string) => void;
     updateMySolution: (updates: Partial<MySolution>) => void;
+    addMarketSignal: (signal: Omit<MarketSignal, 'id' | 'createdAt' | 'updatedAt'>) => void;
+    deleteMarketSignal: (id: string) => void;
 
     // Feature Matrix Actions
     addComparisonCriterion: (feature: string) => void;
@@ -537,6 +550,12 @@ const initialState = {
         },
         featureAnalysis: {},
         comparisonCriteria: ['Mobile App', 'API Access', '24/7 Support', 'Custom Branding', 'Analytics'], // Defaults
+        teamSize: '',
+        fundingStage: '',
+        fundingAmount: '',
+        yearFounded: '',
+        geography: '',
+        pricing: '',
     },
     strategicRecommendations: null,
     competitiveIntelligence: null,
@@ -846,6 +865,10 @@ export const useFounderStore = create<FounderStore>()(
                 ),
             })),
 
+            updateMySolution: (updates) => set((state) => ({
+                mySolution: { ...state.mySolution, ...updates }
+            })),
+
             deleteCompetitor: (id) => set((state) => ({
                 competitors: state.competitors.filter((c) => c.id !== id),
             })),
@@ -865,9 +888,7 @@ export const useFounderStore = create<FounderStore>()(
                 marketSignals: state.marketSignals.filter((s) => s.id !== id),
             })),
 
-            updateMySolution: (updates) => set((state) => ({
-                mySolution: { ...state.mySolution, ...updates },
-            })),
+
 
             addComparisonCriterion: (feature) => set((state) => {
                 const currentCriteria = state.mySolution.comparisonCriteria || [];

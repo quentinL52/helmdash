@@ -11,6 +11,7 @@ import {
 } from '@/lib/competitive-intelligence';
 import { LeanHealthPanel } from './lean-health-panel';
 import { CompetitorDialog } from './competitor-dialog';
+import { CompetitorInlineForm } from './competitor-inline-form';
 import { toast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -70,6 +71,7 @@ export function LeanDashboardTab({ onTabChange }: LeanDashboardTabProps) {
     // --- Competitor Dialog state ---
     const [searchTerm, setSearchTerm] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isInlineFormOpen, setIsInlineFormOpen] = useState(false);
     const [selectedCompetitor, setSelectedCompetitor] = useState<Competitor | null>(null);
 
     const filteredCompetitors = useMemo(
@@ -89,8 +91,7 @@ export function LeanDashboardTab({ onTabChange }: LeanDashboardTabProps) {
     };
 
     const handleNew = () => {
-        setSelectedCompetitor(null);
-        setIsDialogOpen(true);
+        setIsInlineFormOpen(!isInlineFormOpen);
     };
 
     // --- Computed KPIs ---
@@ -106,33 +107,7 @@ export function LeanDashboardTab({ onTabChange }: LeanDashboardTabProps) {
         };
     }, [mySolution, competitors, marketSignals, competitiveIntelligence]);
 
-    // --- Critical Signals: filter urgent/high-impact signals from last 7 days ---
-    const criticalSignals = useMemo(() => {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        const cutoff = sevenDaysAgo.toISOString();
-        return marketSignals
-            .filter(
-                (s) =>
-                    (s.urgency === 'critical' || s.urgency === 'high') &&
-                    (s.createdAt >= cutoff || s.date >= cutoff.split('T')[0])
-            )
-            .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-            .slice(0, 3);
-    }, [marketSignals]);
 
-    // --- Priority Actions from AI analysis ---
-    const priorityActions = useMemo(() => {
-        if (!competitiveIntelligence?.alerts) return [];
-        return competitiveIntelligence.alerts
-            .filter((a) => !a.acknowledgedAt && a.suggestedAction)
-            .sort((a, b) => {
-                const sevOrder = { critical: 0, high: 1, medium: 2, low: 3 };
-                return (sevOrder[a.severity as keyof typeof sevOrder] ?? 3) -
-                    (sevOrder[b.severity as keyof typeof sevOrder] ?? 3);
-            })
-            .slice(0, 5);
-    }, [competitiveIntelligence]);
 
     const handleAddToRoadmap = (title: string, priority: 'high' | 'medium' | 'low') => {
         addRoadmapItem({
@@ -192,16 +167,22 @@ export function LeanDashboardTab({ onTabChange }: LeanDashboardTabProps) {
                             size="sm"
                             className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white"
                         >
-                            <Plus className="mr-1.5 h-4 w-4" /> {t.addCompetitor}
+                            <Plus className="mr-1.5 h-4 w-4" /> {language === 'fr' ? 'Ajouter un compétiteur' : t.addCompetitor}
                         </Button>
                     </div>
                 </CardHeader>
                 <CardContent>
-                    {competitors.length === 0 ? (
+                    {isInlineFormOpen && (
+                        <CompetitorInlineForm
+                            onCancel={() => setIsInlineFormOpen(false)}
+                            onSuccess={() => setIsInlineFormOpen(false)}
+                        />
+                    )}
+                    {competitors.length === 0 && !isInlineFormOpen ? (
                         <div className="py-8 text-center">
                             <p className="text-muted-foreground mb-4">{t.noCompetitors}</p>
                             <Button onClick={handleNew} variant="outline">
-                                <Plus className="h-4 w-4 mr-2" /> {t.addCompetitor}
+                                <Plus className="h-4 w-4 mr-2" /> {language === 'fr' ? 'Ajouter un compétiteur' : t.addCompetitor}
                             </Button>
                         </div>
                     ) : (
@@ -348,131 +329,7 @@ export function LeanDashboardTab({ onTabChange }: LeanDashboardTabProps) {
                 </Card>
             </div>
 
-            {/* ───────────── 2-Column: Critical Signals + Priority Actions ───────────── */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {/* Critical Signals */}
-                <Card>
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Zap className="h-4 w-4 text-amber-400" />
-                                <CardTitle className="text-base">{t.leanDashboard.criticalSignals}</CardTitle>
-                            </div>
-                            {marketSignals.length > 0 && (
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="text-xs"
-                                    onClick={() => onTabChange?.('analysis')}
-                                >
-                                    {t.leanDashboard.viewAll} <ArrowRight className="h-3 w-3 ml-1" />
-                                </Button>
-                            )}
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        {criticalSignals.length === 0 ? (
-                            <p className="text-sm text-muted-foreground py-4 text-center">
-                                {t.leanDashboard.noSignals}
-                            </p>
-                        ) : (
-                            <div className="space-y-3">
-                                {criticalSignals.map((signal) => (
-                                    <div
-                                        key={signal.id}
-                                        className="flex items-start gap-3 p-3 rounded-lg border bg-card"
-                                    >
-                                        {impactIcon(signal.impact)}
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="text-sm font-medium truncate">{signal.title}</span>
-                                                {signal.urgency && (
-                                                    <Badge variant="outline" className={`text-xs ${severityColor(signal.urgency)}`}>
-                                                        {t.signals.urgency[signal.urgency as keyof typeof t.signals.urgency] || signal.urgency}
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                            {signal.description && (
-                                                <p className="text-xs text-muted-foreground line-clamp-2">{signal.description}</p>
-                                            )}
-                                        </div>
-                                        {signal.sourceUrl && (
-                                            <a href={signal.sourceUrl} target="_blank" rel="noopener noreferrer">
-                                                <ExternalLink className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
-                                            </a>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
 
-                {/* Priority Actions */}
-                <Card>
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center gap-2">
-                            <AlertTriangle className="h-4 w-4 text-violet-400" />
-                            <CardTitle className="text-base">{t.leanDashboard.priorityActions}</CardTitle>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        {priorityActions.length === 0 ? (
-                            <p className="text-sm text-muted-foreground py-4 text-center">
-                                {t.leanDashboard.noActions}
-                            </p>
-                        ) : (
-                            <div className="space-y-3">
-                                {priorityActions.map((action) => (
-                                    <div
-                                        key={action.id}
-                                        className="p-3 rounded-lg border bg-card space-y-2"
-                                    >
-                                        <div className="flex items-start justify-between gap-2">
-                                            <div className="flex-1 min-w-0">
-                                                <div className="text-sm font-medium">{action.title}</div>
-                                                {action.suggestedAction && (
-                                                    <p className="text-xs text-muted-foreground mt-1">
-                                                        {action.suggestedAction}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <Badge variant="outline" className={`text-xs shrink-0 ${severityColor(action.severity)}`}>
-                                                {action.severity}
-                                            </Badge>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                className="text-xs h-7"
-                                                onClick={() => handleAddToRoadmap(
-                                                    action.suggestedAction || action.title,
-                                                    action.severity === 'critical' ? 'high' : 'medium'
-                                                )}
-                                            >
-                                                <Plus className="h-3 w-3 mr-1" />
-                                                {t.leanDashboard.addToRoadmap}
-                                            </Button>
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                className="text-xs h-7"
-                                                onClick={() => handleCreateHypothesis(
-                                                    action.suggestedAction || action.title
-                                                )}
-                                            >
-                                                <Plus className="h-3 w-3 mr-1" />
-                                                {t.leanDashboard.createHypothesis}
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
 
             {/* ───────────── Competitor Dialog ───────────── */}
             <CompetitorDialog

@@ -61,33 +61,45 @@ export function PricingChart() {
         }[] = [];
 
         // My solution
-        const myPrice = parsePriceRange(mySolution.pricingRange);
+        // Fallback to 'pricing' field if 'pricingRange' is empty, similar to competitors
+        const myPricingText = mySolution.pricingRange || mySolution.pricing;
+        const myPrice = parsePriceRange(myPricingText);
+
         if (myPrice) {
+            // If min === max (single price), give it a small range so it's visible as a line
+            const rangeVal = myPrice.max - myPrice.min;
+            const displayRange = rangeVal === 0 ? (myPrice.max > 0 ? myPrice.max * 0.05 : 1) : rangeVal;
+
             items.push({
                 name: mySolution.name || (language === 'fr' ? 'Ma Solution' : 'My Solution'),
                 min: myPrice.min,
                 max: myPrice.max,
-                range: myPrice.max - myPrice.min,
+                range: displayRange,
                 model: mySolution.pricingModel || 'other',
                 modelLabel: t.pricingModels?.[mySolution.pricingModel || 'other'] || mySolution.pricingModel || 'Other',
                 isMe: true,
-                rawPricing: mySolution.pricingRange || '',
+                rawPricing: myPricingText || '',
             });
         }
 
         // Competitors
         competitors.forEach((c) => {
-            const price = parsePriceRange(c.pricingRange || c.pricing);
+            const pricingText = c.pricingRange || c.pricing;
+            const price = parsePriceRange(pricingText);
             if (price) {
+                // If min === max (single price), give it a small range so it's visible as a line
+                const rangeVal = price.max - price.min;
+                const displayRange = rangeVal === 0 ? (price.max > 0 ? price.max * 0.05 : 1) : rangeVal;
+
                 items.push({
                     name: c.name,
                     min: price.min,
                     max: price.max,
-                    range: price.max - price.min,
+                    range: displayRange,
                     model: c.pricingModel || 'other',
                     modelLabel: t.pricingModels?.[c.pricingModel || 'other'] || c.pricingModel || 'Other',
                     isMe: false,
-                    rawPricing: c.pricingRange || c.pricing || '',
+                    rawPricing: pricingText || '',
                 });
             }
         });
@@ -300,7 +312,7 @@ export function PricingChart() {
                                     {t.pricingModels?.[mySolution.pricingModel || 'other'] || mySolution.pricingModel || '-'}
                                 </Badge>
                                 <span className="text-[#e8e9ed] text-sm min-w-[80px] text-right">
-                                    {mySolution.pricingRange || '-'}
+                                    {mySolution.pricingRange || mySolution.pricing || '-'}
                                 </span>
                             </div>
                         </div>
