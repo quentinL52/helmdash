@@ -20,6 +20,10 @@ const HypothesesWidget = dynamic(
     () => import('@/components/dashboard/hypotheses-widget').then(m => m.HypothesesWidget),
     { loading: () => <CardSkeleton /> }
 );
+const CalendarWidget = dynamic(
+    () => import('@/components/dashboard/calendar-widget').then(m => m.CalendarWidget),
+    { loading: () => <CardSkeleton /> }
+);
 
 export default function DashboardPage() {
     const language = useFounderStore(s => s.language);
@@ -66,6 +70,9 @@ export default function DashboardPage() {
                     <HypothesesWidget />
                 </div>
             </div>
+
+            {/* Calendrier centralisé */}
+            <CalendarWidget />
         </div>
     );
 }

@@ -1,0 +1,733 @@
+'use client';
+
+import { useState, useMemo, useCallback } from 'react';
+import { useFounderStore } from '@/store/founder-store';
+import { useRouter } from 'next/navigation';
+import {
+    format, addDays, addWeeks, addMonths, addYears,
+    subDays, subWeeks, subMonths, subYears,
+    startOfWeek, endOfWeek, startOfMonth, endOfMonth,
+    isSameDay, isSameMonth, isWithinInterval,
+    eachDayOfInterval, eachWeekOfInterval,
+    startOfYear, endOfYear, getQuarter, setQuarter, startOfQuarter, endOfQuarter,
+    parseISO, isValid,
+} from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { ChevronLeft, ChevronRight, X, MapPin, FileText, Target, Clock, Calendar, ExternalLink } from 'lucide-react';
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+type ViewType = 'day' | 'week' | 'month' | 'semester' | 'year';
+
+interface CalendarEvent {
+    id: string;
+    type: 'roadmap' | 'content' | 'okr' | 'routine';
+    title: string;
+    date: Date;
+    startDate?: Date;
+    endDate?: Date;
+    color: string;
+    data: Record<string, unknown>;
+}
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const COLORS = {
+    bg: '#12141c',
+    surface: '#181a24',
+    surfaceHover: '#1e2130',
+    border: '#282c3a',
+    text: '#e8e9ed',
+    textMuted: '#8b8fa3',
+    textDim: '#5c6078',
+    accent: '#6c5ce7',
+    accentLight: '#a29bfe',
+};
+
+const TYPE_CONFIG: Record<CalendarEvent['type'], { color: string; label: string; icon: React.ReactNode; route: string }> = {
+    roadmap: { color: '#a29bfe', label: 'Roadmap', icon: <MapPin size={12} />, route: '/roadmap' },
+    content: { color: '#00cec9', label: 'Contenu', icon: <FileText size={12} />, route: '/content' },
+    okr: { color: '#fdcb6e', label: 'OKR', icon: <Target size={12} />, route: '/okr' },
+    routine: { color: '#00b894', label: 'Routine', icon: <Clock size={12} />, route: '/routine' },
+};
+
+const VIEWS: { key: ViewType; label: string }[] = [
+    { key: 'day', label: 'Jour' },
+    { key: 'week', label: 'Semaine' },
+    { key: 'month', label: 'Mois' },
+    { key: 'semester', label: 'Semestre' },
+    { key: 'year', label: 'Année' },
+];
+
+const DAYS_FR = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+// ─── Quarter parsing ──────────────────────────────────────────────────────────
+
+function parseQuarter(quarterStr: string): { start: Date; end: Date } | null {
+    // e.g. "Q1 2026", "Q2 2026"
+    const match = quarterStr.match(/Q(\d)\s+(\d{4})/i);
+    if (!match) return null;
+    const q = parseInt(match[1]);
+    const year = parseInt(match[2]);
+    if (q < 1 || q > 4) return null;
+    const ref = setQuarter(new Date(year, 0, 1), q);
+    return { start: startOfQuarter(ref), end: endOfQuarter(ref) };
+}
+
+// ─── Event aggregation ────────────────────────────────────────────────────────
+
+function useAllEvents(): CalendarEvent[] {
+    const roadmap = useFounderStore(s => s.roadmap);
+    const contentIdeas = useFounderStore(s => s.contentIdeas);
+    const objectives = useFounderStore(s => s.objectives);
+    const routineDays = useFounderStore(s => s.routine);
+    const today = useMemo(() => new Date(), []);
+
+    return useMemo(() => {
+        const events: CalendarEvent[] = [];
+
+        // Roadmap items with dueDate
+        roadmap.forEach(item => {
+            if (item.dueDate) {
+                const due = parseISO(item.dueDate);
+                if (isValid(due)) {
+                    const start = item.startDate ? parseISO(item.startDate) : undefined;
+                    events.push({
+                        id: `roadmap-${item.id}`,
+                        type: 'roadmap',
+                        title: item.title,
+                        date: due,
+                        startDate: start && isValid(start) ? start : undefined,
+                        endDate: due,
+                        color: TYPE_CONFIG.roadmap.color,
+                        data: item as unknown as Record<string, unknown>,
+                    });
+                }
+            }
+        });
+
+        // Content — scheduled items with a date
+        contentIdeas.forEach(idea => {
+            if (idea.status === 'scheduled' && idea.date) {
+                const d = parseISO(idea.date);
+                if (isValid(d)) {
+                    events.push({
+                        id: `content-${idea.id}`,
+                        type: 'content',
+                        title: idea.title,
+                        date: d,
+                        color: TYPE_CONFIG.content.color,
+                        data: idea as unknown as Record<string, unknown>,
+                    });
+                }
+            }
+        });
+
+        // OKRs — mapped to quarter range
+        objectives.forEach(obj => {
+            const range = parseQuarter(obj.quarter);
+            if (range) {
+                events.push({
+                    id: `okr-${obj.id}`,
+                    type: 'okr',
+                    title: obj.title,
+                    date: range.start,
+                    startDate: range.start,
+                    endDate: range.end,
+                    color: TYPE_CONFIG.okr.color,
+                    data: obj as unknown as Record<string, unknown>,
+                });
+            }
+        });
+
+        // Routine — today only, one event per task
+        routineDays.forEach((day: { id: string; day: string; tasks: { id: string; text: string; done: boolean }[] }) => {
+            day.tasks.forEach((task: { id: string; text: string; done: boolean }) => {
+                events.push({
+                    id: `routine-${day.id}-${task.id}`,
+                    type: 'routine',
+                    title: task.text,
+                    date: today,
+                    color: TYPE_CONFIG.routine.color,
+                    data: { ...task, day: day.day } as unknown as Record<string, unknown>,
+                });
+            });
+        });
+
+        return events;
+    }, [roadmap, contentIdeas, objectives, routineDays, today]);
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function getEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
+    return events.filter(ev => {
+        if (ev.startDate && ev.endDate) {
+            return isWithinInterval(day, { start: ev.startDate, end: ev.endDate });
+        }
+        return isSameDay(ev.date, day);
+    });
+}
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function EventBadge({ event, onClick }: { event: CalendarEvent; onClick: (e: CalendarEvent) => void }) {
+    return (
+        <button
+            onClick={() => onClick(event)}
+            style={{
+                display: 'flex', alignItems: 'center', gap: '4px',
+                padding: '2px 6px', borderRadius: '4px', fontSize: '11px',
+                background: `${event.color}20`, color: event.color,
+                border: `1px solid ${event.color}40`,
+                cursor: 'pointer', width: '100%', textAlign: 'left',
+                overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
+                transition: 'background 0.15s',
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = `${event.color}35`; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = `${event.color}20`; }}
+        >
+            <span style={{ flexShrink: 0 }}>{TYPE_CONFIG[event.type].icon}</span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{event.title}</span>
+        </button>
+    );
+}
+
+// ─── Views ────────────────────────────────────────────────────────────────────
+
+function DayView({ current, events, onEventClick }: { current: Date; events: CalendarEvent[]; onEventClick: (e: CalendarEvent) => void }) {
+    const dayEvents = getEventsForDay(events, current);
+    return (
+        <div style={{ padding: '16px', minHeight: '320px' }}>
+            <div style={{ fontSize: '14px', color: COLORS.textMuted, marginBottom: '16px' }}>
+                {format(current, 'EEEE d MMMM yyyy', { locale: fr })}
+            </div>
+            {dayEvents.length === 0 ? (
+                <div style={{ color: COLORS.textDim, fontSize: '13px', textAlign: 'center', paddingTop: '60px' }}>
+                    Aucun événement ce jour
+                </div>
+            ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {dayEvents.map(ev => (
+                        <button
+                            key={ev.id}
+                            onClick={() => onEventClick(ev)}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: '12px',
+                                padding: '12px 16px', borderRadius: '8px',
+                                background: `${ev.color}15`, border: `1px solid ${ev.color}35`,
+                                cursor: 'pointer', textAlign: 'left', width: '100%',
+                                transition: 'background 0.15s',
+                            }}
+                            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = `${ev.color}25`; }}
+                            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = `${ev.color}15`; }}
+                        >
+                            <span style={{ color: ev.color, flexShrink: 0 }}>{TYPE_CONFIG[ev.type].icon}</span>
+                            <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: '13px', color: COLORS.text, fontWeight: 500 }}>{ev.title}</div>
+                                <div style={{ fontSize: '11px', color: ev.color, marginTop: '2px' }}>{TYPE_CONFIG[ev.type].label}</div>
+                            </div>
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function WeekView({ current, events, onEventClick }: { current: Date; events: CalendarEvent[]; onEventClick: (e: CalendarEvent) => void }) {
+    const weekStart = startOfWeek(current, { weekStartsOn: 1 });
+    const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+    const today = new Date();
+
+    return (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', padding: '16px' }}>
+            {days.map((day, i) => {
+                const dayEvents = getEventsForDay(events, day);
+                const isToday = isSameDay(day, today);
+                return (
+                    <div key={i} style={{
+                        minHeight: '120px', padding: '8px 6px', borderRadius: '8px',
+                        background: isToday ? `${COLORS.accent}10` : COLORS.surfaceHover,
+                        border: `1px solid ${isToday ? COLORS.accent + '50' : COLORS.border}`,
+                    }}>
+                        <div style={{ fontSize: '11px', color: isToday ? COLORS.accent : COLORS.textMuted, fontWeight: 600, marginBottom: '6px', textAlign: 'center' }}>
+                            {DAYS_FR[i]}
+                            <div style={{ fontSize: '14px', color: isToday ? COLORS.accent : COLORS.text, fontWeight: isToday ? 700 : 400 }}>
+                                {format(day, 'd')}
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            {dayEvents.slice(0, 4).map(ev => (
+                                <EventBadge key={ev.id} event={ev} onClick={onEventClick} />
+                            ))}
+                            {dayEvents.length > 4 && (
+                                <span style={{ fontSize: '10px', color: COLORS.textDim, paddingLeft: '4px' }}>
+                                    +{dayEvents.length - 4} autres
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+
+function MonthView({ current, events, onEventClick }: { current: Date; events: CalendarEvent[]; onEventClick: (e: CalendarEvent) => void }) {
+    const monthStart = startOfMonth(current);
+    const monthEnd = endOfMonth(current);
+    const calStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+    const calEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+    const days = eachDayOfInterval({ start: calStart, end: calEnd });
+    const today = new Date();
+
+    return (
+        <div style={{ padding: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '4px' }}>
+                {DAYS_FR.map(d => (
+                    <div key={d} style={{ textAlign: 'center', fontSize: '11px', color: COLORS.textMuted, fontWeight: 600, padding: '4px 0' }}>{d}</div>
+                ))}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' }}>
+                {days.map((day, i) => {
+                    const dayEvents = getEventsForDay(events, day);
+                    const isToday = isSameDay(day, today);
+                    const inMonth = isSameMonth(day, current);
+                    return (
+                        <div key={i} style={{
+                            minHeight: '80px', padding: '6px 4px', borderRadius: '6px',
+                            background: isToday ? `${COLORS.accent}15` : inMonth ? COLORS.surfaceHover : 'transparent',
+                            border: `1px solid ${isToday ? COLORS.accent + '50' : inMonth ? COLORS.border : 'transparent'}`,
+                            opacity: inMonth ? 1 : 0.4,
+                        }}>
+                            <div style={{
+                                fontSize: '12px', textAlign: 'center', marginBottom: '4px',
+                                color: isToday ? COLORS.accent : COLORS.text,
+                                fontWeight: isToday ? 700 : 400,
+                                width: isToday ? '20px' : 'auto',
+                                height: isToday ? '20px' : 'auto',
+                                background: isToday ? `${COLORS.accent}25` : 'transparent',
+                                borderRadius: '50%', lineHeight: isToday ? '20px' : 'normal',
+                                margin: isToday ? '0 auto 4px' : '0 0 4px',
+                            }}>
+                                {format(day, 'd')}
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                                {dayEvents.slice(0, 2).map(ev => (
+                                    <EventBadge key={ev.id} event={ev} onClick={onEventClick} />
+                                ))}
+                                {dayEvents.length > 2 && (
+                                    <span style={{ fontSize: '10px', color: COLORS.textDim, paddingLeft: '4px' }}>
+                                        +{dayEvents.length - 2}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
+function SemesterView({ current, events, onEventClick }: { current: Date; events: CalendarEvent[]; onEventClick: (e: CalendarEvent) => void }) {
+    // Show 6 months starting from current month
+    const months = Array.from({ length: 6 }, (_, i) => addMonths(startOfMonth(current), i));
+
+    return (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', padding: '16px' }}>
+            {months.map((month, mi) => {
+                // Collect all events in this month
+                const monthStart = startOfMonth(month);
+                const monthEnd = endOfMonth(month);
+                const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+                const monthEvents: CalendarEvent[] = [];
+                const seen = new Set<string>();
+                monthDays.forEach(day => {
+                    getEventsForDay(events, day).forEach(ev => {
+                        if (!seen.has(ev.id)) {
+                            seen.add(ev.id);
+                            monthEvents.push(ev);
+                        }
+                    });
+                });
+
+                return (
+                    <div key={mi} style={{
+                        padding: '12px', borderRadius: '8px',
+                        background: COLORS.surfaceHover, border: `1px solid ${COLORS.border}`,
+                    }}>
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: COLORS.text, marginBottom: '8px', textTransform: 'capitalize' }}>
+                            {format(month, 'MMMM yyyy', { locale: fr })}
+                        </div>
+                        {monthEvents.length === 0 ? (
+                            <div style={{ fontSize: '11px', color: COLORS.textDim, fontStyle: 'italic' }}>Aucun événement</div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                                {monthEvents.slice(0, 5).map(ev => (
+                                    <button
+                                        key={ev.id}
+                                        onClick={() => onEventClick(ev)}
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: '6px',
+                                            padding: '4px 6px', borderRadius: '4px',
+                                            background: `${ev.color}15`, border: `1px solid ${ev.color}30`,
+                                            cursor: 'pointer', textAlign: 'left', width: '100%',
+                                        }}
+                                    >
+                                        <span style={{ color: ev.color, flexShrink: 0 }}>{TYPE_CONFIG[ev.type].icon}</span>
+                                        <span style={{ fontSize: '11px', color: COLORS.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            {ev.title}
+                                        </span>
+                                    </button>
+                                ))}
+                                {monthEvents.length > 5 && (
+                                    <span style={{ fontSize: '10px', color: COLORS.textDim, paddingLeft: '4px' }}>
+                                        +{monthEvents.length - 5} autres
+                                    </span>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+
+function YearView({ current, events, onEventClick }: { current: Date; events: CalendarEvent[]; onEventClick: (e: CalendarEvent) => void }) {
+    const year = current.getFullYear();
+    const months = Array.from({ length: 12 }, (_, i) => new Date(year, i, 1));
+
+    return (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', padding: '16px' }}>
+            {months.map((month, mi) => {
+                const monthStart = startOfMonth(month);
+                const monthEnd = endOfMonth(month);
+                const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+                const seen = new Set<string>();
+                const monthEvents: CalendarEvent[] = [];
+                monthDays.forEach(day => {
+                    getEventsForDay(events, day).forEach(ev => {
+                        if (!seen.has(ev.id)) { seen.add(ev.id); monthEvents.push(ev); }
+                    });
+                });
+                const byType = monthEvents.reduce<Record<string, number>>((acc, ev) => {
+                    acc[ev.type] = (acc[ev.type] || 0) + 1;
+                    return acc;
+                }, {});
+
+                return (
+                    <div key={mi} style={{
+                        padding: '10px', borderRadius: '8px',
+                        background: COLORS.surfaceHover, border: `1px solid ${COLORS.border}`,
+                    }}>
+                        <div style={{ fontSize: '12px', fontWeight: 600, color: COLORS.text, marginBottom: '6px', textTransform: 'capitalize' }}>
+                            {format(month, 'MMMM', { locale: fr })}
+                        </div>
+                        {monthEvents.length === 0 ? (
+                            <div style={{ fontSize: '10px', color: COLORS.textDim }}>—</div>
+                        ) : (
+                            <>
+                                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '4px' }}>
+                                    {(Object.entries(byType) as [CalendarEvent['type'], number][]).map(([type, count]) => (
+                                        <span key={type} style={{
+                                            fontSize: '10px', padding: '1px 5px', borderRadius: '3px',
+                                            background: `${TYPE_CONFIG[type].color}20`, color: TYPE_CONFIG[type].color,
+                                        }}>
+                                            {count} {TYPE_CONFIG[type].label}
+                                        </span>
+                                    ))}
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                    {monthEvents.slice(0, 3).map(ev => (
+                                        <button
+                                            key={ev.id}
+                                            onClick={() => onEventClick(ev)}
+                                            style={{
+                                                fontSize: '10px', color: ev.color,
+                                                background: 'none', border: 'none',
+                                                cursor: 'pointer', textAlign: 'left', padding: '0',
+                                                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                                            }}
+                                        >
+                                            · {ev.title}
+                                        </button>
+                                    ))}
+                                    {monthEvents.length > 3 && (
+                                        <span style={{ fontSize: '10px', color: COLORS.textDim }}>+{monthEvents.length - 3}</span>
+                                    )}
+                                </div>
+                            </>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
+}
+
+// ─── Detail Panel ─────────────────────────────────────────────────────────────
+
+function EventDetailPanel({ event, onClose }: { event: CalendarEvent; onClose: () => void }) {
+    const router = useRouter();
+    const cfg = TYPE_CONFIG[event.type];
+    const data = event.data;
+
+    return (
+        <div style={{
+            position: 'absolute', right: '0', top: '0', bottom: '0',
+            width: '320px', background: COLORS.surface,
+            border: `1px solid ${COLORS.border}`, borderRadius: '12px',
+            padding: '20px', zIndex: 10,
+            boxShadow: '-4px 0 24px rgba(0,0,0,0.4)',
+            display: 'flex', flexDirection: 'column', gap: '16px',
+            overflowY: 'auto',
+        }}>
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <span style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '6px',
+                    padding: '4px 10px', borderRadius: '6px', fontSize: '12px',
+                    background: `${cfg.color}20`, color: cfg.color, fontWeight: 600,
+                }}>
+                    {cfg.icon} {cfg.label}
+                </span>
+                <button
+                    onClick={onClose}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: COLORS.textMuted, padding: '4px' }}
+                >
+                    <X size={16} />
+                </button>
+            </div>
+
+            {/* Title */}
+            <div>
+                <h3 style={{ fontSize: '15px', fontWeight: 600, color: COLORS.text, margin: 0 }}>{event.title}</h3>
+                {(data.description as string) && (
+                    <p style={{ fontSize: '12px', color: COLORS.textMuted, marginTop: '6px', lineHeight: 1.5 }}>
+                        {data.description as string}
+                    </p>
+                )}
+            </div>
+
+            {/* Dates */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                {event.startDate && (
+                    <div style={{ fontSize: '12px', color: COLORS.textMuted }}>
+                        <span style={{ color: COLORS.textDim }}>Début : </span>
+                        {format(event.startDate, 'd MMM yyyy', { locale: fr })}
+                    </div>
+                )}
+                {event.endDate && (
+                    <div style={{ fontSize: '12px', color: COLORS.textMuted }}>
+                        <span style={{ color: COLORS.textDim }}>{event.startDate ? 'Fin : ' : 'Date : '}</span>
+                        {format(event.endDate, 'd MMM yyyy', { locale: fr })}
+                    </div>
+                )}
+                {!event.startDate && !event.endDate && (
+                    <div style={{ fontSize: '12px', color: COLORS.textMuted }}>
+                        <span style={{ color: COLORS.textDim }}>Date : </span>
+                        {format(event.date, 'd MMM yyyy', { locale: fr })}
+                    </div>
+                )}
+            </div>
+
+            {/* Status / extra info */}
+            {(data.status as string) && (
+                <div style={{ fontSize: '12px', color: COLORS.textMuted }}>
+                    <span style={{ color: COLORS.textDim }}>Statut : </span>
+                    <span style={{ color: COLORS.text }}>{data.status as string}</span>
+                </div>
+            )}
+            {(data.priority as string) && (
+                <div style={{ fontSize: '12px', color: COLORS.textMuted }}>
+                    <span style={{ color: COLORS.textDim }}>Priorité : </span>
+                    <span style={{ color: COLORS.text }}>{data.priority as string}</span>
+                </div>
+            )}
+            {(data.platform as string) && (
+                <div style={{ fontSize: '12px', color: COLORS.textMuted }}>
+                    <span style={{ color: COLORS.textDim }}>Plateforme : </span>
+                    <span style={{ color: COLORS.text }}>{data.platform as string}</span>
+                </div>
+            )}
+            {(data.quarter as string) && (
+                <div style={{ fontSize: '12px', color: COLORS.textMuted }}>
+                    <span style={{ color: COLORS.textDim }}>Trimestre : </span>
+                    <span style={{ color: COLORS.text }}>{data.quarter as string}</span>
+                </div>
+            )}
+            {(data.day as string) && (
+                <div style={{ fontSize: '12px', color: COLORS.textMuted }}>
+                    <span style={{ color: COLORS.textDim }}>Jour : </span>
+                    <span style={{ color: COLORS.text }}>{data.day as string}</span>
+                </div>
+            )}
+
+            {/* Navigation link */}
+            {event.type !== 'routine' && (
+                <button
+                    onClick={() => router.push(cfg.route)}
+                    style={{
+                        display: 'flex', alignItems: 'center', gap: '6px',
+                        padding: '8px 14px', borderRadius: '8px', fontSize: '12px',
+                        background: `${cfg.color}15`, color: cfg.color,
+                        border: `1px solid ${cfg.color}35`, cursor: 'pointer',
+                        marginTop: 'auto',
+                    }}
+                >
+                    <ExternalLink size={12} />
+                    Voir dans {cfg.label}
+                </button>
+            )}
+        </div>
+    );
+}
+
+// ─── Navigation helpers ───────────────────────────────────────────────────────
+
+function formatPeriodLabel(view: ViewType, current: Date): string {
+    switch (view) {
+        case 'day':
+            return format(current, 'd MMMM yyyy', { locale: fr });
+        case 'week': {
+            const ws = startOfWeek(current, { weekStartsOn: 1 });
+            const we = endOfWeek(current, { weekStartsOn: 1 });
+            return `${format(ws, 'd MMM', { locale: fr })} – ${format(we, 'd MMM yyyy', { locale: fr })}`;
+        }
+        case 'month':
+            return format(current, 'MMMM yyyy', { locale: fr });
+        case 'semester': {
+            const end = addMonths(current, 5);
+            return `${format(current, 'MMM', { locale: fr })} – ${format(end, 'MMM yyyy', { locale: fr })}`;
+        }
+        case 'year':
+            return current.getFullYear().toString();
+    }
+}
+
+function navigate(view: ViewType, current: Date, dir: 1 | -1): Date {
+    switch (view) {
+        case 'day': return dir === 1 ? addDays(current, 1) : subDays(current, 1);
+        case 'week': return dir === 1 ? addWeeks(current, 1) : subWeeks(current, 1);
+        case 'month': return dir === 1 ? addMonths(current, 1) : subMonths(current, 1);
+        case 'semester': return dir === 1 ? addMonths(current, 6) : subMonths(current, 6);
+        case 'year': return dir === 1 ? addYears(current, 1) : subYears(current, 1);
+    }
+}
+
+// ─── Main Widget ──────────────────────────────────────────────────────────────
+
+export function CalendarWidget() {
+    const [view, setView] = useState<ViewType>('month');
+    const [current, setCurrent] = useState(new Date());
+    const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+    const events = useAllEvents();
+
+    const handlePrev = useCallback(() => setCurrent(d => navigate(view, d, -1)), [view]);
+    const handleNext = useCallback(() => setCurrent(d => navigate(view, d, 1)), [view]);
+    const handleToday = useCallback(() => setCurrent(new Date()), []);
+
+    const label = formatPeriodLabel(view, current);
+
+    return (
+        <div style={{
+            background: COLORS.surface, border: `1px solid ${COLORS.border}`,
+            borderRadius: '12px', overflow: 'hidden', position: 'relative',
+        }}>
+            {/* Header */}
+            <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '16px 20px', borderBottom: `1px solid ${COLORS.border}`,
+                flexWrap: 'wrap', gap: '12px',
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Calendar size={18} style={{ color: COLORS.accentLight }} />
+                    <span style={{ fontSize: '15px', fontWeight: 600, color: COLORS.text }}>Calendrier</span>
+                </div>
+
+                {/* Navigation */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <button
+                        onClick={handlePrev}
+                        style={{
+                            background: COLORS.surfaceHover, border: `1px solid ${COLORS.border}`,
+                            borderRadius: '6px', padding: '4px 8px', color: COLORS.textMuted,
+                            cursor: 'pointer', display: 'flex', alignItems: 'center',
+                        }}
+                    >
+                        <ChevronLeft size={16} />
+                    </button>
+                    <button
+                        onClick={handleToday}
+                        style={{
+                            background: COLORS.surfaceHover, border: `1px solid ${COLORS.border}`,
+                            borderRadius: '6px', padding: '4px 12px', color: COLORS.text,
+                            cursor: 'pointer', fontSize: '13px', minWidth: '180px', textAlign: 'center',
+                            fontWeight: 500, textTransform: 'capitalize',
+                        }}
+                    >
+                        {label}
+                    </button>
+                    <button
+                        onClick={handleNext}
+                        style={{
+                            background: COLORS.surfaceHover, border: `1px solid ${COLORS.border}`,
+                            borderRadius: '6px', padding: '4px 8px', color: COLORS.textMuted,
+                            cursor: 'pointer', display: 'flex', alignItems: 'center',
+                        }}
+                    >
+                        <ChevronRight size={16} />
+                    </button>
+                </div>
+
+                {/* View tabs */}
+                <div style={{ display: 'flex', gap: '4px', background: COLORS.bg, borderRadius: '8px', padding: '3px' }}>
+                    {VIEWS.map(v => (
+                        <button
+                            key={v.key}
+                            onClick={() => setView(v.key)}
+                            style={{
+                                padding: '5px 12px', borderRadius: '6px', fontSize: '12px',
+                                fontWeight: 500, cursor: 'pointer', border: 'none',
+                                background: view === v.key ? COLORS.accent : 'transparent',
+                                color: view === v.key ? '#fff' : COLORS.textMuted,
+                                transition: 'all 0.15s',
+                            }}
+                        >
+                            {v.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Legend */}
+            <div style={{
+                display: 'flex', gap: '16px', padding: '10px 20px',
+                borderBottom: `1px solid ${COLORS.border}`, flexWrap: 'wrap',
+            }}>
+                {(Object.entries(TYPE_CONFIG) as [CalendarEvent['type'], typeof TYPE_CONFIG['roadmap']][]).map(([type, cfg]) => (
+                    <div key={type} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: cfg.color }} />
+                        <span style={{ fontSize: '11px', color: COLORS.textMuted }}>{cfg.label}</span>
+                    </div>
+                ))}
+            </div>
+
+            {/* Calendar body */}
+            <div style={{ position: 'relative', minHeight: '320px' }}>
+                {view === 'day' && <DayView current={current} events={events} onEventClick={setSelectedEvent} />}
+                {view === 'week' && <WeekView current={current} events={events} onEventClick={setSelectedEvent} />}
+                {view === 'month' && <MonthView current={current} events={events} onEventClick={setSelectedEvent} />}
+                {view === 'semester' && <SemesterView current={current} events={events} onEventClick={setSelectedEvent} />}
+                {view === 'year' && <YearView current={current} events={events} onEventClick={setSelectedEvent} />}
+
+                {selectedEvent && (
+                    <EventDetailPanel event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+                )}
+            </div>
+        </div>
+    );
+}
