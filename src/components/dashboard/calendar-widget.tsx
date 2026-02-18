@@ -131,17 +131,27 @@ function useAllEvents(): CalendarEvent[] {
             }
         });
 
-        // OKRs — mapped to quarter range
+        // OKRs — sur la date d'échéance si définie, sinon fin de trimestre
         objectives.forEach(obj => {
-            const range = parseQuarter(obj.quarter);
-            if (range) {
+            let eventDate: Date | null = null;
+
+            if (obj.endDate) {
+                const d = parseISO(obj.endDate);
+                if (isValid(d)) eventDate = d;
+            }
+
+            if (!eventDate) {
+                // Fallback : dernier jour du trimestre
+                const range = parseQuarter(obj.quarter);
+                if (range) eventDate = range.end;
+            }
+
+            if (eventDate) {
                 events.push({
                     id: `okr-${obj.id}`,
                     type: 'okr',
                     title: obj.title,
-                    date: range.start,
-                    startDate: range.start,
-                    endDate: range.end,
+                    date: eventDate,
                     color: TYPE_CONFIG.okr.color,
                     data: obj as unknown as Record<string, unknown>,
                 });
@@ -265,22 +275,36 @@ function WeekView({ current, events, onEventClick }: { current: Date; events: Ca
                 const isToday = isSameDay(day, today);
                 return (
                     <div key={i} style={{
-                        minHeight: '120px', padding: '8px 6px', borderRadius: '8px',
+                        height: '160px',          /* ← hauteur fixe */
+                        display: 'flex', flexDirection: 'column',
+                        padding: '8px 6px', borderRadius: '8px',
                         background: isToday ? `${COLORS.accent}10` : COLORS.surfaceHover,
                         border: `1px solid ${isToday ? COLORS.accent + '50' : COLORS.border}`,
+                        overflow: 'hidden',
                     }}>
-                        <div style={{ fontSize: '11px', color: isToday ? COLORS.accent : COLORS.textMuted, fontWeight: 600, marginBottom: '6px', textAlign: 'center' }}>
-                            {DAYS_FR[i]}
-                            <div style={{ fontSize: '14px', color: isToday ? COLORS.accent : COLORS.text, fontWeight: isToday ? 700 : 400 }}>
+                        {/* Header jour fixe */}
+                        <div style={{ flexShrink: 0, textAlign: 'center', marginBottom: '6px' }}>
+                            <div style={{ fontSize: '11px', color: isToday ? COLORS.accent : COLORS.textMuted, fontWeight: 600 }}>
+                                {DAYS_FR[i]}
+                            </div>
+                            <div style={{
+                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                width: '24px', height: '24px', borderRadius: '50%', fontSize: '13px',
+                                fontWeight: isToday ? 700 : 400,
+                                background: isToday ? COLORS.accent : 'transparent',
+                                color: isToday ? '#fff' : COLORS.text,
+                                margin: '2px auto 0',
+                            }}>
                                 {format(day, 'd')}
                             </div>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                        {/* Events — zone scrollable masquée */}
+                        <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                             {dayEvents.slice(0, 4).map(ev => (
                                 <EventBadge key={ev.id} event={ev} onClick={onEventClick} />
                             ))}
                             {dayEvents.length > 4 && (
-                                <span style={{ fontSize: '10px', color: COLORS.textDim, paddingLeft: '4px' }}>
+                                <span style={{ fontSize: '10px', color: COLORS.textDim, paddingLeft: '4px', flexShrink: 0 }}>
                                     +{dayEvents.length - 4} autres
                                 </span>
                             )}
@@ -334,7 +358,10 @@ function MonthView({ current, events, onEventClick }: { current: Date; events: C
                             const inMonth = isSameMonth(day, current);
                             return (
                                 <div key={di} style={{
-                                    minHeight: '80px', padding: '6px 4px', borderRadius: '6px',
+                                    height: '90px',           /* ← hauteur fixe */
+                                    display: 'flex', flexDirection: 'column',
+                                    padding: '4px',
+                                    borderRadius: '6px',
                                     background: isToday
                                         ? `${COLORS.accent}15`
                                         : inMonth ? COLORS.surfaceHover : 'transparent',
@@ -342,15 +369,13 @@ function MonthView({ current, events, onEventClick }: { current: Date; events: C
                                         ? COLORS.accent + '50'
                                         : inMonth ? COLORS.border : 'transparent'}`,
                                     opacity: inMonth ? 1 : 0.35,
+                                    overflow: 'hidden',
                                 }}>
-                                    {/* Day number — always centered */}
-                                    <div style={{
-                                        display: 'flex', justifyContent: 'center',
-                                        marginBottom: '4px',
-                                    }}>
+                                    {/* Day number — always centered, fixed height */}
+                                    <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'center', marginBottom: '3px' }}>
                                         <span style={{
                                             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                            width: '22px', height: '22px', borderRadius: '50%', fontSize: '12px',
+                                            width: '22px', height: '22px', borderRadius: '50%', fontSize: '11px',
                                             fontWeight: isToday ? 700 : 400,
                                             background: isToday ? COLORS.accent : 'transparent',
                                             color: isToday ? '#fff' : inMonth ? COLORS.text : COLORS.textDim,
@@ -359,16 +384,13 @@ function MonthView({ current, events, onEventClick }: { current: Date; events: C
                                         </span>
                                     </div>
 
-                                    {/* Events */}
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                                    {/* Events — zone fixe, débordement masqué */}
+                                    <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: '1px' }}>
                                         {dayEvents.slice(0, 2).map(ev => (
                                             <EventBadge key={ev.id} event={ev} onClick={onEventClick} />
                                         ))}
                                         {dayEvents.length > 2 && (
-                                            <span style={{
-                                                fontSize: '10px', color: COLORS.textDim,
-                                                paddingLeft: '4px',
-                                            }}>
+                                            <span style={{ fontSize: '10px', color: COLORS.textDim, paddingLeft: '2px', flexShrink: 0 }}>
                                                 +{dayEvents.length - 2}
                                             </span>
                                         )}
