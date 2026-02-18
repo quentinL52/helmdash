@@ -97,15 +97,18 @@ export default function OkrPage() {
     const [showForm, setShowForm] = useState(false);
     const [newTitle, setNewTitle] = useState('');
     const [newQuarter, setNewQuarter] = useState('Q1 2026');
+    const [newEndDate, setNewEndDate] = useState('');
 
     const handleAddObjective = () => {
         if (!newTitle.trim()) return;
         addObjective({
             title: newTitle,
             status: 'on-track',
-            quarter: newQuarter
+            quarter: newQuarter,
+            ...(newEndDate ? { endDate: newEndDate } : {}),
         });
         setNewTitle('');
+        setNewEndDate('');
         setShowForm(false);
     };
 
@@ -141,7 +144,7 @@ export default function OkrPage() {
             {/* Inline Add Form */}
             {showForm && (
                 <Card className="scale-in" style={{ marginBottom: "20px", border: `1px solid ${COLORS.accent}33`, flexShrink: 0 }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: "10px", alignItems: "center" }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto auto", gap: "10px", alignItems: "end" }}>
                         <Input
                             value={newTitle}
                             onChange={(e: any) => setNewTitle(e.target.value)}
@@ -158,6 +161,15 @@ export default function OkrPage() {
                                 { value: "Q3 2026", label: "Q3 2026" },
                             ]}
                         />
+                        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                            <label style={{ fontSize: "11px", color: COLORS.textMuted, fontWeight: 600 }}>Date d'échéance</label>
+                            <Input
+                                type="date"
+                                value={newEndDate}
+                                onChange={(e: any) => setNewEndDate(e.target.value)}
+                                style={{ colorScheme: "dark", minWidth: "140px" }}
+                            />
+                        </div>
                         <div style={{ display: "flex", gap: "8px" }}>
                             <Button onClick={() => setShowForm(false)}>Cancel</Button>
                             <Button variant="primary" onClick={handleAddObjective}>Create</Button>

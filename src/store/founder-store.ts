@@ -106,6 +106,7 @@ export interface Objective {
     keyResults: KeyResult[];
     status: 'on-track' | 'risk' | 'behind' | 'completed';
     quarter: string; // e.g. "Q1 2024"
+    endDate?: string; // ISO date string — deadline shown on calendar
 }
 
 // Module 10: Content Pipeline
