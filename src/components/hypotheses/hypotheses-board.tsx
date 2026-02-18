@@ -148,7 +148,6 @@ export function HypothesesBoard() {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [showForm, setShowForm] = useState(false);
     const [form, setForm] = useState(EMPTY_FORM);
-    const [draftInput, setDraftInput] = useState('');
     const [showResults, setShowResults] = useState(false);
 
     // Categorize
@@ -205,17 +204,6 @@ export function HypothesesBoard() {
         setForm(EMPTY_FORM);
         setEditingId(null);
         setShowForm(false);
-    };
-
-    const quickAdd = () => {
-        if (!draftInput.trim()) return;
-        addHypothesis({
-            statement: draftInput.trim(),
-            category: 'problem' as HypothesisCategory,
-            riskLevel: 'medium' as HypothesisRisk,
-            testMethod: '', successCriteria: '', status: 'draft',
-        });
-        setDraftInput('');
     };
 
     const moveToBuild = (id: string) => updateHypothesis(id, { status: 'testing', actualResult: undefined });
@@ -314,19 +302,6 @@ export function HypothesesBoard() {
                                 <Icons.Plus /> {t.new}
                             </Btn>
                         </div>
-                    </div>
-
-                    {/* Quick add */}
-                    <div style={{ display: "flex", gap: "8px", marginBottom: drafts.length > 0 ? "10px" : "0" }}>
-                        <Input
-                            value={draftInput}
-                            onChange={(e: any) => setDraftInput(e.target.value)}
-                            onKeyDown={(e: any) => e.key === 'Enter' && quickAdd()}
-                            placeholder={t.bml.addDraft}
-                        />
-                        <Btn variant="primary" onClick={quickAdd} disabled={!draftInput.trim()} style={{ flexShrink: 0 }}>
-                            <Icons.Plus />
-                        </Btn>
                     </div>
 
                     {/* Draft list */}
