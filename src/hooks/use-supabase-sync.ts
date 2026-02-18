@@ -166,12 +166,6 @@ export function useSupabaseSync() {
                         description: error.message,
                         variant: "destructive",
                     });
-                } else {
-                    toast({
-                        title: "Saved",
-                        description: "Your changes have been saved.",
-                        duration: 2000,
-                    });
                 }
             }, 2000);
         });
