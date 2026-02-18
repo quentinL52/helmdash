@@ -203,20 +203,23 @@ function EventBadge({ event, onClick }: { event: CalendarEvent; onClick: (e: Cal
     return (
         <button
             onClick={() => onClick(event)}
+            title={event.title}
             style={{
-                display: 'flex', alignItems: 'center', gap: '4px',
-                padding: '2px 6px', borderRadius: '4px', fontSize: '11px',
+                display: 'flex', alignItems: 'center', gap: '3px',
+                padding: '1px 4px', borderRadius: '3px',
+                fontSize: '10px', lineHeight: '14px',
                 background: `${event.color}20`, color: event.color,
                 border: `1px solid ${event.color}40`,
                 cursor: 'pointer', width: '100%', textAlign: 'left',
-                overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
+                overflow: 'hidden', whiteSpace: 'nowrap',
                 transition: 'background 0.15s',
+                flexShrink: 0,
             }}
             onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = `${event.color}35`; }}
             onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = `${event.color}20`; }}
         >
-            <span style={{ flexShrink: 0 }}>{TYPE_CONFIG[event.type].icon}</span>
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{event.title}</span>
+            <span style={{ flexShrink: 0, display: 'flex' }}>{TYPE_CONFIG[event.type].icon}</span>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>{event.title}</span>
         </button>
     );
 }
@@ -356,9 +359,20 @@ function MonthView({ current, events, onEventClick }: { current: Date; events: C
                             const dayEvents = getEventsForDay(events, day);
                             const isToday = isSameDay(day, today);
                             const inMonth = isSameMonth(day, current);
+                            // Calcul du nombre max d'events affichables dans la hauteur fixe
+                            // Hauteur cellule = 110px, header = 26px, gap = 3px, chaque badge = 16px
+                            const CELL_H = 110;
+                            const HEADER_H = 26;
+                            const GAP = 1;
+                            const BADGE_H = 16;
+                            const availableH = CELL_H - HEADER_H - 4; // 4px padding bas
+                            const maxVisible = Math.max(1, Math.floor(availableH / (BADGE_H + GAP)));
+                            const visible = dayEvents.slice(0, maxVisible);
+                            const overflow = dayEvents.length - maxVisible;
+
                             return (
                                 <div key={di} style={{
-                                    minHeight: '90px',        /* grandit avec le contenu */
+                                    height: `${CELL_H}px`,   /* hauteur strictement fixe */
                                     display: 'flex', flexDirection: 'column',
                                     padding: '4px',
                                     borderRadius: '6px',
@@ -369,12 +383,14 @@ function MonthView({ current, events, onEventClick }: { current: Date; events: C
                                         ? COLORS.accent + '50'
                                         : inMonth ? COLORS.border : 'transparent'}`,
                                     opacity: inMonth ? 1 : 0.35,
+                                    overflow: 'hidden',
+                                    boxSizing: 'border-box',
                                 }}>
-                                    {/* Day number — always centered, fixed height */}
+                                    {/* Numéro du jour — hauteur fixe */}
                                     <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'center', marginBottom: '3px' }}>
                                         <span style={{
                                             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                            width: '22px', height: '22px', borderRadius: '50%', fontSize: '11px',
+                                            width: '20px', height: '20px', borderRadius: '50%', fontSize: '11px',
                                             fontWeight: isToday ? 700 : 400,
                                             background: isToday ? COLORS.accent : 'transparent',
                                             color: isToday ? '#fff' : inMonth ? COLORS.text : COLORS.textDim,
@@ -383,11 +399,19 @@ function MonthView({ current, events, onEventClick }: { current: Date; events: C
                                         </span>
                                     </div>
 
-                                    {/* Tous les événements — aucune troncature */}
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                                        {dayEvents.map(ev => (
+                                    {/* Événements visibles */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: `${GAP}px`, flex: 1, overflow: 'hidden' }}>
+                                        {visible.map(ev => (
                                             <EventBadge key={ev.id} event={ev} onClick={onEventClick} />
                                         ))}
+                                        {overflow > 0 && (
+                                            <span style={{
+                                                fontSize: '9px', color: COLORS.textDim,
+                                                paddingLeft: '2px', flexShrink: 0, lineHeight: '14px',
+                                            }}>
+                                                +{overflow} autre{overflow > 1 ? 's' : ''}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             );
