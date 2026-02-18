@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { useFounderStore } from '@/store/founder-store';
 import { useRouter } from 'next/navigation';
 import {
@@ -231,6 +231,85 @@ function sortByPriority(evs: CalendarEvent[]): CalendarEvent[] {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
+function OverflowPopover({
+    hiddenEvents,
+    onEventClick,
+    label,
+}: {
+    hiddenEvents: CalendarEvent[];
+    onEventClick: (ev: CalendarEvent) => void;
+    label: string;
+}) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!open) return;
+        function handleClickOutside(e: MouseEvent) {
+            if (ref.current && !ref.current.contains(e.target as Node)) {
+                setOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [open]);
+
+    return (
+        <div ref={ref} style={{ position: 'relative', flexShrink: 0 }}>
+            <button
+                onClick={() => setOpen(o => !o)}
+                style={{
+                    fontSize: '10px', color: COLORS.accentLight,
+                    background: `${COLORS.accent}15`, border: `1px solid ${COLORS.accent}30`,
+                    borderRadius: '3px', padding: '1px 5px',
+                    cursor: 'pointer', width: '100%', textAlign: 'left',
+                    transition: 'background 0.15s',
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = `${COLORS.accent}25`; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = `${COLORS.accent}15`; }}
+            >
+                {label}
+            </button>
+            {open && (
+                <div style={{
+                    position: 'absolute', bottom: '100%', left: 0,
+                    marginBottom: '4px', zIndex: 50,
+                    background: COLORS.surface, border: `1px solid ${COLORS.border}`,
+                    borderRadius: '8px', padding: '8px',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+                    minWidth: '160px', maxWidth: '220px',
+                    display: 'flex', flexDirection: 'column', gap: '3px',
+                }}>
+                    {hiddenEvents.map(ev => (
+                        <button
+                            key={ev.id}
+                            onClick={() => { onEventClick(ev); setOpen(false); }}
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: '5px',
+                                padding: '4px 6px', borderRadius: '4px',
+                                background: `${ev.color}15`, border: `1px solid ${ev.color}30`,
+                                cursor: 'pointer', textAlign: 'left', width: '100%',
+                                fontSize: '11px', color: COLORS.text,
+                                overflow: 'hidden', whiteSpace: 'nowrap',
+                                transition: 'background 0.15s',
+                            }}
+                            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = `${ev.color}30`; }}
+                            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = `${ev.color}15`; }}
+                        >
+                            <span style={{ color: ev.color, flexShrink: 0, display: 'flex' }}>
+                                {TYPE_CONFIG[ev.type].icon}
+                            </span>
+                            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {ev.title}
+                            </span>
+                        </button>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
 function EventBadge({ event, onClick }: { event: CalendarEvent; onClick: (e: CalendarEvent) => void }) {
     return (
         <button
@@ -339,9 +418,11 @@ function WeekView({ current, events, onEventClick }: { current: Date; events: Ca
                                 <EventBadge key={ev.id} event={ev} onClick={onEventClick} />
                             ))}
                             {dayEvents.length > 4 && (
-                                <span style={{ fontSize: '10px', color: COLORS.textDim, paddingLeft: '4px', flexShrink: 0 }}>
-                                    +{dayEvents.length - 4} autres
-                                </span>
+                                <OverflowPopover
+                                    hiddenEvents={dayEvents.slice(4)}
+                                    onEventClick={onEventClick}
+                                    label={`+${dayEvents.length - 4} autres`}
+                                />
                             )}
                         </div>
                     </div>
@@ -437,12 +518,11 @@ function MonthView({ current, events, onEventClick }: { current: Date; events: C
                                             <EventBadge key={ev.id} event={ev} onClick={onEventClick} />
                                         ))}
                                         {overflow > 0 && (
-                                            <span style={{
-                                                fontSize: '9px', color: COLORS.textDim,
-                                                paddingLeft: '2px', flexShrink: 0, lineHeight: '14px',
-                                            }}>
-                                                +{overflow} autre{overflow > 1 ? 's' : ''}
-                                            </span>
+                                            <OverflowPopover
+                                                hiddenEvents={dayEvents.slice(maxVisible)}
+                                                onEventClick={onEventClick}
+                                                label={`+${overflow} autre${overflow > 1 ? 's' : ''}`}
+                                            />
                                         )}
                                     </div>
                                 </div>
@@ -508,9 +588,11 @@ function SemesterView({ current, events, onEventClick }: { current: Date; events
                                     </button>
                                 ))}
                                 {monthEvents.length > 5 && (
-                                    <span style={{ fontSize: '10px', color: COLORS.textDim, paddingLeft: '4px' }}>
-                                        +{monthEvents.length - 5} autres
-                                    </span>
+                                    <OverflowPopover
+                                        hiddenEvents={monthEvents.slice(5)}
+                                        onEventClick={onEventClick}
+                                        label={`+${monthEvents.length - 5} autres`}
+                                    />
                                 )}
                             </div>
                         )}
@@ -582,7 +664,11 @@ function YearView({ current, events, onEventClick }: { current: Date; events: Ca
                                         </button>
                                     ))}
                                     {monthEvents.length > 3 && (
-                                        <span style={{ fontSize: '10px', color: COLORS.textDim }}>+{monthEvents.length - 3}</span>
+                                        <OverflowPopover
+                                            hiddenEvents={monthEvents.slice(3)}
+                                            onEventClick={onEventClick}
+                                            label={`+${monthEvents.length - 3}`}
+                                        />
                                     )}
                                 </div>
                             </>
