@@ -253,6 +253,8 @@ export interface RoadmapItem {
     status: 'todo' | 'doing' | 'done';
     priority: 'high' | 'medium' | 'low';
     week?: string;
+    startDate?: string; // ISO date string
+    dueDate?: string;   // ISO date string
     createdAt: string;
     updatedAt: string;
 }

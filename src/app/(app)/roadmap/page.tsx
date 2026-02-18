@@ -108,7 +108,7 @@ export default function RoadmapPage() {
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ title: "", description: "", status: "todo", priority: "medium", week: "" });
+  const [form, setForm] = useState({ title: "", description: "", status: "todo", priority: "medium", week: "", startDate: "", dueDate: "" });
 
   const language = useFounderStore(s => s.language);
   const t = translations[language].roadmap;
@@ -130,18 +130,18 @@ export default function RoadmapPage() {
       addRoadmapItem(form as any);
     }
 
-    setForm({ title: "", description: "", status: "todo", priority: "medium", week: "" });
+    setForm({ title: "", description: "", status: "todo", priority: "medium", week: "", startDate: "", dueDate: "" });
     setShowForm(false);
   };
 
   const edit = (task: any) => {
-    setForm(task);
+    setForm({ ...task, startDate: task.startDate || "", dueDate: task.dueDate || "" });
     setEditingId(task.id);
     setShowForm(true);
   };
 
   const cancel = () => {
-    setForm({ title: "", description: "", status: "todo", priority: "medium", week: "" });
+    setForm({ title: "", description: "", status: "todo", priority: "medium", week: "", startDate: "", dueDate: "" });
     setEditingId(null);
     setShowForm(false);
   };
@@ -177,7 +177,7 @@ export default function RoadmapPage() {
           >
             <Sparkles className="w-4 h-4" />
           </Button>
-          <Button variant="primary" onClick={() => { setShowForm(!showForm); setEditingId(null); setForm({ title: "", description: "", status: "todo", priority: "medium", week: "" }); }}>
+          <Button variant="primary" onClick={() => { setShowForm(!showForm); setEditingId(null); setForm({ title: "", description: "", status: "todo", priority: "medium", week: "", startDate: "", dueDate: "" }); }}>
             <Icons.Plus /> {t.new}
           </Button>
         </div>
@@ -204,6 +204,14 @@ export default function RoadmapPage() {
             <Input value={form.week} onChange={(e: any) => setForm({ ...form, week: e.target.value })} placeholder={t.form.week} />
             <div style={{ gridColumn: "1 / -1" }}>
               <TextArea value={form.description} onChange={(e: any) => setForm({ ...form, description: e.target.value })} placeholder={`${t.form.description}...`} />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              <label style={{ fontSize: "11px", color: COLORS.textMuted, fontWeight: 600 }}>Date de début</label>
+              <Input type="date" value={form.startDate} onChange={(e: any) => setForm({ ...form, startDate: e.target.value })} style={{ colorScheme: "dark" }} />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+              <label style={{ fontSize: "11px", color: COLORS.textMuted, fontWeight: 600 }}>Date limite</label>
+              <Input type="date" value={form.dueDate} onChange={(e: any) => setForm({ ...form, dueDate: e.target.value })} style={{ colorScheme: "dark" }} />
             </div>
             <select value={form.priority} onChange={(e: any) => setForm({ ...form, priority: e.target.value })} style={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: "8px", padding: "8px 12px", color: COLORS.text, fontSize: "13px", fontFamily: "'DM Sans', sans-serif", outline: "none" }}>
               <option value="high">{t.priority.high}</option>
