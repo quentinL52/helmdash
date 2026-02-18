@@ -8,8 +8,8 @@ import {
     subDays, subWeeks, subMonths, subYears,
     startOfWeek, endOfWeek, startOfMonth, endOfMonth,
     isSameDay, isSameMonth, isWithinInterval,
-    eachDayOfInterval, eachWeekOfInterval,
-    startOfYear, endOfYear, getQuarter, setQuarter, startOfQuarter, endOfQuarter,
+    eachDayOfInterval,
+    setQuarter, startOfQuarter, endOfQuarter,
     parseISO, isValid,
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -27,6 +27,8 @@ interface CalendarEvent {
     startDate?: Date;
     endDate?: Date;
     color: string;
+    /** For routine events: JS day-of-week (1=Mon … 5=Fri), used for recurring matching */
+    recurringDow?: number;
     data: Record<string, unknown>;
 }
 
@@ -60,6 +62,12 @@ const VIEWS: { key: ViewType; label: string }[] = [
 ];
 
 const DAYS_FR = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+// ─── Routine day-of-week mapping ──────────────────────────────────────────────
+// Routine store IDs → JS getDay() value (0=Sun, 1=Mon … 6=Sat)
+const ROUTINE_DOW: Record<string, number> = {
+    mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6, sun: 0,
+};
 
 // ─── Quarter parsing ──────────────────────────────────────────────────────────
 
@@ -140,16 +148,19 @@ function useAllEvents(): CalendarEvent[] {
             }
         });
 
-        // Routine — today only, one event per task
+        // Routine — recurring weekly events, matched by day-of-week
         routineDays.forEach((day: { id: string; day: string; tasks: { id: string; text: string; done: boolean }[] }) => {
+            const dow = ROUTINE_DOW[day.id];
+            if (dow === undefined) return;
             day.tasks.forEach((task: { id: string; text: string; done: boolean }) => {
                 events.push({
                     id: `routine-${day.id}-${task.id}`,
                     type: 'routine',
                     title: task.text,
-                    date: today,
+                    date: today, // fallback date (not used for matching)
+                    recurringDow: dow,
                     color: TYPE_CONFIG.routine.color,
-                    data: { ...task, day: day.day } as unknown as Record<string, unknown>,
+                    data: { ...task, day: day.day, dow } as unknown as Record<string, unknown>,
                 });
             });
         });
@@ -161,10 +172,17 @@ function useAllEvents(): CalendarEvent[] {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
+    const dow = day.getDay(); // 0=Sun … 6=Sat
     return events.filter(ev => {
+        // Recurring routine: match by day-of-week, Mon–Fri only
+        if (ev.recurringDow !== undefined) {
+            return ev.recurringDow === dow;
+        }
+        // Range events (OKR, roadmap with startDate+endDate)
         if (ev.startDate && ev.endDate) {
             return isWithinInterval(day, { start: ev.startDate, end: ev.endDate });
         }
+        // Punctual events
         return isSameDay(ev.date, day);
     });
 }
@@ -275,57 +293,91 @@ function WeekView({ current, events, onEventClick }: { current: Date; events: Ca
 }
 
 function MonthView({ current, events, onEventClick }: { current: Date; events: CalendarEvent[]; onEventClick: (e: CalendarEvent) => void }) {
+    const today = new Date();
     const monthStart = startOfMonth(current);
     const monthEnd = endOfMonth(current);
-    const calStart = startOfWeek(monthStart, { weekStartsOn: 1 });
-    const calEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
-    const days = eachDayOfInterval({ start: calStart, end: calEnd });
-    const today = new Date();
+
+    // Build explicit weeks: each week is an array of 7 days Mon→Sun
+    const firstMonday = startOfWeek(monthStart, { weekStartsOn: 1 });
+    const lastSunday = endOfWeek(monthEnd, { weekStartsOn: 1 });
+    const allDays = eachDayOfInterval({ start: firstMonday, end: lastSunday });
+    // Chunk into weeks of 7
+    const weeks: Date[][] = [];
+    for (let i = 0; i < allDays.length; i += 7) {
+        weeks.push(allDays.slice(i, i + 7));
+    }
 
     return (
         <div style={{ padding: '16px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px', marginBottom: '4px' }}>
+            {/* Day-of-week header */}
+            <div style={{
+                display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)',
+                gap: '2px', marginBottom: '4px',
+            }}>
                 {DAYS_FR.map(d => (
-                    <div key={d} style={{ textAlign: 'center', fontSize: '11px', color: COLORS.textMuted, fontWeight: 600, padding: '4px 0' }}>{d}</div>
+                    <div key={d} style={{
+                        textAlign: 'center', fontSize: '11px',
+                        color: COLORS.textMuted, fontWeight: 600, padding: '4px 0',
+                    }}>{d}</div>
                 ))}
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px' }}>
-                {days.map((day, i) => {
-                    const dayEvents = getEventsForDay(events, day);
-                    const isToday = isSameDay(day, today);
-                    const inMonth = isSameMonth(day, current);
-                    return (
-                        <div key={i} style={{
-                            minHeight: '80px', padding: '6px 4px', borderRadius: '6px',
-                            background: isToday ? `${COLORS.accent}15` : inMonth ? COLORS.surfaceHover : 'transparent',
-                            border: `1px solid ${isToday ? COLORS.accent + '50' : inMonth ? COLORS.border : 'transparent'}`,
-                            opacity: inMonth ? 1 : 0.4,
-                        }}>
-                            <div style={{
-                                fontSize: '12px', textAlign: 'center', marginBottom: '4px',
-                                color: isToday ? COLORS.accent : COLORS.text,
-                                fontWeight: isToday ? 700 : 400,
-                                width: isToday ? '20px' : 'auto',
-                                height: isToday ? '20px' : 'auto',
-                                background: isToday ? `${COLORS.accent}25` : 'transparent',
-                                borderRadius: '50%', lineHeight: isToday ? '20px' : 'normal',
-                                margin: isToday ? '0 auto 4px' : '0 0 4px',
-                            }}>
-                                {format(day, 'd')}
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                                {dayEvents.slice(0, 2).map(ev => (
-                                    <EventBadge key={ev.id} event={ev} onClick={onEventClick} />
-                                ))}
-                                {dayEvents.length > 2 && (
-                                    <span style={{ fontSize: '10px', color: COLORS.textDim, paddingLeft: '4px' }}>
-                                        +{dayEvents.length - 2}
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                    );
-                })}
+
+            {/* Weeks rows */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                {weeks.map((week, wi) => (
+                    <div key={wi} style={{
+                        display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px',
+                    }}>
+                        {week.map((day, di) => {
+                            const dayEvents = getEventsForDay(events, day);
+                            const isToday = isSameDay(day, today);
+                            const inMonth = isSameMonth(day, current);
+                            return (
+                                <div key={di} style={{
+                                    minHeight: '80px', padding: '6px 4px', borderRadius: '6px',
+                                    background: isToday
+                                        ? `${COLORS.accent}15`
+                                        : inMonth ? COLORS.surfaceHover : 'transparent',
+                                    border: `1px solid ${isToday
+                                        ? COLORS.accent + '50'
+                                        : inMonth ? COLORS.border : 'transparent'}`,
+                                    opacity: inMonth ? 1 : 0.35,
+                                }}>
+                                    {/* Day number — always centered */}
+                                    <div style={{
+                                        display: 'flex', justifyContent: 'center',
+                                        marginBottom: '4px',
+                                    }}>
+                                        <span style={{
+                                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                            width: '22px', height: '22px', borderRadius: '50%', fontSize: '12px',
+                                            fontWeight: isToday ? 700 : 400,
+                                            background: isToday ? COLORS.accent : 'transparent',
+                                            color: isToday ? '#fff' : inMonth ? COLORS.text : COLORS.textDim,
+                                        }}>
+                                            {format(day, 'd')}
+                                        </span>
+                                    </div>
+
+                                    {/* Events */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                                        {dayEvents.slice(0, 2).map(ev => (
+                                            <EventBadge key={ev.id} event={ev} onClick={onEventClick} />
+                                        ))}
+                                        {dayEvents.length > 2 && (
+                                            <span style={{
+                                                fontSize: '10px', color: COLORS.textDim,
+                                                paddingLeft: '4px',
+                                            }}>
+                                                +{dayEvents.length - 2}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                ))}
             </div>
         </div>
     );
