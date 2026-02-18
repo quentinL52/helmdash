@@ -197,6 +197,38 @@ function getEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
     });
 }
 
+// ─── Priority sorting ─────────────────────────────────────────────────────────
+
+/**
+ * Lower score = higher priority (shown first).
+ * Roadmap:  high=0, medium=1, low=2
+ * OKR:      behind=0, risk=1, on-track=2, completed=3
+ * Content:  scheduled=0, draft=1, idea=2, published=3
+ * Routine:  always last = 10
+ */
+function getPriorityScore(ev: CalendarEvent): number {
+    switch (ev.type) {
+        case 'roadmap': {
+            const p = (ev.data.priority as string) ?? 'medium';
+            return p === 'high' ? 0 : p === 'medium' ? 1 : 2;
+        }
+        case 'okr': {
+            const s = (ev.data.status as string) ?? 'on-track';
+            return s === 'behind' ? 0 : s === 'risk' ? 1 : s === 'on-track' ? 2 : 3;
+        }
+        case 'content': {
+            const s = (ev.data.status as string) ?? 'idea';
+            return s === 'scheduled' ? 0 : s === 'draft' ? 1 : s === 'idea' ? 2 : 3;
+        }
+        case 'routine':
+            return 10;
+    }
+}
+
+function sortByPriority(evs: CalendarEvent[]): CalendarEvent[] {
+    return [...evs].sort((a, b) => getPriorityScore(a) - getPriorityScore(b));
+}
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function EventBadge({ event, onClick }: { event: CalendarEvent; onClick: (e: CalendarEvent) => void }) {
@@ -274,7 +306,7 @@ function WeekView({ current, events, onEventClick }: { current: Date; events: Ca
     return (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', padding: '16px' }}>
             {days.map((day, i) => {
-                const dayEvents = getEventsForDay(events, day);
+                const dayEvents = sortByPriority(getEventsForDay(events, day));
                 const isToday = isSameDay(day, today);
                 return (
                     <div key={i} style={{
@@ -356,7 +388,7 @@ function MonthView({ current, events, onEventClick }: { current: Date; events: C
                         display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px',
                     }}>
                         {week.map((day, di) => {
-                            const dayEvents = getEventsForDay(events, day);
+                            const dayEvents = sortByPriority(getEventsForDay(events, day));
                             const isToday = isSameDay(day, today);
                             const inMonth = isSameMonth(day, current);
                             // Calcul du nombre max d'events affichables dans la hauteur fixe
@@ -434,16 +466,17 @@ function SemesterView({ current, events, onEventClick }: { current: Date; events
                 const monthStart = startOfMonth(month);
                 const monthEnd = endOfMonth(month);
                 const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
-                const monthEvents: CalendarEvent[] = [];
+                const monthEventsRaw: CalendarEvent[] = [];
                 const seen = new Set<string>();
                 monthDays.forEach(day => {
                     getEventsForDay(events, day).forEach(ev => {
                         if (!seen.has(ev.id)) {
                             seen.add(ev.id);
-                            monthEvents.push(ev);
+                            monthEventsRaw.push(ev);
                         }
                     });
                 });
+                const monthEvents = sortByPriority(monthEventsRaw);
 
                 return (
                     <div key={mi} style={{
@@ -499,12 +532,13 @@ function YearView({ current, events, onEventClick }: { current: Date; events: Ca
                 const monthEnd = endOfMonth(month);
                 const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
                 const seen = new Set<string>();
-                const monthEvents: CalendarEvent[] = [];
+                const monthEventsRaw: CalendarEvent[] = [];
                 monthDays.forEach(day => {
                     getEventsForDay(events, day).forEach(ev => {
-                        if (!seen.has(ev.id)) { seen.add(ev.id); monthEvents.push(ev); }
+                        if (!seen.has(ev.id)) { seen.add(ev.id); monthEventsRaw.push(ev); }
                     });
                 });
+                const monthEvents = sortByPriority(monthEventsRaw);
                 const byType = monthEvents.reduce<Record<string, number>>((acc, ev) => {
                     acc[ev.type] = (acc[ev.type] || 0) + 1;
                     return acc;
