@@ -358,7 +358,7 @@ function MonthView({ current, events, onEventClick }: { current: Date; events: C
                             const inMonth = isSameMonth(day, current);
                             return (
                                 <div key={di} style={{
-                                    height: '90px',           /* ← hauteur fixe */
+                                    minHeight: '90px',        /* grandit avec le contenu */
                                     display: 'flex', flexDirection: 'column',
                                     padding: '4px',
                                     borderRadius: '6px',
@@ -369,7 +369,6 @@ function MonthView({ current, events, onEventClick }: { current: Date; events: C
                                         ? COLORS.accent + '50'
                                         : inMonth ? COLORS.border : 'transparent'}`,
                                     opacity: inMonth ? 1 : 0.35,
-                                    overflow: 'hidden',
                                 }}>
                                     {/* Day number — always centered, fixed height */}
                                     <div style={{ flexShrink: 0, display: 'flex', justifyContent: 'center', marginBottom: '3px' }}>
@@ -384,16 +383,11 @@ function MonthView({ current, events, onEventClick }: { current: Date; events: C
                                         </span>
                                     </div>
 
-                                    {/* Events — zone fixe, débordement masqué */}
-                                    <div style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                                        {dayEvents.slice(0, 2).map(ev => (
+                                    {/* Tous les événements — aucune troncature */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                                        {dayEvents.map(ev => (
                                             <EventBadge key={ev.id} event={ev} onClick={onEventClick} />
                                         ))}
-                                        {dayEvents.length > 2 && (
-                                            <span style={{ fontSize: '10px', color: COLORS.textDim, paddingLeft: '2px', flexShrink: 0 }}>
-                                                +{dayEvents.length - 2}
-                                            </span>
-                                        )}
                                     </div>
                                 </div>
                             );
