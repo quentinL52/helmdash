@@ -28,6 +28,12 @@ const CalendarWidget = dynamic(
 export default function DashboardPage() {
     const language = useFounderStore(s => s.language);
     const t = translations[language].dashboard;
+    const routine = useFounderStore(s => s.routine);
+
+    // Calcul du taux de complétion réel de la semaine courante
+    const totalTasks = routine.reduce((acc, day) => acc + day.tasks.length, 0);
+    const doneTasks = routine.reduce((acc, day) => acc + day.tasks.filter(task => task.done).length, 0);
+    const consistencyRate = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
 
     return (
         <div className="flex flex-col h-full space-y-4 p-8 pt-6">
@@ -60,8 +66,8 @@ export default function DashboardPage() {
                             <CheckCircle className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">0%</div>
-                            <p className="text-xs text-muted-foreground">This week</p>
+                            <div className="text-2xl font-bold">{consistencyRate}%</div>
+                            <p className="text-xs text-muted-foreground">{doneTasks} / {totalTasks} tâches cochées</p>
                         </CardContent>
                     </Card>
                 </div>

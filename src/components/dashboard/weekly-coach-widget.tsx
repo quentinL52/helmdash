@@ -13,12 +13,10 @@ export function WeeklyCoachWidget() {
     const { weeklyReport, isGenerating, generateReport } = useWeeklyCoach();
     const [isExpanded, setIsExpanded] = useState(false);
 
-    // Auto-expand if report is new (generated today)
+    // Auto-expand when a new report is generated in this session
     useEffect(() => {
-        if (weeklyReport && new Date(weeklyReport.createdAt).toDateString() === new Date().toDateString()) {
-            setIsExpanded(true);
-        }
-    }, [weeklyReport]);
+        if (isGenerating) setIsExpanded(false);
+    }, [isGenerating]);
 
     if (!weeklyReport && !isGenerating) {
         return (
@@ -49,62 +47,59 @@ export function WeeklyCoachWidget() {
 
     return (
         <Card className="col-span-full border-primary/20 transition-all duration-300">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                        <Sparkles className="h-5 w-5 text-primary" />
-                        Weekly AI Coach
-                    </CardTitle>
-                    {weeklyReport && (
-                        <Badge variant="outline" className="ml-2">
-                            {weeklyReport.date}
-                        </Badge>
-                    )}
-                </div>
-                <CardDescription>
-                    {isGenerating ? "Analyzing your data..." : "Your strategic roadmap for the week."}
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="pb-3">
-                {isGenerating ? (
-                    <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        <p className="text-sm text-muted-foreground animate-pulse">
-                            Reviewing your journal...<br />
-                            Checking key results...<br />
-                            Formulating strategy...
-                        </p>
+                    <div className="flex items-center gap-3">
+                        <CardTitle className="flex items-center gap-2">
+                            <Sparkles className="h-5 w-5 text-primary" />
+                            Weekly AI Coach
+                        </CardTitle>
+                        <CardDescription className="mt-0">
+                            {isGenerating ? "Analyzing your data..." : "Your strategic roadmap for the week."}
+                        </CardDescription>
                     </div>
-                ) : weeklyReport ? (
-                    <div className={`relative transition-all duration-500 ${isExpanded ? 'h-auto' : 'h-40 overflow-hidden'}`}>
-                        <ScrollArea className={isExpanded ? "h-[500px] w-full pr-4" : "h-full w-full"}>
+                    <div className="flex items-center gap-2">
+                        {weeklyReport && (
+                            <Badge variant="outline">
+                                {weeklyReport.date}
+                            </Badge>
+                        )}
+                        {weeklyReport && !isGenerating && (
+                            <>
+                                <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)}>
+                                    {isExpanded ? "Collapse" : "Expand"}
+                                </Button>
+                                <Button variant="ghost" size="icon" onClick={generateReport} title="Regenerate">
+                                    <RefreshCw className="h-4 w-4" />
+                                </Button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </CardHeader>
+            {isExpanded && (
+                <CardContent className="pt-0 pb-3">
+                    {isGenerating ? (
+                        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                            <p className="text-sm text-muted-foreground animate-pulse">
+                                Reviewing your journal...<br />
+                                Checking key results...<br />
+                                Formulating strategy...
+                            </p>
+                        </div>
+                    ) : weeklyReport ? (
+                        <ScrollArea className="h-[500px] w-full pr-4">
                             <div className="prose prose-sm dark:prose-invert max-w-none">
                                 <ReactMarkdown>{weeklyReport.content}</ReactMarkdown>
                             </div>
                         </ScrollArea>
-                        {!isExpanded && (
-                            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent flex items-end justify-center pb-2">
-                                <Button variant="secondary" size="sm" onClick={() => setIsExpanded(true)}>
-                                    Read Full Report
-                                </Button>
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    <div className="py-8 text-center text-muted-foreground">
-                        <p>Unable to load report.</p>
-                    </div>
-                )}
-            </CardContent>
-            {weeklyReport && !isGenerating && (
-                <CardFooter className="flex justify-between pt-0">
-                    <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)}>
-                        {isExpanded ? "Collapse" : "Expand"}
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={generateReport} title="Regenerate">
-                        <RefreshCw className="h-4 w-4" />
-                    </Button>
-                </CardFooter>
+                    ) : (
+                        <div className="py-8 text-center text-muted-foreground">
+                            <p>Unable to load report.</p>
+                        </div>
+                    )}
+                </CardContent>
             )}
         </Card>
     );
