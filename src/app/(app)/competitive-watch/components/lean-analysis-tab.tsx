@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 // Import existing sub-tab components
 import { RadarTab } from './radar-tab';
 import { FeatureMatrixTab } from './feature-matrix-tab';
-
+import { HeadToHeadTab } from './head-to-head-tab';
 import { PricingChart } from './pricing-chart';
 import { TimelineChart } from './timeline-chart';
 import { ThreatMatrix } from './threat-matrix';
@@ -25,14 +25,14 @@ interface LeanAnalysisTabProps {
  * In Advanced mode, also shows Timeline, Threats, and Competitive Score.
  */
 export function LeanAnalysisTab({ advancedMode }: LeanAnalysisTabProps) {
-    const language = useFounderStore((s) => s.language);
+    const language = useFounderStore(s => s.language);
     const t = (translations[language] as any).competitiveWatch;
     const [activeSubTab, setActiveSubTab] = useState('radar');
 
     const essentialTabs = [
         { key: 'radar', label: t.tabs.radar },
         { key: 'features', label: t.analysisSubTabs.features },
-
+        { key: 'headtohead', label: language === 'fr' ? '1v1 Avantages' : '1v1 Advantages' },
         { key: 'pricing', label: t.analysisSubTabs.pricing },
     ];
 
@@ -74,7 +74,9 @@ export function LeanAnalysisTab({ advancedMode }: LeanAnalysisTabProps) {
                 <FeatureMatrixTab />
             </TabsContent>
 
-
+            <TabsContent value="headtohead">
+                <HeadToHeadTab />
+            </TabsContent>
 
             <TabsContent value="pricing">
                 <PricingChart />

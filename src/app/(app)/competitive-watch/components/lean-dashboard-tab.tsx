@@ -207,7 +207,7 @@ export function LeanDashboardTab({ onTabChange }: LeanDashboardTabProps) {
                                             <TableHead className="text-[#8b8fa3]">{t.competitor.name}</TableHead>
                                             <TableHead className="text-[#8b8fa3]">{t.competitor.website}</TableHead>
                                             <TableHead className="text-[#8b8fa3]">{t.competitor.pricing}</TableHead>
-                                            <TableHead className="text-[#8b8fa3]">{t.competitor.positioning}</TableHead>
+                                            <TableHead className="text-[#8b8fa3]">{language === 'fr' ? 'Différenciateurs' : 'Differentiators'}</TableHead>
                                             <TableHead className="text-right text-[#8b8fa3]">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
@@ -242,10 +242,24 @@ export function LeanDashboardTab({ onTabChange }: LeanDashboardTabProps) {
                                                 <TableCell className="text-[#dfe1e6] text-sm">
                                                     {competitor.pricing || <span className="text-[#8b8fa3]">-</span>}
                                                 </TableCell>
-                                                <TableCell className="text-[#dfe1e6] text-sm max-w-[200px]">
-                                                    <span className="line-clamp-1">
-                                                        {competitor.positioning || <span className="text-[#8b8fa3]">-</span>}
-                                                    </span>
+                                                <TableCell className="max-w-[220px]">
+                                                    {competitor.differentiators && competitor.differentiators.length > 0 ? (
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {competitor.differentiators.slice(0, 3).map((d, i) => (
+                                                                <Badge
+                                                                    key={i}
+                                                                    variant="outline"
+                                                                    className="text-[10px] px-1.5 py-0 border-[#6c5ce7]/30 text-[#a29bfe] bg-[#6c5ce7]/5"
+                                                                >
+                                                                    {d}
+                                                                </Badge>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-[#5c6078] text-xs italic">
+                                                            {language === 'fr' ? 'Non renseigné' : 'Not set'}
+                                                        </span>
+                                                    )}
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

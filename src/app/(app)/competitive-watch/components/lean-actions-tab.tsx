@@ -21,6 +21,10 @@ import {
     MoreHorizontal,
     LayoutDashboard,
     ArrowRight,
+    CheckCircle2,
+    Pencil,
+    Trash2,
+    X,
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -59,6 +63,7 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
     const addHypothesis = useFounderStore((s) => s.addHypothesis);
     const updateCanvasSection = useFounderStore((s) => s.updateCanvasSection);
     const mySolution = useFounderStore((s) => s.mySolution);
+    const updateMySolution = useFounderStore((s) => s.updateMySolution);
     const competitors = useFounderStore((s) => s.competitors);
     const leanCanvas = useFounderStore((s) => s.leanCanvas);
     const roadmap = useFounderStore((s) => s.roadmap);
@@ -69,6 +74,21 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
     // Local state for editing
     const [editingItem, setEditingItem] = useState<{ type: string; index: number; text: string } | null>(null);
     const [newItemTexts, setNewItemTexts] = useState<Record<string, string>>({});
+
+    // Competitive advantages state
+    const [newAdvantage, setNewAdvantage] = useState('');
+    const advantages = mySolution.competitiveAdvantages ?? [];
+
+    const handleAddAdvantage = () => {
+        const trimmed = newAdvantage.trim();
+        if (!trimmed) return;
+        updateMySolution({ competitiveAdvantages: [...advantages, trimmed] });
+        setNewAdvantage('');
+    };
+
+    const handleRemoveAdvantage = (index: number) => {
+        updateMySolution({ competitiveAdvantages: advantages.filter((_, i) => i !== index) });
+    };
 
     // Confirmation dialog state
     const [showConfirmGenerate, setShowConfirmGenerate] = useState(false);
@@ -257,6 +277,61 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
                     </Button>
                 </div>
             </div>
+
+            {/* ── Notre avantage concurrentiel ── */}
+            <Card>
+                <CardHeader className="pb-3">
+                    <div className="flex items-center gap-2">
+                        <Shield className="h-4 w-4 text-emerald-400" />
+                        <CardTitle className="text-base">
+                            {language === 'fr' ? 'Notre avantage concurrentiel' : 'Our competitive advantage'}
+                        </CardTitle>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                        {language === 'fr'
+                            ? 'Pourquoi un client vous choisirait plutôt qu\'un concurrent.'
+                            : 'Why a customer would choose you over a competitor.'}
+                    </p>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                    {advantages.length > 0 ? (
+                        <ul className="space-y-2">
+                            {advantages.map((a, i) => (
+                                <li key={i} className="flex items-start gap-2 group">
+                                    <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
+                                    <span className="text-sm text-[#dfe1e6] flex-1">{a}</span>
+                                    <button
+                                        onClick={() => handleRemoveAdvantage(i)}
+                                        className="opacity-0 group-hover:opacity-100 transition-opacity text-[#8b8fa3] hover:text-red-400"
+                                    >
+                                        <X className="h-3.5 w-3.5" />
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-xs text-muted-foreground">
+                            {language === 'fr'
+                                ? 'Ajoutez vos avantages concurrentiels clés ci-dessous.'
+                                : 'Add your key competitive advantages below.'}
+                        </p>
+                    )}
+                    <div className="flex gap-2 pt-1">
+                        <input
+                            className="flex-1 text-xs bg-transparent border-b border-dashed border-[#282c3a] focus:border-emerald-500 outline-none py-1 placeholder:text-[#5c6078] text-[#e8e9ed]"
+                            placeholder={language === 'fr' ? '+ Ajouter un avantage...' : '+ Add an advantage...'}
+                            value={newAdvantage}
+                            onChange={e => setNewAdvantage(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter') handleAddAdvantage(); }}
+                        />
+                        {newAdvantage.trim() && (
+                            <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={handleAddAdvantage}>
+                                <Plus className="h-3 w-3" />
+                            </Button>
+                        )}
+                    </div>
+                </CardContent>
+            </Card>
 
             {/* Lean SWOT */}
             <Card>
