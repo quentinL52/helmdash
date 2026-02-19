@@ -3,11 +3,8 @@
 import { useState } from "react";
 import { useFounderStore } from '@/store/founder-store';
 import { generateRoutineAnalysis } from '@/lib/ai-service';
-import { Area, AreaChart, Tooltip, ResponsiveContainer } from 'recharts';
 import { translations } from '@/lib/translations';
 import { RecommendationBanner } from '@/components/ui/recommendation-banner';
-import { Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -125,7 +122,6 @@ export default function RoutinePage() {
   const language = useFounderStore(s => s.language);
 
   const recommendations = useFounderStore(s => s.strategicRecommendations?.routineOptimization);
-  const showRecommendations = useFounderStore(s => s.showStrategicRecommendations);
   const toggleRecommendations = useFounderStore(s => s.toggleStrategicRecommendations);
 
   const t = translations[language].routine;
@@ -133,6 +129,7 @@ export default function RoutinePage() {
 
   const [addingTo, setAddingTo] = useState<string | null>(null);
   const [newTask, setNewTask] = useState("");
+  const [suggestionsExpanded, setSuggestionsExpanded] = useState(false);
 
   // AI Analysis State
   const [analysis, setAnalysis] = useState("");
@@ -195,7 +192,6 @@ export default function RoutinePage() {
 
   // Safe checks for potentially undefined state during hot reload/migration
   const safeRoutine = routine || [];
-  const safeHistory = routineHistory || [];
 
   const totalTasks = safeRoutine.reduce((a, d) => a + d.tasks.length, 0);
   const doneTasks = safeRoutine.reduce((a, d) => a + d.tasks.filter((t: any) => t.done).length, 0);
@@ -208,18 +204,12 @@ export default function RoutinePage() {
     .fade-in { animation: fadeIn 0.3s ease both; }
   `;
 
-  // Filter history to last 14 days for the chart
-  const historyData = safeHistory.slice(-14).map(h => ({
-    date: new Date(h.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
-    rate: Math.round(h.completionRate * 100)
-  }));
-
   return (
-    <div className="fade-in h-[calc(100vh-64px)] flex flex-col overflow-hidden" style={{ fontFamily: "'DM Sans', sans-serif", color: COLORS.text }}>
+    <div className="fade-in" style={{ fontFamily: "'DM Sans', sans-serif", color: COLORS.text }}>
       <style>{animationCSS}</style>
 
       {/* Header & Stats */}
-      <div className="shrink-0 p-8 pb-0">
+      <div className="p-8 pb-0">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-[#e8e9ed]">{t.title}</h1>
@@ -268,9 +258,22 @@ export default function RoutinePage() {
 
 
 
-        {
-          showRecommendations && recommendations && recommendations.length > 0 && (
-            <div className="mb-6">
+        {recommendations && recommendations.length > 0 && (
+          <div className="mb-6">
+            <button
+              onClick={() => setSuggestionsExpanded(v => !v)}
+              className="flex items-center gap-2 text-sm font-medium mb-3 transition-colors"
+              style={{ color: COLORS.textMuted, background: "none", border: "none", cursor: "pointer", padding: 0 }}
+            >
+              <svg
+                width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                style={{ transform: suggestionsExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease" }}
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+              Suggestions de rythme ({recommendations.length})
+            </button>
+            {suggestionsExpanded && (
               <RecommendationBanner
                 recommendations={recommendations}
                 type="routine"
@@ -281,41 +284,18 @@ export default function RoutinePage() {
                       addRoutineTask(day, item.suggestion);
                     });
                   } else {
-                    // Default to Monday for weekly tasks
                     addRoutineTask('monday', item.suggestion);
                   }
                 }}
                 onDismiss={toggleRecommendations}
               />
-            </div>
-          )
-        }
+            )}
+          </div>
+        )}
 
-        {/* Consistency Chart */}
-        {
-          historyData.length > 2 && (
-            <div className="h-[100px] w-full mb-8">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={historyData}>
-                  <defs>
-                    <linearGradient id="colorRate" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={COLORS.accent} stopOpacity={0.3} />
-                      <stop offset="95%" stopColor={COLORS.accent} stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <Tooltip
-                    contentStyle={{ background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: '8px' }}
-                    itemStyle={{ color: COLORS.text }}
-                  />
-                  <Area type="monotone" dataKey="rate" stroke={COLORS.accent} fillOpacity={1} fill="url(#colorRate)" strokeWidth={2} />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          )
-        }
       </div>
       {/* Columns */}
-      <div className="flex-1 overflow-y-auto px-8 pb-8">
+      <div className="px-8 pb-8">
         <div className="grid grid-cols-5 gap-4 pb-8">
           {safeRoutine.map((day, dayIdx) => (
             <div key={day.id} className="flex flex-col gap-3">
