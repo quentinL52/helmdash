@@ -43,8 +43,11 @@ export function useSupabaseSync() {
         async function loadData() {
             if (!user || !session) return;
 
-            // If we just reset, we are loading.
-            // If we didn't reset, we might still be loading if it's a refresh.
+            // Guard: if already loaded for this user, do not overwrite local data.
+            // This prevents Clerk session token refreshes (which update the `session`
+            // object reference) from re-triggering a load that would erase unsaved
+            // local changes when a previous save had failed with an RLS error.
+            if (isLoadedRef.current) return;
 
             const supabase = createClerkSupabaseClient(getToken);
 
@@ -157,15 +160,21 @@ export function useSupabaseSync() {
                     }, { onConflict: 'id' });
 
                 const [founderRes, userRes] = await Promise.all([saveFounderData, saveUserProfile]);
-                const error = founderRes.error || userRes.error;
-
-                if (error) {
-                    console.error('Supabase Save Error:', error.message);
+                if (founderRes.error) {
+                    const isRlsError = founderRes.error.code === '42501';
+                    console.error('Supabase Save Error (founder_data):', founderRes.error.message);
                     toast({
                         title: "Error saving changes",
-                        description: error.message,
+                        description: isRlsError
+                            ? "Permission denied: check Supabase RLS policies for founder_data."
+                            : founderRes.error.message,
                         variant: "destructive",
                     });
+                }
+
+                if (userRes.error) {
+                    // Non-critical: log only, do not block the user
+                    console.warn('Supabase Save Warning (users):', userRes.error.message);
                 }
             }, 2000);
         });
