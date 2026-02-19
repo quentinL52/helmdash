@@ -15,13 +15,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Plus, Search, Mail, Linkedin, RefreshCw, MoreHorizontal } from 'lucide-react';
+import { Plus, Search, Mail, Linkedin, RefreshCw, Pencil, Trash2 } from 'lucide-react';
 import { translations } from '@/lib/translations';
 
 const STATUS_COLORS: Record<ContactStatus, string> = {
@@ -207,21 +201,24 @@ export default function CRMPage() {
                                                 <RefreshCw className={`h-4 w-4 ${aiLoading ? 'animate-spin' : ''}`} />
                                             </Button>
 
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button size="icon" variant="ghost" className="h-8 w-8 text-[#8b8fa3]">
-                                                        <MoreHorizontal className="h-4 w-4" />
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
-                                                    <DropdownMenuItem onClick={() => handleEdit(contact)} className="hover:bg-[#282c3a]">
-                                                        {common.edit}
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => deleteContact(contact.id)} className="text-red-400 hover:bg-red-500/10 hover:text-red-400">
-                                                        {common.delete}
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                                <Button
+                                                size="icon"
+                                                variant="ghost"
+                                                className="h-8 w-8 text-[#8b8fa3] hover:text-[#6c5ce7]"
+                                                onClick={() => handleEdit(contact)}
+                                                title={common.edit}
+                                            >
+                                                <Pencil className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                size="icon"
+                                                variant="ghost"
+                                                className="h-8 w-8 text-[#8b8fa3] hover:text-red-400"
+                                                onClick={() => deleteContact(contact.id)}
+                                                title={common.delete}
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
                                         </div>
                                     </TableCell>
                                 </TableRow>
