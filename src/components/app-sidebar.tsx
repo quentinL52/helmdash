@@ -108,7 +108,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3 px-2">
                         <div className="relative w-8 h-8 shrink-0">
                             <Image
-                                src="/logo.png"
+                                src="/Gemini_Generated_Image_8puxnv8puxnv8pux.png"
                                 alt="FounderOS Logo"
                                 fill
                                 className="object-contain"
