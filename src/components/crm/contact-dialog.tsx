@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
 
 interface ContactDialogProps {
@@ -15,12 +14,15 @@ interface ContactDialogProps {
     contactToEdit?: Contact | null;
 }
 
-const COLORS = {
-    accent: '#6c5ce7',
-    surface: '#181a24',
-    border: '#282c3a',
-    text: '#e8e9ed',
-    muted: '#8b8fa3'
+const DATE_INPUT_STYLE: React.CSSProperties = {
+    colorScheme: 'dark',
+    width: '100%',
+    background: '#13151f',
+    border: '1px solid #282c3a',
+    borderRadius: '6px',
+    padding: '8px 12px',
+    color: '#e8e9ed',
+    fontSize: '14px',
 };
 
 export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDialogProps) {
@@ -36,14 +38,18 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
         linkedin: '',
         status: 'lead',
         notes: '',
-        lastContactDate: new Date().toISOString().split('T')[0]
+        lastContactDate: new Date().toISOString().split('T')[0],
+        nextFollowUpDate: '',
     });
 
     useEffect(() => {
         if (contactToEdit) {
             setFormData({
                 ...contactToEdit,
-                lastContactDate: contactToEdit.lastContactDate.split('T')[0]
+                lastContactDate: contactToEdit.lastContactDate.split('T')[0],
+                nextFollowUpDate: contactToEdit.nextFollowUpDate
+                    ? contactToEdit.nextFollowUpDate.split('T')[0]
+                    : '',
             });
         } else {
             setFormData({
@@ -54,7 +60,8 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                 linkedin: '',
                 status: 'lead',
                 notes: '',
-                lastContactDate: new Date().toISOString().split('T')[0]
+                lastContactDate: new Date().toISOString().split('T')[0],
+                nextFollowUpDate: '',
             });
         }
     }, [contactToEdit, open]);
@@ -63,13 +70,18 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
         e.preventDefault();
         setIsLoading(true);
 
-        // Simulate small delay for UX
         await new Promise(resolve => setTimeout(resolve, 500));
 
+        // Nettoyer nextFollowUpDate si vide
+        const dataToSave = {
+            ...formData,
+            nextFollowUpDate: formData.nextFollowUpDate || undefined,
+        };
+
         if (contactToEdit) {
-            updateContact(contactToEdit.id, formData);
+            updateContact(contactToEdit.id, dataToSave);
         } else {
-            addContact(formData as Omit<Contact, 'id'>);
+            addContact(dataToSave as Omit<Contact, 'id'>);
         }
 
         setIsLoading(false);
@@ -80,16 +92,17 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-[600px] bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
                 <DialogHeader>
-                    <DialogTitle>{contactToEdit ? 'Edit Contact' : 'Add New Contact'}</DialogTitle>
+                    <DialogTitle>{contactToEdit ? 'Modifier le contact' : 'Ajouter un contact'}</DialogTitle>
                     <DialogDescription className="text-[#8b8fa3]">
-                        {contactToEdit ? 'Update contact details and status.' : 'Add a new person to your network.'}
+                        {contactToEdit ? 'Mettre à jour les informations du contact.' : 'Ajouter une nouvelle personne à votre réseau.'}
                     </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+                <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+                    {/* Nom + Entreprise */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="name">Name *</Label>
+                            <Label htmlFor="name">Nom *</Label>
                             <Input
                                 id="name"
                                 value={formData.name}
@@ -100,7 +113,7 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="company">Company</Label>
+                            <Label htmlFor="company">Entreprise</Label>
                             <Input
                                 id="company"
                                 value={formData.company}
@@ -111,9 +124,10 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                         </div>
                     </div>
 
+                    {/* Rôle + Statut */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="role">Role</Label>
+                            <Label htmlFor="role">Rôle</Label>
                             <Input
                                 id="role"
                                 value={formData.role}
@@ -123,55 +137,94 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="status">Status</Label>
+                            <Label htmlFor="status">Statut</Label>
                             <Select
                                 value={formData.status}
                                 onValueChange={(value: ContactStatus) => setFormData({ ...formData, status: value })}
                             >
                                 <SelectTrigger className="bg-[#13151f] border-[#282c3a]">
-                                    <SelectValue placeholder="Select status" />
+                                    <SelectValue placeholder="Sélectionner un statut" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
                                     <SelectItem value="lead">Lead</SelectItem>
-                                    <SelectItem value="contacted">Contacted</SelectItem>
-                                    <SelectItem value="negotiation">Negotiation</SelectItem>
-                                    <SelectItem value="customer">Customer</SelectItem>
-                                    <SelectItem value="partner">Partner</SelectItem>
-                                    <SelectItem value="lost">Lost</SelectItem>
+                                    <SelectItem value="contacted">Contacté</SelectItem>
+                                    <SelectItem value="negotiation">Négociation</SelectItem>
+                                    <SelectItem value="customer">Client</SelectItem>
+                                    <SelectItem value="partner">Partenaire</SelectItem>
+                                    <SelectItem value="lost">Perdu</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="linkedin">LinkedIn URL</Label>
-                        <Input
-                            id="linkedin"
-                            value={formData.linkedin}
-                            onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
-                            placeholder="https://linkedin.com/in/..."
-                            className="bg-[#13151f] border-[#282c3a] focus:border-[#6c5ce7]"
-                        />
+                    {/* Email + LinkedIn */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="email">Email</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                placeholder="contact@example.com"
+                                className="bg-[#13151f] border-[#282c3a] focus:border-[#6c5ce7]"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="linkedin">LinkedIn URL</Label>
+                            <Input
+                                id="linkedin"
+                                value={formData.linkedin}
+                                onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
+                                placeholder="https://linkedin.com/in/..."
+                                className="bg-[#13151f] border-[#282c3a] focus:border-[#6c5ce7]"
+                            />
+                        </div>
                     </div>
 
+                    {/* Dernier contact + Contact prévu */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="lastContactDate">Dernier contact</Label>
+                            <input
+                                type="date"
+                                id="lastContactDate"
+                                value={formData.lastContactDate || ''}
+                                onChange={(e) => setFormData({ ...formData, lastContactDate: e.target.value })}
+                                style={DATE_INPUT_STYLE}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="nextFollowUpDate">Contact prévu (optionnel)</Label>
+                            <input
+                                type="date"
+                                id="nextFollowUpDate"
+                                value={formData.nextFollowUpDate || ''}
+                                onChange={(e) => setFormData({ ...formData, nextFollowUpDate: e.target.value || undefined })}
+                                style={DATE_INPUT_STYLE}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Notes */}
                     <div className="space-y-2">
                         <Label htmlFor="notes">Notes</Label>
                         <Textarea
                             id="notes"
                             value={formData.notes}
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                            placeholder="Met at TechCrunch Disrupt..."
-                            className="bg-[#13151f] border-[#282c3a] focus:border-[#6c5ce7] min-h-[100px]"
+                            placeholder="Rencontré à TechCrunch Disrupt..."
+                            className="bg-[#13151f] border-[#282c3a] focus:border-[#6c5ce7] min-h-[80px]"
                         />
                     </div>
 
                     <DialogFooter>
                         <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="hover:bg-[#282c3a] hover:text-white">
-                            Cancel
+                            Annuler
                         </Button>
                         <Button type="submit" disabled={isLoading} className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white">
                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            {contactToEdit ? 'Save Changes' : 'Add Contact'}
+                            {contactToEdit ? 'Enregistrer' : 'Ajouter'}
                         </Button>
                     </DialogFooter>
                 </form>

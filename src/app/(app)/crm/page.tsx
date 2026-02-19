@@ -74,6 +74,8 @@ export default function CRMPage() {
         }
     }, [language]);
 
+    const locale = language === 'fr' ? 'fr-FR' : 'en-US';
+
     return (
         <div className="h-full flex flex-col p-8 max-w-7xl mx-auto space-y-8">
             {/* Header */}
@@ -81,14 +83,14 @@ export default function CRMPage() {
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight text-[#e8e9ed]">{t.title || 'CRM Lite'}</h1>
                     <p className="text-[#8b8fa3]">
-                        {t.subtitle || 'Manage your network and relationships.'}
+                        {t.subtitle || 'Gérez votre réseau et vos relations.'}
                     </p>
                 </div>
                 <Button
                     onClick={handleNew}
                     className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white"
                 >
-                    <Plus className="mr-2 h-4 w-4" /> {t.addContact || 'Add Contact'}
+                    <Plus className="mr-2 h-4 w-4" /> {t.addContact || 'Ajouter un contact'}
                 </Button>
             </div>
 
@@ -97,7 +99,7 @@ export default function CRMPage() {
                 <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b8fa3]" />
                     <Input
-                        placeholder={t.searchPlaceholder || "Search contacts..."}
+                        placeholder={t.searchPlaceholder || "Rechercher un contact..."}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-9 bg-[#181a24] border-[#282c3a] text-[#e8e9ed] focus:ring-[#6c5ce7]"
@@ -105,69 +107,102 @@ export default function CRMPage() {
                 </div>
             </div>
 
-            {/* Content */}
+            {/* Table */}
             <div className="rounded-xl border border-[#282c3a] bg-[#181a24]/50 overflow-hidden">
                 <Table>
                     <TableHeader className="bg-[#181a24]">
                         <TableRow className="border-[#282c3a] hover:bg-[#181a24]">
-                            <TableHead className="text-[#8b8fa3]">{t.columns?.name || 'Name'}</TableHead>
-                            <TableHead className="text-[#8b8fa3]">{t.columns?.roleCompany || 'Role & Company'}</TableHead>
+                            <TableHead className="text-[#8b8fa3]">{t.columns?.name || 'Nom'}</TableHead>
+                            <TableHead className="text-[#8b8fa3]">{t.columns?.roleCompany || 'Rôle & Entreprise'}</TableHead>
                             <TableHead className="text-[#8b8fa3]">{t.columns?.status || common.status}</TableHead>
-                            <TableHead className="text-[#8b8fa3]">{t.columns?.lastContact || 'Last Contact'}</TableHead>
+                            <TableHead className="text-[#8b8fa3]">{t.columns?.lastContact || 'Dernier contact'}</TableHead>
+                            <TableHead className="text-[#8b8fa3]">Contact prévu</TableHead>
                             <TableHead className="text-right text-[#8b8fa3]">{t.columns?.actions || 'Actions'}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {filteredContacts.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-24 text-center text-[#8b8fa3]">
-                                    {t.noContacts || 'No contacts found.'}
+                                <TableCell colSpan={6} className="h-24 text-center text-[#8b8fa3]">
+                                    {t.noContacts || 'Aucun contact trouvé.'}
                                 </TableCell>
                             </TableRow>
                         ) : (
                             filteredContacts.map((contact) => (
                                 <TableRow key={contact.id} className="border-[#282c3a] hover:bg-[#282c3a]/50 group">
+
+                                    {/* Nom + icônes mail/linkedin dynamiques */}
                                     <TableCell className="font-medium text-[#e8e9ed]">
-                                        <div className="flex flex-col">
+                                        <div className="flex flex-col gap-1">
                                             <span>{contact.name}</span>
-                                            {contact.email && (
-                                                <span className="text-xs text-[#8b8fa3] flex items-center gap-1">
-                                                    <Mail className="w-3 h-3" /> {contact.email}
-                                                </span>
+                                            {(contact.email || contact.linkedin) && (
+                                                <div className="flex items-center gap-2">
+                                                    {contact.email && (
+                                                        <a
+                                                            href={`mailto:${contact.email}`}
+                                                            title={contact.email}
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            <Mail className="w-3.5 h-3.5 text-[#5c6078] hover:text-[#00cec9] transition-colors" />
+                                                        </a>
+                                                    )}
+                                                    {contact.linkedin && (
+                                                        <a
+                                                            href={contact.linkedin}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            title="LinkedIn"
+                                                            onClick={(e) => e.stopPropagation()}
+                                                        >
+                                                            <Linkedin className="w-3.5 h-3.5 text-[#5c6078] hover:text-[#0077b5] transition-colors" />
+                                                        </a>
+                                                    )}
+                                                </div>
                                             )}
                                         </div>
                                     </TableCell>
+
+                                    {/* Rôle & Entreprise */}
                                     <TableCell className="text-[#dfe1e6]">
                                         <div className="flex flex-col">
                                             <span>{contact.role || '-'}</span>
                                             {contact.company && <span className="text-xs text-[#8b8fa3]">{contact.company}</span>}
                                         </div>
                                     </TableCell>
+
+                                    {/* Statut */}
                                     <TableCell>
                                         <Badge variant="outline" className={`capitalize font-medium border ${STATUS_COLORS[contact.status] || 'border-[#282c3a]'}`}>
                                             {t.statuses?.[contact.status] || contact.status}
                                         </Badge>
                                     </TableCell>
+
+                                    {/* Dernier contact */}
                                     <TableCell className="text-[#8b8fa3] text-sm">
-                                        {new Date(contact.lastContactDate).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US')}
+                                        {new Date(contact.lastContactDate).toLocaleDateString(locale)}
                                     </TableCell>
+
+                                    {/* Contact prévu */}
+                                    <TableCell className="text-sm">
+                                        {contact.nextFollowUpDate ? (
+                                            <span className="text-[#a29bfe]">
+                                                {new Date(contact.nextFollowUpDate).toLocaleDateString(locale)}
+                                            </span>
+                                        ) : (
+                                            <span className="text-[#5c6078]">—</span>
+                                        )}
+                                    </TableCell>
+
+                                    {/* Actions */}
                                     <TableCell className="text-right">
                                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            {contact.linkedin && (
-                                                <a href={contact.linkedin} target="_blank" rel="noopener noreferrer">
-                                                    <Button size="icon" variant="ghost" className="h-8 w-8 text-[#8b8fa3] hover:text-[#0077b5]">
-                                                        <Linkedin className="h-4 w-4" />
-                                                    </Button>
-                                                </a>
-                                            )}
-
                                             <Button
                                                 size="icon"
                                                 variant="ghost"
                                                 className="h-8 w-8 text-[#8b8fa3] hover:text-[#6c5ce7]"
                                                 onClick={() => handleGenerateFollowUp(contact)}
                                                 disabled={aiLoading}
-                                                title={t.generateFollowUp || "Generate AI Follow-up"}
+                                                title={t.generateFollowUp || "Générer un suivi IA"}
                                             >
                                                 <RefreshCw className={`h-4 w-4 ${aiLoading ? 'animate-spin' : ''}`} />
                                             </Button>

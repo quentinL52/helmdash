@@ -13,7 +13,7 @@ import {
     parseISO, isValid,
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, X, MapPin, FileText, Target, Clock, Calendar, ExternalLink } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, MapPin, FileText, Target, Clock, Calendar, ExternalLink, Users } from 'lucide-react';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -21,7 +21,7 @@ type ViewType = 'day' | 'week' | 'month' | 'semester' | 'year';
 
 interface CalendarEvent {
     id: string;
-    type: 'roadmap' | 'content' | 'okr' | 'routine';
+    type: 'roadmap' | 'content' | 'okr' | 'routine' | 'crm';
     title: string;
     date: Date;
     startDate?: Date;
@@ -51,6 +51,7 @@ const TYPE_CONFIG: Record<CalendarEvent['type'], { color: string; label: string;
     content: { color: '#00cec9', label: 'Contenu', icon: <FileText size={12} />, route: '/content' },
     okr: { color: '#fdcb6e', label: 'OKR', icon: <Target size={12} />, route: '/okr' },
     routine: { color: '#00b894', label: 'Routine', icon: <Clock size={12} />, route: '/routine' },
+    crm: { color: '#e84393', label: 'CRM', icon: <Users size={12} />, route: '/crm' },
 };
 
 const VIEWS: { key: ViewType; label: string }[] = [
@@ -89,6 +90,7 @@ function useAllEvents(): CalendarEvent[] {
     const contentIdeas = useFounderStore(s => s.contentIdeas);
     const objectives = useFounderStore(s => s.objectives);
     const routineDays = useFounderStore(s => s.routine);
+    const contacts = useFounderStore(s => s.contacts);
     const today = useMemo(() => new Date(), []);
 
     return useMemo(() => {
@@ -175,8 +177,25 @@ function useAllEvents(): CalendarEvent[] {
             });
         });
 
+        // CRM — contacts avec nextFollowUpDate
+        contacts.forEach(contact => {
+            if (contact.nextFollowUpDate) {
+                const d = parseISO(contact.nextFollowUpDate);
+                if (isValid(d)) {
+                    events.push({
+                        id: `crm-${contact.id}`,
+                        type: 'crm',
+                        title: contact.name,
+                        date: d,
+                        color: TYPE_CONFIG.crm.color,
+                        data: contact as unknown as Record<string, unknown>,
+                    });
+                }
+            }
+        });
+
         return events;
-    }, [roadmap, contentIdeas, objectives, routineDays, today]);
+    }, [roadmap, contentIdeas, objectives, routineDays, contacts, today]);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -222,6 +241,8 @@ function getPriorityScore(ev: CalendarEvent): number {
         }
         case 'routine':
             return 10;
+        case 'crm':
+            return 5;
     }
 }
 
@@ -747,6 +768,18 @@ function EventDetailPanel({ event, onClose }: { event: CalendarEvent; onClose: (
             </div>
 
             {/* Status / extra info */}
+            {(data.company as string) && (
+                <div style={{ fontSize: '12px', color: COLORS.textMuted }}>
+                    <span style={{ color: COLORS.textDim }}>Entreprise : </span>
+                    <span style={{ color: COLORS.text }}>{data.company as string}</span>
+                </div>
+            )}
+            {(data.role as string) && (
+                <div style={{ fontSize: '12px', color: COLORS.textMuted }}>
+                    <span style={{ color: COLORS.textDim }}>Rôle : </span>
+                    <span style={{ color: COLORS.text }}>{data.role as string}</span>
+                </div>
+            )}
             {(data.status as string) && (
                 <div style={{ fontSize: '12px', color: COLORS.textMuted }}>
                     <span style={{ color: COLORS.textDim }}>Statut : </span>
