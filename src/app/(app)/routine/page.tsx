@@ -57,7 +57,7 @@ const COLORS = {
 // Renamed to avoid collision with imported Button if any, but we are importing Button from ui/button in the replacement above? 
 // Actually the previous import of Button from ui/button might conflict with this local Button.
 // Let's RENAME the local Button to StyledButton to be safe.
-const StyledButton = ({ onClick, children, variant = "default", size = "md", style, ...props }: any) => {
+const StyledButton = ({ onClick, children, variant = "default", size = "md", style, className, ...props }: any) => {
   const base: React.CSSProperties = {
     display: "inline-flex", alignItems: "center", gap: "6px",
     border: "none", borderRadius: "8px", cursor: "pointer",
@@ -68,7 +68,7 @@ const StyledButton = ({ onClick, children, variant = "default", size = "md", sty
   };
   const variants: Record<string, React.CSSProperties> = {
     default: { background: COLORS.surfaceHover, color: COLORS.text, border: `1px solid ${COLORS.border}` },
-    primary: { background: COLORS.accent, color: "#fff", border: "none" },
+    primary: { background: "#6c5ce7", color: "#fff", border: "none" },
     danger: { background: "rgba(255, 77, 79, 0.1)", color: COLORS.delete, border: `1px solid ${COLORS.delete}` },
     ghost: { background: "transparent", color: COLORS.textMuted, border: "none" },
     ai: { background: "linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)", color: "#fff", border: "none" },
@@ -79,6 +79,7 @@ const StyledButton = ({ onClick, children, variant = "default", size = "md", sty
       style={{ ...base, ...variants[variant], ...style }}
       onMouseEnter={(e: any) => { e.target.style.opacity = "0.85"; }}
       onMouseLeave={(e: any) => { e.target.style.opacity = "1"; }}
+      className={className}
       {...props}
     >
       {children}

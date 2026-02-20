@@ -41,40 +41,35 @@ export default function DashboardPage() {
                 <h2 className="text-3xl font-bold tracking-tight">{translations[language].nav.dashboard}</h2>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <WeeklyCoachWidget />
+            {/* Weekly AI Coach - Full Width */}
+            <WeeklyCoachWidget />
 
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <RunwayWidget />
 
-                <div className="col-span-1">
-                    <Card className="h-full">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">{t.okrProgress}</CardTitle>
-                            <Target className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">0.0</div>
-                            <p className="text-xs text-muted-foreground">Target: 0.7</p>
-                        </CardContent>
-                    </Card>
-                </div>
+                <Card className="h-full">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">{t.okrProgress}</CardTitle>
+                        <Target className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">0.0</div>
+                        <p className="text-xs text-muted-foreground">Target: 0.7</p>
+                    </CardContent>
+                </Card>
 
-                <div className="col-span-1">
-                    <Card className="h-full">
-                        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                            <CardTitle className="text-sm font-medium">{t.routineConsistency}</CardTitle>
-                            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">{consistencyRate}%</div>
-                            <p className="text-xs text-muted-foreground">{doneTasks} / {totalTasks} tâches cochées</p>
-                        </CardContent>
-                    </Card>
-                </div>
+                <Card className="h-full">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">{t.routineConsistency}</CardTitle>
+                        <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{consistencyRate}%</div>
+                        <p className="text-xs text-muted-foreground">{doneTasks} / {totalTasks} tâches cochées</p>
+                    </CardContent>
+                </Card>
 
-                <div className="col-span-1">
-                    <HypothesesWidget />
-                </div>
+                <HypothesesWidget />
             </div>
 
             {/* Calendrier centralisé */}

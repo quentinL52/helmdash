@@ -11,7 +11,7 @@ const TIERS = [
         name: 'Starter',
         id: 'starter',
         priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER || '',
-        priceMonthly: '9€',
+        priceMonthly: '10€',
         description: 'Les fondations essentielles pour structurer votre projet.',
         features: [
             "Validation d'hypothèses illimitées",
@@ -137,8 +137,8 @@ export default function PricingPage() {
                                 onClick={() => handleSubscribe(tier.priceId, tier.id)}
                                 disabled={loadingPriceId !== null}
                                 className={`mt-6 w-full ${tier.popular
-                                    ? 'bg-primary text-foreground hover:bg-primary/90'
-                                    : 'bg-white/10 text-foreground hover:bg-white/20'
+                                    ? 'bg-[#6c5ce7] text-white hover:bg-[#6c5ce7]/90'
+                                    : 'bg-[#6c5ce7]/20 text-foreground hover:bg-[#6c5ce7]/30'
                                     }`}
                             >
                                 {loadingPriceId === tier.priceId ? (

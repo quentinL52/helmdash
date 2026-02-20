@@ -57,25 +57,16 @@ export default function CompetitiveWatchPage() {
             )}
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-                <TabsList className="grid w-full max-w-[600px] grid-cols-3 bg-card text-muted-foreground mb-6">
-                    <TabsTrigger
-                        value="dashboard"
-                        className="data-[state=active]:bg-primary data-[state=active]:text-foreground"
-                    >
+                <TabsList className="grid w-full max-w-[600px] grid-cols-3 bg-[#6c5ce7]/10 text-muted-foreground mb-6">
+                    <TabsTrigger value="dashboard">
                         <LayoutDashboard className="mr-1.5 h-4 w-4" />
                         {t.tabs.dashboard}
                     </TabsTrigger>
-                    <TabsTrigger
-                        value="analysis"
-                        className="data-[state=active]:bg-primary data-[state=active]:text-foreground"
-                    >
+                    <TabsTrigger value="analysis">
                         <BarChart3 className="mr-1.5 h-4 w-4" />
                         {t.tabs.analysis}
                     </TabsTrigger>
-                    <TabsTrigger
-                        value="actions"
-                        className="data-[state=active]:bg-primary data-[state=active]:text-foreground"
-                    >
+                    <TabsTrigger value="actions">
                         <Zap className="mr-1.5 h-4 w-4" />
                         {t.tabs.actions}
                     </TabsTrigger>
