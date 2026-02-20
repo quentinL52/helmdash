@@ -1,8 +1,7 @@
 'use client';
 
-import Link from "next/link";
 import { AuthFormsWrapper } from "@/components/auth/auth-forms-wrapper";
-import { CheckCircle2, ArrowRight, FlaskConical, LineChart, Target } from "lucide-react";
+import { CheckCircle2, FlaskConical, LineChart, Target, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
@@ -34,31 +33,24 @@ export default function Home() {
                 Un espace unique pour valider vos hypothèses, suivre vos finances, et exécuter vos sprints. Conçu pour les fondateurs qui veulent de la clarté, pas du chaos.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button className="h-12 px-8 text-base">
-                  Commencer
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-
-              <div className="pt-8 flex items-center gap-6 text-muted-foreground text-sm">
+              <div className="pt-4 flex items-center gap-6 text-muted-foreground text-sm">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                  <CheckCircle2 className="w-4 h-4 text-[#6c5ce7]" />
                   <span>Données persistantes</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                  <CheckCircle2 className="w-4 h-4 text-[#6c5ce7]" />
                   <span>Mode hors-ligne</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>100% Gratuit</span>
+                  <CheckCircle2 className="w-4 h-4 text-[#6c5ce7]" />
+                  <span>Commencez gratuitement</span>
                 </div>
               </div>
             </div>
 
             {/* Login/Signup Card */}
-            <div className="relative flex justify-center">
+            <div id="auth-section" className="relative flex justify-center">
               <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-2xl blur opacity-20 transform rotate-2 scale-105"></div>
               <div className="relative z-10 w-full max-w-md bg-card border border-border rounded-xl shadow-xl overflow-hidden">
                 <AuthFormsWrapper />
@@ -105,6 +97,85 @@ export default function Home() {
                   </p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Section */}
+        <section id="pricing" className="py-24 border-t border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <h2 className="text-3xl font-bold mb-4 text-foreground">Un prix simple, sans surprise</h2>
+              <p className="text-muted-foreground">
+                Commencez gratuitement, puis débloquez toute la puissance de FounderOS pour seulement 10€/mois.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              {/* Free Plan */}
+              <div className="rounded-2xl p-8 bg-card border border-border shadow-sm">
+                <h3 className="text-xl font-bold text-foreground">Gratuit</h3>
+                <p className="mt-2 text-sm text-muted-foreground">Pour découvrir et structurer votre projet.</p>
+                <p className="mt-6 flex items-baseline gap-x-1">
+                  <span className="text-4xl font-bold tracking-tight text-foreground">0€</span>
+                  <span className="text-sm text-muted-foreground">/mois</span>
+                </p>
+                <ul className="mt-8 space-y-3 text-sm">
+                  {[
+                    "Validation d'hypothèses (5 max)",
+                    "Suivi de la Runway basique",
+                    "Routines quotidiennes",
+                    "Lean Canvas",
+                    "Journal de bord",
+                  ].map((f) => (
+                    <li key={f} className="flex items-center gap-3 text-foreground">
+                      <Check className="h-4 w-4 flex-none text-[#6c5ce7]" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  className="w-full mt-8 bg-muted hover:bg-muted/80 text-foreground"
+                  onClick={() => document.getElementById('auth-section')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Commencer gratuitement
+                </Button>
+              </div>
+
+              {/* Starter Plan - 10€ */}
+              <div className="rounded-2xl p-8 bg-card border-2 border-[#6c5ce7] shadow-lg relative">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#6c5ce7] text-white px-3 py-1 rounded-full text-xs font-semibold">
+                  Recommandé
+                </div>
+                <h3 className="text-xl font-bold text-foreground">Starter</h3>
+                <p className="mt-2 text-sm text-muted-foreground">Tout ce qu'il faut pour accélérer.</p>
+                <p className="mt-6 flex items-baseline gap-x-1">
+                  <span className="text-4xl font-bold tracking-tight text-foreground">10€</span>
+                  <span className="text-sm text-muted-foreground">/mois</span>
+                </p>
+                <ul className="mt-8 space-y-3 text-sm">
+                  {[
+                    "Hypothèses illimitées",
+                    "Suivi de la Runway complet",
+                    "Routines quotidiennes",
+                    "Score de compétitivité",
+                    "Rapport IA hebdomadaire",
+                    "Pipeline de contenu",
+                    "Support prioritaire",
+                  ].map((f) => (
+                    <li key={f} className="flex items-center gap-3 text-foreground">
+                      <Check className="h-4 w-4 flex-none text-[#6c5ce7]" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  className="w-full mt-8 bg-[#6c5ce7] hover:bg-[#6c5ce7]/90 text-white"
+                  onClick={() => document.getElementById('auth-section')?.scrollIntoView({ behavior: 'smooth' })}
+                >
+                  Démarrer l'essai
+                </Button>
+              </div>
             </div>
           </div>
         </section>

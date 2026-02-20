@@ -63,7 +63,7 @@ export default function HypothesesPage() {
             )}
 
             <Tabs defaultValue="board" className="h-full flex flex-col">
-                <TabsList className="grid w-[400px] grid-cols-2 bg-card text-muted-foreground mb-4">
+                <TabsList className="grid w-[400px] grid-cols-2 bg-[#6c5ce7]/10 text-muted-foreground mb-4">
                     <TabsTrigger value="board">{t.tabs.board}</TabsTrigger>
                     <TabsTrigger value="list">{t.tabs.list}</TabsTrigger>
                 </TabsList>

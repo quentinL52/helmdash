@@ -57,7 +57,7 @@ export default function CompetitiveWatchPage() {
             )}
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-                <TabsList className="grid w-full max-w-[600px] grid-cols-3 bg-card text-muted-foreground mb-6">
+                <TabsList className="grid w-full max-w-[600px] grid-cols-3 bg-[#6c5ce7]/10 text-muted-foreground mb-6">
                     <TabsTrigger value="dashboard">
                         <LayoutDashboard className="mr-1.5 h-4 w-4" />
                         {t.tabs.dashboard}
