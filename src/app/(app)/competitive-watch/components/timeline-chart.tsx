@@ -118,10 +118,10 @@ export function TimelineChart() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-xl font-semibold text-[#e8e9ed]">
+                    <h2 className="text-xl font-semibold text-foreground">
                         {t.timeline?.title || (language === 'fr' ? 'Timeline Concurrentielle' : 'Competitive Timeline')}
                     </h2>
-                    <p className="text-[#8b8fa3] text-sm">
+                    <p className="text-muted-foreground text-sm">
                         {t.timeline?.subtitle || (language === 'fr'
                             ? 'Suivez l\'évolution du niveau de menace au fil du temps.'
                             : 'Track threat level evolution over time.')}
@@ -130,7 +130,7 @@ export function TimelineChart() {
                 <Button
                     onClick={handleTakeSnapshot}
                     disabled={competitors.length === 0}
-                    className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white"
+                    className="bg-primary hover:bg-primary/90 text-foreground"
                     size="sm"
                 >
                     <Camera className="h-4 w-4 mr-1" />
@@ -139,13 +139,13 @@ export function TimelineChart() {
             </div>
 
             {!hasData ? (
-                <Card className="bg-[#1e2029] border-[#2b2d36]">
+                <Card className="bg-card border-border">
                     <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-                        <Clock className="h-12 w-12 text-[#8b8fa3] opacity-40 mb-4" />
-                        <p className="text-[#e8e9ed] font-medium mb-2">
+                        <Clock className="h-12 w-12 text-muted-foreground opacity-40 mb-4" />
+                        <p className="text-foreground font-medium mb-2">
                             {language === 'fr' ? 'Aucun snapshot disponible' : 'No snapshots available'}
                         </p>
-                        <p className="text-[#8b8fa3] text-sm max-w-md">
+                        <p className="text-muted-foreground text-sm max-w-md">
                             {language === 'fr'
                                 ? 'Prenez des snapshots réguliers pour suivre l\'évolution concurrentielle. Chaque snapshot capture les scores radar et niveaux de menace de vos concurrents.'
                                 : 'Take regular snapshots to track competitive evolution. Each snapshot captures radar scores and threat levels for your competitors.'}
@@ -155,9 +155,9 @@ export function TimelineChart() {
             ) : (
                 <div className="grid grid-cols-1 gap-6">
                     {/* Threat Level Timeline */}
-                    <Card className="bg-[#1e2029] border-[#2b2d36]">
+                    <Card className="bg-card border-border">
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-base text-[#e8e9ed] flex items-center gap-2">
+                            <CardTitle className="text-base text-foreground flex items-center gap-2">
                                 <TrendingUp className="h-4 w-4 text-red-400" />
                                 {language === 'fr' ? 'Niveau de Menace' : 'Threat Level'}
                             </CardTitle>
@@ -211,10 +211,10 @@ export function TimelineChart() {
                     </Card>
 
                     {/* Radar Score Timeline */}
-                    <Card className="bg-[#1e2029] border-[#2b2d36]">
+                    <Card className="bg-card border-border">
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-base text-[#e8e9ed] flex items-center gap-2">
-                                <TrendingUp className="h-4 w-4 text-[#6c5ce7]" />
+                            <CardTitle className="text-base text-foreground flex items-center gap-2">
+                                <TrendingUp className="h-4 w-4 text-primary" />
                                 {language === 'fr' ? 'Score Radar Moyen' : 'Average Radar Score'}
                             </CardTitle>
                         </CardHeader>
@@ -267,7 +267,7 @@ export function TimelineChart() {
                     </Card>
 
                     {/* Snapshot info */}
-                    <div className="text-xs text-[#8b8fa3] text-center">
+                    <div className="text-xs text-muted-foreground text-center">
                         {language === 'fr'
                             ? `${competitiveSnapshots.length} snapshots enregistrés pour ${competitors.length} concurrents`
                             : `${competitiveSnapshots.length} snapshots recorded for ${competitors.length} competitors`}

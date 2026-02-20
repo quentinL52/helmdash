@@ -171,8 +171,8 @@ export function MarketSignalsTab() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-xl font-semibold text-[#e8e9ed]">{t.signals.title}</h2>
-                    <p className="text-[#8b8fa3] text-sm">
+                    <h2 className="text-xl font-semibold text-foreground">{t.signals.title}</h2>
+                    <p className="text-muted-foreground text-sm">
                         {language === 'fr'
                             ? 'Suivez les signaux importants de votre marché.'
                             : 'Track important signals from your market.'}
@@ -184,7 +184,7 @@ export function MarketSignalsTab() {
                         size="sm"
                         onClick={handleScan}
                         disabled={isScanning}
-                        className="border-[#6c5ce7]/30 text-[#a29bfe] hover:bg-[#6c5ce7]/10"
+                        className="border-primary/30 text-accent-foreground hover:bg-primary/10"
                     >
                         {isScanning ? (
                             <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> {language === 'fr' ? 'Scan...' : 'Scanning...'}</>
@@ -196,12 +196,12 @@ export function MarketSignalsTab() {
                         variant="outline"
                         size="sm"
                         onClick={() => setShowFilters(!showFilters)}
-                        className={`border-[#282c3a] ${showFilters ? 'bg-[#282c3a] text-[#e8e9ed]' : 'text-[#8b8fa3] hover:text-[#e8e9ed]'}`}
+                        className={`border-border ${showFilters ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                     >
                         <Filter className="h-4 w-4 mr-1" />
                         {language === 'fr' ? 'Filtres' : 'Filters'}
                     </Button>
-                    <Button onClick={() => setIsDialogOpen(true)} className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white">
+                    <Button onClick={() => setIsDialogOpen(true)} className="bg-primary hover:bg-primary/90 text-foreground">
                         <Plus className="mr-1 h-4 w-4" /> {t.signals.addSignal}
                     </Button>
                 </div>
@@ -209,73 +209,73 @@ export function MarketSignalsTab() {
 
             {/* Stats Summary */}
             <div className="grid grid-cols-5 gap-3">
-                <Card className="bg-[#181a24] border-[#282c3a]">
+                <Card className="bg-card border-border">
                     <CardContent className="p-3 text-center">
-                        <p className="text-2xl font-bold text-[#e8e9ed]">{stats.total}</p>
-                        <p className="text-xs text-[#8b8fa3]">{language === 'fr' ? 'Total' : 'Total'}</p>
+                        <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+                        <p className="text-xs text-muted-foreground">{language === 'fr' ? 'Total' : 'Total'}</p>
                     </CardContent>
                 </Card>
-                <Card className="bg-[#181a24] border-[#282c3a]">
+                <Card className="bg-card border-border">
                     <CardContent className="p-3 text-center">
                         <p className="text-2xl font-bold text-green-400">{stats.positive}</p>
-                        <p className="text-xs text-[#8b8fa3]">{t.signals.impact.positive}</p>
+                        <p className="text-xs text-muted-foreground">{t.signals.impact.positive}</p>
                     </CardContent>
                 </Card>
-                <Card className="bg-[#181a24] border-[#282c3a]">
+                <Card className="bg-card border-border">
                     <CardContent className="p-3 text-center">
                         <p className="text-2xl font-bold text-red-400">{stats.negative}</p>
-                        <p className="text-xs text-[#8b8fa3]">{t.signals.impact.negative}</p>
+                        <p className="text-xs text-muted-foreground">{t.signals.impact.negative}</p>
                     </CardContent>
                 </Card>
-                <Card className="bg-[#181a24] border-[#282c3a]">
+                <Card className="bg-card border-border">
                     <CardContent className="p-3 text-center">
                         <p className="text-2xl font-bold text-orange-400">{stats.critical}</p>
-                        <p className="text-xs text-[#8b8fa3]">{language === 'fr' ? 'Urgents' : 'Urgent'}</p>
+                        <p className="text-xs text-muted-foreground">{language === 'fr' ? 'Urgents' : 'Urgent'}</p>
                     </CardContent>
                 </Card>
-                <Card className="bg-[#181a24] border-[#282c3a]">
+                <Card className="bg-card border-border">
                     <CardContent className="p-3 text-center">
-                        <p className="text-2xl font-bold text-[#6c5ce7]">{stats.thisWeek}</p>
-                        <p className="text-xs text-[#8b8fa3]">{language === 'fr' ? 'Cette semaine' : 'This week'}</p>
+                        <p className="text-2xl font-bold text-primary">{stats.thisWeek}</p>
+                        <p className="text-xs text-muted-foreground">{language === 'fr' ? 'Cette semaine' : 'This week'}</p>
                     </CardContent>
                 </Card>
             </div>
 
             {/* Filters */}
             {showFilters && (
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-[#181a24] border border-[#282c3a]">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-card border border-border">
                     <Select value={filterCategory} onValueChange={setFilterCategory}>
-                        <SelectTrigger className="w-[160px] bg-[#0f1117] border-[#282c3a] text-[#e8e9ed] text-sm">
+                        <SelectTrigger className="w-[160px] bg-background border-border text-foreground text-sm">
                             <SelectValue placeholder={language === 'fr' ? 'Catégorie' : 'Category'} />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
-                            <SelectItem value="all" className="hover:bg-[#282c3a]">{language === 'fr' ? 'Toutes' : 'All'}</SelectItem>
+                        <SelectContent className="bg-card border-border text-foreground">
+                            <SelectItem value="all" className="hover:bg-muted">{language === 'fr' ? 'Toutes' : 'All'}</SelectItem>
                             {(['funding', 'product_launch', 'pricing_change', 'partnership', 'hiring', 'acquisition', 'market_entry', 'regulation', 'technology', 'leadership', 'other'] as MarketSignalCategory[]).map(cat => (
-                                <SelectItem key={cat} value={cat} className="hover:bg-[#282c3a]">
+                                <SelectItem key={cat} value={cat} className="hover:bg-muted">
                                     {t.signals.categories?.[cat] || cat}
                                 </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
                     <Select value={filterImpact} onValueChange={setFilterImpact}>
-                        <SelectTrigger className="w-[130px] bg-[#0f1117] border-[#282c3a] text-[#e8e9ed] text-sm">
+                        <SelectTrigger className="w-[130px] bg-background border-border text-foreground text-sm">
                             <SelectValue placeholder="Impact" />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
-                            <SelectItem value="all" className="hover:bg-[#282c3a]">{language === 'fr' ? 'Tous' : 'All'}</SelectItem>
-                            <SelectItem value="positive" className="hover:bg-[#282c3a]">{t.signals.impact.positive}</SelectItem>
-                            <SelectItem value="negative" className="hover:bg-[#282c3a]">{t.signals.impact.negative}</SelectItem>
-                            <SelectItem value="neutral" className="hover:bg-[#282c3a]">{t.signals.impact.neutral}</SelectItem>
+                        <SelectContent className="bg-card border-border text-foreground">
+                            <SelectItem value="all" className="hover:bg-muted">{language === 'fr' ? 'Tous' : 'All'}</SelectItem>
+                            <SelectItem value="positive" className="hover:bg-muted">{t.signals.impact.positive}</SelectItem>
+                            <SelectItem value="negative" className="hover:bg-muted">{t.signals.impact.negative}</SelectItem>
+                            <SelectItem value="neutral" className="hover:bg-muted">{t.signals.impact.neutral}</SelectItem>
                         </SelectContent>
                     </Select>
                     <Select value={filterUrgency} onValueChange={setFilterUrgency}>
-                        <SelectTrigger className="w-[130px] bg-[#0f1117] border-[#282c3a] text-[#e8e9ed] text-sm">
+                        <SelectTrigger className="w-[130px] bg-background border-border text-foreground text-sm">
                             <SelectValue placeholder={language === 'fr' ? 'Urgence' : 'Urgency'} />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
-                            <SelectItem value="all" className="hover:bg-[#282c3a]">{language === 'fr' ? 'Toutes' : 'All'}</SelectItem>
+                        <SelectContent className="bg-card border-border text-foreground">
+                            <SelectItem value="all" className="hover:bg-muted">{language === 'fr' ? 'Toutes' : 'All'}</SelectItem>
                             {(['critical', 'high', 'medium', 'low'] as MarketSignalUrgency[]).map(u => (
-                                <SelectItem key={u} value={u} className="hover:bg-[#282c3a]">
+                                <SelectItem key={u} value={u} className="hover:bg-muted">
                                     {t.signals.urgency?.[u] || u}
                                 </SelectItem>
                             ))}
@@ -283,13 +283,13 @@ export function MarketSignalsTab() {
                     </Select>
                     {competitors.length > 0 && (
                         <Select value={filterCompetitor} onValueChange={setFilterCompetitor}>
-                            <SelectTrigger className="w-[160px] bg-[#0f1117] border-[#282c3a] text-[#e8e9ed] text-sm">
+                            <SelectTrigger className="w-[160px] bg-background border-border text-foreground text-sm">
                                 <SelectValue placeholder={language === 'fr' ? 'Concurrent' : 'Competitor'} />
                             </SelectTrigger>
-                            <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
-                                <SelectItem value="all" className="hover:bg-[#282c3a]">{language === 'fr' ? 'Tous' : 'All'}</SelectItem>
+                            <SelectContent className="bg-card border-border text-foreground">
+                                <SelectItem value="all" className="hover:bg-muted">{language === 'fr' ? 'Tous' : 'All'}</SelectItem>
                                 {competitors.map(c => (
-                                    <SelectItem key={c.id} value={c.id} className="hover:bg-[#282c3a]">{c.name}</SelectItem>
+                                    <SelectItem key={c.id} value={c.id} className="hover:bg-muted">{c.name}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
@@ -298,7 +298,7 @@ export function MarketSignalsTab() {
                         variant="ghost"
                         size="sm"
                         onClick={() => { setFilterCategory('all'); setFilterImpact('all'); setFilterUrgency('all'); setFilterCompetitor('all'); }}
-                        className="text-[#8b8fa3] hover:text-[#e8e9ed] ml-auto"
+                        className="text-muted-foreground hover:text-foreground ml-auto"
                     >
                         {language === 'fr' ? 'Réinitialiser' : 'Reset'}
                     </Button>
@@ -306,7 +306,7 @@ export function MarketSignalsTab() {
             )}
 
             {filteredSignals.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-[300px] text-[#8b8fa3] space-y-2">
+                <div className="flex flex-col items-center justify-center h-[300px] text-muted-foreground space-y-2">
                     <Signal className="h-12 w-12 opacity-40" />
                     <p>{marketSignals.length === 0 ? t.noSignals : (language === 'fr' ? 'Aucun signal ne correspond aux filtres.' : 'No signals match the filters.')}</p>
                 </div>
@@ -316,7 +316,7 @@ export function MarketSignalsTab() {
                         const config = impactConfig[signal.impact];
                         const competitorName = getCompetitorName(signal.competitorId);
                         return (
-                            <Card key={signal.id} className="bg-[#181a24] border-[#282c3a] hover:border-[#3a3f52] transition-colors">
+                            <Card key={signal.id} className="bg-card border-border hover:border-border transition-colors">
                                 <CardContent className="p-4">
                                     <div className="flex items-start justify-between gap-4">
                                         <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -325,7 +325,7 @@ export function MarketSignalsTab() {
                                             </div>
                                             <div className="flex-1 min-w-0 space-y-1">
                                                 <div className="flex items-center gap-2 flex-wrap">
-                                                    <h3 className="text-[#e8e9ed] font-medium">{signal.title}</h3>
+                                                    <h3 className="text-foreground font-medium">{signal.title}</h3>
                                                     <Badge variant="outline" className={`text-xs border ${config.color}`}>
                                                         {config.label}
                                                     </Badge>
@@ -335,31 +335,31 @@ export function MarketSignalsTab() {
                                                         </Badge>
                                                     )}
                                                     {signal.category && signal.category !== 'other' && (
-                                                        <Badge variant="outline" className="text-xs bg-[#282c3a]/50 text-[#8b8fa3] border-[#282c3a]">
+                                                        <Badge variant="outline" className="text-xs bg-muted/50 text-muted-foreground border-border">
                                                             {t.signals.categories?.[signal.category] || signal.category}
                                                         </Badge>
                                                     )}
                                                     {signal.isAutoGenerated && (
-                                                        <Sparkles className="h-3 w-3 text-[#6c5ce7]" />
+                                                        <Sparkles className="h-3 w-3 text-primary" />
                                                     )}
                                                 </div>
                                                 {signal.description && (
-                                                    <p className="text-[#8b8fa3] text-sm">{signal.description}</p>
+                                                    <p className="text-muted-foreground text-sm">{signal.description}</p>
                                                 )}
                                                 {signal.aiSummary && (
-                                                    <p className="text-[#a29bfe] text-xs italic border-l-2 border-[#6c5ce7]/30 pl-2">{signal.aiSummary}</p>
+                                                    <p className="text-accent-foreground text-xs italic border-l-2 border-primary/30 pl-2">{signal.aiSummary}</p>
                                                 )}
-                                                <div className="flex items-center gap-3 text-xs text-[#8b8fa3]">
+                                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                                     <span>{new Date(signal.date).toLocaleDateString()}</span>
                                                     {competitorName && (
                                                         <>
-                                                            <span className="text-[#282c3a]">|</span>
-                                                            <span className="text-[#6c5ce7]">{competitorName}</span>
+                                                            <span className="text-muted-foreground">|</span>
+                                                            <span className="text-primary">{competitorName}</span>
                                                         </>
                                                     )}
                                                     {signal.source && (
                                                         <>
-                                                            <span className="text-[#282c3a]">|</span>
+                                                            <span className="text-muted-foreground">|</span>
                                                             <span>{signal.source}</span>
                                                         </>
                                                     )}
@@ -368,7 +368,7 @@ export function MarketSignalsTab() {
                                                             href={signal.sourceUrl}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="text-[#6c5ce7] hover:text-[#a29bfe] flex items-center gap-0.5"
+                                                            className="text-primary hover:text-accent-foreground flex items-center gap-0.5"
                                                         >
                                                             <ExternalLink className="h-3 w-3" />
                                                         </a>
@@ -379,7 +379,7 @@ export function MarketSignalsTab() {
                                         <Button
                                             size="icon"
                                             variant="ghost"
-                                            className="h-8 w-8 text-[#8b8fa3] hover:text-red-400 shrink-0"
+                                            className="h-8 w-8 text-muted-foreground hover:text-red-400 shrink-0"
                                             onClick={() => deleteMarketSignal(signal.id)}
                                         >
                                             <Trash2 className="h-4 w-4" />

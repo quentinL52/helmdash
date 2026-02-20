@@ -30,11 +30,11 @@ export default function HypothesesPage() {
     const addHypothesis = useFounderStore(s => s.addHypothesis);
 
     return (
-        <div className="flex flex-col h-full space-y-4 p-8 pt-6 font-sans text-[#e8e9ed]">
+        <div className="flex flex-col h-full space-y-4 p-8 pt-6 font-sans text-foreground">
             <div className="flex justify-between items-center">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
-                    <p className="text-[#8b8fa3] text-sm">{t.subtitle}</p>
+                    <p className="text-muted-foreground text-sm">{t.subtitle}</p>
                 </div>
                 <Button
                     variant="default"
@@ -63,9 +63,9 @@ export default function HypothesesPage() {
             )}
 
             <Tabs defaultValue="board" className="h-full flex flex-col">
-                <TabsList className="grid w-[400px] grid-cols-2 bg-[#181a24] text-[#8b8fa3] mb-4">
-                    <TabsTrigger value="board" className="data-[state=active]:bg-[#6c5ce7] data-[state=active]:text-white">{t.tabs.board}</TabsTrigger>
-                    <TabsTrigger value="list" className="data-[state=active]:bg-[#6c5ce7] data-[state=active]:text-white">{t.tabs.list}</TabsTrigger>
+                <TabsList className="grid w-[400px] grid-cols-2 bg-card text-muted-foreground mb-4">
+                    <TabsTrigger value="board" className="data-[state=active]:bg-primary data-[state=active]:text-foreground">{t.tabs.board}</TabsTrigger>
+                    <TabsTrigger value="list" className="data-[state=active]:bg-primary data-[state=active]:text-foreground">{t.tabs.list}</TabsTrigger>
                 </TabsList>
                 <TabsContent value="board" className="flex-1 overflow-hidden mt-0">
                     <HypothesesBoard />

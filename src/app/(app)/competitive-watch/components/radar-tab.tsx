@@ -53,7 +53,7 @@ export function RadarTab() {
 
     if (competitors.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center h-[400px] text-[#8b8fa3] space-y-2">
+            <div className="flex flex-col items-center justify-center h-[400px] text-muted-foreground space-y-2">
                 <Eye className="h-12 w-12 opacity-40" />
                 <p>{t.noCompetitors}</p>
                 <p className="text-sm">
@@ -68,16 +68,16 @@ export function RadarTab() {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-xl font-semibold text-[#e8e9ed]">
+                <h2 className="text-xl font-semibold text-foreground">
                     {language === 'fr' ? 'Carte Radar des Concurrents' : 'Competitor Radar Chart'}
                 </h2>
-                <p className="text-[#8b8fa3] text-sm">
+                <p className="text-muted-foreground text-sm">
                     {language === 'fr'
                         ? 'Comparez visuellement les forces de vos concurrents.'
                         : 'Visually compare your competitors strengths.'}
                 </p>
             </div>
-            <Card className="bg-[#181a24] border-[#282c3a]">
+            <Card className="bg-card border-border">
                 <CardContent className="pt-6">
                     <ResponsiveContainer width="100%" height={500}>
                         <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="80%">

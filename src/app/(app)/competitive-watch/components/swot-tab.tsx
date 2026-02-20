@@ -177,7 +177,7 @@ export function SwotTab() {
 
     if (competitors.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center h-[400px] text-[#8b8fa3] space-y-2">
+            <div className="flex flex-col items-center justify-center h-[400px] text-muted-foreground space-y-2">
                 <Eye className="h-12 w-12 opacity-40" />
                 <p>{t.noCompetitors}</p>
                 <p className="text-sm">
@@ -224,10 +224,10 @@ export function SwotTab() {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-xl font-semibold text-[#e8e9ed]">
+                    <h2 className="text-xl font-semibold text-foreground">
                         {language === 'fr' ? 'Analyse SWOT' : 'SWOT Analysis'}
                     </h2>
-                    <p className="text-[#8b8fa3] text-sm">{t.selectCompetitor}</p>
+                    <p className="text-muted-foreground text-sm">{t.selectCompetitor}</p>
                 </div>
                 <div className="flex items-center gap-2">
                     <Button
@@ -235,7 +235,7 @@ export function SwotTab() {
                         size="sm"
                         onClick={handleAutoGenerate}
                         disabled={!selectedCompetitor || isGenerating}
-                        className="border-[#6c5ce7]/30 text-[#a29bfe] hover:bg-[#6c5ce7]/10"
+                        className="border-primary/30 text-accent-foreground hover:bg-primary/10"
                     >
                         {isGenerating ? (
                             <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> {language === 'fr' ? 'Génération...' : 'Generating...'}</>
@@ -244,12 +244,12 @@ export function SwotTab() {
                         )}
                     </Button>
                     <Select value={selectedId} onValueChange={setSelectedId}>
-                        <SelectTrigger className="w-[250px] bg-[#181a24] border-[#282c3a] text-[#e8e9ed]">
+                        <SelectTrigger className="w-[250px] bg-card border-border text-foreground">
                             <SelectValue placeholder={t.selectCompetitor} />
                         </SelectTrigger>
-                        <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+                        <SelectContent className="bg-card border-border text-foreground">
                             {competitors.map((c) => (
-                                <SelectItem key={c.id} value={c.id} className="hover:bg-[#282c3a]">
+                                <SelectItem key={c.id} value={c.id} className="hover:bg-muted">
                                     {c.name}
                                 </SelectItem>
                             ))}
@@ -279,7 +279,7 @@ export function SwotTab() {
                                             ? `Listez les ${quadrant.label.toLowerCase()}...`
                                             : `List ${quadrant.label.toLowerCase()}...`
                                     }
-                                    className="bg-transparent border-none text-[#e8e9ed] placeholder:text-[#8b8fa3]/50 min-h-[150px] resize-none focus-visible:ring-0 p-0"
+                                    className="bg-transparent border-none text-foreground placeholder:text-muted-foreground/50 min-h-[150px] resize-none focus-visible:ring-0 p-0"
                                 />
                             </CardContent>
                         </Card>

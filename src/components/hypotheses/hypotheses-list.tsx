@@ -86,24 +86,24 @@ export function HypothesesList() {
     };
 
     return (
-        <div className="rounded-md border border-[#282c3a] bg-[#181a24] overflow-hidden">
+        <div className="rounded-md border border-border bg-card overflow-hidden">
             <Table>
-                <TableHeader className="bg-[#1e2130]">
-                    <TableRow className="border-b border-[#282c3a] hover:bg-[#1e2130]">
-                        <TableHead className="w-[100px] text-[#8b8fa3]">Phase</TableHead>
-                        <TableHead className="text-[#8b8fa3]">{t.statement}</TableHead>
-                        <TableHead className="w-[120px] text-[#8b8fa3]">{t.category}</TableHead>
-                        <TableHead className="w-[100px] text-[#8b8fa3]">{t.risk}</TableHead>
-                        <TableHead className="text-[#8b8fa3] hidden md:table-cell">{t.method}</TableHead>
-                        <TableHead className="text-[#8b8fa3] hidden lg:table-cell">Measure</TableHead>
-                        <TableHead className="text-[#8b8fa3] hidden lg:table-cell">Learn</TableHead>
-                        <TableHead className="text-right text-[#8b8fa3]">{t.actions}</TableHead>
+                <TableHeader className="bg-muted">
+                    <TableRow className="border-b border-border hover:bg-muted">
+                        <TableHead className="w-[100px] text-muted-foreground">Phase</TableHead>
+                        <TableHead className="text-muted-foreground">{t.statement}</TableHead>
+                        <TableHead className="w-[120px] text-muted-foreground">{t.category}</TableHead>
+                        <TableHead className="w-[100px] text-muted-foreground">{t.risk}</TableHead>
+                        <TableHead className="text-muted-foreground hidden md:table-cell">{t.method}</TableHead>
+                        <TableHead className="text-muted-foreground hidden lg:table-cell">Measure</TableHead>
+                        <TableHead className="text-muted-foreground hidden lg:table-cell">Learn</TableHead>
+                        <TableHead className="text-right text-muted-foreground">{t.actions}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {hypotheses.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={8} className="h-24 text-center text-[#8b8fa3]">
+                            <TableCell colSpan={8} className="h-24 text-center text-muted-foreground">
                                 {t.empty}
                             </TableCell>
                         </TableRow>
@@ -111,7 +111,7 @@ export function HypothesesList() {
                         hypotheses.map((hypothesis) => {
                             const phase = getPhase(hypothesis);
                             return (
-                                <TableRow key={hypothesis.id} className="border-b border-[#282c3a] hover:bg-[#1e2130]/50 transition-colors">
+                                <TableRow key={hypothesis.id} className="border-b border-border hover:bg-muted/50 transition-colors">
                                     <TableCell>
                                         <div className="flex items-center gap-1.5">
                                             <Badge variant="outline" className={`border-0 capitalize text-[10px] ${PHASE_COLORS[phase]}`}>
@@ -122,22 +122,22 @@ export function HypothesesList() {
                                             )}
                                         </div>
                                     </TableCell>
-                                    <TableCell className="font-medium text-[#e8e9ed]">
+                                    <TableCell className="font-medium text-foreground">
                                         {hypothesis.statement}
                                     </TableCell>
-                                    <TableCell className="capitalize text-[#8b8fa3]">
+                                    <TableCell className="capitalize text-muted-foreground">
                                         {hypothesis.category}
                                     </TableCell>
                                     <TableCell className={`capitalize font-medium ${RISK_COLORS[hypothesis.riskLevel]}`}>
                                         {hypothesis.riskLevel}
                                     </TableCell>
-                                    <TableCell className="text-[#8b8fa3] hidden md:table-cell">
+                                    <TableCell className="text-muted-foreground hidden md:table-cell">
                                         {hypothesis.testMethod || '—'}
                                     </TableCell>
-                                    <TableCell className="text-[#8b8fa3] hidden lg:table-cell max-w-[200px]">
+                                    <TableCell className="text-muted-foreground hidden lg:table-cell max-w-[200px]">
                                         <span className="text-[11px] line-clamp-2">{hypothesis.measureNotes || '—'}</span>
                                     </TableCell>
-                                    <TableCell className="text-[#8b8fa3] hidden lg:table-cell max-w-[200px]">
+                                    <TableCell className="text-muted-foreground hidden lg:table-cell max-w-[200px]">
                                         <span className="text-[11px] line-clamp-2">{hypothesis.learnings || '—'}</span>
                                     </TableCell>
                                     <TableCell className="text-right">
@@ -146,7 +146,7 @@ export function HypothesesList() {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleEdit(hypothesis)}
-                                                className="h-8 w-8 text-[#8b8fa3] hover:text-[#e8e9ed] hover:bg-[#282c3a]"
+                                                className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted"
                                             >
                                                 <Edit className="h-4 w-4" />
                                             </Button>
@@ -154,7 +154,7 @@ export function HypothesesList() {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleDelete(hypothesis.id)}
-                                                className="h-8 w-8 text-[#8b8fa3] hover:text-red-400 hover:bg-[#282c3a]"
+                                                className="h-8 w-8 text-muted-foreground hover:text-red-400 hover:bg-muted"
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>

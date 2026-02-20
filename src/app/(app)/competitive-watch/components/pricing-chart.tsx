@@ -136,7 +136,7 @@ export function PricingChart() {
 
     if (competitors.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center h-[400px] text-[#8b8fa3] space-y-2">
+            <div className="flex flex-col items-center justify-center h-[400px] text-muted-foreground space-y-2">
                 <Eye className="h-12 w-12 opacity-40" />
                 <p>{t.noCompetitors}</p>
             </div>
@@ -146,10 +146,10 @@ export function PricingChart() {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-xl font-semibold text-[#e8e9ed]">
+                <h2 className="text-xl font-semibold text-foreground">
                     {t.pricingChart?.title || (language === 'fr' ? 'Comparaison Pricing' : 'Pricing Comparison')}
                 </h2>
-                <p className="text-[#8b8fa3] text-sm">
+                <p className="text-muted-foreground text-sm">
                     {t.pricingChart?.subtitle || (language === 'fr'
                         ? 'Visualisez les fourchettes de prix et modèles tarifaires.'
                         : 'Visualize price ranges and pricing models.')}
@@ -159,17 +159,17 @@ export function PricingChart() {
             {/* Pricing Model Overview */}
             <div className="flex flex-wrap gap-3">
                 {modelGroups.map(([model, data]) => (
-                    <Card key={model} className="bg-[#1e2029] border-[#2b2d36] flex-1 min-w-[150px]">
+                    <Card key={model} className="bg-card border-border flex-1 min-w-[150px]">
                         <CardContent className="pt-4 pb-3 px-4">
                             <div className="flex items-center gap-2 mb-1">
                                 <div
                                     className="w-3 h-3 rounded-full"
                                     style={{ backgroundColor: PRICING_COLORS[model] || '#8b8fa3' }}
                                 />
-                                <span className="text-sm font-medium text-[#e8e9ed]">{data.label}</span>
+                                <span className="text-sm font-medium text-foreground">{data.label}</span>
                             </div>
-                            <span className="text-2xl font-bold text-[#e8e9ed]">{data.count}</span>
-                            <p className="text-xs text-[#8b8fa3] mt-1 line-clamp-1">
+                            <span className="text-2xl font-bold text-foreground">{data.count}</span>
+                            <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
                                 {data.entities.join(', ')}
                             </p>
                         </CardContent>
@@ -179,10 +179,10 @@ export function PricingChart() {
 
             {/* Price Range Chart */}
             {hasChartData ? (
-                <Card className="bg-[#1e2029] border-[#2b2d36]">
+                <Card className="bg-card border-border">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-base text-[#e8e9ed] flex items-center gap-2">
-                            <DollarSign className="h-4 w-4 text-[#6c5ce7]" />
+                        <CardTitle className="text-base text-foreground flex items-center gap-2">
+                            <DollarSign className="h-4 w-4 text-primary" />
                             {language === 'fr' ? 'Fourchettes de Prix' : 'Price Ranges'}
                         </CardTitle>
                     </CardHeader>
@@ -218,16 +218,16 @@ export function PricingChart() {
                                         const data = payload[0]?.payload;
                                         if (!data) return null;
                                         return (
-                                            <div className="bg-[#1a1d2d] border border-[#2b2d36] rounded-lg p-3 text-sm">
-                                                <p className="font-semibold text-[#e8e9ed]">{data.name}</p>
-                                                <p className="text-[#8b8fa3]">
+                                            <div className="bg-card border border-border rounded-lg p-3 text-sm">
+                                                <p className="font-semibold text-foreground">{data.name}</p>
+                                                <p className="text-muted-foreground">
                                                     {language === 'fr' ? 'Fourchette' : 'Range'}: {data.rawPricing}
                                                 </p>
-                                                <p className="text-[#8b8fa3]">
+                                                <p className="text-muted-foreground">
                                                     {language === 'fr' ? 'Modèle' : 'Model'}: {data.modelLabel}
                                                 </p>
                                                 {data.isMe && (
-                                                    <Badge className="mt-1 bg-[#6c5ce7]/20 text-[#a29bfe] border-[#6c5ce7]/30">
+                                                    <Badge className="mt-1 bg-primary/20 text-accent-foreground border-primary/30">
                                                         {language === 'fr' ? 'Votre solution' : 'Your solution'}
                                                     </Badge>
                                                 )}
@@ -262,7 +262,7 @@ export function PricingChart() {
                                             className="w-3 h-3 rounded-sm"
                                             style={{ backgroundColor: color }}
                                         />
-                                        <span className="text-xs text-[#8b8fa3]">
+                                        <span className="text-xs text-muted-foreground">
                                             {t.pricingModels?.[model] || model}
                                         </span>
                                     </div>
@@ -272,13 +272,13 @@ export function PricingChart() {
                     </CardContent>
                 </Card>
             ) : (
-                <Card className="bg-[#1e2029] border-[#2b2d36]">
+                <Card className="bg-card border-border">
                     <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                        <DollarSign className="h-10 w-10 text-[#8b8fa3] opacity-40 mb-3" />
-                        <p className="text-[#e8e9ed] font-medium mb-1">
+                        <DollarSign className="h-10 w-10 text-muted-foreground opacity-40 mb-3" />
+                        <p className="text-foreground font-medium mb-1">
                             {language === 'fr' ? 'Pas de données de prix' : 'No pricing data'}
                         </p>
-                        <p className="text-[#8b8fa3] text-sm max-w-md">
+                        <p className="text-muted-foreground text-sm max-w-md">
                             {language === 'fr'
                                 ? 'Renseignez les fourchettes de prix dans les profils concurrents pour visualiser la comparaison.'
                                 : 'Fill in price ranges in competitor profiles to visualize the comparison.'}
@@ -288,9 +288,9 @@ export function PricingChart() {
             )}
 
             {/* Detailed Pricing Table */}
-            <Card className="bg-[#1e2029] border-[#2b2d36]">
+            <Card className="bg-card border-border">
                 <CardHeader className="pb-2">
-                    <CardTitle className="text-base text-[#e8e9ed]">
+                    <CardTitle className="text-base text-foreground">
                         {language === 'fr' ? 'Détails Tarifaires' : 'Pricing Details'}
                     </CardTitle>
                 </CardHeader>
@@ -299,19 +299,19 @@ export function PricingChart() {
                         {/* My solution */}
                         <div className="flex items-center justify-between py-3">
                             <div className="flex items-center gap-3">
-                                <div className="w-2 h-2 rounded-full bg-[#6c5ce7]" />
-                                <span className="text-[#e8e9ed] font-medium">
+                                <div className="w-2 h-2 rounded-full bg-primary" />
+                                <span className="text-foreground font-medium">
                                     {mySolution.name || (language === 'fr' ? 'Ma Solution' : 'My Solution')}
                                 </span>
-                                <Badge className="bg-[#6c5ce7]/20 text-[#a29bfe] border-[#6c5ce7]/30 text-xs">
+                                <Badge className="bg-primary/20 text-accent-foreground border-primary/30 text-xs">
                                     {language === 'fr' ? 'Vous' : 'You'}
                                 </Badge>
                             </div>
                             <div className="flex items-center gap-3">
-                                <Badge variant="outline" className="border-[#2b2d36] text-[#8b8fa3]">
+                                <Badge variant="outline" className="border-border text-muted-foreground">
                                     {t.pricingModels?.[mySolution.pricingModel || 'other'] || mySolution.pricingModel || '-'}
                                 </Badge>
-                                <span className="text-[#e8e9ed] text-sm min-w-[80px] text-right">
+                                <span className="text-foreground text-sm min-w-[80px] text-right">
                                     {mySolution.pricingRange || mySolution.pricing || '-'}
                                 </span>
                             </div>
@@ -324,13 +324,13 @@ export function PricingChart() {
                                         className="w-2 h-2 rounded-full"
                                         style={{ backgroundColor: PRICING_COLORS[c.pricingModel || 'other'] || '#8b8fa3' }}
                                     />
-                                    <span className="text-[#e8e9ed] font-medium">{c.name}</span>
+                                    <span className="text-foreground font-medium">{c.name}</span>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <Badge variant="outline" className="border-[#2b2d36] text-[#8b8fa3]">
+                                    <Badge variant="outline" className="border-border text-muted-foreground">
                                         {t.pricingModels?.[c.pricingModel || 'other'] || c.pricingModel || '-'}
                                     </Badge>
-                                    <span className="text-[#e8e9ed] text-sm min-w-[80px] text-right">
+                                    <span className="text-foreground text-sm min-w-[80px] text-right">
                                         {c.pricingRange || c.pricing || '-'}
                                     </span>
                                 </div>

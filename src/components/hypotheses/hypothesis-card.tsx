@@ -73,7 +73,7 @@ export const HypothesisCard = memo(function HypothesisCard({ hypothesis, onEdit,
             <CardContent className="p-3">
                 <div className="flex justify-between items-start gap-2 mb-2">
                     <div className="flex-1">
-                        <p className="text-[13px] font-semibold tracking-tight text-[#e8e9ed] line-clamp-3 leading-snug">
+                        <p className="text-[13px] font-semibold tracking-tight text-foreground line-clamp-3 leading-snug">
                             {hypothesis.statement}
                         </p>
                     </div>
@@ -109,12 +109,12 @@ export const HypothesisCard = memo(function HypothesisCard({ hypothesis, onEdit,
                 </div>
 
                 {hypothesis.testMethod && (
-                    <p className="text-[11px] text-[#8b8fa3] mb-3 line-clamp-2 leading-relaxed opacity-80">
+                    <p className="text-[11px] text-muted-foreground mb-3 line-clamp-2 leading-relaxed opacity-80">
                         {hypothesis.testMethod}
                     </p>
                 )}
 
-                <div className="flex items-center justify-between mt-3 pt-2 border-t border-[#282c3a]/50">
+                <div className="flex items-center justify-between mt-3 pt-2 border-t border-border/50">
                     <div className="flex items-center gap-2">
                         <Badge
                             variant="outline"
@@ -126,7 +126,7 @@ export const HypothesisCard = memo(function HypothesisCard({ hypothesis, onEdit,
                         >
                             {t.risks[hypothesis.riskLevel]}
                         </Badge>
-                        <span className="text-[10px] text-[#5c6078] hidden sm:inline-block">
+                        <span className="text-[10px] text-muted-foreground hidden sm:inline-block">
                             {formatDistanceToNow(new Date(hypothesis.updatedAt), { addSuffix: true })}
                         </span>
                     </div>
@@ -136,7 +136,7 @@ export const HypothesisCard = memo(function HypothesisCard({ hypothesis, onEdit,
                         onValueChange={(value) => updateHypothesis(hypothesis.id, { status: value as HypothesisStatus })}
                     >
                         <SelectTrigger
-                            className="h-6 text-[10px] w-auto border-0 bg-transparent focus:ring-0 p-0 gap-1 text-[#8b8fa3] hover:text-[#e8e9ed]"
+                            className="h-6 text-[10px] w-auto border-0 bg-transparent focus:ring-0 p-0 gap-1 text-muted-foreground hover:text-foreground"
                         >
                             <SelectValue />
                         </SelectTrigger>

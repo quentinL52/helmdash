@@ -55,7 +55,7 @@ export function AlertFeed({ alerts, onAcknowledge, language }: AlertFeedProps) {
 
     if (alerts.length === 0) {
         return (
-            <div className="flex items-center justify-center py-12 text-[#8b8fa3] text-sm">
+            <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">
                 {t.noAlerts}
             </div>
         );
@@ -72,7 +72,7 @@ export function AlertFeed({ alerts, onAcknowledge, language }: AlertFeedProps) {
                 return (
                     <div
                         key={alert.id}
-                        className={`relative flex items-start gap-3 p-3 rounded-lg bg-[#1e2029] border border-[#2b2d36] transition-opacity ${
+                        className={`relative flex items-start gap-3 p-3 rounded-lg bg-card border border-border transition-opacity ${
                             isAcknowledged ? 'opacity-50' : ''
                         }`}
                         style={{ borderLeftWidth: '4px', borderLeftColor: severityColor }}
@@ -98,24 +98,24 @@ export function AlertFeed({ alerts, onAcknowledge, language }: AlertFeedProps) {
                                 >
                                     {severityLabel}
                                 </Badge>
-                                <span className="text-[10px] text-[#8b8fa3]">{typeLabel}</span>
+                                <span className="text-[10px] text-muted-foreground">{typeLabel}</span>
                             </div>
 
                             {/* Title */}
-                            <h4 className="text-sm font-semibold text-[#e8e9ed] leading-tight">
+                            <h4 className="text-sm font-semibold text-foreground leading-tight">
                                 {alert.title}
                             </h4>
 
                             {/* Description */}
-                            <p className="text-xs text-[#8b8fa3] leading-relaxed">
+                            <p className="text-xs text-muted-foreground leading-relaxed">
                                 {alert.description}
                             </p>
 
                             {/* Suggested action */}
                             {alert.suggestedAction && (
                                 <div className="mt-1.5 flex items-start gap-1.5">
-                                    <Zap className="h-3 w-3 text-[#6c5ce7] mt-0.5 shrink-0" />
-                                    <span className="text-xs text-[#a29bfe] leading-relaxed">
+                                    <Zap className="h-3 w-3 text-primary mt-0.5 shrink-0" />
+                                    <span className="text-xs text-accent-foreground leading-relaxed">
                                         {alert.suggestedAction}
                                     </span>
                                 </div>
@@ -125,15 +125,15 @@ export function AlertFeed({ alerts, onAcknowledge, language }: AlertFeedProps) {
                         {/* Acknowledge button / check */}
                         <div className="shrink-0 mt-0.5">
                             {isAcknowledged ? (
-                                <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[#00b894]/15">
-                                    <Check className="h-3.5 w-3.5 text-[#00b894]" />
+                                <div className="flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500/15">
+                                    <Check className="h-3.5 w-3.5 text-emerald-500" />
                                 </div>
                             ) : (
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => onAcknowledge(alert.id)}
-                                    className="h-7 px-2 text-[10px] text-[#8b8fa3] hover:text-[#e8e9ed] hover:bg-[#2b2d36]"
+                                    className="h-7 px-2 text-[10px] text-muted-foreground hover:text-foreground hover:bg-muted"
                                 >
                                     {t.acknowledge}
                                 </Button>

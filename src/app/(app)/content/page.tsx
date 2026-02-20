@@ -16,13 +16,13 @@ const ContentCalendar = dynamic(
 
 export default function ContentPage() {
     return (
-        <div className="flex flex-col h-full space-y-4 p-8 pt-6 font-sans text-[#e8e9ed]">
+        <div className="flex flex-col h-full space-y-4 p-8 pt-6 font-sans text-foreground">
             <Tabs defaultValue="board" className="flex-1 flex flex-col h-full overflow-hidden">
-                <TabsList className="bg-[#181a24] border border-[#282c3a] w-fit">
-                    <TabsTrigger value="board" className="data-[state=active]:bg-[#282c3a] data-[state=active]:text-[#e8e9ed] text-[#8b8fa3]">
+                <TabsList className="bg-card border border-border w-fit">
+                    <TabsTrigger value="board" className="data-[state=active]:bg-muted data-[state=active]:text-foreground text-muted-foreground">
                         Board
                     </TabsTrigger>
-                    <TabsTrigger value="calendar" className="data-[state=active]:bg-[#282c3a] data-[state=active]:text-[#e8e9ed] text-[#8b8fa3]">
+                    <TabsTrigger value="calendar" className="data-[state=active]:bg-muted data-[state=active]:text-foreground text-muted-foreground">
                         Calendar
                     </TabsTrigger>
                 </TabsList>

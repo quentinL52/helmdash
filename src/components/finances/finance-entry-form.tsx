@@ -156,7 +156,7 @@ export function FinanceEntryForm() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <Card className="col-span-3 bg-slate-900 border-slate-800">
                 <CardHeader>
-                    <CardTitle className="text-white">{translations[language].finance.chart.cash}</CardTitle>
+                    <CardTitle className="text-foreground">{translations[language].finance.chart.cash}</CardTitle>
                     <CardDescription className="text-gray-300">
                         Update your current bank balance.
                     </CardDescription>
@@ -164,13 +164,13 @@ export function FinanceEntryForm() {
                 <CardContent>
                     <div className="flex space-x-2">
                         <div className="grid w-full items-center gap-1.5">
-                            <Label htmlFor="cash" className="text-white">{t.amount} (€)</Label>
+                            <Label htmlFor="cash" className="text-foreground">{t.amount} (€)</Label>
                             <Input
                                 id="cash"
                                 type="number"
                                 value={cashInput}
                                 onChange={(e) => setCashInput(e.target.value)}
-                                className="bg-slate-800 border-slate-700 text-white"
+                                className="bg-slate-800 border-slate-700 text-foreground"
                             />
                         </div>
                     </div>
@@ -182,7 +182,7 @@ export function FinanceEntryForm() {
 
             <Card className="col-span-4 bg-slate-900 border-slate-800">
                 <CardHeader>
-                    <CardTitle className="text-white">{t.title}</CardTitle>
+                    <CardTitle className="text-foreground">{t.title}</CardTitle>
                     <CardDescription className="text-gray-300">Add a recurring expense or revenue for this month.</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -194,9 +194,9 @@ export function FinanceEntryForm() {
                                     name="date"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-white">{t.date}</FormLabel>
+                                            <FormLabel className="text-foreground">{t.date}</FormLabel>
                                             <FormControl>
-                                                <Input type="date" {...field} className="bg-slate-800 border-slate-700 text-white" />
+                                                <Input type="date" {...field} className="bg-slate-800 border-slate-700 text-foreground" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -207,14 +207,14 @@ export function FinanceEntryForm() {
                                     name="type"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-white">{t.type}</FormLabel>
+                                            <FormLabel className="text-foreground">{t.type}</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                 <FormControl>
-                                                    <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                                                    <SelectTrigger className="bg-slate-800 border-slate-700 text-foreground">
                                                         <SelectValue placeholder="Select type" />
                                                     </SelectTrigger>
                                                 </FormControl>
-                                                <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                                                <SelectContent className="bg-slate-800 border-slate-700 text-foreground">
                                                     <SelectItem value="expense">{t.expense}</SelectItem>
                                                     <SelectItem value="revenue">{t.income}</SelectItem>
                                                 </SelectContent>
@@ -230,9 +230,9 @@ export function FinanceEntryForm() {
                                     name="amount"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-white">{t.amount} (€)</FormLabel>
+                                            <FormLabel className="text-foreground">{t.amount} (€)</FormLabel>
                                             <FormControl>
-                                                <Input type="number" {...field} className="bg-slate-800 border-slate-700 text-white" />
+                                                <Input type="number" {...field} className="bg-slate-800 border-slate-700 text-foreground" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -243,9 +243,9 @@ export function FinanceEntryForm() {
                                     name="label"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-white">{t.description}</FormLabel>
+                                            <FormLabel className="text-foreground">{t.description}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="e.g. Hosting" {...field} className="bg-slate-800 border-slate-700 text-white" />
+                                                <Input placeholder="e.g. Hosting" {...field} className="bg-slate-800 border-slate-700 text-foreground" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -258,14 +258,14 @@ export function FinanceEntryForm() {
                                     name="category"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-white">{t.category}</FormLabel>
+                                            <FormLabel className="text-foreground">{t.category}</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={field.value} disabled={form.watch('type') === 'revenue'}>
                                                 <FormControl>
-                                                    <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                                                    <SelectTrigger className="bg-slate-800 border-slate-700 text-foreground">
                                                         <SelectValue placeholder="Select category" />
                                                     </SelectTrigger>
                                                 </FormControl>
-                                                <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                                                <SelectContent className="bg-slate-800 border-slate-700 text-foreground">
                                                     <SelectItem value="saas">SaaS</SelectItem>
                                                     <SelectItem value="hosting">Hosting</SelectItem>
                                                     <SelectItem value="marketing">Marketing</SelectItem>

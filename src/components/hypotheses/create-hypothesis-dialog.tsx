@@ -159,7 +159,7 @@ export function HypothesisDialog({
         <Dialog open={open} onOpenChange={setOpen}>
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
             <DialogContent
-                className="sm:max-w-[525px] border-[#282c3a]"
+                className="sm:max-w-[525px] border-border"
                 style={{
                     backgroundColor: COLORS.bg,
                     color: COLORS.text
@@ -182,7 +182,7 @@ export function HypothesisDialog({
                                     <FormControl>
                                         <Textarea
                                             placeholder="We believe that..."
-                                            className="resize-none focus-visible:ring-0 focus-visible:border-[#6c5ce7]"
+                                            className="resize-none focus-visible:ring-0 focus-visible:border-primary"
                                             style={inputStyle}
                                             {...field}
                                         />
@@ -200,7 +200,7 @@ export function HypothesisDialog({
                                         <FormLabel style={labelStyle}>{t.form.category}</FormLabel>
                                         <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
-                                                <SelectTrigger style={inputStyle} className="focus:ring-0 focus:border-[#6c5ce7]">
+                                                <SelectTrigger style={inputStyle} className="focus:ring-0 focus:border-primary">
                                                     <SelectValue placeholder="Select category" />
                                                 </SelectTrigger>
                                             </FormControl>
@@ -224,7 +224,7 @@ export function HypothesisDialog({
                                         <FormLabel style={labelStyle}>{t.form.risk}</FormLabel>
                                         <Select onValueChange={field.onChange} value={field.value}>
                                             <FormControl>
-                                                <SelectTrigger style={inputStyle} className="focus:ring-0 focus:border-[#6c5ce7]">
+                                                <SelectTrigger style={inputStyle} className="focus:ring-0 focus:border-primary">
                                                     <SelectValue placeholder="Select risk" />
                                                 </SelectTrigger>
                                             </FormControl>
@@ -249,7 +249,7 @@ export function HypothesisDialog({
                                     <FormControl>
                                         <Input
                                             placeholder="Landing page, Interview..."
-                                            className="focus-visible:ring-0 focus-visible:border-[#6c5ce7]"
+                                            className="focus-visible:ring-0 focus-visible:border-primary"
                                             style={inputStyle}
                                             {...field}
                                         />
@@ -267,7 +267,7 @@ export function HypothesisDialog({
                                     <FormControl>
                                         <Input
                                             placeholder="e.g. Conversion rate > 5%"
-                                            className="focus-visible:ring-0 focus-visible:border-[#6c5ce7]"
+                                            className="focus-visible:ring-0 focus-visible:border-primary"
                                             style={inputStyle}
                                             {...field}
                                         />

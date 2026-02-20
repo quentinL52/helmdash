@@ -362,6 +362,7 @@ export interface ScenarioAnalysis {
 export interface FounderStore {
     // --- State ---
     userId: string | null; // For data isolation check
+    planTier: 'free' | 'starter' | 'growth' | 'scale';
     hypotheses: Hypothesis[];
     finance: FinanceData;
     journalEntries: JournalEntry[];
@@ -479,6 +480,7 @@ export interface FounderStore {
     setLanguage: (lang: 'fr' | 'en') => void;
     hydrate: (state: Partial<FounderStore>) => void;
     setUserId: (id: string | null) => void;
+    setPlanTier: (tier: 'free' | 'starter' | 'growth' | 'scale') => void;
     reset: () => void;
 }
 
@@ -496,6 +498,7 @@ const calculateObjectiveProgress = (krs: KeyResult[]): number => {
 
 const initialState = {
     userId: null,
+    planTier: 'free' as const,
     language: 'fr' as const,
     hypotheses: [],
     finance: {
@@ -588,6 +591,7 @@ export const useFounderStore = create<FounderStore>()(
             language: 'fr', // Explicit override if needed, but initialState has it
 
             setUserId: (id) => set({ userId: id }),
+            setPlanTier: (tier) => set({ planTier: tier }),
             setLanguage: (lang) => set({ language: lang }),
             reset: () => set(initialState),
             hydrate: (state) => set({ ...state }),

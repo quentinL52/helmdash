@@ -227,12 +227,12 @@ export function CompetitorDialog({
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed] sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
+            <DialogContent className="bg-card border-border text-foreground sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>
                         {competitorToEdit ? (language === 'fr' ? 'Modifier Concurrent' : 'Edit Competitor') : t.addCompetitor}
                     </DialogTitle>
-                    <DialogDescription className="text-[#8b8fa3]">
+                    <DialogDescription className="text-muted-foreground">
                         {competitorToEdit
                             ? (language === 'fr' ? 'Mettez a jour les informations du concurrent.' : 'Update competitor details.')
                             : (language === 'fr' ? 'Ajoutez un nouveau concurrent a surveiller.' : 'Add a new competitor to watch.')}
@@ -242,23 +242,23 @@ export function CompetitorDialog({
                 <div className="space-y-4 py-4">
                     {/* Name */}
                     <div className="space-y-2">
-                        <Label className="text-[#e8e9ed]">{t.competitor.name} *</Label>
+                        <Label className="text-foreground">{t.competitor.name} *</Label>
                         <Input
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder={t.competitor.name}
-                            className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]"
+                            className="bg-card border-border text-foreground"
                         />
                     </div>
                     {/* Website + Auto-fill */}
                     <div className="space-y-2">
-                        <Label className="text-[#e8e9ed]">{t.competitor.website}</Label>
+                        <Label className="text-foreground">{t.competitor.website}</Label>
                         <div className="flex gap-2">
                             <Input
                                 value={website}
                                 onChange={(e) => setWebsite(e.target.value)}
                                 placeholder="https://..."
-                                className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] flex-1"
+                                className="bg-card border-border text-foreground flex-1"
                             />
                             <Button
                                 type="button"
@@ -266,7 +266,7 @@ export function CompetitorDialog({
                                 size="sm"
                                 onClick={handleAutoFill}
                                 disabled={!website.trim() || isAutoFilling}
-                                className="border-[#6c5ce7]/50 text-[#a29bfe] hover:bg-[#6c5ce7]/10 shrink-0"
+                                className="border-primary/50 text-accent-foreground hover:bg-primary/10 shrink-0"
                             >
                                 {isAutoFilling ? (
                                     <><Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> {t.autoFilling || 'Analyzing...'}</>
@@ -278,49 +278,49 @@ export function CompetitorDialog({
                     </div>
                     {/* Description */}
                     <div className="space-y-2">
-                        <Label className="text-[#e8e9ed]">{t.competitor.description}</Label>
+                        <Label className="text-foreground">{t.competitor.description}</Label>
                         <Textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder={t.competitor.description}
-                            className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] min-h-[60px]"
+                            className="bg-card border-border text-foreground min-h-[60px]"
                         />
                     </div>
                     {/* Strengths & Weaknesses */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed]">{t.competitor.strengths}</Label>
+                            <Label className="text-foreground">{t.competitor.strengths}</Label>
                             <Textarea
                                 value={strengths}
                                 onChange={(e) => setStrengths(e.target.value)}
-                                className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] min-h-[80px]"
+                                className="bg-card border-border text-foreground min-h-[80px]"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed]">{t.competitor.weaknesses}</Label>
+                            <Label className="text-foreground">{t.competitor.weaknesses}</Label>
                             <Textarea
                                 value={weaknesses}
                                 onChange={(e) => setWeaknesses(e.target.value)}
-                                className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] min-h-[80px]"
+                                className="bg-card border-border text-foreground min-h-[80px]"
                             />
                         </div>
                     </div>
                     {/* Pricing & Positioning */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed]">{t.competitor.pricing}</Label>
+                            <Label className="text-foreground">{t.competitor.pricing}</Label>
                             <Input
                                 value={pricing}
                                 onChange={(e) => setPricing(e.target.value)}
-                                className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]"
+                                className="bg-card border-border text-foreground"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed]">{t.competitor.positioning}</Label>
+                            <Label className="text-foreground">{t.competitor.positioning}</Label>
                             <Input
                                 value={positioning}
                                 onChange={(e) => setPositioning(e.target.value)}
-                                className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]"
+                                className="bg-card border-border text-foreground"
                             />
                         </div>
                     </div>
@@ -330,73 +330,73 @@ export function CompetitorDialog({
                         <button
                             type="button"
                             onClick={() => setShowAdvanced(!showAdvanced)}
-                            className="flex items-center gap-2 text-sm text-[#6c5ce7] hover:text-[#a29bfe] transition-colors w-full"
+                            className="flex items-center gap-2 text-sm text-primary hover:text-accent-foreground transition-colors w-full"
                         >
                             {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                             {language === 'fr' ? 'Données stratégiques avancées' : 'Advanced strategic data'}
                         </button>
                         {showAdvanced && (
-                            <div className="space-y-4 mt-3 pl-2 border-l-2 border-[#6c5ce7]/30">
+                            <div className="space-y-4 mt-3 pl-2 border-l-2 border-primary/30">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label className="text-[#e8e9ed] text-sm">{t.competitor.targetSegment}</Label>
-                                        <Input value={targetSegment} onChange={(e) => setTargetSegment(e.target.value)} placeholder={language === 'fr' ? 'Ex: PME SaaS' : 'E.g. SMB SaaS'} className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]" />
+                                        <Label className="text-foreground text-sm">{t.competitor.targetSegment}</Label>
+                                        <Input value={targetSegment} onChange={(e) => setTargetSegment(e.target.value)} placeholder={language === 'fr' ? 'Ex: PME SaaS' : 'E.g. SMB SaaS'} className="bg-card border-border text-foreground" />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-[#e8e9ed] text-sm">{t.competitor.businessModel}</Label>
-                                        <Input value={businessModel} onChange={(e) => setBusinessModel(e.target.value)} placeholder={language === 'fr' ? 'Ex: SaaS B2B' : 'E.g. B2B SaaS'} className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]" />
+                                        <Label className="text-foreground text-sm">{t.competitor.businessModel}</Label>
+                                        <Input value={businessModel} onChange={(e) => setBusinessModel(e.target.value)} placeholder={language === 'fr' ? 'Ex: SaaS B2B' : 'E.g. B2B SaaS'} className="bg-card border-border text-foreground" />
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label className="text-[#e8e9ed] text-sm">{t.competitor.teamSize}</Label>
-                                        <Input value={teamSize} onChange={(e) => setTeamSize(e.target.value)} placeholder="1-10, 11-50..." className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]" />
+                                        <Label className="text-foreground text-sm">{t.competitor.teamSize}</Label>
+                                        <Input value={teamSize} onChange={(e) => setTeamSize(e.target.value)} placeholder="1-10, 11-50..." className="bg-card border-border text-foreground" />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-[#e8e9ed] text-sm">{t.competitor.yearFounded}</Label>
-                                        <Input value={yearFounded} onChange={(e) => setYearFounded(e.target.value)} placeholder="2023" className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]" />
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <Label className="text-[#e8e9ed] text-sm">{t.competitor.fundingStage}</Label>
-                                        <Input value={fundingStage} onChange={(e) => setFundingStage(e.target.value)} placeholder={language === 'fr' ? 'Ex: Série A' : 'E.g. Series A'} className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-[#e8e9ed] text-sm">{t.competitor.fundingAmount}</Label>
-                                        <Input value={fundingAmount} onChange={(e) => setFundingAmount(e.target.value)} placeholder="$5M" className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]" />
+                                        <Label className="text-foreground text-sm">{t.competitor.yearFounded}</Label>
+                                        <Input value={yearFounded} onChange={(e) => setYearFounded(e.target.value)} placeholder="2023" className="bg-card border-border text-foreground" />
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <Label className="text-[#e8e9ed] text-sm">{t.competitor.pricingModel}</Label>
+                                        <Label className="text-foreground text-sm">{t.competitor.fundingStage}</Label>
+                                        <Input value={fundingStage} onChange={(e) => setFundingStage(e.target.value)} placeholder={language === 'fr' ? 'Ex: Série A' : 'E.g. Series A'} className="bg-card border-border text-foreground" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-foreground text-sm">{t.competitor.fundingAmount}</Label>
+                                        <Input value={fundingAmount} onChange={(e) => setFundingAmount(e.target.value)} placeholder="$5M" className="bg-card border-border text-foreground" />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label className="text-foreground text-sm">{t.competitor.pricingModel}</Label>
                                         <Select value={pricingModel} onValueChange={(v) => setPricingModel(v as PricingModelType)}>
-                                            <SelectTrigger className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]">
+                                            <SelectTrigger className="bg-card border-border text-foreground">
                                                 <SelectValue placeholder="—" />
                                             </SelectTrigger>
-                                            <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+                                            <SelectContent className="bg-card border-border text-foreground">
                                                 {(['free', 'freemium', 'subscription', 'usage', 'enterprise', 'other'] as PricingModelType[]).map(pm => (
-                                                    <SelectItem key={pm} value={pm} className="hover:bg-[#282c3a]">{t.pricingModels[pm]}</SelectItem>
+                                                    <SelectItem key={pm} value={pm} className="hover:bg-muted">{t.pricingModels[pm]}</SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-[#e8e9ed] text-sm">{t.competitor.pricingRange}</Label>
-                                        <Input value={pricingRange} onChange={(e) => setPricingRange(e.target.value)} placeholder="$0 - $99/mo" className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]" />
+                                        <Label className="text-foreground text-sm">{t.competitor.pricingRange}</Label>
+                                        <Input value={pricingRange} onChange={(e) => setPricingRange(e.target.value)} placeholder="$0 - $99/mo" className="bg-card border-border text-foreground" />
                                     </div>
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[#e8e9ed] text-sm">{t.competitor.geography}</Label>
-                                    <Input value={geography} onChange={(e) => setGeography(e.target.value)} placeholder={language === 'fr' ? 'Ex: Europe, US' : 'E.g. Europe, US'} className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]" />
+                                    <Label className="text-foreground text-sm">{t.competitor.geography}</Label>
+                                    <Input value={geography} onChange={(e) => setGeography(e.target.value)} placeholder={language === 'fr' ? 'Ex: Europe, US' : 'E.g. Europe, US'} className="bg-card border-border text-foreground" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[#e8e9ed] text-sm">{t.competitor.keyFeatures}</Label>
-                                    <Input value={keyFeatures} onChange={(e) => setKeyFeatures(e.target.value)} placeholder={language === 'fr' ? 'Séparées par des virgules' : 'Comma separated'} className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]" />
+                                    <Label className="text-foreground text-sm">{t.competitor.keyFeatures}</Label>
+                                    <Input value={keyFeatures} onChange={(e) => setKeyFeatures(e.target.value)} placeholder={language === 'fr' ? 'Séparées par des virgules' : 'Comma separated'} className="bg-card border-border text-foreground" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[#e8e9ed] text-sm">{t.competitor.differentiators}</Label>
-                                    <Input value={differentiators} onChange={(e) => setDifferentiators(e.target.value)} placeholder={language === 'fr' ? 'Séparés par des virgules' : 'Comma separated'} className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]" />
+                                    <Label className="text-foreground text-sm">{t.competitor.differentiators}</Label>
+                                    <Input value={differentiators} onChange={(e) => setDifferentiators(e.target.value)} placeholder={language === 'fr' ? 'Séparés par des virgules' : 'Comma separated'} className="bg-card border-border text-foreground" />
                                 </div>
                             </div>
                         )}
@@ -404,12 +404,12 @@ export function CompetitorDialog({
 
                     {/* Radar Scores */}
                     <div className="space-y-3 pt-2">
-                        <Label className="text-[#e8e9ed] text-sm font-semibold">
+                        <Label className="text-foreground text-sm font-semibold">
                             {language === 'fr' ? 'Scores Radar (1-10)' : 'Radar Scores (1-10)'}
                         </Label>
                         {radarAxesKeys.map((axis) => (
                             <div key={axis} className="flex items-center gap-3">
-                                <span className="text-[#8b8fa3] text-sm w-24 shrink-0">{t.radarAxes[axis]}</span>
+                                <span className="text-muted-foreground text-sm w-24 shrink-0">{t.radarAxes[axis]}</span>
                                 <Slider
                                     min={1}
                                     max={10}
@@ -420,7 +420,7 @@ export function CompetitorDialog({
                                     }
                                     className="flex-1"
                                 />
-                                <span className="text-[#e8e9ed] text-sm w-6 text-right font-mono">
+                                <span className="text-foreground text-sm w-6 text-right font-mono">
                                     {radarScores[axis]}
                                 </span>
                             </div>
@@ -429,13 +429,13 @@ export function CompetitorDialog({
                 </div>
 
                 <DialogFooter>
-                    <Button variant="ghost" onClick={() => onOpenChange(false)} className="text-[#8b8fa3]">
+                    <Button variant="ghost" onClick={() => onOpenChange(false)} className="text-muted-foreground">
                         {language === 'fr' ? 'Annuler' : 'Cancel'}
                     </Button>
                     <Button
                         onClick={handleSubmit}
                         disabled={!name.trim()}
-                        className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white"
+                        className="bg-primary hover:bg-primary/90 text-foreground"
                     >
                         {competitorToEdit
                             ? (language === 'fr' ? 'Enregistrer' : 'Save')

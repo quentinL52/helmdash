@@ -116,7 +116,7 @@ export function HealthScoreGauge({ score, size = 120, label }: HealthScoreGaugeP
 
             {label && (
                 <span
-                    className="text-[#8b8fa3] text-center leading-tight"
+                    className="text-muted-foreground text-center leading-tight"
                     style={{ fontSize: `${Math.max(labelFontSize, 11)}px` }}
                 >
                     {label}

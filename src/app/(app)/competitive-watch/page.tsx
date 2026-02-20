@@ -32,12 +32,12 @@ export default function CompetitiveWatchPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-[#e8e9ed]">{t.title}</h1>
-                    <p className="text-[#8b8fa3]">{t.subtitle}</p>
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">{t.title}</h1>
+                    <p className="text-muted-foreground">{t.subtitle}</p>
                 </div>
                 <button
                     onClick={() => setShowMySolutionForm(!showMySolutionForm)}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white rounded-lg transition-colors font-medium text-sm"
+                    className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-foreground rounded-lg transition-colors font-medium text-sm"
                 >
                     <LayoutDashboard className="h-4 w-4" />
                     {language === 'fr' ? 'Ma Solution' : 'My Solution'}
@@ -57,24 +57,24 @@ export default function CompetitiveWatchPage() {
             )}
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-                <TabsList className="grid w-full max-w-[600px] grid-cols-3 bg-[#181a24] text-[#8b8fa3] mb-6">
+                <TabsList className="grid w-full max-w-[600px] grid-cols-3 bg-card text-muted-foreground mb-6">
                     <TabsTrigger
                         value="dashboard"
-                        className="data-[state=active]:bg-[#6c5ce7] data-[state=active]:text-white"
+                        className="data-[state=active]:bg-primary data-[state=active]:text-foreground"
                     >
                         <LayoutDashboard className="mr-1.5 h-4 w-4" />
                         {t.tabs.dashboard}
                     </TabsTrigger>
                     <TabsTrigger
                         value="analysis"
-                        className="data-[state=active]:bg-[#6c5ce7] data-[state=active]:text-white"
+                        className="data-[state=active]:bg-primary data-[state=active]:text-foreground"
                     >
                         <BarChart3 className="mr-1.5 h-4 w-4" />
                         {t.tabs.analysis}
                     </TabsTrigger>
                     <TabsTrigger
                         value="actions"
-                        className="data-[state=active]:bg-[#6c5ce7] data-[state=active]:text-white"
+                        className="data-[state=active]:bg-primary data-[state=active]:text-foreground"
                     >
                         <Zap className="mr-1.5 h-4 w-4" />
                         {t.tabs.actions}

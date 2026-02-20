@@ -214,32 +214,32 @@ export function AiInsightsTab() {
     return (
         <div className="space-y-8">
             {/* Intelligence Engine - Primary CTA */}
-            <Card className="bg-gradient-to-r from-[#6c5ce7]/10 to-[#a29bfe]/10 border-[#6c5ce7]/30">
+            <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-primary/30">
                 <CardContent className="p-6">
                     <div className="flex items-start justify-between gap-4">
                         <div className="space-y-2">
                             <div className="flex items-center gap-2">
-                                <Zap className="h-5 w-5 text-[#6c5ce7]" />
-                                <h3 className="text-lg font-semibold text-[#e8e9ed]">
+                                <Zap className="h-5 w-5 text-primary" />
+                                <h3 className="text-lg font-semibold text-foreground">
                                     {language === 'fr' ? 'Moteur d\'Intelligence Stratégique' : 'Strategic Intelligence Engine'}
                                 </h3>
                             </div>
-                            <p className="text-sm text-[#8b8fa3] max-w-xl">
+                            <p className="text-sm text-muted-foreground max-w-xl">
                                 {language === 'fr'
                                     ? 'Analyse complète cross-module : santé concurrentielle, gaps features, pricing, tendances marché, et recommandations actionnables.'
                                     : 'Comprehensive cross-module analysis: competitive health, feature gaps, pricing, market trends, and actionable recommendations.'}
                             </p>
                             {competitiveIntelligence?.lastAnalyzedAt && (
-                                <p className="text-xs text-[#8b8fa3]">
+                                <p className="text-xs text-muted-foreground">
                                     {language === 'fr' ? 'Dernière analyse' : 'Last analysis'}: {new Date(competitiveIntelligence.lastAnalyzedAt).toLocaleString(language)}
-                                    {' — '}Score: <span className="text-[#e8e9ed] font-medium">{competitiveIntelligence.healthScore}/100</span>
+                                    {' — '}Score: <span className="text-foreground font-medium">{competitiveIntelligence.healthScore}/100</span>
                                 </p>
                             )}
                         </div>
                         <Button
                             onClick={handleRunIntelligence}
                             disabled={!canAnalyze || isRunningIntelligence}
-                            className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white shrink-0 px-6"
+                            className="bg-primary hover:bg-primary/90 text-foreground shrink-0 px-6"
                         >
                             {isRunningIntelligence ? (
                                 <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {language === 'fr' ? 'Analyse...' : 'Analyzing...'}</>
@@ -265,51 +265,51 @@ export function AiInsightsTab() {
 
             {/* Trend Summary (from intelligence) */}
             {intelligenceResult?.trendSummary && (
-                <Card className="bg-[#181a24] border-[#282c3a]">
+                <Card className="bg-card border-border">
                     <CardHeader className="pb-2">
                         <div className="flex items-center gap-2">
-                            <Sparkles className="h-5 w-5 text-[#a29bfe]" />
-                            <CardTitle className="text-base text-[#e8e9ed]">
+                            <Sparkles className="h-5 w-5 text-accent-foreground" />
+                            <CardTitle className="text-base text-foreground">
                                 {language === 'fr' ? 'Tendances Marché' : 'Market Trends'}
                             </CardTitle>
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-sm text-[#dfe1e6] leading-relaxed">{intelligenceResult.trendSummary}</p>
+                        <p className="text-sm text-foreground leading-relaxed">{intelligenceResult.trendSummary}</p>
                     </CardContent>
                 </Card>
             )}
 
             {/* Competitor Updates from intelligence */}
             {intelligenceResult?.competitorUpdates?.length > 0 && (
-                <Card className="bg-[#181a24] border-[#282c3a]">
+                <Card className="bg-card border-border">
                     <CardHeader className="pb-2">
                         <div className="flex items-center gap-2">
-                            <Target className="h-5 w-5 text-[#00cec9]" />
-                            <CardTitle className="text-base text-[#e8e9ed]">
+                            <Target className="h-5 w-5 text-teal-400" />
+                            <CardTitle className="text-base text-foreground">
                                 {language === 'fr' ? 'Actualités Concurrents' : 'Competitor Updates'}
                             </CardTitle>
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
                         {intelligenceResult.competitorUpdates.map((update: any, i: number) => (
-                            <div key={i} className="rounded-lg bg-[#0f1117] border border-[#282c3a] p-3">
+                            <div key={i} className="rounded-lg bg-background border border-border p-3">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-sm font-medium text-[#e8e9ed]">{update.competitorName}</span>
+                                    <span className="text-sm font-medium text-foreground">{update.competitorName}</span>
                                     <Badge variant="outline" className={`text-xs ${update.suggestedMomentum === 'rising' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
                                         update.suggestedMomentum === 'declining' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
                                             'bg-gray-500/20 text-gray-400 border-gray-500/30'
                                         }`}>
                                         {t.momentum?.[update.suggestedMomentum] || update.suggestedMomentum}
                                     </Badge>
-                                    <span className="text-xs text-[#8b8fa3] ml-auto">
+                                    <span className="text-xs text-muted-foreground ml-auto">
                                         {t.threatLevel}: {update.suggestedThreatLevel}/100
                                     </span>
                                 </div>
                                 {update.recentNews?.map((news: any, j: number) => (
                                     <div key={j} className="ml-2 mb-1">
-                                        <p className="text-xs text-[#dfe1e6]">{news.title}</p>
-                                        <p className="text-xs text-[#8b8fa3]">{news.summary}</p>
+                                        <p className="text-xs text-foreground">{news.title}</p>
+                                        <p className="text-xs text-muted-foreground">{news.summary}</p>
                                     </div>
                                 ))}
                             </div>
@@ -318,14 +318,14 @@ export function AiInsightsTab() {
                 </Card>
             )}
 
-            <hr className="border-[#282c3a]" />
+            <hr className="border-border" />
 
             {/* Legacy: Strategic Analysis + Competitive Analysis Sections */}
-            <Card className="bg-[#181a24] border-[#282c3a] p-4">
-                <h3 className="text-[#e8e9ed] font-semibold mb-2">
+            <Card className="bg-card border-border p-4">
+                <h3 className="text-foreground font-semibold mb-2">
                     {language === 'fr' ? 'Analyse Stratégique Complète' : 'Full Strategic Analysis'}
                 </h3>
-                <p className="text-xs text-[#8b8fa3] mb-4">
+                <p className="text-xs text-muted-foreground mb-4">
                     {language === 'fr'
                         ? 'Générez un plan d\'action complet basé sur vos concurrents, votre Lean Canvas et votre Roadmap.'
                         : 'Generate a comprehensive action plan based on your competitors, Lean Canvas, and Roadmap.'}
@@ -333,7 +333,7 @@ export function AiInsightsTab() {
                 <Button
                     onClick={handleGenerateStrategy}
                     disabled={isAnalyzing}
-                    className="w-full bg-gradient-to-r from-[#6c5ce7] to-[#a29bfe] hover:opacity-90 text-white"
+                    className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 text-foreground"
                 >
                     {isAnalyzing ? (
                         <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {language === 'fr' ? 'Analyse...' : 'Analyzing...'}</>
@@ -344,120 +344,120 @@ export function AiInsightsTab() {
             </Card>
 
             {/* My Solution Section */}
-            <Card className="bg-[#181a24] border-[#282c3a]">
+            <Card className="bg-card border-border">
                 <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
-                        <Target className="h-5 w-5 text-[#6c5ce7]" />
-                        <CardTitle className="text-lg text-[#e8e9ed]">{t.mySolution.title}</CardTitle>
+                        <Target className="h-5 w-5 text-primary" />
+                        <CardTitle className="text-lg text-foreground">{t.mySolution.title}</CardTitle>
                     </div>
-                    <p className="text-sm text-[#8b8fa3]">{t.mySolution.subtitle}</p>
+                    <p className="text-sm text-muted-foreground">{t.mySolution.subtitle}</p>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed] text-sm">{t.competitor.name} *</Label>
+                            <Label className="text-foreground text-sm">{t.competitor.name} *</Label>
                             <Input
                                 value={mySolution.name}
                                 onChange={(e) => updateMySolution({ name: e.target.value })}
                                 placeholder={t.mySolution.namePlaceholder}
-                                className="bg-[#0f1117] border-[#282c3a] text-[#e8e9ed]"
+                                className="bg-background border-border text-foreground"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed] text-sm">{t.competitor.positioning}</Label>
+                            <Label className="text-foreground text-sm">{t.competitor.positioning}</Label>
                             <Input
                                 value={mySolution.positioning || ''}
                                 onChange={(e) => updateMySolution({ positioning: e.target.value })}
-                                className="bg-[#0f1117] border-[#282c3a] text-[#e8e9ed]"
+                                className="bg-background border-border text-foreground"
                             />
                         </div>
                     </div>
                     <div className="space-y-2">
-                        <Label className="text-[#e8e9ed] text-sm">{t.competitor.description}</Label>
+                        <Label className="text-foreground text-sm">{t.competitor.description}</Label>
                         <Textarea
                             value={mySolution.description || ''}
                             onChange={(e) => updateMySolution({ description: e.target.value })}
                             placeholder={t.mySolution.descriptionPlaceholder}
-                            className="bg-[#0f1117] border-[#282c3a] text-[#e8e9ed] min-h-[60px]"
+                            className="bg-background border-border text-foreground min-h-[60px]"
                         />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed] text-sm">{t.competitor.targetSegment}</Label>
+                            <Label className="text-foreground text-sm">{t.competitor.targetSegment}</Label>
                             <Input
                                 value={mySolution.targetSegment || ''}
                                 onChange={(e) => updateMySolution({ targetSegment: e.target.value })}
-                                className="bg-[#0f1117] border-[#282c3a] text-[#e8e9ed]"
+                                className="bg-background border-border text-foreground"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed] text-sm">{t.competitor.businessModel}</Label>
+                            <Label className="text-foreground text-sm">{t.competitor.businessModel}</Label>
                             <Input
                                 value={mySolution.businessModel || ''}
                                 onChange={(e) => updateMySolution({ businessModel: e.target.value })}
-                                className="bg-[#0f1117] border-[#282c3a] text-[#e8e9ed]"
+                                className="bg-background border-border text-foreground"
                             />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed] text-sm">{t.competitor.keyFeatures}</Label>
+                            <Label className="text-foreground text-sm">{t.competitor.keyFeatures}</Label>
                             <Input
                                 value={featuresInput}
                                 onChange={(e) => setFeaturesInput(e.target.value)}
                                 onBlur={handleSaveSolution}
                                 placeholder={language === 'fr' ? 'Séparées par des virgules' : 'Comma separated'}
-                                className="bg-[#0f1117] border-[#282c3a] text-[#e8e9ed]"
+                                className="bg-background border-border text-foreground"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed] text-sm">{t.competitor.differentiators}</Label>
+                            <Label className="text-foreground text-sm">{t.competitor.differentiators}</Label>
                             <Input
                                 value={diffInput}
                                 onChange={(e) => setDiffInput(e.target.value)}
                                 onBlur={handleSaveSolution}
                                 placeholder={language === 'fr' ? 'Séparés par des virgules' : 'Comma separated'}
-                                className="bg-[#0f1117] border-[#282c3a] text-[#e8e9ed]"
+                                className="bg-background border-border text-foreground"
                             />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed] text-sm">{t.competitor.pricingModel}</Label>
+                            <Label className="text-foreground text-sm">{t.competitor.pricingModel}</Label>
                             <Select
                                 value={mySolution.pricingModel || ''}
                                 onValueChange={(v) => updateMySolution({ pricingModel: v as PricingModelType })}
                             >
-                                <SelectTrigger className="bg-[#0f1117] border-[#282c3a] text-[#e8e9ed]">
+                                <SelectTrigger className="bg-background border-border text-foreground">
                                     <SelectValue placeholder="—" />
                                 </SelectTrigger>
-                                <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+                                <SelectContent className="bg-card border-border text-foreground">
                                     {(['free', 'freemium', 'subscription', 'usage', 'enterprise', 'other'] as PricingModelType[]).map(pm => (
-                                        <SelectItem key={pm} value={pm} className="hover:bg-[#282c3a]">{t.pricingModels[pm]}</SelectItem>
+                                        <SelectItem key={pm} value={pm} className="hover:bg-muted">{t.pricingModels[pm]}</SelectItem>
                                     ))}
                                 </SelectContent>
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed] text-sm">{t.competitor.pricingRange}</Label>
+                            <Label className="text-foreground text-sm">{t.competitor.pricingRange}</Label>
                             <Input
                                 value={mySolution.pricingRange || ''}
                                 onChange={(e) => updateMySolution({ pricingRange: e.target.value })}
                                 placeholder="$0 - $99/mo"
-                                className="bg-[#0f1117] border-[#282c3a] text-[#e8e9ed]"
+                                className="bg-background border-border text-foreground"
                             />
                         </div>
                     </div>
 
                     {/* Radar Scores */}
                     <div className="space-y-3 pt-2">
-                        <Label className="text-[#e8e9ed] text-sm font-semibold">
+                        <Label className="text-foreground text-sm font-semibold">
                             {language === 'fr' ? 'Scores Radar (1-10)' : 'Radar Scores (1-10)'}
                         </Label>
                         <div className="grid grid-cols-2 gap-x-6 gap-y-2">
                             {radarAxesKeys.map((axis) => (
                                 <div key={axis} className="flex items-center gap-3">
-                                    <span className="text-[#8b8fa3] text-sm w-24 shrink-0">{t.radarAxes[axis]}</span>
+                                    <span className="text-muted-foreground text-sm w-24 shrink-0">{t.radarAxes[axis]}</span>
                                     <Slider
                                         min={1} max={10} step={1}
                                         value={[mySolution.radarScores?.[axis] ?? 5]}
@@ -466,7 +466,7 @@ export function AiInsightsTab() {
                                         })}
                                         className="flex-1"
                                     />
-                                    <span className="text-[#e8e9ed] text-sm w-6 text-right font-mono">
+                                    <span className="text-foreground text-sm w-6 text-right font-mono">
                                         {mySolution.radarScores?.[axis] ?? 5}
                                     </span>
                                 </div>
@@ -481,7 +481,7 @@ export function AiInsightsTab() {
                 <Button
                     onClick={handleAnalyze}
                     disabled={!canAnalyze || isAnalyzing}
-                    className="bg-gradient-to-r from-[#6c5ce7] to-[#a29bfe] hover:from-[#5a4bd6] hover:to-[#8b7ff5] text-white shadow-lg shadow-[#6c5ce7]/25 px-6"
+                    className="bg-gradient-to-r from-primary to-accent hover:from-[#5a4bd6] hover:to-[#8b7ff5] text-foreground shadow-lg shadow-[#6c5ce7]/25 px-6"
                 >
                     {isAnalyzing ? (
                         <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> {t.aiInsights.analyzing}</>
@@ -507,31 +507,31 @@ export function AiInsightsTab() {
             {analysis && (
                 <div className="space-y-6">
                     {/* Executive Summary */}
-                    <Card className="bg-[#181a24] border-[#6c5ce7]/30">
+                    <Card className="bg-card border-primary/30">
                         <CardHeader className="pb-2">
                             <div className="flex items-center gap-2">
-                                <Sparkles className="h-5 w-5 text-[#6c5ce7]" />
-                                <CardTitle className="text-base text-[#e8e9ed]">{t.aiInsights.executiveSummary}</CardTitle>
+                                <Sparkles className="h-5 w-5 text-primary" />
+                                <CardTitle className="text-base text-foreground">{t.aiInsights.executiveSummary}</CardTitle>
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-[#dfe1e6] text-sm leading-relaxed">{analysis.executiveSummary}</p>
+                            <p className="text-foreground text-sm leading-relaxed">{analysis.executiveSummary}</p>
                         </CardContent>
                     </Card>
 
                     {/* Market Positioning */}
-                    <Card className="bg-[#181a24] border-[#282c3a]">
+                    <Card className="bg-card border-border">
                         <CardHeader className="pb-2">
                             <div className="flex items-center gap-2">
-                                <Target className="h-5 w-5 text-[#00cec9]" />
-                                <CardTitle className="text-base text-[#e8e9ed]">{t.aiInsights.marketPositioning}</CardTitle>
-                                <Badge className="ml-auto bg-[#6c5ce7]/20 text-[#a29bfe] border-[#6c5ce7]/30">
+                                <Target className="h-5 w-5 text-teal-400" />
+                                <CardTitle className="text-base text-foreground">{t.aiInsights.marketPositioning}</CardTitle>
+                                <Badge className="ml-auto bg-primary/20 text-accent-foreground border-primary/30">
                                     {t.aiInsights.quadrant}: {analysis.marketPositioning.quadrantSuggestion}
                                 </Badge>
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-[#dfe1e6] text-sm leading-relaxed">{analysis.marketPositioning.overview}</p>
+                            <p className="text-foreground text-sm leading-relaxed">{analysis.marketPositioning.overview}</p>
                         </CardContent>
                     </Card>
 
@@ -547,7 +547,7 @@ export function AiInsightsTab() {
                             <CardContent>
                                 <ul className="space-y-2">
                                     {analysis.competitiveAdvantages.map((a, i) => (
-                                        <li key={i} className="flex items-start gap-2 text-sm text-[#dfe1e6]">
+                                        <li key={i} className="flex items-start gap-2 text-sm text-foreground">
                                             <CheckCircle className="h-4 w-4 text-green-400 shrink-0 mt-0.5" />
                                             <span>{a}</span>
                                         </li>
@@ -565,7 +565,7 @@ export function AiInsightsTab() {
                             <CardContent>
                                 <ul className="space-y-2">
                                     {analysis.vulnerabilities.map((v, i) => (
-                                        <li key={i} className="flex items-start gap-2 text-sm text-[#dfe1e6]">
+                                        <li key={i} className="flex items-start gap-2 text-sm text-foreground">
                                             <XCircle className="h-4 w-4 text-red-400 shrink-0 mt-0.5" />
                                             <span>{v}</span>
                                         </li>
@@ -587,7 +587,7 @@ export function AiInsightsTab() {
                             <CardContent>
                                 <ul className="space-y-2">
                                     {analysis.opportunities.map((o, i) => (
-                                        <li key={i} className="flex items-start gap-2 text-sm text-[#dfe1e6]">
+                                        <li key={i} className="flex items-start gap-2 text-sm text-foreground">
                                             <CheckCircle className="h-4 w-4 text-blue-400 shrink-0 mt-0.5" />
                                             <span>{o}</span>
                                         </li>
@@ -605,7 +605,7 @@ export function AiInsightsTab() {
                             <CardContent>
                                 <ul className="space-y-2">
                                     {analysis.threats.map((th, i) => (
-                                        <li key={i} className="flex items-start gap-2 text-sm text-[#dfe1e6]">
+                                        <li key={i} className="flex items-start gap-2 text-sm text-foreground">
                                             <XCircle className="h-4 w-4 text-orange-400 shrink-0 mt-0.5" />
                                             <span>{th}</span>
                                         </li>
@@ -616,18 +616,18 @@ export function AiInsightsTab() {
                     </div>
 
                     {/* Head to Head */}
-                    <Card className="bg-[#181a24] border-[#282c3a]">
+                    <Card className="bg-card border-border">
                         <CardHeader className="pb-2">
                             <div className="flex items-center gap-2">
-                                <Swords className="h-5 w-5 text-[#fd79a8]" />
-                                <CardTitle className="text-base text-[#e8e9ed]">{t.aiInsights.headToHead}</CardTitle>
+                                <Swords className="h-5 w-5 text-destructive" />
+                                <CardTitle className="text-base text-foreground">{t.aiInsights.headToHead}</CardTitle>
                             </div>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {analysis.headToHead.map((h2h, i) => (
-                                <div key={i} className="rounded-lg bg-[#0f1117] border border-[#282c3a] p-4 space-y-3">
-                                    <h4 className="text-[#e8e9ed] font-semibold flex items-center gap-2">
-                                        <span className="w-2 h-2 rounded-full bg-[#6c5ce7]" />
+                                <div key={i} className="rounded-lg bg-background border border-border p-4 space-y-3">
+                                    <h4 className="text-foreground font-semibold flex items-center gap-2">
+                                        <span className="w-2 h-2 rounded-full bg-primary" />
                                         vs {h2h.competitorName}
                                     </h4>
                                     <div className="grid grid-cols-2 gap-4">
@@ -635,7 +635,7 @@ export function AiInsightsTab() {
                                             <p className="text-xs text-green-400 font-medium mb-1">{t.aiInsights.wins}</p>
                                             <ul className="space-y-1">
                                                 {h2h.winPoints.map((w, j) => (
-                                                    <li key={j} className="text-sm text-[#dfe1e6] flex items-start gap-1.5">
+                                                    <li key={j} className="text-sm text-foreground flex items-start gap-1.5">
                                                         <CheckCircle className="h-3.5 w-3.5 text-green-400 shrink-0 mt-0.5" />
                                                         {w}
                                                     </li>
@@ -646,7 +646,7 @@ export function AiInsightsTab() {
                                             <p className="text-xs text-red-400 font-medium mb-1">{t.aiInsights.losses}</p>
                                             <ul className="space-y-1">
                                                 {h2h.losePoints.map((l, j) => (
-                                                    <li key={j} className="text-sm text-[#dfe1e6] flex items-start gap-1.5">
+                                                    <li key={j} className="text-sm text-foreground flex items-start gap-1.5">
                                                         <XCircle className="h-3.5 w-3.5 text-red-400 shrink-0 mt-0.5" />
                                                         {l}
                                                     </li>
@@ -654,7 +654,7 @@ export function AiInsightsTab() {
                                             </ul>
                                         </div>
                                     </div>
-                                    <p className="text-sm text-[#a29bfe] italic border-l-2 border-[#6c5ce7]/40 pl-3">
+                                    <p className="text-sm text-accent-foreground italic border-l-2 border-primary/40 pl-3">
                                         {h2h.recommendation}
                                     </p>
                                 </div>
@@ -663,29 +663,29 @@ export function AiInsightsTab() {
                     </Card>
 
                     {/* Strategic Recommendations */}
-                    <Card className="bg-[#181a24] border-[#282c3a]">
+                    <Card className="bg-card border-border">
                         <CardHeader className="pb-2">
                             <div className="flex items-center gap-2">
-                                <Lightbulb className="h-5 w-5 text-[#fdcb6e]" />
-                                <CardTitle className="text-base text-[#e8e9ed]">{t.aiInsights.recommendations}</CardTitle>
+                                <Lightbulb className="h-5 w-5 text-yellow-400" />
+                                <CardTitle className="text-base text-foreground">{t.aiInsights.recommendations}</CardTitle>
                             </div>
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-3">
                                 {analysis.strategicRecommendations.map((rec, i) => (
-                                    <div key={i} className="rounded-lg bg-[#0f1117] border border-[#282c3a] p-4">
+                                    <div key={i} className="rounded-lg bg-background border border-border p-4">
                                         <div className="flex items-center justify-between mb-2">
-                                            <h4 className="text-[#e8e9ed] font-medium text-sm">{rec.title}</h4>
+                                            <h4 className="text-foreground font-medium text-sm">{rec.title}</h4>
                                             <div className="flex items-center gap-2">
                                                 <Badge variant="outline" className={`text-xs ${priorityColors[rec.priority]}`}>
                                                     {t.aiInsights.priority[rec.priority]}
                                                 </Badge>
-                                                <Badge variant="outline" className="text-xs bg-[#282c3a]/50 text-[#8b8fa3] border-[#282c3a]">
+                                                <Badge variant="outline" className="text-xs bg-muted/50 text-muted-foreground border-border">
                                                     {rec.timeline}
                                                 </Badge>
                                             </div>
                                         </div>
-                                        <p className="text-[#8b8fa3] text-sm">{rec.description}</p>
+                                        <p className="text-muted-foreground text-sm">{rec.description}</p>
                                     </div>
                                 ))}
                             </div>

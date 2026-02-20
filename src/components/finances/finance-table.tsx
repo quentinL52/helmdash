@@ -196,7 +196,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                 if (entry.isHeader) {
                                     return (
                                         <TableRow key={entry.id} className="bg-slate-900/80 hover:bg-slate-900/80 border-slate-700">
-                                            <TableCell colSpan={6} className="text-white font-bold py-3 pl-4">
+                                            <TableCell colSpan={6} className="text-foreground font-bold py-3 pl-4">
                                                 {entry.headerLabel}
                                             </TableCell>
                                         </TableRow>
@@ -224,7 +224,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="text-gray-400 hover:text-white hover:bg-slate-800"
+                                                    className="text-gray-400 hover:text-foreground hover:bg-slate-800"
                                                     onClick={() => setEditingEntry(entry)}
                                                 >
                                                     <Edit2 className="h-4 w-4" />
@@ -255,14 +255,14 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
             <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
                 <AlertDialogContent className="bg-slate-900 border-slate-800">
                     <AlertDialogHeader>
-                        <AlertDialogTitle className="text-white">{translations.en.common.error}</AlertDialogTitle> {/* Using common error/confirmation title would be better if added, sticking to EN for generic title or add 'Confirmation' key */}
+                        <AlertDialogTitle className="text-foreground">{translations.en.common.error}</AlertDialogTitle> {/* Using common error/confirmation title would be better if added, sticking to EN for generic title or add 'Confirmation' key */}
                         <AlertDialogDescription className="text-gray-300">
                             Cette action est irréversible.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel className="text-black bg-white hover:bg-gray-200">{common.cancel}</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className="bg-red-600 text-white hover:bg-red-700">
+                        <AlertDialogAction onClick={handleDelete} className="bg-red-600 text-foreground hover:bg-red-700">
                             {common.delete || "Delete"}
                         </AlertDialogAction>
                     </AlertDialogFooter>
@@ -271,9 +271,9 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
 
             {/* Edit Dialog */}
             <Dialog open={!!editingEntry} onOpenChange={(open) => !open && setEditingEntry(null)}>
-                <DialogContent className="bg-slate-900 border-slate-800 text-white sm:max-w-[425px]">
+                <DialogContent className="bg-slate-900 border-slate-800 text-foreground sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle className="text-white">Edit Entry</DialogTitle>
+                        <DialogTitle className="text-foreground">Edit Entry</DialogTitle>
                         <DialogDescription className="text-gray-300">
                             Make changes to your financial entry here.
                         </DialogDescription>
@@ -289,7 +289,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                     type="date"
                                     value={editingEntry.date}
                                     onChange={(e) => setEditingEntry({ ...editingEntry, date: e.target.value })}
-                                    className="col-span-3 bg-slate-800 border-slate-700 text-white"
+                                    className="col-span-3 bg-slate-800 border-slate-700 text-foreground"
                                 />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
@@ -300,7 +300,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                     id="label"
                                     value={editingEntry.label}
                                     onChange={(e) => setEditingEntry({ ...editingEntry, label: e.target.value })}
-                                    className="col-span-3 bg-slate-800 border-slate-700 text-white"
+                                    className="col-span-3 bg-slate-800 border-slate-700 text-foreground"
                                 />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
@@ -312,7 +312,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                     type="number"
                                     value={editingEntry.amount}
                                     onChange={(e) => setEditingEntry({ ...editingEntry, amount: parseFloat(e.target.value) || 0 })}
-                                    className="col-span-3 bg-slate-800 border-slate-700 text-white"
+                                    className="col-span-3 bg-slate-800 border-slate-700 text-foreground"
                                 />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
@@ -325,10 +325,10 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                         onValueChange={(val) => setEditingEntry({ ...editingEntry, category: val as ExpenseCategory })}
                                         disabled={editingEntry.type === 'revenue'}
                                     >
-                                        <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                                        <SelectTrigger className="bg-slate-800 border-slate-700 text-foreground">
                                             <SelectValue placeholder="Select category" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                                        <SelectContent className="bg-slate-800 border-slate-700 text-foreground">
                                             <SelectItem value="saas">SaaS</SelectItem>
                                             <SelectItem value="hosting">Hosting</SelectItem>
                                             <SelectItem value="marketing">Marketing</SelectItem>

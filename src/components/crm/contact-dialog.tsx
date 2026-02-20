@@ -90,11 +90,11 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[600px] bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+            <DialogContent className="sm:max-w-[600px] bg-card border-border text-foreground">
                 <DialogHeader>
-                    <DialogTitle>{contactToEdit ? 'Modifier le contact' : 'Ajouter un contact'}</DialogTitle>
-                    <DialogDescription className="text-[#8b8fa3]">
-                        {contactToEdit ? 'Mettre à jour les informations du contact.' : 'Ajouter une nouvelle personne à votre réseau.'}
+                    <DialogTitle>{contactToEdit ? 'Edit Contact' : 'Add New Contact'}</DialogTitle>
+                    <DialogDescription className="text-muted-foreground">
+                        {contactToEdit ? 'Update contact details and status.' : 'Add a new person to your network.'}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -108,7 +108,7 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 placeholder="Elon Musk"
-                                className="bg-[#13151f] border-[#282c3a] focus:border-[#6c5ce7]"
+                                className="bg-background border-border focus:border-primary"
                                 required
                             />
                         </div>
@@ -119,7 +119,7 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                                 value={formData.company}
                                 onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                                 placeholder="SpaceX"
-                                className="bg-[#13151f] border-[#282c3a] focus:border-[#6c5ce7]"
+                                className="bg-background border-border focus:border-primary"
                             />
                         </div>
                     </div>
@@ -133,7 +133,7 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                                 value={formData.role}
                                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                                 placeholder="CEO"
-                                className="bg-[#13151f] border-[#282c3a] focus:border-[#6c5ce7]"
+                                className="bg-background border-border focus:border-primary"
                             />
                         </div>
                         <div className="space-y-2">
@@ -142,10 +142,10 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                                 value={formData.status}
                                 onValueChange={(value: ContactStatus) => setFormData({ ...formData, status: value })}
                             >
-                                <SelectTrigger className="bg-[#13151f] border-[#282c3a]">
-                                    <SelectValue placeholder="Sélectionner un statut" />
+                                <SelectTrigger className="bg-background border-border">
+                                    <SelectValue placeholder="Select status" />
                                 </SelectTrigger>
-                                <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+                                <SelectContent className="bg-card border-border text-foreground">
                                     <SelectItem value="lead">Lead</SelectItem>
                                     <SelectItem value="contacted">Contacté</SelectItem>
                                     <SelectItem value="negotiation">Négociation</SelectItem>
@@ -167,7 +167,7 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 placeholder="contact@example.com"
-                                className="bg-[#13151f] border-[#282c3a] focus:border-[#6c5ce7]"
+                                className="bg-background border-border focus:border-primary"
                             />
                         </div>
                         <div className="space-y-2">
@@ -177,7 +177,7 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                                 value={formData.linkedin}
                                 onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })}
                                 placeholder="https://linkedin.com/in/..."
-                                className="bg-[#13151f] border-[#282c3a] focus:border-[#6c5ce7]"
+                                className="bg-background border-border focus:border-primary"
                             />
                         </div>
                     </div>
@@ -213,16 +213,16 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                             id="notes"
                             value={formData.notes}
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                            placeholder="Rencontré à TechCrunch Disrupt..."
-                            className="bg-[#13151f] border-[#282c3a] focus:border-[#6c5ce7] min-h-[80px]"
+                            placeholder="Met at TechCrunch Disrupt..."
+                            className="bg-background border-border focus:border-primary min-h-[100px]"
                         />
                     </div>
 
                     <DialogFooter>
-                        <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="hover:bg-[#282c3a] hover:text-white">
-                            Annuler
+                        <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="hover:bg-muted hover:text-foreground">
+                            Cancel
                         </Button>
-                        <Button type="submit" disabled={isLoading} className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white">
+                        <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-foreground">
                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             {contactToEdit ? 'Enregistrer' : 'Ajouter'}
                         </Button>

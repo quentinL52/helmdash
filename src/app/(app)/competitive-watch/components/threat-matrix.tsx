@@ -93,7 +93,7 @@ export function ThreatMatrix() {
 
     if (competitors.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center h-[400px] text-[#8b8fa3] space-y-2">
+            <div className="flex flex-col items-center justify-center h-[400px] text-muted-foreground space-y-2">
                 <Eye className="h-12 w-12 opacity-40" />
                 <p>{t.noCompetitors}</p>
             </div>
@@ -111,19 +111,19 @@ export function ThreatMatrix() {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-xl font-semibold text-[#e8e9ed]">
+                <h2 className="text-xl font-semibold text-foreground">
                     {t.threatMatrix?.title || (language === 'fr' ? 'Matrice de Menaces' : 'Threat Matrix')}
                 </h2>
-                <p className="text-[#8b8fa3] text-sm">
+                <p className="text-muted-foreground text-sm">
                     {t.threatMatrix?.subtitle || (language === 'fr'
                         ? 'Évaluez la probabilité et l\'impact de chaque concurrent.'
                         : 'Assess the probability and impact of each competitor.')}
                 </p>
             </div>
 
-            <Card className="bg-[#1e2029] border-[#2b2d36]">
+            <Card className="bg-card border-border">
                 <CardHeader className="pb-2">
-                    <CardTitle className="text-base text-[#e8e9ed] flex items-center gap-2">
+                    <CardTitle className="text-base text-foreground flex items-center gap-2">
                         <Target className="h-4 w-4 text-red-400" />
                         {language === 'fr' ? 'Probabilité vs Impact' : 'Probability vs Impact'}
                     </CardTitle>
@@ -178,18 +178,18 @@ export function ThreatMatrix() {
                                                 ? (language === 'fr' ? 'En baisse' : 'Declining')
                                                 : (language === 'fr' ? 'Stable' : 'Stable');
                                         return (
-                                            <div className="bg-[#1a1d2d] border border-[#2b2d36] rounded-lg p-3 text-sm space-y-1">
-                                                <p className="font-semibold text-[#e8e9ed] text-base">{data.name}</p>
-                                                <p className="text-[#8b8fa3]">
+                                            <div className="bg-card border border-border rounded-lg p-3 text-sm space-y-1">
+                                                <p className="font-semibold text-foreground text-base">{data.name}</p>
+                                                <p className="text-muted-foreground">
                                                     {language === 'fr' ? 'Probabilité' : 'Probability'}: {Math.round(data.x)}%
                                                 </p>
-                                                <p className="text-[#8b8fa3]">
+                                                <p className="text-muted-foreground">
                                                     Impact: {Math.round(data.y)}%
                                                 </p>
-                                                <p className="text-[#8b8fa3]">
+                                                <p className="text-muted-foreground">
                                                     {language === 'fr' ? 'Équipe' : 'Team'}: {data.teamSize}
                                                 </p>
-                                                <p className="text-[#8b8fa3]">
+                                                <p className="text-muted-foreground">
                                                     Funding: {data.fundingStage} ({data.fundingAmount})
                                                 </p>
                                                 <div className="flex items-center gap-1.5 pt-1">
@@ -197,7 +197,7 @@ export function ThreatMatrix() {
                                                         className="w-2.5 h-2.5 rounded-full"
                                                         style={{ backgroundColor: MOMENTUM_COLORS[data.momentum] || '#fdcb6e' }}
                                                     />
-                                                    <span className="text-xs text-[#8b8fa3]">{momentumLabel}</span>
+                                                    <span className="text-xs text-muted-foreground">{momentumLabel}</span>
                                                 </div>
                                             </div>
                                         );
@@ -216,7 +216,7 @@ export function ThreatMatrix() {
                         </ResponsiveContainer>
 
                         {/* Quadrant labels */}
-                        <div className="absolute top-6 left-8 text-xs text-[#8b8fa3]/50 pointer-events-none">
+                        <div className="absolute top-6 left-8 text-xs text-muted-foreground/50 pointer-events-none">
                             {quadrantLabels.topLeft}
                         </div>
                         <div className="absolute top-6 right-10 text-xs text-red-400/50 pointer-events-none">
@@ -225,7 +225,7 @@ export function ThreatMatrix() {
                         <div className="absolute bottom-10 left-8 text-xs text-green-400/50 pointer-events-none">
                             {quadrantLabels.bottomLeft}
                         </div>
-                        <div className="absolute bottom-10 right-10 text-xs text-[#8b8fa3]/50 pointer-events-none">
+                        <div className="absolute bottom-10 right-10 text-xs text-muted-foreground/50 pointer-events-none">
                             {quadrantLabels.bottomRight}
                         </div>
                     </div>
@@ -238,7 +238,7 @@ export function ThreatMatrix() {
                                     className="w-3 h-3 rounded-full"
                                     style={{ backgroundColor: color }}
                                 />
-                                <span className="text-xs text-[#8b8fa3]">
+                                <span className="text-xs text-muted-foreground">
                                     {momentum === 'rising'
                                         ? (language === 'fr' ? 'En hausse' : 'Rising')
                                         : momentum === 'declining'
@@ -248,7 +248,7 @@ export function ThreatMatrix() {
                             </div>
                         ))}
                         <div className="flex items-center gap-1.5 ml-4">
-                            <span className="text-xs text-[#8b8fa3]">
+                            <span className="text-xs text-muted-foreground">
                                 {language === 'fr' ? 'Taille bulle = équipe + funding' : 'Bubble size = team + funding'}
                             </span>
                         </div>
@@ -273,14 +273,14 @@ export function ThreatMatrix() {
                                             className="w-2 h-2 rounded-full"
                                             style={{ backgroundColor: MOMENTUM_COLORS[d.momentum] }}
                                         />
-                                        <span className="text-sm text-[#e8e9ed]">{d.name}</span>
+                                        <span className="text-sm text-foreground">{d.name}</span>
                                         <Badge className="ml-auto bg-red-500/20 text-red-400 border-red-500/30 text-xs">
                                             {Math.round(d.x)}%
                                         </Badge>
                                     </div>
                                 ))}
                             {chartData.filter((d) => d.x > 50 && d.y > 50).length === 0 && (
-                                <p className="text-xs text-[#8b8fa3]">
+                                <p className="text-xs text-muted-foreground">
                                     {language === 'fr' ? 'Aucun concurrent dans cette zone' : 'No competitors in this zone'}
                                 </p>
                             )}
@@ -303,11 +303,11 @@ export function ThreatMatrix() {
                                             className="w-2 h-2 rounded-full"
                                             style={{ backgroundColor: MOMENTUM_COLORS[d.momentum] }}
                                         />
-                                        <span className="text-sm text-[#e8e9ed]">{d.name}</span>
+                                        <span className="text-sm text-foreground">{d.name}</span>
                                     </div>
                                 ))}
                             {chartData.filter((d) => (d.x > 50 && d.y <= 50) || (d.x <= 50 && d.y > 50)).length === 0 && (
-                                <p className="text-xs text-[#8b8fa3]">
+                                <p className="text-xs text-muted-foreground">
                                     {language === 'fr' ? 'Aucun concurrent dans cette zone' : 'No competitors in this zone'}
                                 </p>
                             )}
@@ -330,11 +330,11 @@ export function ThreatMatrix() {
                                             className="w-2 h-2 rounded-full"
                                             style={{ backgroundColor: MOMENTUM_COLORS[d.momentum] }}
                                         />
-                                        <span className="text-sm text-[#e8e9ed]">{d.name}</span>
+                                        <span className="text-sm text-foreground">{d.name}</span>
                                     </div>
                                 ))}
                             {chartData.filter((d) => d.x <= 50 && d.y <= 50).length === 0 && (
-                                <p className="text-xs text-[#8b8fa3]">
+                                <p className="text-xs text-muted-foreground">
                                     {language === 'fr' ? 'Aucun concurrent dans cette zone' : 'No competitors in this zone'}
                                 </p>
                             )}

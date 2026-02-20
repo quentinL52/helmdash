@@ -247,7 +247,7 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
                             }
                         }}
                         disabled={isGenerating}
-                        className="border-[#6c5ce7]/30 text-[#a29bfe] hover:bg-[#6c5ce7]/10"
+                        className="border-primary/30 text-accent-foreground hover:bg-primary/10"
                     >
                         {isGenerating ? (
                             <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> {language === 'fr' ? 'Analyse en cours...' : 'Analyzing...'}</>

@@ -1,7 +1,8 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
@@ -18,10 +19,11 @@ import {
     Target,
     Megaphone,
     Users,
-    Languages
+    Languages,
+    LogOut
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useUser, useClerk } from '@clerk/nextjs';
+import { createClient } from '@/utils/supabase/client';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -31,15 +33,35 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOut } from 'lucide-react';
+import { ModeToggle } from '@/components/mode-toggle';
 
 export function TopNav() {
     const pathname = usePathname();
+    const router = useRouter();
     const language = useFounderStore(s => s.language);
     const setLanguage = useFounderStore(s => s.setLanguage);
-    const { user } = useUser();
-    const { signOut, openUserProfile } = useClerk();
+    const [user, setUser] = useState<any>(null);
+    const supabase = createClient();
     const t = translations[language].nav;
+
+    useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+        };
+        getUser();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    const handleSignOut = async () => {
+        await supabase.auth.signOut();
+        router.push('/auth');
+    };
 
     const navItems = [
         { href: '/dashboard', label: t.dashboard, icon: LayoutDashboard },
@@ -68,30 +90,30 @@ export function TopNav() {
                         <DropdownMenuTrigger asChild>
                             <Button variant="ghost" className="flex items-center gap-2 px-2 hover:bg-muted/50">
                                 <Avatar className="h-6 w-6">
-                                    <AvatarImage src={user?.imageUrl} />
-                                    <AvatarFallback className="bg-[#6c5ce7] text-white text-xs">
-                                        {user?.firstName?.charAt(0) || user?.username?.charAt(0) || "U"}
+                                    <AvatarImage src={user?.user_metadata?.avatar_url} />
+                                    <AvatarFallback className="bg-primary text-foreground text-xs">
+                                        {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || "U"}
                                     </AvatarFallback>
                                 </Avatar>
                                 <span className="text-sm font-semibold hidden md:block">
-                                    {user?.username || user?.firstName || "FoundersOS"}
+                                    {user?.user_metadata?.full_name || user?.email?.split('@')[0] || "FoundersOS"}
                                 </span>
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-56 bg-[#181a24] border-[#2a2d3d] text-white">
-                            <DropdownMenuLabel className="text-[#8b8fa3]">Mon compte</DropdownMenuLabel>
-                            <DropdownMenuSeparator className="bg-[#2a2d3d]" />
+                        <DropdownMenuContent align="start" className="w-56 bg-card border-border text-foreground">
+                            <DropdownMenuLabel className="text-muted-foreground">Mon compte</DropdownMenuLabel>
+                            <DropdownMenuSeparator className="bg-muted" />
                             <DropdownMenuItem
-                                className="cursor-pointer hover:bg-[#1f212e] focus:bg-[#1f212e]"
-                                onClick={() => openUserProfile()}
+                                className="cursor-pointer hover:bg-muted focus:bg-muted"
+                                onClick={() => router.push('/settings')}
                             >
                                 <Users className="mr-2 h-4 w-4" />
                                 <span>Gérer mon compte</span>
                             </DropdownMenuItem>
-                            <DropdownMenuSeparator className="bg-[#2a2d3d]" />
+                            <DropdownMenuSeparator className="bg-muted" />
                             <DropdownMenuItem
-                                className="cursor-pointer text-red-400 hover:text-red-300 hover:bg-[#1f212e] focus:bg-[#1f212e]"
-                                onClick={() => signOut({ redirectUrl: '/' })}
+                                className="cursor-pointer text-red-400 hover:text-red-300 hover:bg-muted focus:bg-muted"
+                                onClick={handleSignOut}
                             >
                                 <LogOut className="mr-2 h-4 w-4" />
                                 <span>Se déconnecter</span>
@@ -123,6 +145,7 @@ export function TopNav() {
             </div>
 
             <div className="flex items-center gap-2 ml-2">
+                <ModeToggle />
                 <Button
                     variant="ghost"
                     size="sm"

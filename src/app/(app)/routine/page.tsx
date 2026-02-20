@@ -212,7 +212,7 @@ export default function RoutinePage() {
       <div className="p-8 pb-0">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-[#e8e9ed]">{t.title}</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">{t.title}</h1>
             <p style={{ fontSize: "14px", color: COLORS.textMuted, marginTop: "4px" }}>
               {doneTasks}/{totalTasks} {t.completedText}
             </p>
@@ -225,7 +225,7 @@ export default function RoutinePage() {
                   {t.analyze}
                 </StyledButton>
               </DialogTrigger>
-              <DialogContent className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] max-w-2xl">
+              <DialogContent className="bg-card border-border text-foreground max-w-2xl">
                 <DialogHeader>
                   <DialogTitle>{t.coach.title}</DialogTitle>
                   <DialogDescription className="text-gray-400">
@@ -326,7 +326,7 @@ export default function RoutinePage() {
                   return (
                     <div
                       key={task.id}
-                      className="group/task relative p-3 rounded-xl border bg-[#181a24] border-[#282c3a] hover:border-[#3f445a] transition-all"
+                      className="group/task relative p-3 rounded-xl border bg-card border-border hover:border-border transition-all"
                       style={{
                         opacity: task.done ? 0.6 : 1,
                       }}
@@ -355,7 +355,7 @@ export default function RoutinePage() {
                         <div className="flex items-start gap-3">
                           <div
                             onClick={() => handleToggle(day.id, task.id)}
-                            className="mt-0.5 w-5 h-5 rounded-md border-2 border-[#282c3a] flex items-center justify-center cursor-pointer transition-colors"
+                            className="mt-0.5 w-5 h-5 rounded-md border-2 border-border flex items-center justify-center cursor-pointer transition-colors"
                             style={{
                               borderColor: task.done ? COLORS.success : COLORS.border,
                               backgroundColor: task.done ? COLORS.success : "transparent",
@@ -379,17 +379,17 @@ export default function RoutinePage() {
                             {task.text}
                           </span>
 
-                          <div className="absolute right-2 top-2 opacity-0 group-hover/task:opacity-100 flex gap-1 transition-opacity bg-[#181a24]/80 backdrop-blur-sm rounded-md p-1">
+                          <div className="absolute right-2 top-2 opacity-0 group-hover/task:opacity-100 flex gap-1 transition-opacity bg-card/80 backdrop-blur-sm rounded-md p-1">
                             <button
                               onClick={() => startEditing(day.id, task.id, task.text)}
-                              className="p-1 hover:text-white text-[#8b8fa3] transition-colors"
+                              className="p-1 hover:text-foreground text-muted-foreground transition-colors"
                               title={common.edit}
                             >
                               <Icons.Edit />
                             </button>
                             <button
                               onClick={() => handleRemoveTask(day.id, task.id)}
-                              className="p-1 hover:text-[#ff4d4f] text-[#8b8fa3] transition-colors"
+                              className="p-1 hover:text-destructive text-muted-foreground transition-colors"
                               title={common.delete}
                             >
                               <Icons.Trash />
@@ -403,7 +403,7 @@ export default function RoutinePage() {
 
                 {/* 3. Add Button Frame */}
                 {addingTo === day.id ? (
-                  <div className="p-3 rounded-xl border bg-[#181a24] border-[#282c3a]">
+                  <div className="p-3 rounded-xl border bg-card border-border">
                     <div style={{ display: "flex", gap: "6px" }}>
                       <Input
                         value={newTask}
@@ -421,7 +421,7 @@ export default function RoutinePage() {
                 ) : (
                   <button
                     onClick={() => { setAddingTo(day.id); setNewTask(""); }}
-                    className="w-full py-3 rounded-xl border-2 border-dashed border-[#282c3a] text-[#5c6078] hover:border-[#6c5ce7] hover:text-[#6c5ce7] hover:bg-[#6c5ce7]/5 transition-all flex items-center justify-center gap-2 text-sm font-medium"
+                    className="w-full py-3 rounded-xl border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition-all flex items-center justify-center gap-2 text-sm font-medium"
                   >
                     <span>+</span> {t.add}
                   </button>

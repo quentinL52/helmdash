@@ -204,14 +204,14 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
     return (
         <Card className="col-span-4 bg-slate-900 border-slate-800">
             <CardHeader>
-                <CardTitle className="flex justify-between items-center text-white">
+                <CardTitle className="flex justify-between items-center text-foreground">
                     <span>{t.chart.title}</span>
                     <div className="flex items-center gap-4">
                         <Select value={timeframe} onValueChange={(v) => setTimeframe(v as Timeframe)}>
-                            <SelectTrigger className="w-[120px] bg-slate-800 border-slate-700 text-white">
+                            <SelectTrigger className="w-[120px] bg-slate-800 border-slate-700 text-foreground">
                                 <SelectValue placeholder={t.chart.timeframe.month} />
                             </SelectTrigger>
-                            <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                            <SelectContent className="bg-slate-800 border-slate-700 text-foreground">
                                 <SelectItem value="week">{t.chart.timeframe.week}</SelectItem>
                                 <SelectItem value="month">{t.chart.timeframe.month}</SelectItem>
                                 <SelectItem value="quarter">{t.chart.timeframe.quarter}</SelectItem>

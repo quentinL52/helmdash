@@ -29,15 +29,15 @@ export function AnalysisTab() {
     return (
         <div className="space-y-4">
             {/* Sub-navigation */}
-            <div className="flex gap-1 p-1 bg-[#181a24] rounded-lg w-fit overflow-x-auto">
+            <div className="flex gap-1 p-1 bg-card rounded-lg w-fit overflow-x-auto">
                 {subTabs.map((tab) => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveSubTab(tab.id)}
                         className={`px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                             activeSubTab === tab.id
-                                ? 'bg-[#6c5ce7]/20 text-[#a29bfe]'
-                                : 'text-[#8b8fa3] hover:text-[#e8e9ed] hover:bg-[#1e2029]'
+                                ? 'bg-primary/20 text-accent-foreground'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-card'
                         }`}
                     >
                         {tab.label}

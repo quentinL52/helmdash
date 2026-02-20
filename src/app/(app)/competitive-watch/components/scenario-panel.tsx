@@ -182,19 +182,19 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
     const allScenarios = scenarioAnalyses;
 
     return (
-        <Card className="bg-[#181a24] border-[#282c3a]">
+        <Card className="bg-card border-border">
             <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <FlaskConical className="h-5 w-5 text-[#fd79a8]" />
-                        <CardTitle className="text-lg text-[#e8e9ed]">
+                        <FlaskConical className="h-5 w-5 text-destructive" />
+                        <CardTitle className="text-lg text-foreground">
                             {t.scenarios?.title || (language === 'fr' ? 'Scénarios "Et Si..."' : 'What-If Scenarios')}
                         </CardTitle>
                     </div>
                     <Button
                         size="sm"
                         onClick={() => { resetForm(); setDialogOpen(true); }}
-                        className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white"
+                        className="bg-primary hover:bg-primary/90 text-foreground"
                     >
                         <Plus className="h-4 w-4 mr-1" />
                         {language === 'fr' ? 'Nouveau' : 'New'}
@@ -205,8 +205,8 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
                 {/* AI Suggested Scenarios (if any, not yet saved) */}
                 {aiSuggestions.length > 0 && (
                     <div className="space-y-2">
-                        <p className="text-xs text-[#8b8fa3] flex items-center gap-1">
-                            <Sparkles className="h-3 w-3 text-[#6c5ce7]" />
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Sparkles className="h-3 w-3 text-primary" />
                             {language === 'fr' ? 'Suggestions AI' : 'AI Suggestions'}
                         </p>
                         {aiSuggestions
@@ -214,11 +214,11 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
                             .map((suggestion, i) => (
                                 <div
                                     key={`ai-${i}`}
-                                    className="rounded-lg bg-[#6c5ce7]/5 border border-[#6c5ce7]/20 border-dashed p-3"
+                                    className="rounded-lg bg-primary/5 border border-primary/20 border-dashed p-3"
                                 >
                                     <div className="flex items-start justify-between gap-3">
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm text-[#dfe1e6] mb-2">{suggestion.scenario}</p>
+                                            <p className="text-sm text-foreground mb-2">{suggestion.scenario}</p>
                                             <div className="flex items-center gap-2 flex-wrap">
                                                 <Badge variant="outline" className={`text-xs ${probabilityColors[suggestion.probability]}`}>
                                                     P: {suggestion.probability}
@@ -226,7 +226,7 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
                                                 <Badge variant="outline" className={`text-xs ${impactColors[suggestion.impact]}`}>
                                                     I: {suggestion.impact}
                                                 </Badge>
-                                                <span className="text-xs text-[#8b8fa3] flex items-center gap-1">
+                                                <span className="text-xs text-muted-foreground flex items-center gap-1">
                                                     <Clock className="h-3 w-3" />
                                                     {suggestion.timeline}
                                                 </span>
@@ -236,7 +236,7 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
                                             size="sm"
                                             variant="ghost"
                                             onClick={() => handleImportAiSuggestion(suggestion)}
-                                            className="shrink-0 text-[#6c5ce7] hover:text-[#a29bfe] hover:bg-[#6c5ce7]/10"
+                                            className="shrink-0 text-primary hover:text-accent-foreground hover:bg-primary/10"
                                         >
                                             <ArrowUpRight className="h-3.5 w-3.5 mr-1" />
                                             {language === 'fr' ? 'Importer' : 'Import'}
@@ -249,7 +249,7 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
 
                 {/* Saved Scenarios */}
                 {allScenarios.length === 0 && aiSuggestions.length === 0 && (
-                    <div className="text-center py-8 text-[#8b8fa3]">
+                    <div className="text-center py-8 text-muted-foreground">
                         <FlaskConical className="h-8 w-8 mx-auto mb-2 opacity-50" />
                         <p className="text-sm">
                             {language === 'fr'
@@ -260,12 +260,12 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
                 )}
 
                 {allScenarios.map((s) => (
-                    <div key={s.id} className="rounded-lg bg-[#0f1117] border border-[#282c3a] p-4 space-y-3">
+                    <div key={s.id} className="rounded-lg bg-background border border-border p-4 space-y-3">
                         <div className="flex items-start justify-between gap-3">
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <AlertTriangle className="h-4 w-4 text-[#fd79a8]" />
-                                    <span className="text-sm font-medium text-[#e8e9ed]">
+                                    <AlertTriangle className="h-4 w-4 text-destructive" />
+                                    <span className="text-sm font-medium text-foreground">
                                         {language === 'fr' ? 'Scénario' : 'Scenario'}
                                     </span>
                                     <Badge variant="outline" className={`text-xs ${probabilityColors[s.probability]}`}>
@@ -275,19 +275,19 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
                                         Impact: {s.impact}
                                     </Badge>
                                 </div>
-                                <p className="text-sm text-[#dfe1e6] mb-2">{s.scenario}</p>
+                                <p className="text-sm text-foreground mb-2">{s.scenario}</p>
 
                                 {s.yourResponse && (
-                                    <div className="border-l-2 border-[#6c5ce7]/40 pl-3 mb-2">
-                                        <p className="text-xs text-[#8b8fa3] mb-0.5">
+                                    <div className="border-l-2 border-primary/40 pl-3 mb-2">
+                                        <p className="text-xs text-muted-foreground mb-0.5">
                                             {language === 'fr' ? 'Réponse stratégique' : 'Strategic response'}
                                         </p>
-                                        <p className="text-sm text-[#a29bfe]">{s.yourResponse}</p>
+                                        <p className="text-sm text-accent-foreground">{s.yourResponse}</p>
                                     </div>
                                 )}
 
                                 {s.timeline && (
-                                    <div className="flex items-center gap-1 text-xs text-[#8b8fa3]">
+                                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
                                         <Clock className="h-3 w-3" />
                                         {s.timeline}
                                     </div>
@@ -297,7 +297,7 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => deleteScenarioAnalysis(s.id)}
-                                className="shrink-0 text-[#8b8fa3] hover:text-red-400 hover:bg-red-500/10"
+                                className="shrink-0 text-muted-foreground hover:text-red-400 hover:bg-red-500/10"
                             >
                                 <Trash2 className="h-4 w-4" />
                             </Button>
@@ -308,12 +308,12 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
 
             {/* Create Scenario Dialog */}
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed] sm:max-w-[550px] max-h-[85vh] overflow-y-auto">
+                <DialogContent className="bg-card border-border text-foreground sm:max-w-[550px] max-h-[85vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>
                             {language === 'fr' ? 'Nouveau Scénario "Et Si..."' : 'New "What-If" Scenario'}
                         </DialogTitle>
-                        <DialogDescription className="text-[#8b8fa3]">
+                        <DialogDescription className="text-muted-foreground">
                             {language === 'fr'
                                 ? 'Anticipez un mouvement du marché et préparez votre réponse.'
                                 : 'Anticipate a market move and prepare your response.'}
@@ -323,7 +323,7 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
                     <div className="space-y-4 py-4">
                         {/* Templates */}
                         <div className="space-y-2">
-                            <p className="text-sm text-[#8b8fa3]">
+                            <p className="text-sm text-muted-foreground">
                                 {language === 'fr' ? 'Templates prédéfinis :' : 'Predefined templates:'}
                             </p>
                             <div className="flex flex-wrap gap-2">
@@ -334,8 +334,8 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
                                         variant={selectedTemplate === tpl.id ? 'default' : 'outline'}
                                         onClick={() => handleTemplateSelect(tpl.id)}
                                         className={selectedTemplate === tpl.id
-                                            ? 'bg-[#6c5ce7] text-white'
-                                            : 'border-[#282c3a] text-[#8b8fa3] hover:text-[#e8e9ed] hover:bg-[#282c3a]'}
+                                            ? 'bg-primary text-foreground'
+                                            : 'border-border text-muted-foreground hover:text-foreground hover:bg-muted'}
                                     >
                                         {tpl.label}
                                     </Button>
@@ -345,7 +345,7 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
 
                         {/* Scenario text */}
                         <div className="space-y-2">
-                            <label className="text-sm text-[#e8e9ed]">
+                            <label className="text-sm text-foreground">
                                 {language === 'fr' ? 'Description du scénario' : 'Scenario description'}
                             </label>
                             <Textarea
@@ -354,47 +354,47 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
                                 placeholder={language === 'fr'
                                     ? 'Décrivez le scénario en détail...'
                                     : 'Describe the scenario in detail...'}
-                                className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] min-h-[80px]"
+                                className="bg-card border-border text-foreground min-h-[80px]"
                             />
                         </div>
 
                         {/* Probability + Impact */}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm text-[#e8e9ed]">
+                                <label className="text-sm text-foreground">
                                     {language === 'fr' ? 'Probabilité' : 'Probability'}
                                 </label>
                                 <Select value={probability} onValueChange={(v) => setProbability(v as ScenarioProbability)}>
-                                    <SelectTrigger className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]">
+                                    <SelectTrigger className="bg-card border-border text-foreground">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
-                                        <SelectItem value="low" className="hover:bg-[#282c3a]">
+                                    <SelectContent className="bg-card border-border text-foreground">
+                                        <SelectItem value="low" className="hover:bg-muted">
                                             {language === 'fr' ? 'Faible' : 'Low'}
                                         </SelectItem>
-                                        <SelectItem value="medium" className="hover:bg-[#282c3a]">
+                                        <SelectItem value="medium" className="hover:bg-muted">
                                             {language === 'fr' ? 'Moyen' : 'Medium'}
                                         </SelectItem>
-                                        <SelectItem value="high" className="hover:bg-[#282c3a]">
+                                        <SelectItem value="high" className="hover:bg-muted">
                                             {language === 'fr' ? 'Élevé' : 'High'}
                                         </SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm text-[#e8e9ed]">Impact</label>
+                                <label className="text-sm text-foreground">Impact</label>
                                 <Select value={impact} onValueChange={(v) => setImpact(v as ScenarioImpact)}>
-                                    <SelectTrigger className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]">
+                                    <SelectTrigger className="bg-card border-border text-foreground">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
-                                        <SelectItem value="low" className="hover:bg-[#282c3a]">
+                                    <SelectContent className="bg-card border-border text-foreground">
+                                        <SelectItem value="low" className="hover:bg-muted">
                                             {language === 'fr' ? 'Faible' : 'Low'}
                                         </SelectItem>
-                                        <SelectItem value="medium" className="hover:bg-[#282c3a]">
+                                        <SelectItem value="medium" className="hover:bg-muted">
                                             {language === 'fr' ? 'Moyen' : 'Medium'}
                                         </SelectItem>
-                                        <SelectItem value="high" className="hover:bg-[#282c3a]">
+                                        <SelectItem value="high" className="hover:bg-muted">
                                             {language === 'fr' ? 'Élevé' : 'High'}
                                         </SelectItem>
                                     </SelectContent>
@@ -404,7 +404,7 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
 
                         {/* Response */}
                         <div className="space-y-2">
-                            <label className="text-sm text-[#e8e9ed]">
+                            <label className="text-sm text-foreground">
                                 {language === 'fr' ? 'Votre réponse stratégique' : 'Your strategic response'}
                             </label>
                             <Textarea
@@ -413,38 +413,38 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
                                 placeholder={language === 'fr'
                                     ? 'Comment réagiriez-vous à ce scénario ?'
                                     : 'How would you respond to this scenario?'}
-                                className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] min-h-[60px]"
+                                className="bg-card border-border text-foreground min-h-[60px]"
                             />
                         </div>
 
                         {/* Timeline */}
                         <div className="space-y-2">
-                            <label className="text-sm text-[#e8e9ed]">
+                            <label className="text-sm text-foreground">
                                 {language === 'fr' ? 'Horizon temporel' : 'Timeline'}
                             </label>
                             <Select value={timeline} onValueChange={setTimeline}>
-                                <SelectTrigger className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]">
+                                <SelectTrigger className="bg-card border-border text-foreground">
                                     <SelectValue placeholder={language === 'fr' ? 'Sélectionner...' : 'Select...'} />
                                 </SelectTrigger>
-                                <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
-                                    <SelectItem value="0-1 month" className="hover:bg-[#282c3a]">0-1 {language === 'fr' ? 'mois' : 'month'}</SelectItem>
-                                    <SelectItem value="1-3 months" className="hover:bg-[#282c3a]">1-3 {language === 'fr' ? 'mois' : 'months'}</SelectItem>
-                                    <SelectItem value="3-6 months" className="hover:bg-[#282c3a]">3-6 {language === 'fr' ? 'mois' : 'months'}</SelectItem>
-                                    <SelectItem value="6-12 months" className="hover:bg-[#282c3a]">6-12 {language === 'fr' ? 'mois' : 'months'}</SelectItem>
-                                    <SelectItem value="12+ months" className="hover:bg-[#282c3a]">12+ {language === 'fr' ? 'mois' : 'months'}</SelectItem>
+                                <SelectContent className="bg-card border-border text-foreground">
+                                    <SelectItem value="0-1 month" className="hover:bg-muted">0-1 {language === 'fr' ? 'mois' : 'month'}</SelectItem>
+                                    <SelectItem value="1-3 months" className="hover:bg-muted">1-3 {language === 'fr' ? 'mois' : 'months'}</SelectItem>
+                                    <SelectItem value="3-6 months" className="hover:bg-muted">3-6 {language === 'fr' ? 'mois' : 'months'}</SelectItem>
+                                    <SelectItem value="6-12 months" className="hover:bg-muted">6-12 {language === 'fr' ? 'mois' : 'months'}</SelectItem>
+                                    <SelectItem value="12+ months" className="hover:bg-muted">12+ {language === 'fr' ? 'mois' : 'months'}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
                     </div>
 
                     <DialogFooter>
-                        <Button variant="ghost" onClick={() => setDialogOpen(false)} className="text-[#8b8fa3]">
+                        <Button variant="ghost" onClick={() => setDialogOpen(false)} className="text-muted-foreground">
                             {language === 'fr' ? 'Annuler' : 'Cancel'}
                         </Button>
                         <Button
                             onClick={handleSave}
                             disabled={!scenario.trim()}
-                            className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white"
+                            className="bg-primary hover:bg-primary/90 text-foreground"
                         >
                             {language === 'fr' ? 'Sauvegarder' : 'Save'}
                         </Button>

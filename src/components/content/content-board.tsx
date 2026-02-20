@@ -92,14 +92,14 @@ export function ContentBoard() {
         <div className="flex flex-col h-full font-sans">
             <div className="flex items-center justify-between mb-6 flex-shrink-0">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight text-[#e8e9ed]">Content Pipeline</h2>
-                    <p className="text-[#8b8fa3]">
+                    <h2 className="text-3xl font-bold tracking-tight text-foreground">Content Pipeline</h2>
+                    <p className="text-muted-foreground">
                         Manage your ideas, drafts, and publishing schedule.
                     </p>
                 </div>
                 <button
                     onClick={() => setShowForm(!showForm)}
-                    className="inline-flex items-center gap-[6px] border-none rounded-[8px] cursor-pointer font-medium transition-all duration-200 text-[13px] px-[16px] py-[8px] bg-[#6c5ce7] text-white hover:opacity-85"
+                    className="inline-flex items-center gap-[6px] border-none rounded-[8px] cursor-pointer font-medium transition-all duration-200 text-[13px] px-[16px] py-[8px] bg-primary text-foreground hover:opacity-85"
                 >
                     <Plus className="h-4 w-4" /> New Idea
                 </button>
@@ -154,13 +154,13 @@ export function ContentBoard() {
                     <div className="flex justify-end gap-2">
                         <button
                             onClick={() => setShowForm(false)}
-                            className="px-4 py-2 text-[13px] font-medium rounded-lg hover:bg-[#282c3a] text-[#8b8fa3] hover:text-[#e8e9ed] transition-colors"
+                            className="px-4 py-2 text-[13px] font-medium rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             onClick={handleCreate}
-                            className="px-4 py-2 text-[13px] font-medium rounded-lg bg-[#6c5ce7] text-white hover:bg-[#5b4cc4] transition-colors"
+                            className="px-4 py-2 text-[13px] font-medium rounded-lg bg-primary text-foreground hover:bg-primary/90 transition-colors"
                         >
                             Add Content
                         </button>
@@ -228,16 +228,16 @@ function ContentCard({ idea, onDelete, onStatusChange }: { idea: ContentIdea, on
             }}
         >
             <div className="flex justify-between items-start gap-2 mb-2">
-                <h4 className="font-medium text-[#e8e9ed] leading-snug text-[13px]">
+                <h4 className="font-medium text-foreground leading-snug text-[13px]">
                     {idea.title}
                 </h4>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className="h-6 w-6 flex items-center justify-center rounded hover:bg-[#282c3a] text-[#8b8fa3] hover:text-[#e8e9ed] opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button className="h-6 w-6 flex items-center justify-center rounded hover:bg-muted text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity">
                             <MoreHorizontal className="h-4 w-4" />
                         </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]">
+                    <DropdownMenuContent align="end" className="bg-card border-border text-foreground">
                         <DropdownMenuItem onClick={() => onStatusChange('idea')}>Move to Idea</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onStatusChange('draft')}>Move to Draft</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onStatusChange('scheduled')}>Move to Scheduled</DropdownMenuItem>
@@ -250,7 +250,7 @@ function ContentCard({ idea, onDelete, onStatusChange }: { idea: ContentIdea, on
             </div>
 
             {idea.description && (
-                <p className="text-[11px] text-[#8b8fa3] mb-3 line-clamp-2 leading-relaxed">
+                <p className="text-[11px] text-muted-foreground mb-3 line-clamp-2 leading-relaxed">
                     {idea.description}
                 </p>
             )}
@@ -268,14 +268,14 @@ function ContentCard({ idea, onDelete, onStatusChange }: { idea: ContentIdea, on
                 </span>
 
                 {idea.tags.map(tag => (
-                    <span key={tag} className="px-1.5 py-0.5 rounded text-[10px] bg-[#282c3a] text-[#8b8fa3]">
+                    <span key={tag} className="px-1.5 py-0.5 rounded text-[10px] bg-muted text-muted-foreground">
                         #{tag}
                     </span>
                 ))}
             </div>
 
             {idea.date && (
-                <div className="flex items-center gap-1.5 mt-3 pt-2 border-t border-[#282c3a] text-[10px] text-[#8b8fa3]">
+                <div className="flex items-center gap-1.5 mt-3 pt-2 border-t border-border text-[10px] text-muted-foreground">
                     <Calendar className="w-3 h-3" />
                     <span>{new Date(idea.date).toLocaleDateString()}</span>
                 </div>

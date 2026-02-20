@@ -142,17 +142,17 @@ export function PositioningMapTab() {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-xl font-semibold text-[#e8e9ed]">{t.title}</h2>
-                    <p className="text-[#8b8fa3] text-sm">{t.subtitle}</p>
+                    <h2 className="text-xl font-semibold text-foreground">{t.title}</h2>
+                    <p className="text-muted-foreground text-sm">{t.subtitle}</p>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                        <span className="text-xs text-[#8b8fa3] uppercase font-mono">{t.xAxis}</span>
+                        <span className="text-xs text-muted-foreground uppercase font-mono">{t.xAxis}</span>
                         <Select value={xAxis} onValueChange={(v) => setXAxis(v as AxisKey)}>
-                            <SelectTrigger className="w-[140px] bg-[#181a24] border-[#282c3a] text-[#e8e9ed] h-8 text-xs">
+                            <SelectTrigger className="w-[140px] bg-card border-border text-foreground h-8 text-xs">
                                 <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+                            <SelectContent className="bg-card border-border text-foreground">
                                 {axesKeys.map(k => (
                                     <SelectItem key={k} value={k} disabled={k === yAxis}>
                                         {t.axes[k]}
@@ -162,12 +162,12 @@ export function PositioningMapTab() {
                         </Select>
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="text-xs text-[#8b8fa3] uppercase font-mono">{t.yAxis}</span>
+                        <span className="text-xs text-muted-foreground uppercase font-mono">{t.yAxis}</span>
                         <Select value={yAxis} onValueChange={(v) => setYAxis(v as AxisKey)}>
-                            <SelectTrigger className="w-[140px] bg-[#181a24] border-[#282c3a] text-[#e8e9ed] h-8 text-xs">
+                            <SelectTrigger className="w-[140px] bg-card border-border text-foreground h-8 text-xs">
                                 <SelectValue />
                             </SelectTrigger>
-                            <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+                            <SelectContent className="bg-card border-border text-foreground">
                                 {axesKeys.map(k => (
                                     <SelectItem key={k} value={k} disabled={k === xAxis}>
                                         {t.axes[k]}
@@ -179,15 +179,15 @@ export function PositioningMapTab() {
                 </div>
             </div>
 
-            <Card className="bg-[#181a24] border-[#282c3a] overflow-hidden select-none">
+            <Card className="bg-card border-border overflow-hidden select-none">
                 <CardContent className="p-6">
-                    <div className="relative w-full pb-[60%] md:pb-[40%] bg-[#0f1117] rounded-lg border border-[#282c3a]">
+                    <div className="relative w-full pb-[60%] md:pb-[40%] bg-background rounded-lg border border-border">
                         <div className="absolute inset-0 p-8">
                             {/* Grid Labels */}
-                            <div className="absolute left-2 top-1/2 -translate-y-1/2 -rotate-90 text-xs text-[#6c5ce7] font-bold tracking-widest origin-center whitespace-nowrap">
+                            <div className="absolute left-2 top-1/2 -translate-y-1/2 -rotate-90 text-xs text-primary font-bold tracking-widest origin-center whitespace-nowrap">
                                 {t.axes[yAxis].toUpperCase()}
                             </div>
-                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-[#6c5ce7] font-bold tracking-widest whitespace-nowrap">
+                            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-primary font-bold tracking-widest whitespace-nowrap">
                                 {t.axes[xAxis].toUpperCase()}
                             </div>
 
@@ -255,7 +255,7 @@ export function PositioningMapTab() {
                         </div>
                     </div>
 
-                    <div className="mt-4 flex items-center justify-between text-xs text-[#8b8fa3]">
+                    <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
                         <div className="flex items-center gap-2">
                             <Move className="h-3 w-3" />
                             <span>
@@ -266,7 +266,7 @@ export function PositioningMapTab() {
                         </div>
                         <div className="flex gap-4">
                             <div className="flex items-center gap-1.5">
-                                <span className="w-2 h-2 rounded-full bg-[#6c5ce7] border border-white"></span>
+                                <span className="w-2 h-2 rounded-full bg-primary border border-white"></span>
                                 <span>{mySolution.name || t.mySolution}</span>
                             </div>
                             {competitors.map((c, i) => (

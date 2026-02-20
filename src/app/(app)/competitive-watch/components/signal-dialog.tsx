@@ -88,10 +88,10 @@ export function SignalDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed] sm:max-w-[550px] max-h-[85vh] overflow-y-auto">
+            <DialogContent className="bg-card border-border text-foreground sm:max-w-[550px] max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{t.signals.addSignal}</DialogTitle>
-                    <DialogDescription className="text-[#8b8fa3]">
+                    <DialogDescription className="text-muted-foreground">
                         {language === 'fr' ? 'Enregistrez un nouveau signal de marché.' : 'Record a new market signal.'}
                     </DialogDescription>
                 </DialogHeader>
@@ -99,40 +99,40 @@ export function SignalDialog({
                 <div className="space-y-4 py-4">
                     {/* Title */}
                     <div className="space-y-2">
-                        <Label className="text-[#e8e9ed]">
+                        <Label className="text-foreground">
                             {language === 'fr' ? 'Titre' : 'Title'} *
                         </Label>
                         <Input
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder={language === 'fr' ? 'Titre du signal' : 'Signal title'}
-                            className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]"
+                            className="bg-card border-border text-foreground"
                         />
                     </div>
 
                     {/* Date + Competitor */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed]">{t.signals.date}</Label>
+                            <Label className="text-foreground">{t.signals.date}</Label>
                             <Input
                                 type="date"
                                 value={date}
                                 onChange={(e) => setDate(e.target.value)}
-                                className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]"
+                                className="bg-card border-border text-foreground"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed]">
+                            <Label className="text-foreground">
                                 {language === 'fr' ? 'Concurrent lié' : 'Related Competitor'}
                             </Label>
                             <Select value={competitorId} onValueChange={setCompetitorId}>
-                                <SelectTrigger className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]">
+                                <SelectTrigger className="bg-card border-border text-foreground">
                                     <SelectValue placeholder="—" />
                                 </SelectTrigger>
-                                <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
-                                    <SelectItem value="none" className="hover:bg-[#282c3a]">—</SelectItem>
+                                <SelectContent className="bg-card border-border text-foreground">
+                                    <SelectItem value="none" className="hover:bg-muted">—</SelectItem>
                                     {competitors.map((c) => (
-                                        <SelectItem key={c.id} value={c.id} className="hover:bg-[#282c3a]">
+                                        <SelectItem key={c.id} value={c.id} className="hover:bg-muted">
                                             {c.name}
                                         </SelectItem>
                                     ))}
@@ -144,16 +144,16 @@ export function SignalDialog({
                     {/* Category + Urgency */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed]">
+                            <Label className="text-foreground">
                                 {language === 'fr' ? 'Catégorie' : 'Category'}
                             </Label>
                             <Select value={category} onValueChange={(v) => setCategory(v as MarketSignalCategory)}>
-                                <SelectTrigger className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]">
+                                <SelectTrigger className="bg-card border-border text-foreground">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+                                <SelectContent className="bg-card border-border text-foreground">
                                     {SIGNAL_CATEGORIES.map((cat) => (
-                                        <SelectItem key={cat} value={cat} className="hover:bg-[#282c3a]">
+                                        <SelectItem key={cat} value={cat} className="hover:bg-muted">
                                             {t.signals.categories?.[cat] || cat}
                                         </SelectItem>
                                     ))}
@@ -161,16 +161,16 @@ export function SignalDialog({
                             </Select>
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed]">
+                            <Label className="text-foreground">
                                 {language === 'fr' ? 'Urgence' : 'Urgency'}
                             </Label>
                             <Select value={urgency} onValueChange={(v) => setUrgency(v as MarketSignalUrgency)}>
-                                <SelectTrigger className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]">
+                                <SelectTrigger className="bg-card border-border text-foreground">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+                                <SelectContent className="bg-card border-border text-foreground">
                                     {URGENCY_LEVELS.map((u) => (
-                                        <SelectItem key={u} value={u} className="hover:bg-[#282c3a]">
+                                        <SelectItem key={u} value={u} className="hover:bg-muted">
                                             {t.signals.urgency?.[u] || u}
                                         </SelectItem>
                                     ))}
@@ -181,39 +181,39 @@ export function SignalDialog({
 
                     {/* Description */}
                     <div className="space-y-2">
-                        <Label className="text-[#e8e9ed]">{t.signals.description}</Label>
+                        <Label className="text-foreground">{t.signals.description}</Label>
                         <Textarea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] min-h-[80px]"
+                            className="bg-card border-border text-foreground min-h-[80px]"
                         />
                     </div>
 
                     {/* Source + Source URL */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed]">{t.signals.source}</Label>
+                            <Label className="text-foreground">{t.signals.source}</Label>
                             <Input
                                 value={source}
                                 onChange={(e) => setSource(e.target.value)}
                                 placeholder={language === 'fr' ? 'Ex: TechCrunch' : 'E.g. TechCrunch'}
-                                className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]"
+                                className="bg-card border-border text-foreground"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed]">URL</Label>
+                            <Label className="text-foreground">URL</Label>
                             <Input
                                 value={sourceUrl}
                                 onChange={(e) => setSourceUrl(e.target.value)}
                                 placeholder="https://..."
-                                className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]"
+                                className="bg-card border-border text-foreground"
                             />
                         </div>
                     </div>
 
                     {/* Impact */}
                     <div className="space-y-2">
-                        <Label className="text-[#e8e9ed]">Impact</Label>
+                        <Label className="text-foreground">Impact</Label>
                         <RadioGroup
                             value={impact}
                             onValueChange={(val) => setImpact(val as MarketSignalImpact)}
@@ -236,13 +236,13 @@ export function SignalDialog({
                 </div>
 
                 <DialogFooter>
-                    <Button variant="ghost" onClick={() => onOpenChange(false)} className="text-[#8b8fa3]">
+                    <Button variant="ghost" onClick={() => onOpenChange(false)} className="text-muted-foreground">
                         {language === 'fr' ? 'Annuler' : 'Cancel'}
                     </Button>
                     <Button
                         onClick={handleSubmit}
                         disabled={!title.trim()}
-                        className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white"
+                        className="bg-primary hover:bg-primary/90 text-foreground"
                     >
                         {t.signals.addSignal}
                     </Button>

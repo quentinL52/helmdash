@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
@@ -25,13 +25,14 @@ import {
     Radar,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useClerk } from '@clerk/nextjs';
+import { createClient } from '@/utils/supabase/client';
 
 export function AppSidebar() {
     const pathname = usePathname();
+    const router = useRouter();
     const language = useFounderStore(s => s.language);
     const setLanguage = useFounderStore(s => s.setLanguage);
-    const { signOut, openUserProfile } = useClerk();
+    const supabase = createClient();
     const t = translations[language].nav;
     const common = translations[language].common;
 
@@ -74,6 +75,11 @@ export function AppSidebar() {
         setLanguage(language === 'fr' ? 'en' : 'fr');
     };
 
+    const handleSignOut = async () => {
+        await supabase.auth.signOut();
+        router.push('/auth');
+    };
+
     return (
         <>
             {/* Zone de détection invisible côté gauche */}
@@ -86,7 +92,7 @@ export function AppSidebar() {
             {/* Overlay sombre quand sidebar visible */}
             {isVisible && (
                 <div
-                    className="fixed inset-0 bg-black/20 z-[59] transition-opacity duration-200"
+                    className="fixed inset-0 bg-black/50 z-[59] transition-opacity duration-200"
                     onClick={() => setIsVisible(false)}
                 />
             )}
@@ -96,7 +102,7 @@ export function AppSidebar() {
                 ref={sidebarRef}
                 className={cn(
                     "fixed left-0 top-0 h-full w-[240px] z-[61] flex flex-col",
-                    "bg-[#181a24] border-r border-[#282c3a]",
+                    "bg-card border-r border-border shadow-sm",
                     "transition-transform duration-200 ease-out",
                     isVisible ? "translate-x-0" : "-translate-x-full"
                 )}
@@ -104,7 +110,7 @@ export function AppSidebar() {
                 onMouseLeave={hideSidebar}
             >
                 {/* Logo */}
-                <div className="p-4 border-b border-[#282c3a]">
+                <div className="p-4 border-b border-border">
                     <div className="flex items-center gap-3 px-2">
                         <div className="relative w-8 h-8 shrink-0">
                             <Image
@@ -114,7 +120,7 @@ export function AppSidebar() {
                                 className="object-contain"
                             />
                         </div>
-                        <span className="text-base font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+                        <span className="text-base font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-muted-foreground">
                             FounderOS
                         </span>
                     </div>
@@ -122,7 +128,7 @@ export function AppSidebar() {
 
                 {/* Navigation */}
                 <nav className="flex-1 overflow-y-auto py-3 px-2">
-                    <div className="flex flex-col gap-0.5">
+                    <div className="flex flex-col gap-1">
                         {navItems.map((item) => {
                             const isActive = pathname.startsWith(item.href);
                             return (
@@ -131,10 +137,10 @@ export function AppSidebar() {
                                     href={item.href}
                                     onClick={() => setIsVisible(false)}
                                     className={cn(
-                                        "flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150",
+                                        "flex items-center gap-3 px-3 py-2 rounded-md text-[13px] font-medium transition-colors duration-150",
                                         isActive
-                                            ? "bg-[#6c5ce7]/15 text-[#6c5ce7]"
-                                            : "text-[#8b8fa3] hover:bg-[#1f212e] hover:text-[#e8e9ed]"
+                                            ? "bg-primary/10 text-primary"
+                                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                                     )}
                                 >
                                     <item.icon className="w-4 h-4 shrink-0" />
@@ -146,24 +152,24 @@ export function AppSidebar() {
                 </nav>
 
                 {/* Footer: Language + Account + Sign Out */}
-                <div className="p-3 border-t border-[#282c3a] flex flex-col gap-0.5">
+                <div className="p-3 border-t border-border flex flex-col gap-1">
                     <Button
                         variant="ghost"
                         onClick={toggleLanguage}
-                        className="w-full flex items-center gap-2 justify-start px-3 py-2 h-auto text-[#8b8fa3] hover:text-[#e8e9ed] hover:bg-[#1f212e]"
+                        className="w-full flex items-center gap-2 justify-start px-3 py-2 h-auto text-muted-foreground hover:text-accent-foreground hover:bg-accent"
                     >
                         <Languages className="w-4 h-4" />
                         <span className="text-sm font-medium">
                             {language === 'fr' ? 'Français' : 'English'}
                         </span>
-                        <span className="ml-auto text-[11px] bg-[#282c3a] px-2 py-0.5 rounded text-[#8b8fa3]">
+                        <span className="ml-auto text-[11px] bg-muted px-2 py-0.5 rounded text-muted-foreground">
                             {language.toUpperCase()}
                         </span>
                     </Button>
                     <Button
                         variant="ghost"
-                        onClick={() => openUserProfile()}
-                        className="w-full flex items-center gap-2 justify-start px-3 py-2 h-auto text-[#8b8fa3] hover:text-[#e8e9ed] hover:bg-[#1f212e]"
+                        onClick={() => router.push('/settings')}
+                        className="w-full flex items-center gap-2 justify-start px-3 py-2 h-auto text-muted-foreground hover:text-accent-foreground hover:bg-accent"
                     >
                         <Users className="w-4 h-4" />
                         <span className="text-sm font-medium">
@@ -172,8 +178,8 @@ export function AppSidebar() {
                     </Button>
                     <Button
                         variant="ghost"
-                        onClick={() => signOut({ redirectUrl: '/' })}
-                        className="w-full flex items-center gap-2 justify-start px-3 py-2 h-auto text-red-400 hover:text-red-300 hover:bg-[#1f212e]"
+                        onClick={handleSignOut}
+                        className="w-full flex items-center gap-2 justify-start px-3 py-2 h-auto text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                         <LogOut className="w-4 h-4" />
                         <span className="text-sm font-medium">

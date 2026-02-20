@@ -75,14 +75,14 @@ export default function CRMPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-[#e8e9ed]">{t.title || 'CRM Lite'}</h1>
-                    <p className="text-[#8b8fa3]">
+                    <h1 className="text-3xl font-bold tracking-tight text-foreground">{t.title || 'CRM Lite'}</h1>
+                    <p className="text-muted-foreground">
                         {t.subtitle || 'Gérez votre réseau et vos relations.'}
                     </p>
                 </div>
                 <Button
                     onClick={handleNew}
-                    className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white"
+                    className="bg-primary hover:bg-primary/90 text-foreground"
                 >
                     <Plus className="mr-2 h-4 w-4" /> {t.addContact || 'Ajouter un contact'}
                 </Button>
@@ -91,42 +91,42 @@ export default function CRMPage() {
             {/* Filters */}
             <div className="flex items-center gap-4">
                 <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8b8fa3]" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         placeholder={t.searchPlaceholder || "Rechercher un contact..."}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-9 bg-[#181a24] border-[#282c3a] text-[#e8e9ed] focus:ring-[#6c5ce7]"
+                        className="pl-9 bg-card border-border text-foreground focus:ring-primary"
                     />
                 </div>
             </div>
 
             {/* Table */}
-            <div className="rounded-xl border border-[#282c3a] bg-[#181a24]/50 overflow-hidden">
+            <div className="rounded-xl border border-border bg-card/50 overflow-hidden">
                 <Table>
-                    <TableHeader className="bg-[#181a24]">
-                        <TableRow className="border-[#282c3a] hover:bg-[#181a24]">
-                            <TableHead className="text-[#8b8fa3]">{t.columns?.name || 'Nom'}</TableHead>
-                            <TableHead className="text-[#8b8fa3]">{t.columns?.roleCompany || 'Rôle & Entreprise'}</TableHead>
-                            <TableHead className="text-[#8b8fa3]">{t.columns?.status || common.status}</TableHead>
-                            <TableHead className="text-[#8b8fa3]">{t.columns?.lastContact || 'Dernier contact'}</TableHead>
-                            <TableHead className="text-[#8b8fa3]">Contact prévu</TableHead>
-                            <TableHead className="text-right text-[#8b8fa3]">{t.columns?.actions || 'Actions'}</TableHead>
+                    <TableHeader className="bg-card">
+                        <TableRow className="border-border hover:bg-card">
+                            <TableHead className="text-muted-foreground">{t.columns?.name || 'Nom'}</TableHead>
+                            <TableHead className="text-muted-foreground">{t.columns?.roleCompany || 'Rôle & Entreprise'}</TableHead>
+                            <TableHead className="text-muted-foreground">{t.columns?.status || common.status}</TableHead>
+                            <TableHead className="text-muted-foreground">{t.columns?.lastContact || 'Dernier contact'}</TableHead>
+                            <TableHead className="text-muted-foreground">Contact prévu</TableHead>
+                            <TableHead className="text-right text-muted-foreground">{t.columns?.actions || 'Actions'}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {filteredContacts.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center text-[#8b8fa3]">
+                                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                                     {t.noContacts || 'Aucun contact trouvé.'}
                                 </TableCell>
                             </TableRow>
                         ) : (
                             filteredContacts.map((contact) => (
-                                <TableRow key={contact.id} className="border-[#282c3a] hover:bg-[#282c3a]/50 group">
+                                <TableRow key={contact.id} className="border-border hover:bg-muted/50 group">
 
                                     {/* Nom + icônes mail/linkedin dynamiques */}
-                                    <TableCell className="font-medium text-[#e8e9ed]">
+                                    <TableCell className="font-medium text-foreground">
                                         <div className="flex flex-col gap-1">
                                             <span>{contact.name}</span>
                                             {(contact.email || contact.linkedin) && (
@@ -137,7 +137,7 @@ export default function CRMPage() {
                                                             title={contact.email}
                                                             onClick={(e) => e.stopPropagation()}
                                                         >
-                                                            <Mail className="w-3.5 h-3.5 text-[#5c6078] hover:text-[#00cec9] transition-colors" />
+                                                            <Mail className="w-3.5 h-3.5 text-muted-foreground hover:text-cyan-400 transition-colors" />
                                                         </a>
                                                     )}
                                                     {contact.linkedin && (
@@ -148,7 +148,7 @@ export default function CRMPage() {
                                                             title="LinkedIn"
                                                             onClick={(e) => e.stopPropagation()}
                                                         >
-                                                            <Linkedin className="w-3.5 h-3.5 text-[#5c6078] hover:text-[#0077b5] transition-colors" />
+                                                            <Linkedin className="w-3.5 h-3.5 text-muted-foreground hover:text-blue-500 transition-colors" />
                                                         </a>
                                                     )}
                                                 </div>
@@ -157,22 +157,21 @@ export default function CRMPage() {
                                     </TableCell>
 
                                     {/* Rôle & Entreprise */}
-                                    <TableCell className="text-[#dfe1e6]">
+                                    <TableCell className="text-foreground">
                                         <div className="flex flex-col">
                                             <span>{contact.role || '-'}</span>
-                                            {contact.company && <span className="text-xs text-[#8b8fa3]">{contact.company}</span>}
+                                            {contact.company && <span className="text-xs text-muted-foreground">{contact.company}</span>}
                                         </div>
                                     </TableCell>
 
                                     {/* Statut */}
                                     <TableCell>
-                                        <Badge variant="outline" className={`capitalize font-medium border ${STATUS_COLORS[contact.status] || 'border-[#282c3a]'}`}>
+                                        <Badge variant="outline" className={`capitalize font-medium border ${STATUS_COLORS[contact.status] || 'border-border'}`}>
                                             {t.statuses?.[contact.status] || contact.status}
                                         </Badge>
                                     </TableCell>
-
                                     {/* Dernier contact */}
-                                    <TableCell className="text-[#8b8fa3] text-sm">
+                                    <TableCell className="text-muted-foreground text-sm">
                                         {new Date(contact.lastContactDate).toLocaleDateString(locale)}
                                     </TableCell>
 
@@ -190,10 +189,11 @@ export default function CRMPage() {
                                     {/* Actions */}
                                     <TableCell className="text-right">
                                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+
                                             <Button
                                                 size="icon"
                                                 variant="ghost"
-                                                className="h-8 w-8 text-[#8b8fa3] hover:text-[#6c5ce7]"
+                                                className="h-8 w-8 text-muted-foreground hover:text-primary"
                                                 onClick={() => handleGenerateFollowUp(contact)}
                                                 disabled={aiLoading}
                                                 title={t.generateFollowUp || "Générer un suivi IA"}
@@ -201,10 +201,10 @@ export default function CRMPage() {
                                                 <RefreshCw className={`h-4 w-4 ${aiLoading ? 'animate-spin' : ''}`} />
                                             </Button>
 
-                                                <Button
+                                            <Button
                                                 size="icon"
                                                 variant="ghost"
-                                                className="h-8 w-8 text-[#8b8fa3] hover:text-[#6c5ce7]"
+                                                className="h-8 w-8 text-muted-foreground hover:text-primary"
                                                 onClick={() => handleEdit(contact)}
                                                 title={common.edit}
                                             >
@@ -213,7 +213,7 @@ export default function CRMPage() {
                                             <Button
                                                 size="icon"
                                                 variant="ghost"
-                                                className="h-8 w-8 text-[#8b8fa3] hover:text-red-400"
+                                                className="h-8 w-8 text-muted-foreground hover:text-red-400"
                                                 onClick={() => deleteContact(contact.id)}
                                                 title={common.delete}
                                             >

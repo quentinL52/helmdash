@@ -1,26 +1,33 @@
-import { useEffect, useRef, useCallback } from 'react';
-import { useUser, useSession } from '@clerk/nextjs';
-import { createClerkSupabaseClient } from '@/lib/supabase';
+import { useEffect, useRef, useState } from 'react';
+import { createClient } from '@/utils/supabase/client';
 import { useFounderStore } from '@/store/founder-store';
 import { useToast } from '@/hooks/use-toast';
 
 /**
- * Synchronizes founder data between the Zustand store and Supabase.
- * Uses the native Clerk-Supabase integration (Third-Party Auth / JWKS).
- * @see https://clerk.com/docs/integrations/databases/supabase
+ * Synchronizes founder data between the Zustand store and Supabase native Auth.
  */
 export function useSupabaseSync() {
-    const { user } = useUser();
-    const { session } = useSession();
+    const [user, setUser] = useState<any>(null);
     const store = useFounderStore;
     const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const isLoadedRef = useRef(false);
     const { toast } = useToast();
+    const supabase = createClient();
 
-    // Stable reference for the Supabase client via session token
-    const getToken = useCallback(async () => {
-        return session?.getToken() ?? null;
-    }, [session]);
+    // Track Supabase Auth State
+    useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+        };
+        getUser();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     // 1. Load Data on Mount/Login
     useEffect(() => {
@@ -41,12 +48,7 @@ export function useSupabaseSync() {
         }
 
         async function loadData() {
-            if (!user || !session) return;
-
-            // If we just reset, we are loading.
-            // If we didn't reset, we might still be loading if it's a refresh.
-
-            const supabase = createClerkSupabaseClient(getToken);
+            if (!user) return;
 
             const { data, error } = await supabase
                 .from('founder_data')
@@ -95,15 +97,27 @@ export function useSupabaseSync() {
                 };
                 useFounderStore.getState().hydrate(stateToHydrate);
             }
+
+            // Fetch user plan tier
+            const { data: userData } = await supabase
+                .from('users')
+                .select('plan_tier')
+                .eq('id', user.id)
+                .single();
+
+            if (userData?.plan_tier) {
+                useFounderStore.getState().setPlanTier(userData.plan_tier as 'free' | 'starter' | 'growth' | 'scale');
+            }
+
             isLoadedRef.current = true;
         }
 
         loadData();
-    }, [user?.id, session]);
+    }, [user?.id]);
 
     // 2. Subscribe to store changes and save with debounce
     useEffect(() => {
-        if (!user || !session) return;
+        if (!user) return;
 
         const unsubscribe = store.subscribe(() => {
             if (!isLoadedRef.current) return;
@@ -139,8 +153,6 @@ export function useSupabaseSync() {
                     updated_at: now,
                 };
 
-                const supabase = createClerkSupabaseClient(getToken);
-
                 // Parallel save: Founder Data + User Profile
                 const saveFounderData = supabase
                     .from('founder_data')
@@ -150,9 +162,9 @@ export function useSupabaseSync() {
                     .from('users')
                     .upsert({
                         id: user.id,
-                        email: user.primaryEmailAddress?.emailAddress,
-                        full_name: user.fullName,
-                        avatar_url: user.imageUrl,
+                        email: user.email,
+                        full_name: user?.user_metadata?.full_name,
+                        avatar_url: user?.user_metadata?.avatar_url,
                         updated_at: now,
                     }, { onConflict: 'id' });
 
@@ -176,5 +188,5 @@ export function useSupabaseSync() {
                 clearTimeout(saveTimerRef.current);
             }
         };
-    }, [user?.id, session]);
+    }, [user?.id]);
 }

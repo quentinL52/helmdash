@@ -11,19 +11,19 @@ const loadState = (key: string, fallback: any) => {
   } catch { return fallback; }
 };
 const saveState = (key: string, val: any) => {
-  try { 
+  try {
     if (typeof window === 'undefined') return;
-    localStorage.setItem(key, JSON.stringify(val)); 
-  } catch {}
+    localStorage.setItem(key, JSON.stringify(val));
+  } catch { }
 };
 
 // --- ICONS (inline SVG) ---
 const Icons = {
   Plus: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
   ),
   Trash: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /></svg>
   ),
 };
 
@@ -147,12 +147,12 @@ export default function WhiteboardPage() {
 
   const removeIdea = (id: any) => save(ideas.filter((i: any) => i.id !== id));
 
-  const categories = ["all", ...new Set(ideas.map((i: any) => i.category))];
+  const categories: string[] = ["all", ...Array.from(new Set<string>(ideas.map((i: any) => i.category || "Général")))];
   const filtered = filter === "all" ? ideas : ideas.filter((i: any) => i.category === filter);
 
   return (
-    <div className="fade-in" style={{fontFamily: "'DM Sans', sans-serif", color: COLORS.text}}>
-       <style>{animationCSS}</style>
+    <div className="fade-in" style={{ fontFamily: "'DM Sans', sans-serif", color: COLORS.text }}>
+      <style>{animationCSS}</style>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
         <h2 style={{ fontSize: "20px", fontWeight: 700, fontFamily: "'DM Sans', sans-serif" }}>
           Tableau Blanc

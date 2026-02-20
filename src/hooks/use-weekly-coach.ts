@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useFounderStore } from '@/store/founder-store';
-import { generateWeeklyReport } from '@/ai/flows/weekly-coach-flow';
+
 import { toast } from '@/hooks/use-toast';
 
 export function useWeeklyCoach() {
@@ -38,35 +38,18 @@ export function useWeeklyCoach() {
 
         setIsGenerating(true);
         try {
-            // Gather Data
-            // Filter Journal Entries for the last 7 days
-            const oneWeekAgo = new Date(today);
-            oneWeekAgo.setDate(today.getDate() - 7);
-
-            const recentJournal = state.journalEntries.filter(entry => new Date(entry.date) >= oneWeekAgo);
-
-            // Calculate Routine Consistency (simple mock logic for now)
-            const routineConsistency = "Not tracked yet"; // Placeholder until routine history is robust
-
-            const input = {
-                mondayDate: dateString,
-                hypotheses: state.hypotheses.map(h => ({ hypothesis: h.statement, status: h.status })),
-                objectives: state.objectives.map(o => ({ title: o.title, progress: o.progress, status: o.progress >= 100 ? 'Completed' : 'In Progress' })),
-                journalEntries: recentJournal.map(j => ({ content: j.content, mood: j.mood, date: j.date, tags: j.tags })),
-                routineConsistency,
-                weeklyFocus: state.weeklyReport?.date === dateString ? undefined : "Focus on growth",
-                language: state.language,
-            };
-
-            const result = await generateWeeklyReport(input);
-
-            setWeeklyReport({
-                id: crypto.randomUUID(),
-                date: dateString,
-                content: result.report,
-                status: 'generated',
-                createdAt: new Date().toISOString(),
+            const response = await fetch('/api/ai/weekly-report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ dateString })
             });
+
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.error || 'Erreur lors de la génération');
+            }
+
+            setWeeklyReport(result.report);
 
             toast({
                 title: "Weekly Report Ready",

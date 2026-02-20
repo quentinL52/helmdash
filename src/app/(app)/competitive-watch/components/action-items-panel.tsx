@@ -117,12 +117,12 @@ export function ActionItemsPanel({
     if (totalActions === 0 && !pricingIntelligence) return null;
 
     return (
-        <Card className="bg-[#181a24] border-[#282c3a]">
+        <Card className="bg-card border-border">
             <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <ListChecks className="h-5 w-5 text-[#6c5ce7]" />
-                        <CardTitle className="text-lg text-[#e8e9ed]">{t.actionItems.title}</CardTitle>
+                        <ListChecks className="h-5 w-5 text-primary" />
+                        <CardTitle className="text-lg text-foreground">{t.actionItems.title}</CardTitle>
                     </div>
                     {totalActions > 0 && (
                         <div className="flex items-center gap-2 text-sm">
@@ -130,7 +130,7 @@ export function ActionItemsPanel({
                                 <CheckCircle2 className="h-3 w-3 mr-1" />
                                 {appliedCount} {t.actionItems.applied}
                             </Badge>
-                            <Badge variant="outline" className="bg-[#282c3a]/50 text-[#8b8fa3] border-[#282c3a]">
+                            <Badge variant="outline" className="bg-muted/50 text-muted-foreground border-border">
                                 <Clock className="h-3 w-3 mr-1" />
                                 {totalActions - appliedCount} {t.actionItems.pending}
                             </Badge>
@@ -141,18 +141,18 @@ export function ActionItemsPanel({
             <CardContent className="space-y-6">
                 {/* Pricing Intelligence */}
                 {pricingIntelligence && (
-                    <div className="rounded-lg bg-[#6c5ce7]/5 border border-[#6c5ce7]/20 p-4">
+                    <div className="rounded-lg bg-primary/5 border border-primary/20 p-4">
                         <div className="flex items-center gap-2 mb-2">
-                            <TrendingUp className="h-4 w-4 text-[#6c5ce7]" />
-                            <h4 className="text-sm font-semibold text-[#e8e9ed]">
+                            <TrendingUp className="h-4 w-4 text-primary" />
+                            <h4 className="text-sm font-semibold text-foreground">
                                 {language === 'fr' ? 'Intelligence Pricing' : 'Pricing Intelligence'}
                             </h4>
-                            <Badge variant="outline" className="ml-auto text-xs bg-[#6c5ce7]/10 text-[#a29bfe] border-[#6c5ce7]/30">
+                            <Badge variant="outline" className="ml-auto text-xs bg-primary/10 text-accent-foreground border-primary/30">
                                 {pricingIntelligence.yourPosition.replace('_', ' ')}
                             </Badge>
                         </div>
-                        <p className="text-sm text-[#dfe1e6] mb-1">{pricingIntelligence.recommendation}</p>
-                        <p className="text-xs text-[#8b8fa3]">
+                        <p className="text-sm text-foreground mb-1">{pricingIntelligence.recommendation}</p>
+                        <p className="text-xs text-muted-foreground">
                             {language === 'fr' ? 'Impact potentiel' : 'Potential impact'}: {pricingIntelligence.potentialRevenueImpact}
                         </p>
                     </div>
@@ -163,7 +163,7 @@ export function ActionItemsPanel({
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <Zap className="h-4 w-4 text-orange-400" />
-                            <h4 className="text-sm font-semibold text-[#e8e9ed]">
+                            <h4 className="text-sm font-semibold text-foreground">
                                 {language === 'fr' ? 'Gaps Features Prioritaires' : 'Priority Feature Gaps'}
                             </h4>
                         </div>
@@ -177,21 +177,21 @@ export function ActionItemsPanel({
                                         className={`rounded-lg border p-3 transition-colors ${
                                             isApplied
                                                 ? 'bg-green-500/5 border-green-500/20'
-                                                : 'bg-[#0f1117] border-[#282c3a]'
+                                                : 'bg-background border-border'
                                         }`}
                                     >
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <span className="text-sm font-medium text-[#e8e9ed]">{gap.feature}</span>
+                                                    <span className="text-sm font-medium text-foreground">{gap.feature}</span>
                                                     <Badge variant="outline" className={`text-xs ${impactColors[gap.businessImpact]}`}>
                                                         {gap.businessImpact}
                                                     </Badge>
-                                                    <span className="text-xs text-[#8b8fa3]">
+                                                    <span className="text-xs text-muted-foreground">
                                                         {gap.competitorsCoverage} {language === 'fr' ? 'concurrents' : 'competitors'}
                                                     </span>
                                                 </div>
-                                                <p className="text-xs text-[#8b8fa3]">{gap.recommendation}</p>
+                                                <p className="text-xs text-muted-foreground">{gap.recommendation}</p>
                                             </div>
                                             {!isApplied && gap.suggestedRoadmapItem && (
                                                 <Button
@@ -202,7 +202,7 @@ export function ActionItemsPanel({
                                                         gap.suggestedRoadmapItem!.priority,
                                                         key
                                                     )}
-                                                    className="shrink-0 text-[#6c5ce7] hover:text-[#a29bfe] hover:bg-[#6c5ce7]/10"
+                                                    className="shrink-0 text-primary hover:text-accent-foreground hover:bg-primary/10"
                                                 >
                                                     <Plus className="h-3.5 w-3.5 mr-1" />
                                                     Roadmap
@@ -223,8 +223,8 @@ export function ActionItemsPanel({
                 {roadmapRecs.length > 0 && (
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                            <Target className="h-4 w-4 text-[#00cec9]" />
-                            <h4 className="text-sm font-semibold text-[#e8e9ed]">
+                            <Target className="h-4 w-4 text-teal-400" />
+                            <h4 className="text-sm font-semibold text-foreground">
                                 {language === 'fr' ? 'Recommandations Roadmap' : 'Roadmap Recommendations'}
                             </h4>
                         </div>
@@ -238,25 +238,25 @@ export function ActionItemsPanel({
                                         className={`rounded-lg border p-3 transition-colors ${
                                             isApplied
                                                 ? 'bg-green-500/5 border-green-500/20'
-                                                : 'bg-[#0f1117] border-[#282c3a]'
+                                                : 'bg-background border-border'
                                         }`}
                                     >
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <span className="text-sm font-medium text-[#e8e9ed]">{rec.title}</span>
+                                                    <span className="text-sm font-medium text-foreground">{rec.title}</span>
                                                     <Badge variant="outline" className={`text-xs ${impactColors[rec.priority]}`}>
                                                         {rec.priority}
                                                     </Badge>
                                                 </div>
-                                                <p className="text-xs text-[#8b8fa3]">{rec.reasoning}</p>
+                                                <p className="text-xs text-muted-foreground">{rec.reasoning}</p>
                                             </div>
                                             {!isApplied ? (
                                                 <Button
                                                     size="sm"
                                                     variant="ghost"
                                                     onClick={() => handleAddToRoadmap(rec.title, rec.priority, key)}
-                                                    className="shrink-0 text-[#6c5ce7] hover:text-[#a29bfe] hover:bg-[#6c5ce7]/10"
+                                                    className="shrink-0 text-primary hover:text-accent-foreground hover:bg-primary/10"
                                                 >
                                                     <Plus className="h-3.5 w-3.5 mr-1" />
                                                     Roadmap
@@ -276,8 +276,8 @@ export function ActionItemsPanel({
                 {hypothesisRecs.length > 0 && (
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                            <Lightbulb className="h-4 w-4 text-[#fdcb6e]" />
-                            <h4 className="text-sm font-semibold text-[#e8e9ed]">
+                            <Lightbulb className="h-4 w-4 text-yellow-400" />
+                            <h4 className="text-sm font-semibold text-foreground">
                                 {language === 'fr' ? 'Hypothèses Suggérées' : 'Suggested Hypotheses'}
                             </h4>
                         </div>
@@ -291,25 +291,25 @@ export function ActionItemsPanel({
                                         className={`rounded-lg border p-3 transition-colors ${
                                             isApplied
                                                 ? 'bg-green-500/5 border-green-500/20'
-                                                : 'bg-[#0f1117] border-[#282c3a]'
+                                                : 'bg-background border-border'
                                         }`}
                                     >
                                         <div className="flex items-start justify-between gap-3">
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <span className="text-sm font-medium text-[#e8e9ed]">{hyp.statement}</span>
-                                                    <Badge variant="outline" className="text-xs bg-[#282c3a]/50 text-[#8b8fa3] border-[#282c3a]">
+                                                    <span className="text-sm font-medium text-foreground">{hyp.statement}</span>
+                                                    <Badge variant="outline" className="text-xs bg-muted/50 text-muted-foreground border-border">
                                                         {hyp.category}
                                                     </Badge>
                                                 </div>
-                                                <p className="text-xs text-[#8b8fa3]">{hyp.reasoning}</p>
+                                                <p className="text-xs text-muted-foreground">{hyp.reasoning}</p>
                                             </div>
                                             {!isApplied ? (
                                                 <Button
                                                     size="sm"
                                                     variant="ghost"
                                                     onClick={() => handleCreateHypothesis(hyp.statement, hyp.category, key)}
-                                                    className="shrink-0 text-[#fdcb6e] hover:text-[#ffeaa7] hover:bg-[#fdcb6e]/10"
+                                                    className="shrink-0 text-yellow-400 hover:text-yellow-200 hover:bg-yellow-400/10"
                                                 >
                                                     <Plus className="h-3.5 w-3.5 mr-1" />
                                                     {language === 'fr' ? 'Hypothèse' : 'Hypothesis'}
@@ -329,32 +329,32 @@ export function ActionItemsPanel({
                 {(routineRecs.length > 0 || canvasRecs.length > 0) && (
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                            <ArrowRight className="h-4 w-4 text-[#a29bfe]" />
-                            <h4 className="text-sm font-semibold text-[#e8e9ed]">
+                            <ArrowRight className="h-4 w-4 text-accent-foreground" />
+                            <h4 className="text-sm font-semibold text-foreground">
                                 {language === 'fr' ? 'Autres Recommandations' : 'Other Recommendations'}
                             </h4>
                         </div>
                         <div className="space-y-2">
                             {canvasRecs.map((rec, i) => (
-                                <div key={`canvas-${i}`} className="rounded-lg bg-[#0f1117] border border-[#282c3a] p-3">
+                                <div key={`canvas-${i}`} className="rounded-lg bg-background border border-border p-3">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <Badge variant="outline" className="text-xs bg-[#6c5ce7]/10 text-[#a29bfe] border-[#6c5ce7]/30">
+                                        <Badge variant="outline" className="text-xs bg-primary/10 text-accent-foreground border-primary/30">
                                             Lean Canvas
                                         </Badge>
-                                        <span className="text-xs text-[#8b8fa3]">{rec.section}</span>
+                                        <span className="text-xs text-muted-foreground">{rec.section}</span>
                                     </div>
-                                    <p className="text-sm text-[#dfe1e6]">{rec.suggestion}</p>
+                                    <p className="text-sm text-foreground">{rec.suggestion}</p>
                                 </div>
                             ))}
                             {routineRecs.map((rec, i) => (
-                                <div key={`routine-${i}`} className="rounded-lg bg-[#0f1117] border border-[#282c3a] p-3">
+                                <div key={`routine-${i}`} className="rounded-lg bg-background border border-border p-3">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <Badge variant="outline" className="text-xs bg-[#00cec9]/10 text-[#00cec9] border-[#00cec9]/30">
+                                        <Badge variant="outline" className="text-xs bg-teal-400/10 text-teal-400 border-teal-400/30">
                                             Routine
                                         </Badge>
                                     </div>
-                                    <p className="text-sm text-[#dfe1e6]">{rec.suggestion}</p>
-                                    <p className="text-xs text-[#8b8fa3] mt-1">{rec.reasoning}</p>
+                                    <p className="text-sm text-foreground">{rec.suggestion}</p>
+                                    <p className="text-xs text-muted-foreground mt-1">{rec.reasoning}</p>
                                 </div>
                             ))}
                         </div>

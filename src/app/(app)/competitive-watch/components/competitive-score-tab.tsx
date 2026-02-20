@@ -179,7 +179,7 @@ export function CompetitiveScoreTab() {
         if (index === 0) return <Trophy className="h-6 w-6 text-yellow-400" />;
         if (index === 1) return <Medal className="h-6 w-6 text-gray-300" />;
         if (index === 2) return <Award className="h-6 w-6 text-orange-400" />;
-        return <span className="text-[#8b8fa3] font-bold text-lg w-6 text-center">{index + 1}</span>;
+        return <span className="text-muted-foreground font-bold text-lg w-6 text-center">{index + 1}</span>;
     };
 
     const getMomentumIcon = (momentum: string | null) => {
@@ -198,23 +198,23 @@ export function CompetitiveScoreTab() {
         <TooltipProvider>
             <div className="space-y-6">
                 <div>
-                    <h2 className="text-xl font-semibold text-[#e8e9ed]">{t.title}</h2>
-                    <p className="text-[#8b8fa3] text-sm">{t.subtitle}</p>
+                    <h2 className="text-xl font-semibold text-foreground">{t.title}</h2>
+                    <p className="text-muted-foreground text-sm">{t.subtitle}</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Weights Configuration */}
                     <div className="space-y-4">
-                        <Card className="bg-[#181a24] border-[#282c3a]">
+                        <Card className="bg-card border-border">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-base text-[#e8e9ed]">{t.weights}</CardTitle>
+                                <CardTitle className="text-base text-foreground">{t.weights}</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {axesKeys.map((key) => (
                                     <div key={key} className="space-y-1">
                                         <div className="flex justify-between text-sm">
-                                            <span className="text-[#e8e9ed]">{t.axes[key]}</span>
-                                            <span className="text-[#8b8fa3] font-mono text-xs">{weights[key]}%</span>
+                                            <span className="text-foreground">{t.axes[key]}</span>
+                                            <span className="text-muted-foreground font-mono text-xs">{weights[key]}%</span>
                                         </div>
                                         <Slider
                                             value={[weights[key]]}
@@ -228,15 +228,15 @@ export function CompetitiveScoreTab() {
                         </Card>
 
                         {/* Factor Weights */}
-                        <Card className="bg-[#181a24] border-[#282c3a]">
+                        <Card className="bg-card border-border">
                             <CardHeader className="pb-2">
-                                <CardTitle className="text-base text-[#e8e9ed] flex items-center gap-1">
+                                <CardTitle className="text-base text-foreground flex items-center gap-1">
                                     {t.factors}
                                     <Tooltip>
                                         <TooltipTrigger>
-                                            <Info className="h-3.5 w-3.5 text-[#8b8fa3]" />
+                                            <Info className="h-3.5 w-3.5 text-muted-foreground" />
                                         </TooltipTrigger>
-                                        <TooltipContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed] max-w-[200px]">
+                                        <TooltipContent className="bg-card border-border text-foreground max-w-[200px]">
                                             {language === 'fr'
                                                 ? 'Ajustez l\'importance de chaque facteur dans le score final.'
                                                 : 'Adjust the importance of each factor in the final score.'}
@@ -246,15 +246,15 @@ export function CompetitiveScoreTab() {
                             </CardHeader>
                             <CardContent className="space-y-3">
                                 {([
-                                    { key: 'radar', label: t.radarWeight, color: 'text-[#6c5ce7]' },
-                                    { key: 'features', label: t.featuresWeight, color: 'text-[#00cec9]' },
-                                    { key: 'signals', label: t.signalsWeight, color: 'text-[#fd79a8]' },
-                                    { key: 'dataQuality', label: t.dataWeight, color: 'text-[#fdcb6e]' },
+                                    { key: 'radar', label: t.radarWeight, color: 'text-primary' },
+                                    { key: 'features', label: t.featuresWeight, color: 'text-teal-400' },
+                                    { key: 'signals', label: t.signalsWeight, color: 'text-destructive' },
+                                    { key: 'dataQuality', label: t.dataWeight, color: 'text-yellow-400' },
                                 ] as const).map(({ key, label, color }) => (
                                     <div key={key} className="space-y-1">
                                         <div className="flex justify-between text-sm">
                                             <span className={color}>{label}</span>
-                                            <span className="text-[#8b8fa3] font-mono text-xs">{factorWeights[key]}%</span>
+                                            <span className="text-muted-foreground font-mono text-xs">{factorWeights[key]}%</span>
                                         </div>
                                         <Slider
                                             value={[factorWeights[key]]}
@@ -269,9 +269,9 @@ export function CompetitiveScoreTab() {
                     </div>
 
                     {/* Ranking List */}
-                    <Card className="bg-[#181a24] border-[#282c3a] lg:col-span-2">
+                    <Card className="bg-card border-border lg:col-span-2">
                         <CardHeader>
-                            <CardTitle className="text-base text-[#e8e9ed]">{t.ranking}</CardTitle>
+                            <CardTitle className="text-base text-foreground">{t.ranking}</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {ranking.map((entity, index) => (
@@ -279,8 +279,8 @@ export function CompetitiveScoreTab() {
                                     <TooltipTrigger asChild>
                                         <div
                                             className={`flex items-center gap-4 p-4 rounded-lg border transition-all cursor-default ${entity.isMySolution
-                                                ? 'bg-[#6c5ce7]/10 border-[#6c5ce7]/50 shadow-[0_0_15px_rgba(108,92,231,0.15)]'
-                                                : 'bg-[#0f1117] border-[#282c3a] hover:border-[#3a3f52]'
+                                                ? 'bg-primary/10 border-primary/50 shadow-[0_0_15px_rgba(108,92,231,0.15)]'
+                                                : 'bg-background border-border hover:border-border'
                                             }`}
                                         >
                                             <div className="flex items-center justify-center min-w-[40px]">
@@ -289,10 +289,10 @@ export function CompetitiveScoreTab() {
 
                                             <div className="flex-1 space-y-2">
                                                 <div className="flex justify-between items-center">
-                                                    <h3 className={`font-semibold flex items-center gap-2 ${entity.isMySolution ? 'text-[#a29bfe]' : 'text-[#e8e9ed]'}`}>
+                                                    <h3 className={`font-semibold flex items-center gap-2 ${entity.isMySolution ? 'text-accent-foreground' : 'text-foreground'}`}>
                                                         {entity.name}
                                                         {entity.isMySolution && (
-                                                            <Badge className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white border-0 text-[10px]">
+                                                            <Badge className="bg-primary hover:bg-primary/90 text-foreground border-0 text-[10px]">
                                                                 YOU
                                                             </Badge>
                                                         )}
@@ -302,12 +302,12 @@ export function CompetitiveScoreTab() {
                                                         <span className={`text-2xl font-bold ${getScoreColor(entity.breakdown.total)}`}>
                                                             {entity.breakdown.total}
                                                         </span>
-                                                        <span className="text-xs text-[#8b8fa3]">/100</span>
+                                                        <span className="text-xs text-muted-foreground">/100</span>
                                                     </div>
                                                 </div>
 
                                                 {/* Score Bar */}
-                                                <div className="h-2 w-full bg-[#282c3a] rounded-full overflow-hidden">
+                                                <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                                                     <div
                                                         className="h-full rounded-full transition-all duration-500 ease-out"
                                                         style={{
@@ -327,10 +327,10 @@ export function CompetitiveScoreTab() {
                                                     ] as const).map(({ key, label, color }) => (
                                                         <div key={key}>
                                                             <div className="flex justify-between mb-0.5">
-                                                                <span className="text-[#8b8fa3] truncate">{label}</span>
-                                                                <span className="text-[#e8e9ed] font-mono">{entity.breakdown[key]}</span>
+                                                                <span className="text-muted-foreground truncate">{label}</span>
+                                                                <span className="text-foreground font-mono">{entity.breakdown[key]}</span>
                                                             </div>
-                                                            <div className="h-1 w-full bg-[#282c3a] rounded-full overflow-hidden">
+                                                            <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
                                                                 <div
                                                                     className="h-full rounded-full transition-all duration-300"
                                                                     style={{
@@ -347,27 +347,27 @@ export function CompetitiveScoreTab() {
                                     </TooltipTrigger>
                                     <TooltipContent
                                         side="right"
-                                        className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed] p-3 space-y-2 max-w-[250px]"
+                                        className="bg-card border-border text-foreground p-3 space-y-2 max-w-[250px]"
                                     >
                                         <p className="font-semibold text-sm">{entity.name}</p>
                                         <div className="space-y-1 text-xs">
                                             <div className="flex justify-between">
-                                                <span className="text-[#6c5ce7]">{t.breakdown.radar}</span>
+                                                <span className="text-primary">{t.breakdown.radar}</span>
                                                 <span className="font-mono">{entity.breakdown.radar}/100</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-[#00cec9]">{t.breakdown.features}</span>
+                                                <span className="text-teal-400">{t.breakdown.features}</span>
                                                 <span className="font-mono">{entity.breakdown.features}/100</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-[#fd79a8]">{t.breakdown.signals}</span>
+                                                <span className="text-destructive">{t.breakdown.signals}</span>
                                                 <span className="font-mono">{entity.breakdown.signals}/100</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-[#fdcb6e]">{t.breakdown.dataQuality}</span>
+                                                <span className="text-yellow-400">{t.breakdown.dataQuality}</span>
                                                 <span className="font-mono">{entity.breakdown.dataQuality}/100</span>
                                             </div>
-                                            <hr className="border-[#282c3a]" />
+                                            <hr className="border-border" />
                                             <div className="flex justify-between font-semibold">
                                                 <span>Total</span>
                                                 <span className={getScoreColor(entity.breakdown.total)}>{entity.breakdown.total}/100</span>

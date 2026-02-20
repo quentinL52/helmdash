@@ -96,15 +96,15 @@ export function CreateContentDialog({ trigger }: CreateContentDialogProps) {
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {trigger || (
-                    <Button className="bg-[#6c5ce7] hover:bg-[#5b4cc4] text-white">
+                    <Button className="bg-primary hover:bg-primary/90 text-foreground">
                         <Plus className="mr-2 h-4 w-4" /> Add Idea
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] border-[#282c3a] bg-[#0F1117] text-[#e8e9ed]">
+            <DialogContent className="sm:max-w-[500px] border-border bg-background text-foreground">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-semibold">New Content Idea</DialogTitle>
-                    <DialogDescription className="text-[#8b8fa3]">
+                    <DialogDescription className="text-muted-foreground">
                         Capture a new thought or content piece for your pipeline.
                     </DialogDescription>
                 </DialogHeader>
@@ -116,7 +116,7 @@ export function CreateContentDialog({ trigger }: CreateContentDialogProps) {
                             name="title"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-[#8b8fa3]">Title</FormLabel>
+                                    <FormLabel className="text-muted-foreground">Title</FormLabel>
                                     <FormControl>
                                         <Input
                                             placeholder="e.g. 5 Lessons from YC"
@@ -136,7 +136,7 @@ export function CreateContentDialog({ trigger }: CreateContentDialogProps) {
                                 name="platform"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-[#8b8fa3]">Platform</FormLabel>
+                                        <FormLabel className="text-muted-foreground">Platform</FormLabel>
                                         <Select
                                             onValueChange={field.onChange}
                                             defaultValue={field.value}
@@ -144,13 +144,13 @@ export function CreateContentDialog({ trigger }: CreateContentDialogProps) {
                                             <FormControl>
                                                 <SelectTrigger
                                                     style={inputStyle}
-                                                    className="focus:ring-[#6c5ce7]"
+                                                    className="focus:ring-primary"
                                                 >
                                                     <SelectValue placeholder="Select platform" />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent
-                                                className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]"
+                                                className="bg-card border-border text-foreground"
                                             >
                                                 <SelectItem value="linkedin">LinkedIn</SelectItem>
                                                 <SelectItem value="twitter">X (Twitter)</SelectItem>
@@ -170,7 +170,7 @@ export function CreateContentDialog({ trigger }: CreateContentDialogProps) {
                                 name="status"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel className="text-[#8b8fa3]">Status</FormLabel>
+                                        <FormLabel className="text-muted-foreground">Status</FormLabel>
                                         <Select
                                             onValueChange={field.onChange}
                                             defaultValue={field.value}
@@ -178,13 +178,13 @@ export function CreateContentDialog({ trigger }: CreateContentDialogProps) {
                                             <FormControl>
                                                 <SelectTrigger
                                                     style={inputStyle}
-                                                    className="focus:ring-[#6c5ce7]"
+                                                    className="focus:ring-primary"
                                                 >
                                                     <SelectValue placeholder="Select status" />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent
-                                                className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]"
+                                                className="bg-card border-border text-foreground"
                                             >
                                                 <SelectItem value="idea">Idea</SelectItem>
                                                 <SelectItem value="draft">Drafting</SelectItem>
@@ -203,7 +203,7 @@ export function CreateContentDialog({ trigger }: CreateContentDialogProps) {
                             name="description"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-[#8b8fa3]">Description / Rough Draft</FormLabel>
+                                    <FormLabel className="text-muted-foreground">Description / Rough Draft</FormLabel>
                                     <FormControl>
                                         <Textarea
                                             placeholder="Key points, hooks, or full draft..."
@@ -222,7 +222,7 @@ export function CreateContentDialog({ trigger }: CreateContentDialogProps) {
                             name="tags"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-[#8b8fa3]">Tags (comma separated)</FormLabel>
+                                    <FormLabel className="text-muted-foreground">Tags (comma separated)</FormLabel>
                                     <FormControl>
                                         <Input
                                             placeholder="growth, engineering, life"
@@ -241,13 +241,13 @@ export function CreateContentDialog({ trigger }: CreateContentDialogProps) {
                                 type="button"
                                 variant="ghost"
                                 onClick={() => setOpen(false)}
-                                className="text-[#8b8fa3] hover:text-[#e8e9ed] hover:bg-[#282c3a]"
+                                className="text-muted-foreground hover:text-foreground hover:bg-muted"
                             >
                                 Cancel
                             </Button>
                             <Button
                                 type="submit"
-                                className="bg-[#6c5ce7] hover:bg-[#5b4cc4] text-white"
+                                className="bg-primary hover:bg-primary/90 text-foreground"
                             >
                                 Create Content
                             </Button>

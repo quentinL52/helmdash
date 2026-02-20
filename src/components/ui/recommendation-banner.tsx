@@ -148,7 +148,7 @@ export function RecommendationBanner({
                                                 "shrink-0 h-8",
                                                 isApplied
                                                     ? "bg-green-500/10 text-green-400 hover:bg-green-500/20"
-                                                    : "bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 hover:text-white"
+                                                    : "bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 hover:text-foreground"
                                             )}
                                             onClick={() => !isApplied && handleApply(item, index)}
                                             disabled={isApplied}

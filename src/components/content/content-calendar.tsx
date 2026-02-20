@@ -29,12 +29,12 @@ export function ContentCalendar() {
         <div className="flex flex-col lg:flex-row h-full gap-8 p-4">
             {/* Calendar Section */}
             <div className="flex-1 flex flex-col items-start">
-                <div className="bg-[#181a24] border border-[#282c3a] rounded-xl p-8 shadow-sm w-full max-w-[560px] flex justify-center">
+                <div className="bg-card border border-border rounded-xl p-8 shadow-sm w-full max-w-[560px] flex justify-center">
                     <Calendar
                         mode="single"
                         selected={date}
                         onSelect={setDate}
-                        className="rounded-md placeholder:text-[#8b8fa3]"
+                        className="rounded-md placeholder:text-muted-foreground"
                         modifiers={{ hasContent: (d) => hasContent(d) }}
                         modifiersStyles={{
                             hasContent: {
@@ -47,37 +47,37 @@ export function ContentCalendar() {
                         }}
                     />
                 </div>
-                <p className="text-[#8b8fa3] text-sm mt-4 italic">
+                <p className="text-muted-foreground text-sm mt-4 italic">
                     Select a date to view or schedule content. Days with content are underlined.
                 </p>
             </div>
 
             {/* Selected Date Details - Side Panel */}
-            <div className="w-full lg:w-[450px] xl:w-[500px] shrink-0 bg-[#181a24]/50 rounded-xl border border-[#282c3a] flex flex-col overflow-hidden h-auto lg:min-h-[500px]">
-                <div className="p-6 border-b border-[#282c3a] bg-[#181a24]">
-                    <h3 className="text-xl font-semibold text-[#e8e9ed]">
+            <div className="w-full lg:w-[450px] xl:w-[500px] shrink-0 bg-card/50 rounded-xl border border-border flex flex-col overflow-hidden h-auto lg:min-h-[500px]">
+                <div className="p-6 border-b border-border bg-card">
+                    <h3 className="text-xl font-semibold text-foreground">
                         {date ? date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' }) : 'Select a date'}
                     </h3>
                 </div>
 
                 <div className="flex-1 p-4 overflow-y-auto space-y-3">
                     {selectedDateIdeas.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-40 text-[#8b8fa3] text-sm italic">
+                        <div className="flex flex-col items-center justify-center h-40 text-muted-foreground text-sm italic">
                             <Calendar className="w-8 h-8 mb-2 opacity-50" />
                             No content scheduled.
                         </div>
                     ) : (
                         selectedDateIdeas.map(idea => (
-                            <Card key={idea.id} className="bg-[#181a24] border-[#282c3a] hover:border-[#6c5ce7]/50 transition-colors">
+                            <Card key={idea.id} className="bg-card border-border hover:border-primary/50 transition-colors">
                                 <CardContent className="p-4">
                                     <div className="flex justify-between items-start mb-2">
-                                        <h4 className="font-medium text-[#e8e9ed] text-sm">{idea.title}</h4>
-                                        <Badge variant="outline" className="text-[10px] border-[#282c3a] text-[#8b8fa3]">
+                                        <h4 className="font-medium text-foreground text-sm">{idea.title}</h4>
+                                        <Badge variant="outline" className="text-[10px] border-border text-muted-foreground">
                                             {idea.status}
                                         </Badge>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <Badge variant="secondary" className="text-[10px] bg-[#282c3a] text-[#8b8fa3] hover:bg-[#282c3a]">
+                                        <Badge variant="secondary" className="text-[10px] bg-muted text-muted-foreground hover:bg-muted">
                                             {idea.platform}
                                         </Badge>
                                     </div>

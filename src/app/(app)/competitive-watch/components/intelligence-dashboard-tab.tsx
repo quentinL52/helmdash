@@ -164,7 +164,7 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
             case 'declining':
                 return <TrendingDown className="h-4 w-4 text-green-400" />;
             default:
-                return <Minus className="h-4 w-4 text-[#8b8fa3]" />;
+                return <Minus className="h-4 w-4 text-muted-foreground" />;
         }
     };
 
@@ -208,7 +208,7 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
             {/* ============================================================ */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Health Score */}
-                <Card className="bg-[#1e2029] border-[#2b2d36]">
+                <Card className="bg-card border-border">
                     <CardContent className="flex flex-col items-center justify-center pt-6 pb-4">
                         <HealthScoreGauge
                             score={healthScore}
@@ -219,53 +219,53 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                 </Card>
 
                 {/* Active Threats */}
-                <Card className="bg-[#1e2029] border-[#2b2d36]">
+                <Card className="bg-card border-border">
                     <CardContent className="flex flex-col items-center justify-center pt-6 pb-4 gap-2">
                         <div className="flex items-center gap-2">
                             <Shield
-                                className={`h-6 w-6 ${activeThreatsCount > 0 ? 'text-red-400' : 'text-[#8b8fa3]'
+                                className={`h-6 w-6 ${activeThreatsCount > 0 ? 'text-red-400' : 'text-muted-foreground'
                                     }`}
                             />
                             <span
-                                className={`text-3xl font-bold ${activeThreatsCount > 0 ? 'text-red-400' : 'text-[#e8e9ed]'
+                                className={`text-3xl font-bold ${activeThreatsCount > 0 ? 'text-red-400' : 'text-foreground'
                                     }`}
                             >
                                 {activeThreatsCount}
                             </span>
                         </div>
-                        <span className="text-sm text-[#8b8fa3]">
+                        <span className="text-sm text-muted-foreground">
                             {t.intelligence.activeThreats}
                         </span>
                     </CardContent>
                 </Card>
 
                 {/* Feature Coverage */}
-                <Card className="bg-[#1e2029] border-[#2b2d36]">
+                <Card className="bg-card border-border">
                     <CardContent className="flex flex-col items-center justify-center pt-6 pb-4 gap-3">
-                        <span className="text-3xl font-bold text-[#e8e9ed]">
+                        <span className="text-3xl font-bold text-foreground">
                             {featureCoverage}%
                         </span>
                         <Progress
                             value={featureCoverage}
-                            className="h-2 w-full max-w-[140px] bg-[#2b2d36]"
-                            indicatorClassName="bg-[#6c5ce7]"
+                            className="h-2 w-full max-w-[140px] bg-muted"
+                            indicatorClassName="bg-primary"
                         />
-                        <span className="text-sm text-[#8b8fa3]">
+                        <span className="text-sm text-muted-foreground">
                             {t.intelligence.featureCoverage}
                         </span>
                     </CardContent>
                 </Card>
 
                 {/* Competitive Rank */}
-                <Card className="bg-[#1e2029] border-[#2b2d36]">
+                <Card className="bg-card border-border">
                     <CardContent className="flex flex-col items-center justify-center pt-6 pb-4 gap-2">
-                        <span className="text-3xl font-bold text-[#e8e9ed]">
+                        <span className="text-3xl font-bold text-foreground">
                             {competitiveRank.rank}{' '}
-                            <span className="text-lg font-normal text-[#8b8fa3]">
+                            <span className="text-lg font-normal text-muted-foreground">
                                 / {competitiveRank.total}
                             </span>
                         </span>
-                        <span className="text-sm text-[#8b8fa3]">
+                        <span className="text-sm text-muted-foreground">
                             {t.intelligence.competitiveRank}
                         </span>
                     </CardContent>
@@ -278,9 +278,9 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
                 {/* Alert Feed (3 cols) */}
                 <div className="lg:col-span-3">
-                    <Card className="bg-[#1e2029] border-[#2b2d36] h-full">
+                    <Card className="bg-card border-border h-full">
                         <CardHeader className="pb-3">
-                            <CardTitle className="text-[#e8e9ed] text-lg">
+                            <CardTitle className="text-foreground text-lg">
                                 {t.alerts.title}
                             </CardTitle>
                         </CardHeader>
@@ -293,8 +293,8 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                                 />
                             ) : (
                                 <div className="flex flex-col items-center justify-center py-8 text-center">
-                                    <Brain className="h-10 w-10 text-[#8b8fa3] mb-3 opacity-50" />
-                                    <p className="text-[#8b8fa3] text-sm max-w-xs">
+                                    <Brain className="h-10 w-10 text-muted-foreground mb-3 opacity-50" />
+                                    <p className="text-muted-foreground text-sm max-w-xs">
                                         {t.intelligence.noAnalysisYet}
                                     </p>
                                 </div>
@@ -305,15 +305,15 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
 
                 {/* Quick Actions (2 cols) */}
                 <div className="lg:col-span-2">
-                    <Card className="bg-[#1e2029] border-[#2b2d36] h-full">
+                    <Card className="bg-card border-border h-full">
                         <CardHeader className="pb-3">
-                            <CardTitle className="text-[#e8e9ed] text-lg">
+                            <CardTitle className="text-foreground text-lg">
                                 {t.quickActions}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="flex flex-col gap-3">
                             <Button
-                                className="w-full bg-gradient-to-r from-[#6c5ce7] to-[#a29bfe] text-white hover:opacity-90 transition-opacity"
+                                className="w-full bg-gradient-to-r from-primary to-accent text-foreground hover:opacity-90 transition-opacity"
                                 onClick={() => onTabChange?.('ai-strategy')}
                             >
                                 <Brain className="mr-2 h-4 w-4" />
@@ -321,7 +321,7 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                             </Button>
                             <Button
                                 variant="outline"
-                                className="w-full border-[#2b2d36] text-[#e8e9ed] hover:bg-[#2b2d36]/50"
+                                className="w-full border-border text-foreground hover:bg-muted/50"
                                 onClick={() => onTabChange?.('signals')}
                             >
                                 <Scan className="mr-2 h-4 w-4" />
@@ -329,7 +329,7 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                             </Button>
                             <Button
                                 variant="outline"
-                                className="w-full border-[#2b2d36] text-[#e8e9ed] hover:bg-[#2b2d36]/50"
+                                className="w-full border-border text-foreground hover:bg-muted/50"
                                 onClick={handleTakeSnapshot}
                             >
                                 <Camera className="mr-2 h-4 w-4" />
@@ -337,7 +337,7 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                             </Button>
                             <Button
                                 variant="outline"
-                                className="w-full border-[#2b2d36] text-[#e8e9ed] hover:bg-[#2b2d36]/50"
+                                className="w-full border-border text-foreground hover:bg-muted/50"
                                 onClick={() => onTabChange?.('ai-strategy')}
                             >
                                 <Eye className="mr-2 h-4 w-4" />
@@ -358,7 +358,7 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                         return (
                             <div
                                 key={competitor.id}
-                                className="min-w-[220px] bg-[#1e2029] border border-[#2b2d36] rounded-lg p-4 flex flex-col gap-2 shrink-0"
+                                className="min-w-[220px] bg-card border border-border rounded-lg p-4 flex flex-col gap-2 shrink-0"
                             >
                                 {/* Name + Threat dot */}
                                 <div className="flex items-center gap-2">
@@ -367,7 +367,7 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                                             competitor.threatLevel
                                         )}`}
                                     />
-                                    <span className="font-semibold text-[#e8e9ed] text-sm truncate">
+                                    <span className="font-semibold text-foreground text-sm truncate">
                                         {competitor.name}
                                     </span>
                                 </div>
@@ -375,14 +375,14 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                                 {/* Momentum */}
                                 <div className="flex items-center gap-1.5">
                                     {getMomentumIcon(competitor.momentum)}
-                                    <span className="text-xs text-[#8b8fa3]">
+                                    <span className="text-xs text-muted-foreground">
                                         {getMomentumText(competitor.momentum)}
                                     </span>
                                 </div>
 
                                 {/* Last signal */}
                                 {lastSignal && (
-                                    <p className="text-xs text-[#8b8fa3] line-clamp-2 mt-1">
+                                    <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
                                         {lastSignal}
                                     </p>
                                 )}
@@ -395,15 +395,15 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
             {/* ============================================================ */}
             {/* ROW 4 - Enhanced Competitor Table                            */}
             {/* ============================================================ */}
-            <Card className="bg-[#1e2029] border-[#2b2d36]">
+            <Card className="bg-card border-border">
                 <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                        <CardTitle className="text-[#e8e9ed] text-lg">
+                        <CardTitle className="text-foreground text-lg">
                             {language === 'fr' ? 'Concurrents' : 'Competitors'}
                         </CardTitle>
                         <Button
                             onClick={handleAddCompetitor}
-                            className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white"
+                            className="bg-primary hover:bg-primary/90 text-foreground"
                             size="sm"
                         >
                             <Plus className="mr-1.5 h-4 w-4" />
@@ -412,36 +412,36 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                     </div>
                     {/* Search */}
                     <div className="relative max-w-sm pt-2">
-                        <Search className="absolute left-3 top-1/2 mt-1 -translate-y-1/2 h-4 w-4 text-[#8b8fa3]" />
+                        <Search className="absolute left-3 top-1/2 mt-1 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder={t.searchPlaceholder}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-9 bg-[#12141c] border-[#2b2d36] text-[#e8e9ed] focus:ring-[#6c5ce7]"
+                            className="pl-9 bg-background border-border text-foreground focus:ring-primary"
                         />
                     </div>
                 </CardHeader>
                 <CardContent className="pt-0">
-                    <div className="rounded-lg border border-[#2b2d36] overflow-hidden">
+                    <div className="rounded-lg border border-border overflow-hidden">
                         <Table>
-                            <TableHeader className="bg-[#12141c]">
-                                <TableRow className="border-[#2b2d36] hover:bg-[#12141c]">
-                                    <TableHead className="text-[#8b8fa3]">
+                            <TableHeader className="bg-background">
+                                <TableRow className="border-border hover:bg-background">
+                                    <TableHead className="text-muted-foreground">
                                         {t.competitor.name}
                                     </TableHead>
-                                    <TableHead className="text-[#8b8fa3]">
+                                    <TableHead className="text-muted-foreground">
                                         {t.competitor.pricing}
                                     </TableHead>
-                                    <TableHead className="text-[#8b8fa3]">
+                                    <TableHead className="text-muted-foreground">
                                         {t.competitor.positioning}
                                     </TableHead>
-                                    <TableHead className="text-[#8b8fa3]">
+                                    <TableHead className="text-muted-foreground">
                                         {t.threatLevel}
                                     </TableHead>
-                                    <TableHead className="text-[#8b8fa3]">
+                                    <TableHead className="text-muted-foreground">
                                         {language === 'fr' ? 'Momentum' : 'Momentum'}
                                     </TableHead>
-                                    <TableHead className="text-right text-[#8b8fa3]">
+                                    <TableHead className="text-right text-muted-foreground">
                                         Actions
                                     </TableHead>
                                 </TableRow>
@@ -451,7 +451,7 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                                     <TableRow>
                                         <TableCell
                                             colSpan={6}
-                                            className="h-24 text-center text-[#8b8fa3]"
+                                            className="h-24 text-center text-muted-foreground"
                                         >
                                             {t.noCompetitors}
                                         </TableCell>
@@ -460,10 +460,10 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                                     filteredCompetitors.map((competitor) => (
                                         <TableRow
                                             key={competitor.id}
-                                            className="border-[#2b2d36] hover:bg-[#2b2d36]/30 group"
+                                            className="border-border hover:bg-muted/30 group"
                                         >
                                             {/* Name */}
-                                            <TableCell className="font-medium text-[#e8e9ed]">
+                                            <TableCell className="font-medium text-foreground">
                                                 <div className="flex items-center gap-2">
                                                     <span>{competitor.name}</span>
                                                     {competitor.website && (
@@ -471,7 +471,7 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                                                             href={competitor.website}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="text-[#6c5ce7] hover:text-[#a29bfe] transition-colors"
+                                                            className="text-primary hover:text-accent-foreground transition-colors"
                                                         >
                                                             <ExternalLink className="h-3.5 w-3.5" />
                                                         </a>
@@ -480,17 +480,17 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                                             </TableCell>
 
                                             {/* Pricing */}
-                                            <TableCell className="text-[#e8e9ed] text-sm">
+                                            <TableCell className="text-foreground text-sm">
                                                 {competitor.pricing || (
-                                                    <span className="text-[#8b8fa3]">-</span>
+                                                    <span className="text-muted-foreground">-</span>
                                                 )}
                                             </TableCell>
 
                                             {/* Positioning */}
-                                            <TableCell className="text-[#e8e9ed] text-sm max-w-[200px]">
+                                            <TableCell className="text-foreground text-sm max-w-[200px]">
                                                 <span className="line-clamp-1">
                                                     {competitor.positioning || (
-                                                        <span className="text-[#8b8fa3]">-</span>
+                                                        <span className="text-muted-foreground">-</span>
                                                     )}
                                                 </span>
                                             </TableCell>
@@ -504,7 +504,7 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                                             <TableCell>
                                                 <div className="flex items-center gap-1.5">
                                                     {getMomentumIcon(competitor.momentum)}
-                                                    <span className="text-sm text-[#8b8fa3]">
+                                                    <span className="text-sm text-muted-foreground">
                                                         {getMomentumText(competitor.momentum)}
                                                     </span>
                                                 </div>
@@ -516,7 +516,7 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                                                     <Button
                                                         size="icon"
                                                         variant="ghost"
-                                                        className="h-8 w-8 text-[#8b8fa3] hover:text-[#6c5ce7]"
+                                                        className="h-8 w-8 text-muted-foreground hover:text-primary"
                                                         onClick={() =>
                                                             handleEditCompetitor(competitor)
                                                         }
@@ -526,7 +526,7 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                                                     <Button
                                                         size="icon"
                                                         variant="ghost"
-                                                        className="h-8 w-8 text-[#8b8fa3] hover:text-red-400"
+                                                        className="h-8 w-8 text-muted-foreground hover:text-red-400"
                                                         onClick={() =>
                                                             deleteCompetitor(competitor.id)
                                                         }

@@ -169,20 +169,20 @@ export function CompetitorInlineForm({ onCancel, onSuccess, initialData, isMySol
     };
 
     return (
-        <Card className="mb-6 border-[#6c5ce7]/30 bg-[#181a24]/50" style={animationStyle}>
+        <Card className="mb-6 border-primary/30 bg-card/50" style={animationStyle}>
             <CardContent className="pt-6">
                 <style>{`
                     @keyframes scaleIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
                 `}</style>
 
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-medium text-[#e8e9ed]">
+                    <h3 className="text-lg font-medium text-foreground">
                         {isMySolution
                             ? (language === 'fr' ? 'Éditer Ma Solution' : 'Edit My Solution')
                             : (language === 'fr' ? 'Nouveau concurrent' : 'New Competitor')
                         }
                     </h3>
-                    <Button variant="ghost" size="sm" onClick={onCancel} className="h-8 w-8 p-0 text-[#8b8fa3]">
+                    <Button variant="ghost" size="sm" onClick={onCancel} className="h-8 w-8 p-0 text-muted-foreground">
                         <X className="h-4 w-4" />
                     </Button>
                 </div>
@@ -191,24 +191,24 @@ export function CompetitorInlineForm({ onCancel, onSuccess, initialData, isMySol
                     {/* Left Column: Basic Info */}
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed]">{t.competitor.name} *</Label>
+                            <Label className="text-foreground">{t.competitor.name} *</Label>
                             <Input
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 placeholder="E.g. Stripe"
-                                className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]"
+                                className="bg-card border-border text-foreground"
                                 autoFocus
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed]">{t.competitor.website}</Label>
+                            <Label className="text-foreground">{t.competitor.website}</Label>
                             <div className="flex gap-2">
                                 <Input
                                     value={website}
                                     onChange={(e) => setWebsite(e.target.value)}
                                     placeholder="https://stripe.com"
-                                    className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] flex-1"
+                                    className="bg-card border-border text-foreground flex-1"
                                 />
                                 <Button
                                     type="button"
@@ -216,7 +216,7 @@ export function CompetitorInlineForm({ onCancel, onSuccess, initialData, isMySol
                                     size="sm"
                                     onClick={handleAutoFill}
                                     disabled={!website.trim() || isAutoFilling}
-                                    className="border-[#6c5ce7]/50 text-[#a29bfe] hover:bg-[#6c5ce7]/10 shrink-0"
+                                    className="border-primary/50 text-accent-foreground hover:bg-primary/10 shrink-0"
                                 >
                                     {isAutoFilling ? (
                                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -228,30 +228,30 @@ export function CompetitorInlineForm({ onCancel, onSuccess, initialData, isMySol
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-[#e8e9ed]">{t.competitor.description}</Label>
+                            <Label className="text-foreground">{t.competitor.description}</Label>
                             <Textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 placeholder={t.competitor.description}
-                                className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] min-h-[80px]"
+                                className="bg-card border-border text-foreground min-h-[80px]"
                             />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-[#e8e9ed]">{t.competitor.pricing}</Label>
+                                <Label className="text-foreground">{t.competitor.pricing}</Label>
                                 <Input
                                     value={pricing}
                                     onChange={(e) => setPricing(e.target.value)}
-                                    className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]"
+                                    className="bg-card border-border text-foreground"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[#e8e9ed]">{t.competitor.positioning}</Label>
+                                <Label className="text-foreground">{t.competitor.positioning}</Label>
                                 <Input
                                     value={positioning}
                                     onChange={(e) => setPositioning(e.target.value)}
-                                    className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed]"
+                                    className="bg-card border-border text-foreground"
                                 />
                             </div>
                         </div>
@@ -259,13 +259,13 @@ export function CompetitorInlineForm({ onCancel, onSuccess, initialData, isMySol
 
                     {/* Right Column: Radar & Analysis */}
                     <div className="space-y-4">
-                        <Label className="text-[#e8e9ed] font-semibold block mb-2">
+                        <Label className="text-foreground font-semibold block mb-2">
                             {language === 'fr' ? 'Analyse Radar' : 'Radar Analysis'}
                         </Label>
-                        <div className="bg-[#1a1d2d] rounded-lg p-4 border border-[#282c3a] space-y-3">
+                        <div className="bg-card rounded-lg p-4 border border-border space-y-3">
                             {radarAxesKeys.map((axis) => (
                                 <div key={axis} className="flex items-center gap-3">
-                                    <span className="text-[#8b8fa3] text-xs w-20 shrink-0 capitalize">
+                                    <span className="text-muted-foreground text-xs w-20 shrink-0 capitalize">
                                         {t.radarAxes[axis]}
                                     </span>
                                     <Slider
@@ -278,7 +278,7 @@ export function CompetitorInlineForm({ onCancel, onSuccess, initialData, isMySol
                                         }
                                         className="flex-1"
                                     />
-                                    <span className="text-[#e8e9ed] text-xs w-5 text-right font-mono">
+                                    <span className="text-foreground text-xs w-5 text-right font-mono">
                                         {radarScores[axis]}
                                     </span>
                                 </div>
@@ -287,19 +287,19 @@ export function CompetitorInlineForm({ onCancel, onSuccess, initialData, isMySol
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-[#e8e9ed] text-xs uppercase tracking-wider">{t.competitor.strengths}</Label>
+                                <Label className="text-foreground text-xs uppercase tracking-wider">{t.competitor.strengths}</Label>
                                 <Textarea
                                     value={strengths}
                                     onChange={(e) => setStrengths(e.target.value)}
-                                    className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] min-h-[60px] text-xs"
+                                    className="bg-card border-border text-foreground min-h-[60px] text-xs"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[#e8e9ed] text-xs uppercase tracking-wider">{t.competitor.weaknesses}</Label>
+                                <Label className="text-foreground text-xs uppercase tracking-wider">{t.competitor.weaknesses}</Label>
                                 <Textarea
                                     value={weaknesses}
                                     onChange={(e) => setWeaknesses(e.target.value)}
-                                    className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] min-h-[60px] text-xs"
+                                    className="bg-card border-border text-foreground min-h-[60px] text-xs"
                                 />
                             </div>
                         </div>
@@ -307,11 +307,11 @@ export function CompetitorInlineForm({ onCancel, onSuccess, initialData, isMySol
                 </div>
 
                 {/* Advanced Data Toggle */}
-                <div className="mt-4 pt-4 border-t border-[#282c3a]">
+                <div className="mt-4 pt-4 border-t border-border">
                     <button
                         type="button"
                         onClick={() => setShowAdvanced(!showAdvanced)}
-                        className="flex items-center gap-2 text-sm text-[#6c5ce7] hover:text-[#a29bfe] transition-colors"
+                        className="flex items-center gap-2 text-sm text-primary hover:text-accent-foreground transition-colors"
                     >
                         {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                         {language === 'fr' ? 'Données stratégiques avancées' : 'Advanced strategic data'}
@@ -320,66 +320,66 @@ export function CompetitorInlineForm({ onCancel, onSuccess, initialData, isMySol
                     {showAdvanced && (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 animate-in fade-in slide-in-from-top-2">
                             <div className="space-y-2">
-                                <Label className="text-[#e8e9ed] text-xs">{t.competitor.targetSegment}</Label>
-                                <Input value={targetSegment} onChange={(e) => setTargetSegment(e.target.value)} className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] h-8 text-xs" />
+                                <Label className="text-foreground text-xs">{t.competitor.targetSegment}</Label>
+                                <Input value={targetSegment} onChange={(e) => setTargetSegment(e.target.value)} className="bg-card border-border text-foreground h-8 text-xs" />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[#e8e9ed] text-xs">{t.competitor.businessModel}</Label>
-                                <Input value={businessModel} onChange={(e) => setBusinessModel(e.target.value)} className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] h-8 text-xs" />
+                                <Label className="text-foreground text-xs">{t.competitor.businessModel}</Label>
+                                <Input value={businessModel} onChange={(e) => setBusinessModel(e.target.value)} className="bg-card border-border text-foreground h-8 text-xs" />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[#e8e9ed] text-xs">{t.competitor.teamSize}</Label>
-                                <Input value={teamSize} onChange={(e) => setTeamSize(e.target.value)} className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] h-8 text-xs" />
+                                <Label className="text-foreground text-xs">{t.competitor.teamSize}</Label>
+                                <Input value={teamSize} onChange={(e) => setTeamSize(e.target.value)} className="bg-card border-border text-foreground h-8 text-xs" />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[#e8e9ed] text-xs">{t.competitor.yearFounded}</Label>
-                                <Input value={yearFounded} onChange={(e) => setYearFounded(e.target.value)} className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] h-8 text-xs" />
+                                <Label className="text-foreground text-xs">{t.competitor.yearFounded}</Label>
+                                <Input value={yearFounded} onChange={(e) => setYearFounded(e.target.value)} className="bg-card border-border text-foreground h-8 text-xs" />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[#e8e9ed] text-xs">{t.competitor.fundingStage}</Label>
-                                <Input value={fundingStage} onChange={(e) => setFundingStage(e.target.value)} className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] h-8 text-xs" />
+                                <Label className="text-foreground text-xs">{t.competitor.fundingStage}</Label>
+                                <Input value={fundingStage} onChange={(e) => setFundingStage(e.target.value)} className="bg-card border-border text-foreground h-8 text-xs" />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[#e8e9ed] text-xs">{t.competitor.fundingAmount}</Label>
-                                <Input value={fundingAmount} onChange={(e) => setFundingAmount(e.target.value)} className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] h-8 text-xs" />
+                                <Label className="text-foreground text-xs">{t.competitor.fundingAmount}</Label>
+                                <Input value={fundingAmount} onChange={(e) => setFundingAmount(e.target.value)} className="bg-card border-border text-foreground h-8 text-xs" />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[#e8e9ed] text-xs">{t.competitor.pricingModel}</Label>
+                                <Label className="text-foreground text-xs">{t.competitor.pricingModel}</Label>
                                 <Select value={pricingModel} onValueChange={(v) => setPricingModel(v as PricingModelType)}>
-                                    <SelectTrigger className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] h-8 text-xs">
+                                    <SelectTrigger className="bg-card border-border text-foreground h-8 text-xs">
                                         <SelectValue placeholder="-" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-[#1a1d2d] border-[#282c3a] text-[#e8e9ed]">
+                                    <SelectContent className="bg-card border-border text-foreground">
                                         {(['free', 'freemium', 'subscription', 'usage', 'enterprise', 'other'] as PricingModelType[]).map(pm => (
-                                            <SelectItem key={pm} value={pm} className="hover:bg-[#282c3a] text-xs">{t.pricingModels[pm]}</SelectItem>
+                                            <SelectItem key={pm} value={pm} className="hover:bg-muted text-xs">{t.pricingModels[pm]}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-[#e8e9ed] text-xs">{t.competitor.pricingRange}</Label>
-                                <Input value={pricingRange} onChange={(e) => setPricingRange(e.target.value)} className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] h-8 text-xs" />
+                                <Label className="text-foreground text-xs">{t.competitor.pricingRange}</Label>
+                                <Input value={pricingRange} onChange={(e) => setPricingRange(e.target.value)} className="bg-card border-border text-foreground h-8 text-xs" />
                             </div>
                             <div className="space-y-2 col-span-2">
-                                <Label className="text-[#e8e9ed] text-xs">{t.competitor.keyFeatures}</Label>
-                                <Input value={keyFeatures} onChange={(e) => setKeyFeatures(e.target.value)} className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] h-8 text-xs" />
+                                <Label className="text-foreground text-xs">{t.competitor.keyFeatures}</Label>
+                                <Input value={keyFeatures} onChange={(e) => setKeyFeatures(e.target.value)} className="bg-card border-border text-foreground h-8 text-xs" />
                             </div>
                             <div className="space-y-2 col-span-2">
-                                <Label className="text-[#e8e9ed] text-xs">{t.competitor.differentiators}</Label>
-                                <Input value={differentiators} onChange={(e) => setDifferentiators(e.target.value)} className="bg-[#181a24] border-[#282c3a] text-[#e8e9ed] h-8 text-xs" />
+                                <Label className="text-foreground text-xs">{t.competitor.differentiators}</Label>
+                                <Input value={differentiators} onChange={(e) => setDifferentiators(e.target.value)} className="bg-card border-border text-foreground h-8 text-xs" />
                             </div>
                         </div>
                     )}
                 </div>
 
                 <div className="flex justify-end gap-3 mt-6">
-                    <Button variant="ghost" onClick={onCancel} className="text-[#8b8fa3]">
+                    <Button variant="ghost" onClick={onCancel} className="text-muted-foreground">
                         {language === 'fr' ? 'Annuler' : 'Cancel'}
                     </Button>
                     <Button
                         onClick={handleSubmit}
                         disabled={!name.trim()}
-                        className="bg-[#6c5ce7] hover:bg-[#5a4bd6] text-white"
+                        className="bg-primary hover:bg-primary/90 text-foreground"
                     >
                         <Save className="mr-2 h-4 w-4" />
                         {isMySolution
