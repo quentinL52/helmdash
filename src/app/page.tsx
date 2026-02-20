@@ -1,7 +1,7 @@
 'use client';
 
 import { AuthFormsWrapper } from "@/components/auth/auth-forms-wrapper";
-import { CheckCircle2, FlaskConical, LineChart, Target, Check } from "lucide-react";
+import { FlaskConical, LineChart, Target, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Home() {
@@ -33,20 +33,6 @@ export default function Home() {
                 Un espace unique pour valider vos hypothèses, suivre vos finances, et exécuter vos sprints. Conçu pour les fondateurs qui veulent de la clarté, pas du chaos.
               </p>
 
-              <div className="pt-4 flex items-center gap-6 text-muted-foreground text-sm">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#6c5ce7]" />
-                  <span>Données persistantes</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#6c5ce7]" />
-                  <span>Mode hors-ligne</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#6c5ce7]" />
-                  <span>Commencez gratuitement</span>
-                </div>
-              </div>
             </div>
 
             {/* Login/Signup Card */}
