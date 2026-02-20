@@ -62,7 +62,7 @@ const animationCSS = `
 `;
 
 // --- REUSABLE COMPONENTS ---
-const Button = ({ children, onClick, variant = "default", size = "md", style, ...props }: any) => {
+const Button = ({ children, onClick, variant = "default", size = "md", style, className, ...props }: any) => {
   const base: React.CSSProperties = {
     display: "inline-flex", alignItems: "center", gap: "6px",
     border: "none", borderRadius: "8px", cursor: "pointer",
@@ -73,7 +73,7 @@ const Button = ({ children, onClick, variant = "default", size = "md", style, ..
   };
   const variants: Record<string, React.CSSProperties> = {
     default: { background: COLORS.surfaceHover, color: COLORS.text, border: `1px solid ${COLORS.border}` },
-    primary: { background: COLORS.accent, color: "#fff", border: "none" },
+    primary: { background: "#6c5ce7", color: "#fff", border: "none" },
   };
   return (
     <button
@@ -81,6 +81,7 @@ const Button = ({ children, onClick, variant = "default", size = "md", style, ..
       style={{ ...base, ...variants[variant], ...style }}
       onMouseEnter={(e: any) => { e.target.style.opacity = "0.85"; }}
       onMouseLeave={(e: any) => { e.target.style.opacity = "1"; }}
+      className={className}
       {...props}
     >
       {children}

@@ -19,10 +19,10 @@ export default function ContentPage() {
         <div className="flex flex-col h-full space-y-4 p-8 pt-6 font-sans text-foreground">
             <Tabs defaultValue="board" className="flex-1 flex flex-col h-full overflow-hidden">
                 <TabsList className="bg-card border border-border w-fit">
-                    <TabsTrigger value="board" className="data-[state=active]:bg-muted data-[state=active]:text-foreground text-muted-foreground">
+                    <TabsTrigger value="board" className="text-muted-foreground">
                         Board
                     </TabsTrigger>
-                    <TabsTrigger value="calendar" className="data-[state=active]:bg-muted data-[state=active]:text-foreground text-muted-foreground">
+                    <TabsTrigger value="calendar" className="text-muted-foreground">
                         Calendar
                     </TabsTrigger>
                 </TabsList>
