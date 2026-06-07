@@ -2,42 +2,22 @@
 
 import { useState } from 'react';
 import { useFounderStore, ContentIdea, ContentStatus, ContentChannel } from '@/store/founder-store';
-import { Plus, Calendar, FileText, CheckCircle2, MoreHorizontal, PenSquare, Trash } from 'lucide-react';
+import { Plus, Calendar, FileText, CheckCircle2, MoreHorizontal, PenSquare } from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { CreateContentDialog } from './create-content-dialog';
 
-const COLORS = {
-    bg: "#0f1117",
-    surface: "#181a24",
-    surfaceHover: "#1e2130",
-    border: "#282c3a",
-    text: "#e8e9ed",
-    textMuted: "#8b8fa3",
-    textDim: "#5c6078",
-    accent: "#6c5ce7",
-    success: "#00cec9",
-    warning: "#fdcb6e",
-    danger: "#ff6b6b",
-    teal: "#00b894",
-};
-
-const COLUMN_COLORS: Record<ContentStatus, string> = {
-    idea: COLORS.textMuted,
-    draft: COLORS.warning,
-    scheduled: COLORS.accent,
-    published: COLORS.success,
-};
-
-const COLUMNS: { id: ContentStatus; label: string; icon: any }[] = [
-    { id: 'idea', label: 'Ideas', icon: PenSquare },
-    { id: 'draft', label: 'Drafting', icon: FileText },
-    { id: 'scheduled', label: 'Scheduled', icon: Calendar },
-    { id: 'published', label: 'Published', icon: CheckCircle2 },
+const COLUMNS: { id: ContentStatus; label: string; icon: any; colorClass: string }[] = [
+    { id: 'idea', label: 'Ideas', icon: PenSquare, colorClass: 'text-muted-foreground border-muted-foreground bg-muted-foreground' },
+    { id: 'draft', label: 'Drafting', icon: FileText, colorClass: 'text-warning border-warning bg-warning' },
+    { id: 'scheduled', label: 'Scheduled', icon: Calendar, colorClass: 'text-primary border-primary bg-primary' },
+    { id: 'published', label: 'Published', icon: CheckCircle2, colorClass: 'text-success border-success bg-success' },
 ];
 
 export function ContentBoard() {
@@ -77,18 +57,6 @@ export function ContentBoard() {
         updateContentIdea(id, { status: newStatus });
     };
 
-    const inputStyle = {
-        background: COLORS.surface,
-        border: `1px solid ${COLORS.border}`,
-        borderRadius: "8px",
-        padding: "8px 12px",
-        color: COLORS.text,
-        fontSize: "13px",
-        fontFamily: "'DM Sans', sans-serif",
-        outline: "none",
-        width: "100%",
-    };
-
     return (
         <div className="flex flex-col h-full font-sans">
             <div className="flex items-center justify-between mb-6 flex-shrink-0">
@@ -98,42 +66,32 @@ export function ContentBoard() {
                         Manage your ideas, drafts, and publishing schedule.
                     </p>
                 </div>
-                <button
-                    onClick={() => setShowForm(!showForm)}
-                    className="inline-flex items-center gap-2 rounded-lg cursor-pointer font-medium transition-colors text-sm px-4 py-2 bg-[#6c5ce7] text-white hover:bg-[#6c5ce7]/90"
-                >
+                <Button onClick={() => setShowForm(!showForm)} className="gap-2">
                     <Plus className="h-4 w-4" /> New Idea
-                </button>
+                </Button>
             </div>
 
             {showForm && (
-                <div
-                    className="mb-6 p-4 rounded-xl border animate-in fade-in slide-in-from-top-4 duration-300"
-                    style={{
-                        backgroundColor: COLORS.surface,
-                        borderColor: `${COLORS.accent}33`,
-                    }}
-                >
+                <div className="mb-6 p-4 rounded-xl border bg-card border-border animate-in fade-in slide-in-from-top-4 duration-300">
                     <div className="grid grid-cols-2 gap-4 mb-4">
                         <div className="col-span-2">
-                            <input
-                                style={{ ...inputStyle, borderColor: COLORS.accent }}
+                            <Input
                                 placeholder="Content Title / Hook *"
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                 autoFocus
+                                className="border-primary/50 focus-visible:ring-primary"
                             />
                         </div>
                         <div className="col-span-2">
-                            <input
-                                style={inputStyle}
+                            <Input
                                 placeholder="Description or quick notes..."
                                 value={formData.description}
                                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             />
                         </div>
                         <select
-                            style={inputStyle}
+                            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:[color-scheme:dark]"
                             value={formData.channel}
                             onChange={(e) => setFormData({ ...formData, channel: e.target.value as ContentChannel })}
                         >
@@ -142,26 +100,19 @@ export function ContentBoard() {
                             <option value="Newsletter">Newsletter</option>
                             <option value="Thread">Thread</option>
                         </select>
-                        <input
-                            style={inputStyle}
+                        <Input
                             placeholder="Tags (comma separated)..."
                             value={formData.tags}
                             onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                         />
                     </div>
                     <div className="flex justify-end gap-2">
-                        <button
-                            onClick={() => setShowForm(false)}
-                            className="px-4 py-2 text-[13px] font-medium rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-                        >
+                        <Button variant="ghost" onClick={() => setShowForm(false)}>
                             Cancel
-                        </button>
-                        <button
-                            onClick={handleCreate}
-                            className="px-4 py-2 text-sm font-medium rounded-lg bg-[#6c5ce7] text-white hover:bg-[#6c5ce7]/90 transition-colors"
-                        >
+                        </Button>
+                        <Button onClick={handleCreate}>
                             Add Content
-                        </button>
+                        </Button>
                     </div>
                 </div>
             )}
@@ -171,16 +122,9 @@ export function ContentBoard() {
                     const ideas = contentIdeas.filter((idea) => idea.status === col.id);
                     return (
                         <div key={col.id} className="flex-1 flex flex-col min-w-[280px]">
-                            <div
-                                className="flex items-center gap-2 mb-3 px-3 py-2 border backdrop-blur-sm"
-                                style={{
-                                    borderRadius: '8px',
-                                    backgroundColor: `${COLUMN_COLORS[col.id]}11`,
-                                    borderColor: `${COLUMN_COLORS[col.id]}22`,
-                                }}
-                            >
-                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLUMN_COLORS[col.id] }} />
-                                <span className="text-[13px] font-semibold tracking-tight" style={{ color: COLUMN_COLORS[col.id], fontFamily: 'monospace' }}>
+                            <div className="flex items-center gap-2 mb-3 px-3 py-2 rounded-lg border bg-card/50 backdrop-blur-sm border-border">
+                                <div className={`w-2 h-2 rounded-full ${col.colorClass.split(' ')[2]}`} />
+                                <span className={`text-[13px] font-semibold tracking-tight font-mono ${col.colorClass.split(' ')[0]}`}>
                                     {col.label}
                                 </span>
                                 <span className="ml-auto text-[11px] text-muted-foreground">
@@ -208,20 +152,17 @@ export function ContentBoard() {
 
 function ContentCard({ idea, onDelete, onStatusChange }: { idea: ContentIdea, onDelete: () => void, onStatusChange: (s: ContentStatus) => void }) {
     const channelColors: Record<string, string> = {
-        LinkedIn: '#0A66C2',
-        Article: '#FF9F43',
-        Newsletter: '#F8C291',
-        Thread: '#1DA1F2',
+        LinkedIn: 'text-blue-500 bg-blue-500/10 border-blue-500/20',
+        Article: 'text-orange-500 bg-orange-500/10 border-orange-500/20',
+        Newsletter: 'text-amber-500 bg-amber-500/10 border-amber-500/20',
+        Thread: 'text-sky-500 bg-sky-500/10 border-sky-500/20',
     };
 
+    const defaultChannelClass = 'text-muted-foreground bg-muted border-border';
+    const channelClass = channelColors[idea.channel] || defaultChannelClass;
+
     return (
-        <div
-            className="group relative p-3 rounded-xl border transition-all duration-200"
-            style={{
-                backgroundColor: COLORS.surface,
-                borderColor: COLORS.border,
-            }}
-        >
+        <div className="group relative p-3 rounded-xl border bg-card border-border hover:border-border/80 transition-all duration-200 shadow-sm hover:shadow-md">
             <div className="flex justify-between items-start gap-2 mb-2">
                 <h4 className="font-medium text-foreground leading-snug text-[13px]">
                     {idea.title}
@@ -245,28 +186,34 @@ function ContentCard({ idea, onDelete, onStatusChange }: { idea: ContentIdea, on
                         <DropdownMenuItem onClick={() => onStatusChange('draft')}>Move to Draft</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onStatusChange('scheduled')}>Move to Scheduled</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onStatusChange('published')}>Move to Published</DropdownMenuItem>
-                        <DropdownMenuItem onClick={onDelete} className="text-red-400 focus:text-red-400">
+                        <DropdownMenuItem onClick={onDelete} className="text-destructive focus:text-destructive">
                             Delete
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
 
+            {idea.imageUrl && (
+                <div className="mb-3 rounded overflow-hidden border border-border/50">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={idea.imageUrl} alt="Cover" className="w-full h-auto object-cover max-h-32" />
+                </div>
+            )}
+
             {idea.description && (
-                <p className="text-[11px] text-muted-foreground mb-3 line-clamp-2 leading-relaxed">
+                <p className="text-[11px] text-muted-foreground mb-3 leading-relaxed">
                     {idea.description}
                 </p>
             )}
 
+            {idea.contentBody && (
+                <div className="text-[12px] text-foreground mb-3 whitespace-pre-wrap leading-relaxed break-words bg-background/50 p-2 rounded">
+                    {idea.contentBody}
+                </div>
+            )}
+
             <div className="flex flex-wrap gap-1.5 items-center">
-                <span
-                    className="px-1.5 py-0.5 rounded text-[10px] font-medium border"
-                    style={{
-                        borderColor: `${channelColors[idea.channel] || COLORS.border}44`,
-                        color: channelColors[idea.channel] || COLORS.textMuted,
-                        backgroundColor: `${channelColors[idea.channel] || COLORS.border}11`,
-                    }}
-                >
+                <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium border ${channelClass}`}>
                     {idea.channel}
                 </span>
 

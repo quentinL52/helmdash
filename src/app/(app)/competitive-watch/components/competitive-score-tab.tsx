@@ -147,7 +147,7 @@ export function CompetitiveScoreTab() {
                 featureAnalysis: mySolution.featureAnalysis,
                 competitor: null as Competitor | null,
                 isMySolution: true,
-                color: '#6c5ce7',
+                color: 'hsl(var(--primary))',
                 momentum: null as string | null,
             },
             ...competitors.map((c, i) => ({
@@ -320,7 +320,7 @@ export function CompetitiveScoreTab() {
                                                 {/* Mini breakdown bars */}
                                                 <div className="grid grid-cols-4 gap-2 text-xs">
                                                     {([
-                                                        { key: 'radar', label: t.breakdown.radar, color: '#6c5ce7' },
+                                                        { key: 'radar', label: t.breakdown.radar, color: 'hsl(var(--primary))' },
                                                         { key: 'features', label: t.breakdown.features, color: '#00cec9' },
                                                         { key: 'signals', label: t.breakdown.signals, color: '#fd79a8' },
                                                         { key: 'dataQuality', label: t.breakdown.dataQuality, color: '#fdcb6e' },

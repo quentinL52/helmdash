@@ -146,7 +146,7 @@ export function JournalEditor({ onSave, initialDate = new Date() }: JournalEdito
             </div>
 
             <div className="flex justify-end pt-4">
-                <Button onClick={handleSave} size="lg" className="gap-2 accent-gradient text-black shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all">
+                <Button onClick={handleSave} size="lg" className="gap-2">
                     <Save className="w-4 h-4" />
                     {t.saveEntry || 'Enregistrer'}
                 </Button>

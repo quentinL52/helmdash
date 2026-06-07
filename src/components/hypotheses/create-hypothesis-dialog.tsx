@@ -43,7 +43,7 @@ const COLORS = {
     textMuted: "#8b8fa3",
     inputBg: "#181a24", // Match surface
     inputBorder: "#282c3a",
-    accent: "#6c5ce7",
+    accent: "hsl(var(--primary))",
     success: "#00cec9",
     warning: "#fdcb6e",
     danger: "#ff6b6b",

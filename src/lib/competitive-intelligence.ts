@@ -268,7 +268,7 @@ export function getAlertSeverityColor(severity: string): string {
     switch (severity) {
         case 'critical': return '#ff7675';
         case 'high': return '#fdcb6e';
-        case 'medium': return '#6c5ce7';
+        case 'medium': return 'hsl(var(--primary))';
         case 'low': return '#8b8fa3';
         default: return '#8b8fa3';
     }

@@ -41,7 +41,8 @@ const expenseSchema = z.object({
     amount: z.coerce.number().min(0.01, "Amount must be greater than 0"),
     category: z.string(),
     type: z.enum(['expense', 'revenue']),
-    date: z.string().min(1, "Date is required"), // Add date validation
+    date: z.string().min(1, "Date is required"),
+    frequency: z.enum(['monthly', 'annual', 'one-time']).default('monthly')
 });
 
 export function FinanceEntryForm() {
@@ -67,7 +68,8 @@ export function FinanceEntryForm() {
             amount: 0,
             category: 'Divers',
             type: 'expense',
-            date: format(new Date(), 'yyyy-MM-dd'), // Default to today (local time)
+            date: format(new Date(), 'yyyy-MM-dd'),
+            frequency: 'monthly'
         },
     });
 
@@ -90,7 +92,8 @@ export function FinanceEntryForm() {
                         label: values.label,
                         amount: values.amount,
                         category: values.category as ExpenseCategory,
-                        isRecurring: true, // Default for this form
+                        isRecurring: values.frequency !== 'one-time',
+                        frequency: values.frequency as any,
                         date: values.date
                     }
                 ];
@@ -103,8 +106,9 @@ export function FinanceEntryForm() {
                         id: crypto.randomUUID(),
                         label: values.label,
                         amount: values.amount,
-                        category: 'other' as ExpenseCategory, // Revenue category default
-                        isRecurring: true, // Default for this form
+                        category: 'other' as ExpenseCategory,
+                        isRecurring: values.frequency !== 'one-time',
+                        frequency: values.frequency as any,
                         date: values.date
                     }
                 ];
@@ -125,7 +129,8 @@ export function FinanceEntryForm() {
                         label: values.label,
                         amount: values.amount,
                         category: values.category as ExpenseCategory,
-                        isRecurring: true,
+                        isRecurring: values.frequency !== 'one-time',
+                        frequency: values.frequency as any,
                         date: values.date
                     }
                 ] : [],
@@ -135,7 +140,8 @@ export function FinanceEntryForm() {
                         label: values.label,
                         amount: values.amount,
                         category: 'other' as ExpenseCategory,
-                        isRecurring: true,
+                        isRecurring: values.frequency !== 'one-time',
+                        frequency: values.frequency as any,
                         date: values.date
                     }
                 ] : []
@@ -147,14 +153,15 @@ export function FinanceEntryForm() {
             label: '',
             amount: 0,
             category: 'Divers',
-            type: values.type, // Keep last type
-            date: values.date // Keep last date
+            type: values.type,
+            date: values.date,
+            frequency: values.frequency
         });
     };
 
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-3 bg-slate-900 border-slate-800">
+            <Card className="col-span-3">
                 <CardHeader>
                     <CardTitle className="text-foreground">{translations[language].finance.chart.cash}</CardTitle>
                     <CardDescription className="text-gray-300">
@@ -170,7 +177,7 @@ export function FinanceEntryForm() {
                                 type="number"
                                 value={cashInput}
                                 onChange={(e) => setCashInput(e.target.value)}
-                                className="bg-slate-800 border-slate-700 text-foreground"
+                                className=""
                             />
                         </div>
                     </div>
@@ -180,7 +187,7 @@ export function FinanceEntryForm() {
                 </CardFooter>
             </Card>
 
-            <Card className="col-span-4 bg-slate-900 border-slate-800">
+            <Card className="col-span-4">
                 <CardHeader>
                     <CardTitle className="text-foreground">{t.title}</CardTitle>
                     <CardDescription className="text-gray-300">Add a recurring expense or revenue for this month.</CardDescription>
@@ -196,7 +203,7 @@ export function FinanceEntryForm() {
                                         <FormItem>
                                             <FormLabel className="text-foreground">{t.date}</FormLabel>
                                             <FormControl>
-                                                <Input type="date" {...field} className="bg-slate-800 border-slate-700 text-foreground" />
+                                                <Input type="date" {...field} className="" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -210,11 +217,11 @@ export function FinanceEntryForm() {
                                             <FormLabel className="text-foreground">{t.type}</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                 <FormControl>
-                                                    <SelectTrigger className="bg-slate-800 border-slate-700 text-foreground">
+                                                    <SelectTrigger className="">
                                                         <SelectValue placeholder="Select type" />
                                                     </SelectTrigger>
                                                 </FormControl>
-                                                <SelectContent className="bg-slate-800 border-slate-700 text-foreground">
+                                                <SelectContent className="">
                                                     <SelectItem value="expense">{t.expense}</SelectItem>
                                                     <SelectItem value="revenue">{t.income}</SelectItem>
                                                 </SelectContent>
@@ -232,7 +239,7 @@ export function FinanceEntryForm() {
                                         <FormItem>
                                             <FormLabel className="text-foreground">{t.amount} (€)</FormLabel>
                                             <FormControl>
-                                                <Input type="number" {...field} className="bg-slate-800 border-slate-700 text-foreground" />
+                                                <Input type="number" {...field} className="" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
@@ -245,14 +252,36 @@ export function FinanceEntryForm() {
                                         <FormItem>
                                             <FormLabel className="text-foreground">{t.description}</FormLabel>
                                             <FormControl>
-                                                <Input placeholder="e.g. Hosting" {...field} className="bg-slate-800 border-slate-700 text-foreground" />
+                                                <Input placeholder="e.g. Hosting" {...field} className="" />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
                             </div>
-                            <div className="grid grid-cols-1 gap-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="frequency"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-foreground">{language === 'fr' ? 'Fréquence' : 'Frequency'}</FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger className="">
+                                                        <SelectValue placeholder="Select frequency" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent className="">
+                                                    <SelectItem value="monthly">{language === 'fr' ? 'Mensuel' : 'Monthly'}</SelectItem>
+                                                    <SelectItem value="annual">{language === 'fr' ? 'Annuel' : 'Annual'}</SelectItem>
+                                                    <SelectItem value="one-time">{language === 'fr' ? 'Ponctuel' : 'One-time'}</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                                 <FormField
                                     control={form.control}
                                     name="category"
@@ -261,11 +290,11 @@ export function FinanceEntryForm() {
                                             <FormLabel className="text-foreground">{t.category}</FormLabel>
                                             <Select onValueChange={field.onChange} defaultValue={field.value} disabled={form.watch('type') === 'revenue'}>
                                                 <FormControl>
-                                                    <SelectTrigger className="bg-slate-800 border-slate-700 text-foreground">
+                                                    <SelectTrigger className="">
                                                         <SelectValue placeholder="Select category" />
                                                     </SelectTrigger>
                                                 </FormControl>
-                                                <SelectContent className="bg-slate-800 border-slate-700 text-foreground">
+                                                <SelectContent className="">
                                                     <SelectItem value="Infrastructure">Infrastructure</SelectItem>
                                                     <SelectItem value="API IA">API IA</SelectItem>
                                                     <SelectItem value="Auth & Data">Auth & Data</SelectItem>

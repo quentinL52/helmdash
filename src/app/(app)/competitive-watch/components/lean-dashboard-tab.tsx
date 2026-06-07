@@ -165,7 +165,6 @@ export function LeanDashboardTab({ onTabChange }: LeanDashboardTabProps) {
                         <Button
                             onClick={handleNew}
                             size="sm"
-                            className="bg-primary hover:bg-primary/90 text-foreground"
                         >
                             <Plus className="mr-1.5 h-4 w-4" /> {language === 'fr' ? 'Ajouter un compétiteur' : t.addCompetitor}
                         </Button>
@@ -181,7 +180,7 @@ export function LeanDashboardTab({ onTabChange }: LeanDashboardTabProps) {
                     {competitors.length === 0 && !isInlineFormOpen ? (
                         <div className="py-8 text-center">
                             <p className="text-muted-foreground mb-4">{t.noCompetitors}</p>
-                            <Button onClick={handleNew} variant="outline">
+                            <Button onClick={handleNew}>
                                 <Plus className="h-4 w-4 mr-2" /> {language === 'fr' ? 'Ajouter un compétiteur' : t.addCompetitor}
                             </Button>
                         </div>

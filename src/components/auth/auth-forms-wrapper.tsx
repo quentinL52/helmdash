@@ -119,7 +119,7 @@ export function AuthFormsWrapper() {
                 <CardFooter className="flex flex-col space-y-4">
                     <Button
                         type="submit"
-                        className="w-full bg-[#6c5ce7] hover:bg-[#6c5ce7]/90 text-white"
+                        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                         disabled={loading}
                     >
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -166,7 +166,7 @@ export function AuthFormsWrapper() {
                         <button
                             type="button"
                             onClick={() => setIsSignUp(!isSignUp)}
-                            className="ml-2 text-[#6c5ce7] hover:underline"
+                            className="ml-2 text-primary hover:underline"
                         >
                             {isSignUp ? "Se connecter" : "S'inscrire"}
                         </button>

@@ -21,7 +21,7 @@ import {
 const PRICING_COLORS: Record<string, string> = {
     free: '#55efc4',
     freemium: '#74b9ff',
-    subscription: '#6c5ce7',
+    subscription: 'hsl(var(--primary))',
     usage: '#fdcb6e',
     enterprise: '#e17055',
     other: '#8b8fa3',
@@ -241,7 +241,7 @@ export function PricingChart() {
                                     {chartData.map((entry, index) => (
                                         <Cell
                                             key={`cell-${index}`}
-                                            fill={entry.isMe ? '#6c5ce7' : (PRICING_COLORS[entry.model] || '#8b8fa3')}
+                                            fill={entry.isMe ? 'hsl(var(--primary))' : (PRICING_COLORS[entry.model] || '#8b8fa3')}
                                             opacity={entry.isMe ? 1 : 0.7}
                                             stroke={entry.isMe ? '#a29bfe' : 'none'}
                                             strokeWidth={entry.isMe ? 2 : 0}

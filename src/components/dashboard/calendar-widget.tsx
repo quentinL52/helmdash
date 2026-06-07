@@ -35,14 +35,14 @@ interface CalendarEvent {
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const COLORS = {
-    bg: '#12141c',
-    surface: '#181a24',
-    surfaceHover: '#1e2130',
-    border: '#282c3a',
-    text: '#e8e9ed',
-    textMuted: '#8b8fa3',
-    textDim: '#5c6078',
-    accent: '#6c5ce7',
+    bg: 'transparent',
+    surface: '#030711',
+    surfaceHover: '#0d1117',
+    border: 'rgba(255, 255, 255, 0.1)',
+    text: '#f8fafc',
+    textMuted: '#94a3b8',
+    textDim: '#64748b',
+    accent: 'hsl(var(--primary))',
     accentLight: '#a29bfe',
 };
 

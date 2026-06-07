@@ -66,7 +66,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
 
     const data = useMemo(() => {
         // 1. Flatten all transactions with dates
-        const transactions = finance.monthlyEntries.flatMap(month => {
+        const baseTransactions = finance.monthlyEntries.flatMap(month => {
             const expenses = (month.expenses || []).map(e => ({
                 date: new Date(e.date || `${month.month}-01`),
                 amount: e.amount,
@@ -84,6 +84,40 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
         const today = new Date();
         const start = subMonths(today, 6);
         const end = addMonths(today, 12);
+        const currentMonthStr = format(today, 'yyyy-MM');
+
+        const projectedTransactions = [...baseTransactions];
+        const sortedEntries = [...finance.monthlyEntries].sort((a, b) => b.month.localeCompare(a.month));
+        const latestEntry = sortedEntries.find(e => e.month === currentMonthStr) || sortedEntries[0];
+
+        if (latestEntry) {
+            const futureMonths = eachMonthOfInterval({ start: addMonths(today, 1), end });
+            const latestExpenses = (latestEntry.expenses || []);
+            const latestIncomes = (latestEntry.incomes || []);
+            
+            futureMonths.forEach(fm => {
+                latestExpenses.forEach(e => {
+                    const isMonthly = e.frequency === 'monthly' || (e.isRecurring && !e.frequency);
+                    const isAnnual = e.frequency === 'annual';
+                    if (isMonthly || isAnnual) {
+                        const projectedDate = new Date(e.date || `${latestEntry.month}-01`);
+                        projectedDate.setFullYear(fm.getFullYear(), fm.getMonth());
+                        projectedTransactions.push({ date: projectedDate, amount: isAnnual ? e.amount / 12 : e.amount, type: 'expense' });
+                    }
+                });
+                latestIncomes.forEach(i => {
+                    const isMonthly = i.frequency === 'monthly' || (i.isRecurring && !i.frequency);
+                    const isAnnual = i.frequency === 'annual';
+                    if (isMonthly || isAnnual) {
+                        const projectedDate = new Date(i.date || `${latestEntry.month}-01`);
+                        projectedDate.setFullYear(fm.getFullYear(), fm.getMonth());
+                        projectedTransactions.push({ date: projectedDate, amount: isAnnual ? i.amount / 12 : i.amount, type: 'income' });
+                    }
+                });
+            });
+        }
+
+        const transactions = projectedTransactions;
 
         // 3. Generate Intervals
         let intervals: Date[];
@@ -179,18 +213,34 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
     // Calculate Runway (Months)
     const runwayMonths = useMemo(() => {
         const today = new Date();
-        const lastMonthDate = subMonths(today, 1);
-        const transactions = finance.monthlyEntries.flatMap(month => {
-            const expenses = (month.expenses || []).map(e => ({ amount: e.amount, date: new Date(e.date || `${month.month}-01`), type: 'expense' }));
-            const incomes = (month.incomes || []).map(i => ({ amount: i.amount, date: new Date(i.date || `${month.month}-01`), type: 'income' }));
-            return [...expenses, ...incomes];
-        });
+        const currentMonthStr = format(today, 'yyyy-MM');
+        
+        // Find current month's entry, or fallback to the most recent month
+        const sortedEntries = [...finance.monthlyEntries].sort((a, b) => b.month.localeCompare(a.month));
+        const latestEntry = sortedEntries.find(e => e.month === currentMonthStr) || sortedEntries[0];
 
-        const lastMonthTrans = transactions.filter(t => isSameMonth(t.date, lastMonthDate));
-        const expenses = lastMonthTrans.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0);
-        const incomes = lastMonthTrans.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0);
+        if (!latestEntry) return '∞';
 
-        const burn = expenses - incomes;
+        // Calculate burn using ONLY recurring expenses and incomes
+        const recurringExpenses = (latestEntry.expenses || [])
+            .reduce((sum, e) => {
+                const isMonthly = e.frequency === 'monthly' || (e.isRecurring && !e.frequency);
+                const isAnnual = e.frequency === 'annual';
+                if (isAnnual) return sum + (e.amount / 12);
+                if (isMonthly) return sum + e.amount;
+                return sum;
+            }, 0);
+            
+        const recurringIncomes = (latestEntry.incomes || [])
+            .reduce((sum, i) => {
+                const isMonthly = i.frequency === 'monthly' || (i.isRecurring && !i.frequency);
+                const isAnnual = i.frequency === 'annual';
+                if (isAnnual) return sum + (i.amount / 12);
+                if (isMonthly) return sum + i.amount;
+                return sum;
+            }, 0);
+
+        const burn = recurringExpenses - recurringIncomes;
         if (burn <= 0) return '∞';
         return (finance.cashAvailable / burn).toFixed(1);
 
@@ -208,16 +258,16 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
     };
 
     return (
-        <Card className="col-span-4 bg-slate-900 border-slate-800">
+        <Card className="col-span-4">
             <CardHeader>
                 <CardTitle className="flex justify-between items-center text-foreground">
                     <span>{t.chart.title}</span>
                     <div className="flex items-center gap-4">
                         <Select value={timeframe} onValueChange={(v) => setTimeframe(v as Timeframe)}>
-                            <SelectTrigger className="w-[120px] bg-slate-800 border-slate-700 text-foreground">
+                            <SelectTrigger className="w-[120px]">
                                 <SelectValue placeholder={t.chart.timeframe.month} />
                             </SelectTrigger>
-                            <SelectContent className="bg-slate-800 border-slate-700 text-foreground">
+                            <SelectContent>
                                 <SelectItem value="week">{t.chart.timeframe.week}</SelectItem>
                                 <SelectItem value="month">{t.chart.timeframe.month}</SelectItem>
                                 <SelectItem value="quarter">{t.chart.timeframe.quarter}</SelectItem>
@@ -230,7 +280,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                     <Settings className="h-4 w-4" />
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-80 bg-slate-900 border-slate-800 text-foreground p-4">
+                            <PopoverContent className="w-80 p-4">
                                 <div className="space-y-4">
                                     <h4 className="font-medium leading-none">Settings</h4>
                                     <div className="grid gap-2">
@@ -240,7 +290,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                                 id="targetMRR"
                                                 type="number"
                                                 defaultValue={finance.targetMRR || ''}
-                                                className="col-span-2 bg-slate-800 border-slate-700"
+                                                className="col-span-2"
                                                 onBlur={(e) => updateFinanceData({ targetMRR: parseFloat(e.target.value) || undefined })}
                                             />
                                         </div>
@@ -250,7 +300,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                                 id="firstRevDate"
                                                 type="date"
                                                 defaultValue={finance.firstRevenueDate || ''}
-                                                className="col-span-2 bg-slate-800 border-slate-700"
+                                                className="col-span-2"
                                                 onBlur={(e) => updateFinanceData({ firstRevenueDate: e.target.value || undefined })}
                                             />
                                         </div>
@@ -260,7 +310,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                                 id="firstRevAmt"
                                                 type="number"
                                                 defaultValue={finance.firstRevenueAmount || ''}
-                                                className="col-span-2 bg-slate-800 border-slate-700"
+                                                className="col-span-2"
                                                 onBlur={(e) => updateFinanceData({ firstRevenueAmount: parseFloat(e.target.value) || undefined })}
                                             />
                                         </div>
@@ -296,7 +346,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                                tickFormatter={(value) => value >= 1000 || value <= -1000 ? `${(value / 1000).toFixed(0)}k` : `${value}`}
                             />
                             <YAxis
                                 yAxisId="right"
@@ -305,7 +355,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                                tickFormatter={(value) => value >= 1000 || value <= -1000 ? `${(value / 1000).toFixed(0)}k` : `${value}`}
                             />
                             <Tooltip
                                 contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}

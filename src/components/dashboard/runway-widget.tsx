@@ -19,9 +19,26 @@ export function RunwayWidget() {
 
         if (sortedEntries.length > 0) {
             const lastMonth = sortedEntries[0];
-            const revenue = lastMonth.revenue;
-            const expenses = (lastMonth.expenses || []).reduce((sum, e) => sum + e.amount, 0);
-            monthlyBurn = expenses - revenue;
+            
+            const recurringExpenses = (lastMonth.expenses || [])
+                .reduce((sum, e) => {
+                    const isMonthly = e.frequency === 'monthly' || (e.isRecurring && !e.frequency);
+                    const isAnnual = e.frequency === 'annual';
+                    if (isAnnual) return sum + (e.amount / 12);
+                    if (isMonthly) return sum + e.amount;
+                    return sum;
+                }, 0);
+                
+            const recurringIncomes = (lastMonth.incomes || [])
+                .reduce((sum, i) => {
+                    const isMonthly = i.frequency === 'monthly' || (i.isRecurring && !i.frequency);
+                    const isAnnual = i.frequency === 'annual';
+                    if (isAnnual) return sum + (i.amount / 12);
+                    if (isMonthly) return sum + i.amount;
+                    return sum;
+                }, 0);
+
+            monthlyBurn = recurringExpenses - recurringIncomes;
         }
 
         let runway = '∞';
@@ -41,7 +58,7 @@ export function RunwayWidget() {
     const isWarning = !isNaN(runwayNum) && runwayNum < 6 && runwayNum >= 3;
 
     return (
-        <Card>
+        <Card className="h-full flex flex-col justify-between">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                     Runway
@@ -49,17 +66,17 @@ export function RunwayWidget() {
                 <Wallet className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className={`text-2xl font-bold ${isCritical ? 'text-red-500' : isWarning ? 'text-yellow-500' : 'text-green-500'}`}>
+                <div className={`text-2xl font-bold ${isCritical ? 'text-danger' : isWarning ? 'text-warning' : 'text-success'}`}>
                     {metrics.runway === '∞' ? '∞' : `${metrics.runway} months`}
                 </div>
                 <p className="text-xs text-muted-foreground pt-1">
                     {metrics.burn > 0 ? (
-                        <span className="flex items-center text-red-500">
+                        <span className="flex items-center text-danger">
                             <ArrowDown className="h-3 w-3 mr-1" />
                             {metrics.burn.toLocaleString()}€ / month burn
                         </span>
                     ) : (
-                        <span className="flex items-center text-green-500">
+                        <span className="flex items-center text-success">
                             <ArrowUp className="h-3 w-3 mr-1" />
                             Profitable
                         </span>
@@ -67,7 +84,7 @@ export function RunwayWidget() {
                 </p>
                 <div className="mt-3 h-2 w-full bg-secondary rounded-full overflow-hidden">
                     <div
-                        className={`h-full ${isCritical ? 'bg-red-500' : 'bg-green-500'}`}
+                        className={`h-full ${isCritical ? 'bg-danger' : 'bg-success'}`}
                         style={{ width: `${Math.min((runwayNum || 12) / 12 * 100, 100)}%` }}
                     />
                 </div>

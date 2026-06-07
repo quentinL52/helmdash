@@ -18,7 +18,7 @@ import {
 } from 'recharts';
 
 const COLORS = [
-    '#6c5ce7', '#00cec9', '#e17055', '#fdcb6e', '#74b9ff',
+    'hsl(var(--primary))', '#00cec9', '#e17055', '#fdcb6e', '#74b9ff',
     '#a29bfe', '#55efc4', '#fab1a0', '#81ecec', '#ff7675',
 ];
 

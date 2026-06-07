@@ -96,8 +96,8 @@ export function RadarTab() {
                             <Radar
                                 name={mySolution.name || (language === 'fr' ? 'Ma Solution' : 'My Solution')}
                                 dataKey="mySolution"
-                                stroke="#6c5ce7"
-                                fill="#6c5ce7"
+                                stroke="hsl(var(--primary))"
+                                fill="hsl(var(--primary))"
                                 fillOpacity={0.3}
                                 strokeWidth={3}
                             />

@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useRef, useEffect } from 'react';
 import {
   Card,
   CardContent,
@@ -7,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 import type { LeanCanvasSectionId } from '@/lib/constants';
 
 interface CanvasSectionProps {
@@ -18,29 +18,49 @@ interface CanvasSectionProps {
   onContentChange: (content: string) => void;
   businessConcept: string;
   placeholder?: string;
+  isReadOnly?: boolean;
 }
 
 export function CanvasSection({
-  id,
   title,
   description,
   content,
   onContentChange,
-  businessConcept,
   placeholder,
+  isReadOnly,
 }: CanvasSectionProps) {
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (contentRef.current && contentRef.current.innerText !== content) {
+      if (document.activeElement !== contentRef.current) {
+        contentRef.current.innerText = content || '';
+      }
+    }
+  }, [content]);
+
+  const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
+    onContentChange(e.currentTarget.innerText);
+  };
+
   return (
-    <Card className="h-full flex flex-col relative">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+    <Card className={`h-full flex flex-col relative ${isReadOnly ? 'border-primary/20 shadow-none' : ''}`}>
+      <CardHeader className={isReadOnly ? "p-3 pb-0" : ""}>
+        <CardTitle className={isReadOnly ? "text-sm" : ""}>{title}</CardTitle>
+        <CardDescription className={isReadOnly ? "text-[10px] leading-tight" : ""}>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="flex-grow">
-        <Textarea
-          value={content}
-          onChange={(e) => onContentChange(e.target.value)}
-          className="h-full min-h-[150px] resize-none"
-          placeholder={placeholder || `Ideas for ${title}...`}
+      <CardContent className={`flex-grow ${isReadOnly ? "p-3 pt-2" : ""}`}>
+        <div
+          ref={contentRef}
+          contentEditable={!isReadOnly}
+          suppressContentEditableWarning={true}
+          onInput={handleInput}
+          className={`h-full min-h-[150px] outline-none whitespace-pre-wrap overflow-visible rounded-md text-sm empty:before:content-[attr(data-placeholder)] empty:before:text-muted-foreground ${
+            isReadOnly 
+              ? 'bg-transparent text-xs break-words' 
+              : 'p-3 border focus:ring-2 focus:ring-ring focus:border-input bg-transparent cursor-text'
+          }`}
+          data-placeholder={placeholder}
         />
       </CardContent>
     </Card>

@@ -23,7 +23,7 @@ export function HypothesesWidget() {
     }, [hypotheses]);
 
     return (
-        <Card>
+        <Card className="h-full flex flex-col justify-between">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                     Hypotheses / Experiments
@@ -38,7 +38,7 @@ export function HypothesesWidget() {
 
                 {metrics.lastWin ? (
                     <div className="mt-4 text-xs text-muted-foreground">
-                        <div className="flex items-center text-green-600 mb-1">
+                        <div className="flex items-center text-success mb-1">
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                             Last validated:
                         </div>

@@ -5,8 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useFounderStore, HypothesisStatus, HypothesisRisk, HypothesisCategory } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
 import { BoardSkeleton, TableSkeleton } from '@/components/ui/loading-skeleton';
-import { RecommendationBanner } from '@/components/ui/recommendation-banner';
-import { Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { COLORS } from '@/lib/constants';
 
@@ -23,10 +21,6 @@ const HypothesesList = dynamic(
 export default function HypothesesPage() {
     const language = useFounderStore(s => s.language);
     const t = translations[language].hypotheses;
-
-    const recommendations = useFounderStore(s => s.strategicRecommendations?.hypothesisSuggestions);
-    const showRecommendations = useFounderStore(s => s.showStrategicRecommendations);
-    const toggleRecommendations = useFounderStore(s => s.toggleStrategicRecommendations);
     const addHypothesis = useFounderStore(s => s.addHypothesis);
 
     return (
@@ -36,34 +30,10 @@ export default function HypothesesPage() {
                     <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
                     <p className="text-muted-foreground text-sm">{t.subtitle}</p>
                 </div>
-                <Button
-                    variant="default"
-                    size="sm"
-                    onClick={toggleRecommendations}
-                    style={{ background: showRecommendations ? COLORS.accent + '22' : COLORS.surface, color: showRecommendations ? COLORS.accent : COLORS.textMuted }}
-                >
-                    <Sparkles className="w-4 h-4" />
-                </Button>
             </div>
 
-            {showRecommendations && recommendations && recommendations.length > 0 && (
-                <RecommendationBanner
-                    recommendations={recommendations}
-                    type="hypotheses"
-                    onApply={(item) => addHypothesis({
-                        statement: item.statement,
-                        category: item.category as HypothesisCategory,
-                        riskLevel: 'medium' as HypothesisRisk,
-                        testMethod: item.testMethod,
-                        successCriteria: 'TBD',
-                        status: 'draft' as HypothesisStatus
-                    })}
-                    onDismiss={toggleRecommendations}
-                />
-            )}
-
             <Tabs defaultValue="board" className="h-full flex flex-col">
-                <TabsList className="grid w-[400px] grid-cols-2 bg-[#6c5ce7]/10 text-muted-foreground mb-4">
+                <TabsList className="grid w-[400px] grid-cols-2 bg-primary/10 text-muted-foreground mb-4">
                     <TabsTrigger value="board">{t.tabs.board}</TabsTrigger>
                     <TabsTrigger value="list">{t.tabs.list}</TabsTrigger>
                 </TabsList>

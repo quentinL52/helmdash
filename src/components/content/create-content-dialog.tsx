@@ -32,15 +32,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useFounderStore, ContentIdea, ContentChannel, ContentStatus } from '@/store/founder-store';
 import { Plus, Edit2 } from 'lucide-react';
 
-const COLORS = {
-    background: "#0F1117",
-    surface: "#181a24",
-    border: "#282c3a",
-    text: "#e8e9ed",
-    textMuted: "#8b8fa3",
-    primary: "#6c5ce7",
-    primaryHover: "#5b4cc4",
-};
+
 
 const formSchema = z.object({
     title: z.string().min(2, {
@@ -104,17 +96,13 @@ export function CreateContentDialog({ trigger, idea }: CreateContentDialogProps)
         if (!idea) form.reset();
     }
 
-    const inputStyle = {
-        backgroundColor: COLORS.surface,
-        borderColor: COLORS.border,
-        color: COLORS.text,
-    };
+
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {trigger || (
-                    <Button className="bg-primary hover:bg-primary/90 text-foreground">
+                    <Button className="bg-primary hover:bg-primary/90 text-white">
                         <Plus className="mr-2 h-4 w-4" /> Add Idea
                     </Button>
                 )}
@@ -141,8 +129,7 @@ export function CreateContentDialog({ trigger, idea }: CreateContentDialogProps)
                                         <Input
                                             placeholder="e.g. 5 Lessons from YC"
                                             {...field}
-                                            style={inputStyle}
-                                            className="focus-visible:ring-[#6c5ce7]"
+                                            className="focus-visible:ring-primary"
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -163,7 +150,6 @@ export function CreateContentDialog({ trigger, idea }: CreateContentDialogProps)
                                         >
                                             <FormControl>
                                                 <SelectTrigger
-                                                    style={inputStyle}
                                                     className="focus:ring-primary"
                                                 >
                                                     <SelectValue placeholder="Select channel" />
@@ -195,7 +181,6 @@ export function CreateContentDialog({ trigger, idea }: CreateContentDialogProps)
                                         >
                                             <FormControl>
                                                 <SelectTrigger
-                                                    style={inputStyle}
                                                     className="focus:ring-primary"
                                                 >
                                                     <SelectValue placeholder="Select status" />
@@ -225,8 +210,7 @@ export function CreateContentDialog({ trigger, idea }: CreateContentDialogProps)
                                     <FormControl>
                                         <Textarea
                                             placeholder="Key points, hooks, or full draft..."
-                                            className="min-h-[100px] focus-visible:ring-[#6c5ce7]"
-                                            style={inputStyle}
+                                            className="min-h-[100px] focus-visible:ring-primary"
                                             {...field}
                                         />
                                     </FormControl>
@@ -246,8 +230,7 @@ export function CreateContentDialog({ trigger, idea }: CreateContentDialogProps)
                                             <Input
                                                 placeholder="https://..."
                                                 {...field}
-                                                style={inputStyle}
-                                                className="focus-visible:ring-[#6c5ce7]"
+                                                className="focus-visible:ring-primary"
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -265,8 +248,7 @@ export function CreateContentDialog({ trigger, idea }: CreateContentDialogProps)
                                             <Input
                                                 placeholder="https://..."
                                                 {...field}
-                                                style={inputStyle}
-                                                className="focus-visible:ring-[#6c5ce7]"
+                                                className="focus-visible:ring-primary"
                                             />
                                         </FormControl>
                                         <FormMessage />
@@ -285,8 +267,7 @@ export function CreateContentDialog({ trigger, idea }: CreateContentDialogProps)
                                         <Input
                                             type="date"
                                             {...field}
-                                            style={inputStyle}
-                                            className="focus-visible:ring-[#6c5ce7]"
+                                            className="focus-visible:ring-primary dark:[color-scheme:dark]"
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -304,8 +285,7 @@ export function CreateContentDialog({ trigger, idea }: CreateContentDialogProps)
                                         <Input
                                             placeholder="growth, engineering, life"
                                             {...field}
-                                            style={inputStyle}
-                                            className="focus-visible:ring-[#6c5ce7]"
+                                            className="focus-visible:ring-primary"
                                         />
                                     </FormControl>
                                     <FormMessage />
@@ -322,8 +302,7 @@ export function CreateContentDialog({ trigger, idea }: CreateContentDialogProps)
                                     <FormControl>
                                         <Textarea
                                             placeholder="Write the full content here..."
-                                            className="min-h-[200px] focus-visible:ring-[#6c5ce7]"
-                                            style={inputStyle}
+                                            className="min-h-[200px] focus-visible:ring-primary"
                                             {...field}
                                         />
                                     </FormControl>
@@ -343,7 +322,7 @@ export function CreateContentDialog({ trigger, idea }: CreateContentDialogProps)
                             </Button>
                             <Button
                                 type="submit"
-                                className="bg-primary hover:bg-primary/90 text-foreground"
+                                className="bg-primary hover:bg-primary/90 text-white"
                             >
                                 {idea ? 'Save Changes' : 'Create Content'}
                             </Button>

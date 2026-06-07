@@ -14,16 +14,7 @@ interface ContactDialogProps {
     contactToEdit?: Contact | null;
 }
 
-const DATE_INPUT_STYLE: React.CSSProperties = {
-    colorScheme: 'dark',
-    width: '100%',
-    background: '#13151f',
-    border: '1px solid #282c3a',
-    borderRadius: '6px',
-    padding: '8px 12px',
-    color: '#e8e9ed',
-    fontSize: '14px',
-};
+
 
 export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDialogProps) {
     const addContact = useFounderStore(s => s.addContact);
@@ -193,12 +184,12 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="lastContactDate">Dernier contact</Label>
-                            <input
+                            <Input
                                 type="date"
                                 id="lastContactDate"
                                 value={formData.lastContactDate || ''}
                                 onChange={(e) => setFormData({ ...formData, lastContactDate: e.target.value })}
-                                style={DATE_INPUT_STYLE}
+                                className="dark:[color-scheme:dark]"
                             />
                         </div>
                         <div className="space-y-2">
@@ -224,12 +215,12 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="nextActionDate">Prochaine action (Date)</Label>
-                            <input
+                            <Input
                                 type="date"
                                 id="nextActionDate"
                                 value={formData.nextActionDate || ''}
                                 onChange={(e) => setFormData({ ...formData, nextActionDate: e.target.value || undefined })}
-                                style={DATE_INPUT_STYLE}
+                                className="dark:[color-scheme:dark]"
                             />
                         </div>
                         <div className="space-y-2">
@@ -272,7 +263,7 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                         <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="hover:bg-muted hover:text-foreground">
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-foreground">
+                        <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-white">
                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             {contactToEdit ? 'Enregistrer' : 'Ajouter'}
                         </Button>
