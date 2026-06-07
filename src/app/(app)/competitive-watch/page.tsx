@@ -38,7 +38,7 @@ export default function CompetitiveWatchPage() {
                 </div>
                 <Button
                     onClick={() => setShowMySolutionForm(!showMySolutionForm)}
-                    className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-medium"
+                    className="flex items-center gap-2 bg-accent text-white hover:opacity-85 hover:bg-accent rounded-lg px-4 py-2 text-[13px] font-medium transition-all duration-200 border-none"
                 >
                     <LayoutDashboard className="h-4 w-4" />
                     {language === 'fr' ? 'Ma Solution' : 'My Solution'}

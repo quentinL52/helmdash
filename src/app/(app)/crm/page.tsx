@@ -139,7 +139,7 @@ export default function CRMPage() {
                     </Button>
                     <Button
                         onClick={handleNew}
-                        className="bg-primary hover:bg-primary/90 text-white"
+                        className="bg-accent text-white hover:opacity-85 hover:bg-accent rounded-lg px-4 py-2 text-[13px] font-medium transition-all duration-200 border-none"
                     >
                         <Plus className="mr-2 h-4 w-4" /> {t.addContact || 'Ajouter un contact'}
                     </Button>

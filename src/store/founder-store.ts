@@ -369,6 +369,12 @@ export interface ScenarioAnalysis {
     createdAt: string;
 }
 
+export interface LeanCanvasSnapshot {
+    id: string;
+    date: string;
+    data: Record<string, string>;
+}
+
 export interface FounderStore {
     // --- State ---
     userId: string | null; // For data isolation check
@@ -382,6 +388,7 @@ export interface FounderStore {
     routine: RoutineDay[]; // Module 12
     routineHistory: RoutineHistory[]; // Module 12 - Routine Optimization
     leanCanvas: Record<string, string>;
+    leanCanvasSnapshots: LeanCanvasSnapshot[];
     roadmap: RoadmapItem[];
     weeklyReport: WeeklyReport | null; // Module 13
     competitors: Competitor[]; // Module 14
@@ -480,6 +487,8 @@ export interface FounderStore {
 
     // Canvas
     updateCanvasSection: (sectionId: string, content: string) => void;
+    saveLeanCanvasSnapshot: () => void;
+    deleteLeanCanvasSnapshot: (id: string) => void;
 
     // Roadmap
     addRoadmapItem: (item: Omit<RoadmapItem, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -557,6 +566,7 @@ const initialState = {
     ],
     routineHistory: [],
     leanCanvas: {},
+    leanCanvasSnapshots: [],
     roadmap: [], // Initial empty state
     weeklyReport: null,
     competitors: [],
@@ -1004,6 +1014,21 @@ export const useFounderStore = create<FounderStore>()(
                     ...state.leanCanvas,
                     [sectionId]: content,
                 },
+            })),
+
+            saveLeanCanvasSnapshot: () => set((state) => {
+                const newSnapshot = {
+                    id: crypto.randomUUID(),
+                    date: new Date().toISOString(),
+                    data: { ...state.leanCanvas },
+                };
+                return {
+                    leanCanvasSnapshots: [newSnapshot, ...state.leanCanvasSnapshots]
+                };
+            }),
+
+            deleteLeanCanvasSnapshot: (id) => set((state) => ({
+                leanCanvasSnapshots: state.leanCanvasSnapshots.filter(s => s.id !== id)
             })),
 
             // Roadmap Actions

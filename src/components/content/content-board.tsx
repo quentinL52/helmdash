@@ -100,7 +100,7 @@ export function ContentBoard() {
                 </div>
                 <button
                     onClick={() => setShowForm(!showForm)}
-                    className="inline-flex items-center gap-2 rounded-lg cursor-pointer font-medium transition-colors text-sm px-4 py-2 bg-[#6c5ce7] text-white hover:bg-[#6c5ce7]/90"
+                    className="inline-flex items-center gap-2 rounded-lg cursor-pointer font-medium transition-all duration-200 text-[13px] px-4 py-2 bg-accent text-white hover:opacity-85 border-none"
                 >
                     <Plus className="h-4 w-4" /> New Idea
                 </button>

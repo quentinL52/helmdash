@@ -40,7 +40,7 @@ export default function DashboardPage() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <RunwayWidget />
 
-                <Card className="h-full">
+                <Card className="h-full flex flex-col justify-between">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">{t.okrProgress}</CardTitle>
                         <Target className="h-4 w-4 text-muted-foreground" />
@@ -51,7 +51,7 @@ export default function DashboardPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="h-full">
+                <Card className="h-full flex flex-col justify-between">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">{t.routineConsistency}</CardTitle>
                         <CheckCircle className="h-4 w-4 text-muted-foreground" />

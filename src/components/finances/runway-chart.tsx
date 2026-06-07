@@ -66,7 +66,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
 
     const data = useMemo(() => {
         // 1. Flatten all transactions with dates
-        const transactions = finance.monthlyEntries.flatMap(month => {
+        const baseTransactions = finance.monthlyEntries.flatMap(month => {
             const expenses = (month.expenses || []).map(e => ({
                 date: new Date(e.date || `${month.month}-01`),
                 amount: e.amount,
@@ -84,6 +84,32 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
         const today = new Date();
         const start = subMonths(today, 6);
         const end = addMonths(today, 12);
+        const currentMonthStr = format(today, 'yyyy-MM');
+
+        const projectedTransactions = [...baseTransactions];
+        const sortedEntries = [...finance.monthlyEntries].sort((a, b) => b.month.localeCompare(a.month));
+        const latestEntry = sortedEntries.find(e => e.month === currentMonthStr) || sortedEntries[0];
+
+        if (latestEntry) {
+            const futureMonths = eachMonthOfInterval({ start: addMonths(today, 1), end });
+            const latestRecurringExpenses = (latestEntry.expenses || []).filter(e => e.isRecurring);
+            const latestRecurringIncomes = (latestEntry.incomes || []).filter(i => i.isRecurring);
+            
+            futureMonths.forEach(fm => {
+                latestRecurringExpenses.forEach(e => {
+                    const projectedDate = new Date(e.date || `${latestEntry.month}-01`);
+                    projectedDate.setFullYear(fm.getFullYear(), fm.getMonth());
+                    projectedTransactions.push({ date: projectedDate, amount: e.amount, type: 'expense' });
+                });
+                latestRecurringIncomes.forEach(i => {
+                    const projectedDate = new Date(i.date || `${latestEntry.month}-01`);
+                    projectedDate.setFullYear(fm.getFullYear(), fm.getMonth());
+                    projectedTransactions.push({ date: projectedDate, amount: i.amount, type: 'income' });
+                });
+            });
+        }
+
+        const transactions = projectedTransactions;
 
         // 3. Generate Intervals
         let intervals: Date[];
@@ -179,18 +205,24 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
     // Calculate Runway (Months)
     const runwayMonths = useMemo(() => {
         const today = new Date();
-        const lastMonthDate = subMonths(today, 1);
-        const transactions = finance.monthlyEntries.flatMap(month => {
-            const expenses = (month.expenses || []).map(e => ({ amount: e.amount, date: new Date(e.date || `${month.month}-01`), type: 'expense' }));
-            const incomes = (month.incomes || []).map(i => ({ amount: i.amount, date: new Date(i.date || `${month.month}-01`), type: 'income' }));
-            return [...expenses, ...incomes];
-        });
+        const currentMonthStr = format(today, 'yyyy-MM');
+        
+        // Find current month's entry, or fallback to the most recent month
+        const sortedEntries = [...finance.monthlyEntries].sort((a, b) => b.month.localeCompare(a.month));
+        const latestEntry = sortedEntries.find(e => e.month === currentMonthStr) || sortedEntries[0];
 
-        const lastMonthTrans = transactions.filter(t => isSameMonth(t.date, lastMonthDate));
-        const expenses = lastMonthTrans.filter(t => t.type === 'expense').reduce((a, b) => a + b.amount, 0);
-        const incomes = lastMonthTrans.filter(t => t.type === 'income').reduce((a, b) => a + b.amount, 0);
+        if (!latestEntry) return '∞';
 
-        const burn = expenses - incomes;
+        // Calculate burn using ONLY recurring expenses and incomes
+        const recurringExpenses = (latestEntry.expenses || [])
+            .filter(e => e.isRecurring)
+            .reduce((sum, e) => sum + e.amount, 0);
+            
+        const recurringIncomes = (latestEntry.incomes || [])
+            .filter(i => i.isRecurring)
+            .reduce((sum, i) => sum + i.amount, 0);
+
+        const burn = recurringExpenses - recurringIncomes;
         if (burn <= 0) return '∞';
         return (finance.cashAvailable / burn).toFixed(1);
 

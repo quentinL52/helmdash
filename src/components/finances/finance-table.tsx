@@ -208,12 +208,17 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                         <TableCell className="text-gray-300">{entry.date}</TableCell>
                                         <TableCell className="text-gray-300">{entry.label}</TableCell>
                                         <TableCell>
-                                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${entry.type === 'revenue'
-                                                ? 'bg-green-500/10 text-green-400'
-                                                : 'bg-red-500/10 text-red-400'
-                                                }`}>
-                                                {entry.type === 'revenue' ? formT.income : formT.expense}
-                                            </span>
+                                            <div className="flex flex-col gap-1 items-start">
+                                                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${entry.type === 'revenue'
+                                                    ? 'bg-green-500/10 text-green-400'
+                                                    : 'bg-red-500/10 text-red-400'
+                                                    }`}>
+                                                    {entry.type === 'revenue' ? formT.income : formT.expense}
+                                                </span>
+                                                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
+                                                    {entry.isRecurring ? (language === 'fr' ? 'Récurrent' : 'Recurring') : (language === 'fr' ? 'Ponctuel' : 'One-time')}
+                                                </span>
+                                            </div>
                                         </TableCell>
                                         <TableCell className="capitalize text-gray-300">{entry.category}</TableCell>
                                         <TableCell className="text-right font-mono text-gray-300">

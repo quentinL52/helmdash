@@ -258,7 +258,7 @@ export function FeatureMatrixTab() {
                         className="w-64 bg-card border-border text-foreground"
                         onKeyDown={(e) => e.key === 'Enter' && handleAddFeature()}
                     />
-                    <Button onClick={handleAddFeature} disabled={!newFeature.trim()} className="bg-primary hover:bg-primary/90 text-foreground">
+                    <Button onClick={handleAddFeature} disabled={!newFeature.trim()} className="bg-accent text-white hover:opacity-85 hover:bg-accent rounded-lg px-4 py-2 text-[13px] font-medium transition-all duration-200 border-none">
                         <Plus className="h-4 w-4" />
                     </Button>
                 </div>

@@ -41,7 +41,8 @@ const expenseSchema = z.object({
     amount: z.coerce.number().min(0.01, "Amount must be greater than 0"),
     category: z.string(),
     type: z.enum(['expense', 'revenue']),
-    date: z.string().min(1, "Date is required"), // Add date validation
+    date: z.string().min(1, "Date is required"),
+    isRecurring: z.boolean()
 });
 
 export function FinanceEntryForm() {
@@ -67,7 +68,8 @@ export function FinanceEntryForm() {
             amount: 0,
             category: 'Divers',
             type: 'expense',
-            date: format(new Date(), 'yyyy-MM-dd'), // Default to today (local time)
+            date: format(new Date(), 'yyyy-MM-dd'),
+            isRecurring: true
         },
     });
 
@@ -90,7 +92,7 @@ export function FinanceEntryForm() {
                         label: values.label,
                         amount: values.amount,
                         category: values.category as ExpenseCategory,
-                        isRecurring: true, // Default for this form
+                        isRecurring: values.isRecurring,
                         date: values.date
                     }
                 ];
@@ -103,8 +105,8 @@ export function FinanceEntryForm() {
                         id: crypto.randomUUID(),
                         label: values.label,
                         amount: values.amount,
-                        category: 'other' as ExpenseCategory, // Revenue category default
-                        isRecurring: true, // Default for this form
+                        category: 'other' as ExpenseCategory,
+                        isRecurring: values.isRecurring,
                         date: values.date
                     }
                 ];
@@ -125,7 +127,7 @@ export function FinanceEntryForm() {
                         label: values.label,
                         amount: values.amount,
                         category: values.category as ExpenseCategory,
-                        isRecurring: true,
+                        isRecurring: values.isRecurring,
                         date: values.date
                     }
                 ] : [],
@@ -135,7 +137,7 @@ export function FinanceEntryForm() {
                         label: values.label,
                         amount: values.amount,
                         category: 'other' as ExpenseCategory,
-                        isRecurring: true,
+                        isRecurring: values.isRecurring,
                         date: values.date
                     }
                 ] : []
@@ -147,8 +149,9 @@ export function FinanceEntryForm() {
             label: '',
             amount: 0,
             category: 'Divers',
-            type: values.type, // Keep last type
-            date: values.date // Keep last date
+            type: values.type,
+            date: values.date,
+            isRecurring: values.isRecurring
         });
     };
 
@@ -252,7 +255,28 @@ export function FinanceEntryForm() {
                                     )}
                                 />
                             </div>
-                            <div className="grid grid-cols-1 gap-4">
+                            <div className="grid grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="isRecurring"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-foreground">{language === 'fr' ? 'Type de paiement' : 'Payment Type'}</FormLabel>
+                                            <Select onValueChange={(val) => field.onChange(val === 'recurring')} defaultValue={field.value ? 'recurring' : 'one-time'}>
+                                                <FormControl>
+                                                    <SelectTrigger className="bg-slate-800 border-slate-700 text-foreground">
+                                                        <SelectValue placeholder="Select type" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent className="bg-slate-800 border-slate-700 text-foreground">
+                                                    <SelectItem value="recurring">{language === 'fr' ? 'Récurrent' : 'Recurring'}</SelectItem>
+                                                    <SelectItem value="one-time">{language === 'fr' ? 'Ponctuel' : 'One-time'}</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
                                 <FormField
                                     control={form.control}
                                     name="category"
