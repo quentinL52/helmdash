@@ -114,7 +114,7 @@ export function CreateContentDialog({ trigger, idea }: CreateContentDialogProps)
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 {trigger || (
-                    <Button className="bg-primary hover:bg-primary/90 text-foreground">
+                    <Button className="bg-primary hover:bg-primary/90 text-white">
                         <Plus className="mr-2 h-4 w-4" /> Add Idea
                     </Button>
                 )}
@@ -343,7 +343,7 @@ export function CreateContentDialog({ trigger, idea }: CreateContentDialogProps)
                             </Button>
                             <Button
                                 type="submit"
-                                className="bg-primary hover:bg-primary/90 text-foreground"
+                                className="bg-primary hover:bg-primary/90 text-white"
                             >
                                 {idea ? 'Save Changes' : 'Create Content'}
                             </Button>

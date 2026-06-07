@@ -252,10 +252,23 @@ function ContentCard({ idea, onDelete, onStatusChange }: { idea: ContentIdea, on
                 </DropdownMenu>
             </div>
 
+            {idea.imageUrl && (
+                <div className="mb-3 rounded overflow-hidden border border-border/50">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={idea.imageUrl} alt="Cover" className="w-full h-auto object-cover max-h-32" />
+                </div>
+            )}
+
             {idea.description && (
-                <p className="text-[11px] text-muted-foreground mb-3 line-clamp-2 leading-relaxed">
+                <p className="text-[11px] text-muted-foreground mb-3 leading-relaxed">
                     {idea.description}
                 </p>
+            )}
+
+            {idea.contentBody && (
+                <div className="text-[12px] text-foreground mb-3 whitespace-pre-wrap leading-relaxed break-words bg-background/50 p-2 rounded">
+                    {idea.contentBody}
+                </div>
             )}
 
             <div className="flex flex-wrap gap-1.5 items-center">

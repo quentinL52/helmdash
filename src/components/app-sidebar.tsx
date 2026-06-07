@@ -19,7 +19,6 @@ import {
     Target,
     Megaphone,
     Users,
-    Languages,
     LogOut,
     Radar,
 } from 'lucide-react';
@@ -30,7 +29,6 @@ export function AppSidebar() {
     const pathname = usePathname();
     const router = useRouter();
     const language = useFounderStore(s => s.language);
-    const setLanguage = useFounderStore(s => s.setLanguage);
     const supabase = createClient();
     const t = translations[language].nav;
     const common = translations[language].common;
@@ -69,9 +67,7 @@ export function AppSidebar() {
         }, 200);
     }, []);
 
-    const toggleLanguage = () => {
-        setLanguage(language === 'fr' ? 'en' : 'fr');
-    };
+
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
@@ -112,14 +108,14 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3 px-2">
                         <div className="relative w-8 h-8 shrink-0">
                             <Image
-                                src="/Gemini_Generated_Image_8puxnv8puxnv8pux.png"
-                                alt="FounderOS Logo"
+                                src="/AIrh_logo.png"
+                                alt="AIRH Logo"
                                 fill
                                 className="object-contain"
                             />
                         </div>
                         <span className="text-base font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-muted-foreground">
-                            FounderOS
+                            AIRH Founder Central
                         </span>
                     </div>
                 </div>
@@ -149,31 +145,8 @@ export function AppSidebar() {
                     </div>
                 </nav>
 
-                {/* Footer: Language + Account + Sign Out */}
+                {/* Footer: Sign Out */}
                 <div className="p-3 border-t border-border flex flex-col gap-1">
-                    <Button
-                        variant="ghost"
-                        onClick={toggleLanguage}
-                        className="w-full flex items-center gap-2 justify-start px-3 py-2 h-auto text-muted-foreground hover:text-accent-foreground hover:bg-accent"
-                    >
-                        <Languages className="w-4 h-4" />
-                        <span className="text-sm font-medium">
-                            {language === 'fr' ? 'Français' : 'English'}
-                        </span>
-                        <span className="ml-auto text-[11px] bg-muted px-2 py-0.5 rounded text-muted-foreground">
-                            {language.toUpperCase()}
-                        </span>
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        onClick={() => router.push('/settings')}
-                        className="w-full flex items-center gap-2 justify-start px-3 py-2 h-auto text-muted-foreground hover:text-accent-foreground hover:bg-accent"
-                    >
-                        <Users className="w-4 h-4" />
-                        <span className="text-sm font-medium">
-                            {language === 'fr' ? 'Mon compte' : 'My account'}
-                        </span>
-                    </Button>
                     <Button
                         variant="ghost"
                         onClick={handleSignOut}

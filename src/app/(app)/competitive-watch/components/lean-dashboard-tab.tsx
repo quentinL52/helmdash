@@ -165,7 +165,7 @@ export function LeanDashboardTab({ onTabChange }: LeanDashboardTabProps) {
                         <Button
                             onClick={handleNew}
                             size="sm"
-                            className="bg-primary hover:bg-primary/90 text-foreground"
+                            className="bg-primary hover:bg-primary/90 text-white"
                         >
                             <Plus className="mr-1.5 h-4 w-4" /> {language === 'fr' ? 'Ajouter un compétiteur' : t.addCompetitor}
                         </Button>

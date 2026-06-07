@@ -272,7 +272,7 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                         <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="hover:bg-muted hover:text-foreground">
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-foreground">
+                        <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-white">
                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             {contactToEdit ? 'Enregistrer' : 'Ajouter'}
                         </Button>

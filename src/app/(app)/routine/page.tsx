@@ -2,17 +2,7 @@
 
 import { useState } from "react";
 import { useFounderStore } from '@/store/founder-store';
-import { generateRoutineAnalysis } from '@/lib/ai-service';
 import { translations } from '@/lib/translations';
-import { RecommendationBanner } from '@/components/ui/recommendation-banner';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 
 // --- ICONS (inline SVG) ---
 const Icons = {
@@ -27,9 +17,6 @@ const Icons = {
   ),
   X: () => (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-  ),
-  Sparkles: () => (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /></svg>
   ),
 };
 
@@ -71,7 +58,6 @@ const StyledButton = ({ onClick, children, variant = "default", size = "md", sty
     primary: { background: "#6c5ce7", color: "#fff", border: "none" },
     danger: { background: "rgba(255, 77, 79, 0.1)", color: COLORS.delete, border: `1px solid ${COLORS.delete}` },
     ghost: { background: "transparent", color: COLORS.textMuted, border: "none" },
-    ai: { background: "linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)", color: "#fff", border: "none" },
   };
   return (
     <button
@@ -118,24 +104,13 @@ export default function RoutinePage() {
   const addRoutineTask = useFounderStore(s => s.addRoutineTask);
   const updateRoutineTask = useFounderStore(s => s.updateRoutineTask);
   const deleteRoutineTask = useFounderStore(s => s.deleteRoutineTask);
-  const resetRoutineWeek = useFounderStore(s => s.resetRoutineWeek);
-
   const language = useFounderStore(s => s.language);
-
-  const recommendations = useFounderStore(s => s.strategicRecommendations?.routineOptimization);
-  const toggleRecommendations = useFounderStore(s => s.toggleStrategicRecommendations);
 
   const t = translations[language].routine;
   const common = translations[language].common;
 
   const [addingTo, setAddingTo] = useState<string | null>(null);
   const [newTask, setNewTask] = useState("");
-  const [suggestionsExpanded, setSuggestionsExpanded] = useState(false);
-
-  // AI Analysis State
-  const [analysis, setAnalysis] = useState("");
-  const [aiLoading, setAiLoading] = useState(false);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // State for editing task
   const [editingTask, setEditingTask] = useState<{ dayId: string; taskId: string } | null>(null);
@@ -177,20 +152,6 @@ export default function RoutinePage() {
     setEditedTaskText("");
   };
 
-  const handleAnalyzeRoutine = async () => {
-    setAiLoading(true);
-    setIsDialogOpen(true);
-    setAnalysis(t.coach.analyzing);
-    try {
-      const result = await generateRoutineAnalysis(routine, routineHistory);
-      setAnalysis(result);
-    } catch (e) {
-      setAnalysis("Failed to analyze routine.");
-    } finally {
-      setAiLoading(false);
-    }
-  };
-
   // Safe checks for potentially undefined state during hot reload/migration
   const safeRoutine = routine || [];
 
@@ -219,30 +180,6 @@ export default function RoutinePage() {
             </p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <StyledButton variant="ai" onClick={handleAnalyzeRoutine}>
-                  <Icons.Sparkles />
-                  {t.analyze}
-                </StyledButton>
-              </DialogTrigger>
-              <DialogContent className="bg-card border-border text-foreground max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>{t.coach.title}</DialogTitle>
-                  <DialogDescription className="text-gray-400">
-                    {t.coach.desc}
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="mt-4 whitespace-pre-wrap leading-relaxed text-sm text-gray-300">
-                  {aiLoading ? (
-                    <div className="flex items-center gap-2">
-                      <span className="animate-spin">⏳</span> {t.coach.analyzing}
-                    </div>
-                  ) : analysis}
-                </div>
-              </DialogContent>
-            </Dialog>
-
             <div style={{ width: "100px", height: "6px", background: COLORS.surface, borderRadius: "3px", overflow: "hidden" }}>
               <div style={{
                 width: `${progress}%`, height: "100%",
@@ -253,47 +190,8 @@ export default function RoutinePage() {
             <span style={{ fontSize: "12px", color: progress === 100 ? COLORS.success : COLORS.textMuted, fontFamily: "'Space Mono', monospace" }}>
               {Math.round(progress)}%
             </span>
-            <StyledButton size="sm" onClick={resetRoutineWeek}>{t.reset}</StyledButton>
           </div>
         </div>
-
-
-
-        {recommendations && recommendations.length > 0 && (
-          <div className="mb-6">
-            <button
-              onClick={() => setSuggestionsExpanded(v => !v)}
-              className="flex items-center gap-2 text-sm font-medium mb-3 transition-colors"
-              style={{ color: COLORS.textMuted, background: "none", border: "none", cursor: "pointer", padding: 0 }}
-            >
-              <svg
-                width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                style={{ transform: suggestionsExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s ease" }}
-              >
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-              Suggestions de rythme ({recommendations.length})
-            </button>
-            {suggestionsExpanded && (
-              <RecommendationBanner
-                recommendations={recommendations}
-                type="routine"
-                onApply={(item) => {
-                  const isDaily = item.timeframe?.toLowerCase().includes('daily');
-                  if (isDaily) {
-                    ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].forEach(day => {
-                      addRoutineTask(day, item.suggestion);
-                    });
-                  } else {
-                    addRoutineTask('monday', item.suggestion);
-                  }
-                }}
-                onDismiss={toggleRecommendations}
-              />
-            )}
-          </div>
-        )}
-
       </div>
       {/* Columns */}
       <div className="px-8 pb-8">

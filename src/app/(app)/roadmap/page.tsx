@@ -3,8 +3,6 @@
 import { useState } from "react";
 import { useFounderStore, RoadmapItem } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
-import { RecommendationBanner } from '@/components/ui/recommendation-banner';
-import { Sparkles } from 'lucide-react';
 import { COLORS } from '@/lib/constants';
 
 // --- ICONS (inline SVG) ---
@@ -103,10 +101,6 @@ export default function RoadmapPage() {
   const updateRoadmapItem = useFounderStore(s => s.updateRoadmapItem);
   const deleteRoadmapItem = useFounderStore(s => s.deleteRoadmapItem);
 
-  const recommendations = useFounderStore(s => s.strategicRecommendations?.roadmapRecommendations);
-  const showRecommendations = useFounderStore(s => s.showStrategicRecommendations);
-  const toggleRecommendations = useFounderStore(s => s.toggleStrategicRecommendations);
-
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", description: "", status: "todo", priority: "medium", week: "", startDate: "", dueDate: "" });
@@ -170,33 +164,11 @@ export default function RoadmapPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexShrink: 0 }}>
         <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
         <div className="flex items-center gap-2">
-          <Button
-            variant="default"
-            size="sm"
-            onClick={toggleRecommendations}
-            style={{ background: showRecommendations ? COLORS.accent + '22' : COLORS.surface, color: showRecommendations ? COLORS.accent : COLORS.textMuted }}
-          >
-            <Sparkles className="w-4 h-4" />
-          </Button>
           <Button variant="primary" onClick={() => { setShowForm(!showForm); setEditingId(null); setForm({ title: "", description: "", status: "todo", priority: "medium", week: "", startDate: "", dueDate: "" }); }}>
             <Icons.Plus /> {t.new}
           </Button>
         </div>
       </div>
-
-      {showRecommendations && recommendations && recommendations.length > 0 && (
-        <RecommendationBanner
-          recommendations={recommendations}
-          type="roadmap"
-          onApply={(item) => addRoadmapItem({
-            title: item.title,
-            priority: item.priority as any,
-            status: 'todo',
-            week: item.timeframe
-          })}
-          onDismiss={toggleRecommendations}
-        />
-      )}
 
       {showForm && (
         <Card className="scale-in" style={{ marginBottom: "20px", border: `1px solid ${COLORS.accent}33`, flexShrink: 0 }}>

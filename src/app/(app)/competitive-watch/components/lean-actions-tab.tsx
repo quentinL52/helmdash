@@ -49,28 +49,13 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
     const t = (translations[language] as any).competitiveWatch;
     const competitiveIntelligence = useFounderStore((s) => s.competitiveIntelligence);
     const strategicRecommendations = useFounderStore((s) => s.strategicRecommendations);
-    const setStrategicRecommendations = useFounderStore((s) => s.setStrategicRecommendations);
     const addSwotItem = useFounderStore((s) => s.addSwotItem);
     const updateSwotItem = useFounderStore((s) => s.updateSwotItem);
     const removeSwotItem = useFounderStore((s) => s.removeSwotItem);
-    const removeStrategicRecommendation = useFounderStore((s) => s.removeStrategicRecommendation);
-    const addRoadmapItem = useFounderStore((s) => s.addRoadmapItem);
-    const addHypothesis = useFounderStore((s) => s.addHypothesis);
-    const updateCanvasSection = useFounderStore((s) => s.updateCanvasSection);
-    const mySolution = useFounderStore((s) => s.mySolution);
-    const competitors = useFounderStore((s) => s.competitors);
-    const leanCanvas = useFounderStore((s) => s.leanCanvas);
-    const roadmap = useFounderStore((s) => s.roadmap);
-    const hypotheses = useFounderStore((s) => s.hypotheses);
-
-    const [isGenerating, setIsGenerating] = useState(false);
 
     // Local state for editing
     const [editingItem, setEditingItem] = useState<{ type: string; index: number; text: string } | null>(null);
     const [newItemTexts, setNewItemTexts] = useState<Record<string, string>>({});
-
-    // Confirmation dialog state
-    const [showConfirmGenerate, setShowConfirmGenerate] = useState(false);
 
     // --- Lean SWOT (Hybrid: AI > Alerts) ---
     const leanSwot = useMemo(() => {
@@ -114,42 +99,7 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
 
     const hasSwotData = Object.values(leanSwot).some((arr) => arr.length > 0);
 
-    const handleGenerateStrategy = async () => {
-        setIsGenerating(true);
-        setShowConfirmGenerate(false); // Close dialog
-        try {
-            // Import dynamically to avoid circular dependencies if any, or just consistent usage
-            const { generateStrategicRecommendations } = await import('@/lib/ai-service');
 
-            const recommendations = await generateStrategicRecommendations({
-                mySolution,
-                competitors,
-                leanCanvas,
-                roadmap,
-                hypotheses,
-                language,
-            });
-
-            setStrategicRecommendations(recommendations);
-            toast({
-                title: language === 'fr' ? 'Stratégie générée' : 'Strategy generated',
-                description: language === 'fr'
-                    ? 'Nouvelles recommandations disponibles.'
-                    : 'New recommendations available.',
-            });
-        } catch (error) {
-            console.error(error);
-            toast({
-                title: language === 'fr' ? 'Erreur' : 'Error',
-                description: language === 'fr'
-                    ? 'Impossible de générer la stratégie.'
-                    : 'Could not generate strategy.',
-                variant: 'destructive',
-            });
-        } finally {
-            setIsGenerating(false);
-        }
-    };
 
     const handleAddSwotItem = (type: any) => {
         const text = newItemTexts[type]?.trim();
@@ -206,53 +156,9 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
         );
     }
 
-    // --- Essential mode: Lean SWOT + AI Strategy summary ---
+    // --- Essential mode: Lean SWOT ---
     return (
         <div className="space-y-6">
-            {/* Header with Generate Button */}
-            <div className="flex justify-end">
-                <div className="relative">
-                    {/* Confirmation Dialog Component (Simplified inline or Shadcn AlertDialog) */}
-                    {showConfirmGenerate && (
-                        <div className="absolute top-10 right-0 z-50 w-72 bg-popover text-popover-foreground border rounded-md shadow-lg p-4">
-                            <h4 className="font-semibold mb-2 text-sm">{language === 'fr' ? 'Confirmer la régénération ?' : 'Confirm regeneration?'}</h4>
-                            <p className="text-xs text-muted-foreground mb-4">
-                                {language === 'fr'
-                                    ? 'Cela écrasera vos éléments SWOT actuels. Êtes-vous sûr ?'
-                                    : 'This will overwrite your current SWOT items. Are you sure?'}
-                            </p>
-                            <div className="flex justify-end gap-2">
-                                <Button size="sm" variant="ghost" onClick={() => setShowConfirmGenerate(false)}>
-                                    {language === 'fr' ? 'Annuler' : 'Cancel'}
-                                </Button>
-                                <Button size="sm" variant="destructive" onClick={handleGenerateStrategy}>
-                                    {language === 'fr' ? 'Confirmer' : 'Confirm'}
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                            if (hasSwotData) {
-                                setShowConfirmGenerate(true);
-                            } else {
-                                handleGenerateStrategy();
-                            }
-                        }}
-                        disabled={isGenerating}
-                        className="border-primary/30 text-accent-foreground hover:bg-primary/10"
-                    >
-                        {isGenerating ? (
-                            <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> {language === 'fr' ? 'Analyse en cours...' : 'Analyzing...'}</>
-                        ) : (
-                            <><Sparkles className="h-4 w-4 mr-1" /> {language === 'fr' ? 'Actualiser l\'IA Stratégique' : 'Refresh AI Strategy'}</>
-                        )}
-                    </Button>
-                </div>
-            </div>
 
             {/* Lean SWOT */}
             <Card>
@@ -357,125 +263,6 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
                                     </ul>
                                 </div>
                             ))}
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
-
-            {/* AI Strategy Summary */}
-            <Card>
-                <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                        <Brain className="h-4 w-4 text-violet-400" />
-                        <CardTitle className="text-base">{t.leanActions.strategyTitle}</CardTitle>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                        {t.leanActions.strategyDesc}
-                    </p>
-                </CardHeader>
-                <CardContent>
-                    {strategicRecommendations ? (
-                        <div className="space-y-3">
-                            {/* Show top 3 roadmap recommendations */}
-                            {strategicRecommendations.roadmapRecommendations?.slice(0, 3).map((rec, i) => (
-                                <div key={i} className="flex items-start gap-3 p-3 rounded-lg border bg-card">
-                                    <Zap className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-sm font-medium">{rec.title}</div>
-                                        {rec.timeframe && (
-                                            <p className="text-xs text-muted-foreground mt-0.5">{rec.timeframe}</p>
-                                        )}
-                                    </div>
-                                    <div className="flex gap-1 shrink-0">
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            className="text-xs h-7"
-                                            onClick={() => {
-                                                addRoadmapItem({
-                                                    title: rec.title,
-                                                    status: 'todo',
-                                                    priority: rec.priority,
-                                                });
-                                                toast({ title: t.leanDashboard.addToRoadmap, description: rec.title });
-                                                removeStrategicRecommendation('roadmap', rec.title);
-                                            }}
-                                        >
-                                            <Plus className="h-3 w-3 mr-1" />
-                                            {t.leanDashboard.addToRoadmap}
-                                        </Button>
-                                    </div>
-                                </div>
-                            ))}
-
-                            {/* NEW: Show Lean Canvas Recommendations if any */}
-                            {strategicRecommendations.leanCanvasRecommendations?.slice(0, 2).map((rec, i) => (
-                                <div key={`lc-${i}`} className="flex items-start gap-3 p-3 rounded-lg border bg-card border-violet-500/20">
-                                    <Lightbulb className="h-4 w-4 text-violet-400 shrink-0 mt-0.5" />
-                                    <div className="flex-1 min-w-0">
-                                        <span className="text-xs font-semibold text-violet-400 uppercase mb-1 block">
-                                            {rec.section}
-                                        </span>
-                                        <p className="text-sm text-muted-foreground">{rec.suggestion}</p>
-                                    </div>
-                                    <div className="flex gap-1 shrink-0">
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            className="text-xs h-7"
-                                            onClick={() => {
-                                                const sectionMap: Record<string, string> = {
-                                                    'Problem': 'problem',
-                                                    'Solution': 'solution',
-                                                    'Unique Value Proposition': 'uvp',
-                                                    'Unfair Advantage': 'advantage',
-                                                    'Channels': 'channels',
-                                                    'Customer Segments': 'segments',
-                                                    'Cost Structure': 'cost',
-                                                    'Revenue Streams': 'revenue',
-                                                    'Key Metrics': 'metrics'
-                                                };
-                                                const targetSection = sectionMap[rec.section] || 'solution';
-
-                                                const currentContent = leanCanvas[targetSection] || '';
-                                                const newContent = currentContent
-                                                    ? `${currentContent}\n\n• ${rec.suggestion}`
-                                                    : `• ${rec.suggestion}`;
-
-                                                updateCanvasSection(targetSection, newContent);
-                                                toast({
-                                                    title: language === 'fr' ? 'Ajouté au Lean Canvas' : 'Added to Lean Canvas',
-                                                    description: rec.suggestion.slice(0, 50)
-                                                });
-                                                removeStrategicRecommendation('lean', rec.suggestion);
-                                            }}
-                                        >
-                                            <Plus className="h-3 w-3 mr-1" />
-                                            {language === 'fr' ? 'Ajouter' : 'Add'}
-                                        </Button>
-                                    </div>
-                                </div>
-                            ))}
-
-                            {strategicRecommendations.generatedAt && (
-                                <p className="text-xs text-muted-foreground text-right">
-                                    {language === 'fr' ? 'Dernière analyse' : 'Last analysis'}:{' '}
-                                    {new Date(strategicRecommendations.generatedAt).toLocaleString(language)}
-                                </p>
-                            )}
-                        </div>
-                    ) : (
-                        <div className="text-center py-6">
-                            <p className="text-sm text-muted-foreground mb-3">
-                                {t.leanDashboard.noActions}
-                            </p>
-                            <Button variant="outline" size="sm" onClick={() => {
-                                if (hasSwotData) setShowConfirmGenerate(true);
-                                else handleGenerateStrategy();
-                            }} disabled={isGenerating}>
-                                {isGenerating ? <Loader2 className="h-3 w-3 animate-spin mr-2" /> : <Sparkles className="h-3 w-3 mr-2" />}
-                                {language === 'fr' ? 'Générer une stratégie' : 'Generate Strategy'}
-                            </Button>
                         </div>
                     )}
                 </CardContent>
