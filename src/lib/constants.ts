@@ -66,7 +66,7 @@ export const COLORS = {
   background: "#12141c",
   surface: "#1e2029",
   surfaceHover: "#1e2130", // Added for Roadmap compatibility
-  primary: "#6c5ce7",
+  primary: "hsl(var(--primary))",
   accent: "#a29bfe",
   text: "#e8e9ed",
   textMuted: "#8b8fa3",

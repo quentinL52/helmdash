@@ -40,7 +40,7 @@ export function ContentCalendar() {
                             hasContent: {
                                 fontWeight: 'bold',
                                 textDecoration: 'underline',
-                                textDecorationColor: '#6c5ce7',
+                                textDecorationColor: 'hsl(var(--primary))',
                                 textDecorationThickness: '2px',
                                 textUnderlineOffset: '4px'
                             }

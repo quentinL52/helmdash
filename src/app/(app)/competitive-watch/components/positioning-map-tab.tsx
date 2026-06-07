@@ -248,7 +248,7 @@ export function PositioningMapTab() {
                                     mySolution.name || t.mySolution,
                                     mySolution.radarScores?.[xAxis] ?? 5,
                                     mySolution.radarScores?.[yAxis] ?? 5,
-                                    '#6c5ce7',
+                                    'hsl(var(--primary))',
                                     true
                                 )}
                             </svg>

@@ -5,92 +5,9 @@ import { useFounderStore } from '@/store/founder-store';
 import { OkrCard } from '@/components/okr/okr-card';
 import { Plus, Target, TrendingUp, AlertCircle } from 'lucide-react';
 
-// --- COLOR PALETTE ---
-const COLORS = {
-    bg: "#0f1117",
-    surface: "#181a24",
-    surfaceHover: "#1e2130",
-    border: "#282c3a",
-    text: "#e8e9ed",
-    textMuted: "#8b8fa3",
-    textDim: "#5c6078",
-    accent: "#6c5ce7",
-    success: "#00cec9",
-    warning: "#fdcb6e",
-    danger: "#ff6b6b",
-    teal: "#00b894",
-};
-
-// --- REUSABLE COMPONENTS (Matching Roadmap) ---
-const Button = ({ children, onClick, variant = "default", size = "md", style, className, ...props }: any) => {
-    const base: React.CSSProperties = {
-        display: "inline-flex", alignItems: "center", gap: "6px",
-        border: "none", borderRadius: "8px", cursor: "pointer",
-        fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-        transition: "all 0.2s ease",
-        fontSize: size === "sm" ? "12px" : "13px",
-        padding: size === "sm" ? "6px 10px" : "8px 16px",
-    };
-    const variants: Record<string, React.CSSProperties> = {
-        default: { background: COLORS.surfaceHover, color: COLORS.text, border: `1px solid ${COLORS.border}` },
-        primary: { background: "#6c5ce7", color: "#fff", border: "none" },
-        outline: { background: "transparent", color: COLORS.text, border: `1px solid ${COLORS.border}` },
-    };
-    return (
-        <button
-            onClick={onClick}
-            style={{ ...base, ...variants[variant], ...style }}
-            onMouseEnter={(e: any) => { e.target.style.opacity = "0.85"; }}
-            onMouseLeave={(e: any) => { e.target.style.opacity = "1"; }}
-            className={className}
-            {...props}
-        >
-            {children}
-        </button>
-    );
-};
-
-const Input = ({ style, ...props }: any) => (
-    <input
-        style={{
-            background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: "8px",
-            padding: "8px 12px", color: COLORS.text, fontSize: "13px",
-            fontFamily: "'DM Sans', sans-serif", outline: "none", width: "100%",
-            transition: "border-color 0.2s", ...style,
-        }}
-        onFocus={(e: any) => { e.target.style.borderColor = COLORS.accent; }}
-        onBlur={(e: any) => { e.target.style.borderColor = COLORS.border; }}
-        {...props}
-    />
-);
-
-const Card = ({ children, style, className = "" }: any) => (
-    <div className={className} style={{
-        background: COLORS.surface, border: `1px solid ${COLORS.border}`,
-        borderRadius: "12px", padding: "12px", ...style,
-    }}>
-        {children}
-    </div>
-);
-
-const Select = ({ value, onChange, options, style }: any) => (
-    <select
-        value={value}
-        onChange={onChange}
-        style={{
-            background: COLORS.surface, border: `1px solid ${COLORS.border}`, borderRadius: "8px",
-            padding: "8px 12px", color: COLORS.text, fontSize: "13px",
-            fontFamily: "'DM Sans', sans-serif", outline: "none",
-            transition: "border-color 0.2s", ...style,
-        }}
-        onFocus={(e: any) => { e.target.style.borderColor = COLORS.accent; }}
-        onBlur={(e: any) => { e.target.style.borderColor = COLORS.border; }}
-    >
-        {options.map((opt: any) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-        ))}
-    </select>
-);
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function OkrPage() {
     const objectives = useFounderStore(s => s.objectives);
@@ -120,112 +37,103 @@ export default function OkrPage() {
         ? Math.round(objectives.reduce((acc, o) => acc + o.progress, 0) / totalObjectives)
         : 0;
 
-    const animationCSS = `
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        .fade-in { animation: fadeIn 0.3s ease both; }
-        .scale-in { animation: scaleIn 0.25s ease both; }
-    `;
-
     return (
-        <div className="fade-in" style={{ fontFamily: "'DM Sans', sans-serif", color: COLORS.text, height: "100%", display: "flex", flexDirection: "column", padding: "24px 32px 32px" }}>
-            <style>{animationCSS}</style>
-
+        <div className="h-full flex flex-col p-6 lg:p-8 animate-in fade-in duration-300">
             {/* Header */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexShrink: 0 }}>
+            <div className="flex justify-between items-center mb-6 shrink-0">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">OKRs & Goals</h1>
-                    <p style={{ color: COLORS.textMuted, marginTop: "4px" }}>Align your daily execution with your long-term North Star.</p>
+                    <p className="text-muted-foreground mt-1">Align your daily execution with your long-term North Star.</p>
                 </div>
-                <Button variant="primary" onClick={() => setShowForm(!showForm)}>
-                    <Plus style={{ width: 16, height: 16 }} /> New Objective
+                <Button onClick={() => setShowForm(!showForm)}>
+                    <Plus className="w-4 h-4 mr-2" /> New Objective
                 </Button>
             </div>
 
             {/* Inline Add Form */}
             {showForm && (
-                <Card className="scale-in" style={{ marginBottom: "20px", border: `1px solid ${COLORS.accent}33`, flexShrink: 0 }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr auto auto auto", gap: "10px", alignItems: "end" }}>
+                <Card className="mb-6 shrink-0 border-primary/30 animate-in slide-in-from-top-4 duration-200">
+                    <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-[1fr_auto_auto_auto] gap-4 items-end">
                         <Input
                             value={newTitle}
                             onChange={(e: any) => setNewTitle(e.target.value)}
                             placeholder="Objective Statement (e.g. Achieve Product-Market Fit)"
                             autoFocus
                         />
-                        <Select
+                        <select
                             value={newQuarter}
                             onChange={(e: any) => setNewQuarter(e.target.value)}
-                            options={[
-                                { value: "Q4 2025", label: "Q4 2025" },
-                                { value: "Q1 2026", label: "Q1 2026" },
-                                { value: "Q2 2026", label: "Q2 2026" },
-                                { value: "Q3 2026", label: "Q3 2026" },
-                            ]}
-                        />
-                        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                            <label style={{ fontSize: "11px", color: COLORS.textMuted, fontWeight: 600 }}>Date d'échéance</label>
+                            className="flex h-10 w-full rounded-md border border-input bg-card px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                            <option value="Q4 2025">Q4 2025</option>
+                            <option value="Q1 2026">Q1 2026</option>
+                            <option value="Q2 2026">Q2 2026</option>
+                            <option value="Q3 2026">Q3 2026</option>
+                        </select>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-muted-foreground">Date d'échéance</label>
                             <Input
                                 type="date"
                                 value={newEndDate}
                                 onChange={(e: any) => setNewEndDate(e.target.value)}
-                                style={{ colorScheme: "dark", minWidth: "140px" }}
+                                className="min-w-[140px] dark:[color-scheme:dark]"
                             />
                         </div>
-                        <div style={{ display: "flex", gap: "8px" }}>
-                            <Button onClick={() => setShowForm(false)}>Cancel</Button>
-                            <Button variant="primary" onClick={handleAddObjective}>Create</Button>
+                        <div className="flex gap-2 h-10">
+                            <Button variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
+                            <Button onClick={handleAddObjective}>Create</Button>
                         </div>
-                    </div>
+                    </CardContent>
                 </Card>
             )}
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <Card style={{ background: `linear-gradient(135deg, ${COLORS.surface} 0%, ${COLORS.surfaceHover} 100%)` }}>
-                    <div className="flex items-center justify-between">
+                <Card className="bg-gradient-to-br from-card to-muted">
+                    <CardContent className="p-4 flex items-center justify-between">
                         <div>
-                            <p style={{ color: COLORS.textMuted, fontSize: "13px", fontWeight: 500 }}>Active Objectives</p>
+                            <p className="text-muted-foreground text-sm font-medium">Active Objectives</p>
                             <h3 className="text-2xl font-bold mt-1">{totalObjectives}</h3>
                         </div>
-                        <div style={{ width: 40, height: 40, borderRadius: "50%", background: `${COLORS.accent}22`, color: COLORS.accent, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
                             <Target className="w-5 h-5" />
                         </div>
-                    </div>
+                    </CardContent>
                 </Card>
-                <Card style={{ background: `linear-gradient(135deg, ${COLORS.surface} 0%, ${COLORS.surfaceHover} 100%)` }}>
-                    <div className="flex items-center justify-between">
+                <Card className="bg-gradient-to-br from-card to-muted">
+                    <CardContent className="p-4 flex items-center justify-between">
                         <div>
-                            <p style={{ color: COLORS.textMuted, fontSize: "13px", fontWeight: 500 }}>Overall Progress</p>
+                            <p className="text-muted-foreground text-sm font-medium">Overall Progress</p>
                             <h3 className="text-2xl font-bold mt-1">{avgProgress}%</h3>
                         </div>
-                        <div style={{ width: 40, height: 40, borderRadius: "50%", background: `${COLORS.warning}22`, color: COLORS.warning, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div className="w-10 h-10 rounded-full bg-warning/10 text-warning flex items-center justify-center">
                             <TrendingUp className="w-5 h-5" />
                         </div>
-                    </div>
+                    </CardContent>
                 </Card>
-                <Card style={{ background: `linear-gradient(135deg, ${COLORS.surface} 0%, ${COLORS.surfaceHover} 100%)` }}>
-                    <div className="flex items-center justify-between">
+                <Card className="bg-gradient-to-br from-card to-muted">
+                    <CardContent className="p-4 flex items-center justify-between">
                         <div>
-                            <p style={{ color: COLORS.textMuted, fontSize: "13px", fontWeight: 500 }}>Completed</p>
+                            <p className="text-muted-foreground text-sm font-medium">Completed</p>
                             <h3 className="text-2xl font-bold mt-1">{completedObjectives}</h3>
                         </div>
-                        <div style={{ width: 40, height: 40, borderRadius: "50%", background: `${COLORS.success}22`, color: COLORS.success, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        <div className="w-10 h-10 rounded-full bg-success/10 text-success flex items-center justify-center">
                             <AlertCircle className="w-5 h-5" />
                         </div>
-                    </div>
+                    </CardContent>
                 </Card>
             </div>
 
             {/* Objectives List */}
             {objectives.length === 0 ? (
-                <div className="text-center py-20 rounded-xl" style={{ border: `1px dashed ${COLORS.border}`, background: `${COLORS.surface}44` }}>
-                    <Target className="w-12 h-12 mx-auto mb-4" style={{ color: COLORS.textDim }} />
+                <div className="text-center py-20 rounded-xl border border-dashed border-border bg-card/50">
+                    <Target className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
                     <h3 className="text-lg font-medium">No Objectives Set</h3>
-                    <p style={{ color: COLORS.textMuted, marginTop: "8px", marginBottom: "24px" }}>Start by defining what success looks like for this quarter.</p>
+                    <p className="text-muted-foreground mt-2 mb-6">Start by defining what success looks like for this quarter.</p>
                     <Button variant="outline" onClick={() => setShowForm(true)}>Set First Objective</Button>
                 </div>
             ) : (
-                <div className="grid gap-6">
+                <div className="grid gap-6 flex-1 overflow-y-auto pr-1">
                     {objectives.map((obj) => (
                         <OkrCard key={obj.id} objective={obj} />
                     ))}

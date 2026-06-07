@@ -165,7 +165,7 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
                 <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <Swords className="h-4 w-4 text-violet-400" />
+                            <Swords className="h-4 w-4 text-primary" />
                             <CardTitle className="text-base">{t.leanActions.swotTitle}</CardTitle>
                         </div>
                         <p className="text-xs text-muted-foreground">

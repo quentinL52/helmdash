@@ -39,13 +39,15 @@ export interface Hypothesis {
 
 // Module 7: Finances
 export type ExpenseCategory = 'Infrastructure' | 'API IA' | 'Auth & Data' | 'Observabilité' | 'Email' | 'Outils SaaS' | 'Marketing' | 'Divers';
+export type ExpenseFrequency = 'monthly' | 'annual' | 'one-time';
 
 export interface ExpenseItem {
     id: string;
     label: string;
     amount: number;
     category: ExpenseCategory;
-    isRecurring: boolean;
+    isRecurring: boolean; // Keep for backwards compatibility
+    frequency?: ExpenseFrequency;
     date?: string; // ISO Date "YYYY-MM-DD"
 }
 

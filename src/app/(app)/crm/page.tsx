@@ -20,11 +20,11 @@ import { Plus, Search, Mail, Linkedin, RefreshCw, Pencil, Trash2, DownloadCloud 
 import { translations } from '@/lib/translations';
 
 const STATUS_COLORS: Record<ContactStatus, string> = {
-    'À contacter': 'border-blue-500/50 text-blue-400',
-    'En discussion': 'border-yellow-500/50 text-yellow-400',
-    'Qualifié': 'border-orange-500/50 text-orange-400',
-    'Client': 'border-green-500/50 text-green-400',
-    'Perdu': 'border-red-500/50 text-red-400',
+    'À contacter': 'border-primary/50 text-primary',
+    'En discussion': 'border-warning/50 text-warning',
+    'Qualifié': 'border-cyan-500/50 text-cyan-400',
+    'Client': 'border-success/50 text-success',
+    'Perdu': 'border-danger/50 text-danger',
 };
 
 export default function CRMPage() {
@@ -139,7 +139,6 @@ export default function CRMPage() {
                     </Button>
                     <Button
                         onClick={handleNew}
-                        className="bg-accent text-white hover:opacity-85 hover:bg-accent rounded-lg px-4 py-2 text-[13px] font-medium transition-all duration-200 border-none"
                     >
                         <Plus className="mr-2 h-4 w-4" /> {t.addContact || 'Ajouter un contact'}
                     </Button>
@@ -242,7 +241,7 @@ export default function CRMPage() {
                                     <TableCell className="text-sm">
                                         {contact.nextActionDate ? (
                                             <div className="flex flex-col">
-                                                <span className="text-[#a29bfe]">
+                                                <span className="text-primary">
                                                     {new Date(contact.nextActionDate).toLocaleDateString(locale)}
                                                 </span>
                                                 {contact.nextActionLabel && (
@@ -252,7 +251,7 @@ export default function CRMPage() {
                                                 )}
                                             </div>
                                         ) : (
-                                            <span className="text-[#5c6078]">—</span>
+                                            <span className="text-muted-foreground">—</span>
                                         )}
                                     </TableCell>
 

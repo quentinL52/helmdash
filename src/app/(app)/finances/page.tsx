@@ -6,6 +6,9 @@ import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
 import { ChartSkeleton, TableSkeleton, CardSkeleton } from '@/components/ui/loading-skeleton';
 import type { Timeframe } from '@/components/finances/runway-chart';
+import { FinanceKPIs } from '@/components/finances/finance-kpis';
+import { FinanceCharts } from '@/components/finances/finance-charts';
+import { RecurringExpensesList } from '@/components/finances/recurring-expenses-list';
 
 // Lazy load heavy components (recharts, complex tables)
 const RunwayChart = dynamic(
@@ -37,15 +40,20 @@ export default function FinancesPage() {
                 </div>
             </div>
 
+            <FinanceKPIs />
+
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <RunwayChart timeframe={timeframe} setTimeframe={setTimeframe} />
             </div>
 
+            <FinanceCharts />
+
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <div className="col-span-7">
+                <div className="col-span-7 lg:col-span-3">
                     <FinanceEntryForm />
                 </div>
-                <div className="col-span-7">
+                <div className="col-span-7 lg:col-span-4 space-y-4">
+                    <RecurringExpensesList />
                     <FinanceTable timeframe={timeframe} />
                 </div>
             </div>

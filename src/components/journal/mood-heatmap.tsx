@@ -25,7 +25,7 @@ const getMoodColor = (mood?: Mood) => {
 
 const getMoodTextColor = (mood: Mood): string => {
     switch (mood) {
-        case 'great': return '#22c55e';
+        case 'great': return '#22c55e'; // keeping exact colors for heatmap scale
         case 'good': return '#34d399';
         case 'neutral': return '#eab308';
         case 'bad': return '#f97316';
@@ -73,8 +73,8 @@ export function MoodHeatmap({ entries, year = new Date().getFullYear() }: MoodHe
                     left: cardLeft,
                     top: cardTop,
                     zIndex: 9999,
-                    background: '#181a24',
-                    border: '1px solid #282c3a',
+                    background: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
                     borderRadius: '10px',
                     padding: '12px',
                     width: `${CARD_W}px`,
@@ -83,7 +83,7 @@ export function MoodHeatmap({ entries, year = new Date().getFullYear() }: MoodHe
                 }}
             >
                 {/* Date */}
-                <div style={{ fontSize: '12px', fontWeight: 600, color: '#e8e9ed', marginBottom: '6px' }}>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: 'hsl(var(--foreground))', marginBottom: '6px' }}>
                     {format(day, 'd MMMM yyyy', { locale: fr })}
                 </div>
 
@@ -101,7 +101,7 @@ export function MoodHeatmap({ entries, year = new Date().getFullYear() }: MoodHe
                         {/* Contenu */}
                         {entry.content && (
                             <div style={{
-                                fontSize: '11px', color: '#8b8fa3',
+                                fontSize: '11px', color: 'hsl(var(--muted-foreground))',
                                 lineHeight: 1.5, marginBottom: '8px',
                                 overflow: 'hidden',
                                 display: '-webkit-box',
@@ -115,8 +115,8 @@ export function MoodHeatmap({ entries, year = new Date().getFullYear() }: MoodHe
                         {/* Blocages */}
                         {entry.blockers && (
                             <div style={{
-                                fontSize: '10px', color: '#e17055',
-                                background: '#e1705518',
+                                fontSize: '10px', color: 'hsl(var(--danger))',
+                                background: 'hsl(var(--danger) / 0.1)',
                                 borderRadius: '4px', padding: '4px 6px',
                                 marginBottom: '6px',
                             }}>
@@ -131,7 +131,7 @@ export function MoodHeatmap({ entries, year = new Date().getFullYear() }: MoodHe
                                     <span key={tag} style={{
                                         fontSize: '9px', padding: '1px 5px',
                                         borderRadius: '3px',
-                                        background: '#6c5ce720', color: '#a29bfe',
+                                        background: 'hsl(var(--primary) / 0.1)', color: 'hsl(var(--primary))',
                                     }}>
                                         #{tag}
                                     </span>
@@ -140,7 +140,7 @@ export function MoodHeatmap({ entries, year = new Date().getFullYear() }: MoodHe
                         )}
                     </>
                 ) : (
-                    <div style={{ fontSize: '11px', color: '#5c6078', fontStyle: 'italic' }}>
+                    <div style={{ fontSize: '11px', color: 'hsl(var(--muted-foreground))', fontStyle: 'italic' }}>
                         Aucune entrée
                     </div>
                 )}

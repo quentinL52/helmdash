@@ -38,7 +38,7 @@ export default function CompetitiveWatchPage() {
                 </div>
                 <Button
                     onClick={() => setShowMySolutionForm(!showMySolutionForm)}
-                    className="flex items-center gap-2 bg-accent text-white hover:opacity-85 hover:bg-accent rounded-lg px-4 py-2 text-[13px] font-medium transition-all duration-200 border-none"
+                    className="flex items-center gap-2"
                 >
                     <LayoutDashboard className="h-4 w-4" />
                     {language === 'fr' ? 'Ma Solution' : 'My Solution'}
@@ -58,7 +58,7 @@ export default function CompetitiveWatchPage() {
             )}
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-                <TabsList className="grid w-full max-w-[600px] grid-cols-3 bg-[#6c5ce7]/10 text-muted-foreground mb-6">
+                <TabsList className="grid w-full max-w-[600px] grid-cols-3 bg-primary/10 text-muted-foreground mb-6">
                     <TabsTrigger value="dashboard">
                         <LayoutDashboard className="mr-1.5 h-4 w-4" />
                         {t.tabs.dashboard}

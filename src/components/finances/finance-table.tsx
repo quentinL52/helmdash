@@ -164,6 +164,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                 amount: editingEntry.amount,
                 category: editingEntry.category,
                 date: editingEntry.date,
+                frequency: editingEntry.frequency
             });
             setEditingEntry(null);
         }
@@ -171,10 +172,10 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
 
     return (
         <div className="space-y-4">
-            <div className="rounded-md border border-slate-800">
+            <div className="rounded-md border border-border">
                 <Table>
                     <TableHeader>
-                        <TableRow className="border-slate-800 hover:bg-slate-900/50">
+                        <TableRow>
                             <TableHead className="text-gray-400">{t.date}</TableHead>
                             <TableHead className="text-gray-400">{t.description}</TableHead>
                             <TableHead className="text-gray-400">{formT.type}</TableHead>
@@ -185,7 +186,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                     </TableHeader>
                     <TableBody>
                         {entries.length === 0 ? (
-                            <TableRow className="border-slate-800">
+                            <TableRow>
                                 <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">
                                     No entries found.
                                 </TableCell>
@@ -195,7 +196,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                             entries.map((entry) => {
                                 if (entry.isHeader) {
                                     return (
-                                        <TableRow key={entry.id} className="bg-slate-900/80 hover:bg-slate-900/80 border-slate-700">
+                                        <TableRow key={entry.id} className="bg-muted/50 hover:bg-muted/50">
                                             <TableCell colSpan={6} className="text-foreground font-bold py-3 pl-4">
                                                 {entry.headerLabel}
                                             </TableCell>
@@ -204,7 +205,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                 }
 
                                 return (
-                                    <TableRow key={entry.id} className="border-slate-800 hover:bg-slate-900/50">
+                                    <TableRow key={entry.id}>
                                         <TableCell className="text-gray-300">{entry.date}</TableCell>
                                         <TableCell className="text-gray-300">{entry.label}</TableCell>
                                         <TableCell>
@@ -216,7 +217,9 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                                     {entry.type === 'revenue' ? formT.income : formT.expense}
                                                 </span>
                                                 <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
-                                                    {entry.isRecurring ? (language === 'fr' ? 'Récurrent' : 'Recurring') : (language === 'fr' ? 'Ponctuel' : 'One-time')}
+                                                    {entry.frequency === 'annual' ? (language === 'fr' ? 'Annuel' : 'Annual') : 
+                                                     (entry.frequency === 'monthly' || entry.isRecurring) ? (language === 'fr' ? 'Mensuel' : 'Monthly') : 
+                                                     (language === 'fr' ? 'Ponctuel' : 'One-time')}
                                                 </span>
                                             </div>
                                         </TableCell>
@@ -258,7 +261,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
 
             {/* Delete Confirmation */}
             <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
-                <AlertDialogContent className="bg-slate-900 border-slate-800">
+                <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle className="text-foreground">{translations.en.common.error}</AlertDialogTitle> {/* Using common error/confirmation title would be better if added, sticking to EN for generic title or add 'Confirmation' key */}
                         <AlertDialogDescription className="text-gray-300">
@@ -276,7 +279,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
 
             {/* Edit Dialog */}
             <Dialog open={!!editingEntry} onOpenChange={(open) => !open && setEditingEntry(null)}>
-                <DialogContent className="bg-slate-900 border-slate-800 text-foreground sm:max-w-[425px]">
+                <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
                         <DialogTitle className="text-foreground">Edit Entry</DialogTitle>
                         <DialogDescription className="text-gray-300">
@@ -294,7 +297,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                     type="date"
                                     value={editingEntry.date}
                                     onChange={(e) => setEditingEntry({ ...editingEntry, date: e.target.value })}
-                                    className="col-span-3 bg-slate-800 border-slate-700 text-foreground"
+                                    className="col-span-3"
                                 />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
@@ -305,7 +308,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                     id="label"
                                     value={editingEntry.label}
                                     onChange={(e) => setEditingEntry({ ...editingEntry, label: e.target.value })}
-                                    className="col-span-3 bg-slate-800 border-slate-700 text-foreground"
+                                    className="col-span-3"
                                 />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
@@ -317,7 +320,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                     type="number"
                                     value={editingEntry.amount}
                                     onChange={(e) => setEditingEntry({ ...editingEntry, amount: parseFloat(e.target.value) || 0 })}
-                                    className="col-span-3 bg-slate-800 border-slate-700 text-foreground"
+                                    className="col-span-3"
                                 />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
@@ -330,10 +333,10 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                         onValueChange={(val) => setEditingEntry({ ...editingEntry, category: val as ExpenseCategory })}
                                         disabled={editingEntry.type === 'revenue'}
                                     >
-                                        <SelectTrigger className="bg-slate-800 border-slate-700 text-foreground">
+                                        <SelectTrigger className="">
                                             <SelectValue placeholder="Select category" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-slate-800 border-slate-700 text-foreground">
+                                        <SelectContent className="">
                                             <SelectItem value="Infrastructure">Infrastructure</SelectItem>
                                             <SelectItem value="API IA">API IA</SelectItem>
                                             <SelectItem value="Auth & Data">Auth & Data</SelectItem>
@@ -342,6 +345,26 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                             <SelectItem value="Outils SaaS">Outils SaaS</SelectItem>
                                             <SelectItem value="Marketing">Marketing</SelectItem>
                                             <SelectItem value="Divers">Divers</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="frequency" className="text-right text-gray-300">
+                                    {language === 'fr' ? 'Fréquence' : 'Frequency'}
+                                </Label>
+                                <div className="col-span-3">
+                                    <Select
+                                        value={editingEntry.frequency || (editingEntry.isRecurring ? 'monthly' : 'one-time')}
+                                        onValueChange={(val) => setEditingEntry({ ...editingEntry, frequency: val as any })}
+                                    >
+                                        <SelectTrigger className="">
+                                            <SelectValue placeholder="Select frequency" />
+                                        </SelectTrigger>
+                                        <SelectContent className="">
+                                            <SelectItem value="monthly">{language === 'fr' ? 'Mensuel' : 'Monthly'}</SelectItem>
+                                            <SelectItem value="annual">{language === 'fr' ? 'Annuel' : 'Annual'}</SelectItem>
+                                            <SelectItem value="one-time">{language === 'fr' ? 'Ponctuel' : 'One-time'}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>

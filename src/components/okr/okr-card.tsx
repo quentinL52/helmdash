@@ -51,13 +51,13 @@ export function OkrCard({ objective }: OkrCardProps) {
     };
 
     const getStatusColor = (progress: number) => {
-        if (progress >= 70) return 'bg-green-500';
-        if (progress >= 40) return 'bg-yellow-500';
-        return 'bg-red-500';
+        if (progress >= 70) return 'bg-success';
+        if (progress >= 40) return 'bg-warning';
+        return 'bg-danger';
     };
 
     return (
-        <Card className="mb-4 overflow-hidden border-l-4" style={{ borderLeftColor: objective.progress >= 70 ? '#22c55e' : objective.progress >= 40 ? '#eab308' : '#ef4444' }}>
+        <Card className="mb-4 overflow-hidden border-l-4" style={{ borderLeftColor: objective.progress >= 70 ? 'hsl(var(--success))' : objective.progress >= 40 ? 'hsl(var(--warning))' : 'hsl(var(--danger))' }}>
             <CardHeader className="pb-2">
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -66,9 +66,9 @@ export function OkrCard({ objective }: OkrCardProps) {
                                 {objective.quarter}
                             </Badge>
                             <span className={cn("text-xs font-bold px-1.5 py-0.5 rounded",
-                                objective.progress >= 70 ? "bg-green-100 text-green-700" :
-                                    objective.progress >= 40 ? "bg-yellow-100 text-yellow-700" :
-                                        "bg-red-100 text-red-700"
+                                objective.progress >= 70 ? "bg-success/20 text-success" :
+                                    objective.progress >= 40 ? "bg-warning/20 text-warning" :
+                                        "bg-danger/20 text-danger"
                             )}>
                                 {objective.progress}%
                             </span>

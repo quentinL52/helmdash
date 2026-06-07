@@ -84,34 +84,169 @@ export default function LeanCanvasPage() {
             handleContentChange(section.id, newContent);
           }}
           businessConcept={businessConcept}
-          isExporting={isExporting}
+          isReadOnly={isReadOnly}
         />
       </div>
     );
   };
 
-  const exportPDF = async () => {
+  const escapeHtml = (unsafe: string) => {
+    if (!unsafe) return '';
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+  };
+
+  const buildPdfElement = (data: CanvasData, currentLanguage: string, currentT: any) => {
+    const getTitle = (id: LeanCanvasSectionId) => {
+      switch (id) {
+        case 'Problem': return currentT.sections.problem.title;
+        case 'Solution': return currentT.sections.solution.title;
+        case 'Key Metrics': return currentT.sections.keyMetrics.title;
+        case 'Unique Value Proposition': return currentT.sections.uvp.title;
+        case 'Unfair Advantage': return currentT.sections.unfairAdvantage.title;
+        case 'Channels': return currentT.sections.channels.title;
+        case 'Customer Segments': return currentT.sections.customerSegments.title;
+        case 'Cost Structure': return currentT.sections.costStructure.title;
+        case 'Revenue Streams': return currentT.sections.revenueStreams.title;
+        default: return id;
+      }
+    };
+
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.left = '-9999px';
+    container.style.top = '0';
+    
+    container.innerHTML = `
+      <style>
+        .lean-canvas-pdf {
+          width: 1122px;
+          height: 794px;
+          display: grid;
+          grid-template-columns: repeat(10, 1fr);
+          grid-template-rows: repeat(3, 1fr);
+          gap: 4px;
+          background: #000;
+          border: 1px solid #000;
+          font-family: Arial, sans-serif;
+          box-sizing: border-box;
+        }
+        .pdf-cell {
+          background: #f8f9fa;
+          color: #1a1a1a;
+          padding: 8px 10px;
+          overflow: hidden;
+          font-size: 10px;
+          line-height: 1.4;
+          box-sizing: border-box;
+        }
+        .pdf-cell h3 {
+          font-size: 11px;
+          font-weight: 700;
+          margin: 0 0 4px 0;
+          color: #6c5ce7;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .cell-probleme          { grid-column: 1 / 3; grid-row: 1 / 3; }
+        .cell-solution          { grid-column: 3 / 5; grid-row: 1 / 2; }
+        .cell-indicateurs       { grid-column: 3 / 5; grid-row: 2 / 3; }
+        .cell-pvp               { grid-column: 5 / 7; grid-row: 1 / 3; }
+        .cell-avantage          { grid-column: 7 / 9; grid-row: 1 / 2; }
+        .cell-canaux            { grid-column: 7 / 9; grid-row: 2 / 3; }
+        .cell-segments          { grid-column: 9 / 11; grid-row: 1 / 3; }
+        .cell-couts             { grid-column: 1 / 6; grid-row: 3 / 4; }
+        .cell-revenus           { grid-column: 6 / 11; grid-row: 3 / 4; }
+      </style>
+      <div class="lean-canvas-pdf">
+        <div class="pdf-cell cell-probleme">
+          <h3>${getTitle('Problem')}</h3>
+          <div style="white-space: pre-wrap;">${escapeHtml(data['Problem'])}</div>
+        </div>
+        <div class="pdf-cell cell-solution">
+          <h3>${getTitle('Solution')}</h3>
+          <div style="white-space: pre-wrap;">${escapeHtml(data['Solution'])}</div>
+        </div>
+        <div class="pdf-cell cell-indicateurs">
+          <h3>${getTitle('Key Metrics')}</h3>
+          <div style="white-space: pre-wrap;">${escapeHtml(data['Key Metrics'])}</div>
+        </div>
+        <div class="pdf-cell cell-pvp">
+          <h3>${getTitle('Unique Value Proposition')}</h3>
+          <div style="white-space: pre-wrap;">${escapeHtml(data['Unique Value Proposition'])}</div>
+        </div>
+        <div class="pdf-cell cell-avantage">
+          <h3>${getTitle('Unfair Advantage')}</h3>
+          <div style="white-space: pre-wrap;">${escapeHtml(data['Unfair Advantage'])}</div>
+        </div>
+        <div class="pdf-cell cell-canaux">
+          <h3>${getTitle('Channels')}</h3>
+          <div style="white-space: pre-wrap;">${escapeHtml(data['Channels'])}</div>
+        </div>
+        <div class="pdf-cell cell-segments">
+          <h3>${getTitle('Customer Segments')}</h3>
+          <div style="white-space: pre-wrap;">${escapeHtml(data['Customer Segments'])}</div>
+        </div>
+        <div class="pdf-cell cell-couts">
+          <h3>${getTitle('Cost Structure')}</h3>
+          <div style="white-space: pre-wrap;">${escapeHtml(data['Cost Structure'])}</div>
+        </div>
+        <div class="pdf-cell cell-revenus">
+          <h3>${getTitle('Revenue Streams')}</h3>
+          <div style="white-space: pre-wrap;">${escapeHtml(data['Revenue Streams'])}</div>
+        </div>
+      </div>
+    `;
+    return container;
+  };
+
+  const exportPDF = async (dataToExport?: CanvasData, timestamp?: number) => {
     setIsExporting(true);
     
-    // Give React a tick to re-render as divs
-    setTimeout(async () => {
-      const element = document.getElementById('lean-canvas-export-area');
-      if (!element) {
-        setIsExporting(false);
-        return;
-      }
+    try {
+      const isEvent = dataToExport && typeof dataToExport === 'object' && ('nativeEvent' in dataToExport || 'preventDefault' in dataToExport);
+      const data = (dataToExport && !isEvent) ? dataToExport as CanvasData : canvasData;
       
+      const exportElement = buildPdfElement(data, language, t);
+      document.body.appendChild(exportElement);
+      
+      const filename = timestamp 
+        ? `lean-canvas-${new Date(timestamp).toISOString().split('T')[0]}.pdf` 
+        : 'lean-canvas.pdf';
+
       const opt = {
-        margin:       5,
-        filename:     'lean-canvas-airh.pdf',
-        image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { scale: 2, useCORS: true, windowWidth: 1200 },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        margin:       0,
+        filename,
+        image:        { type: 'png', quality: 1 },
+        html2canvas:  { 
+          scale: 2, 
+          useCORS: true, 
+          windowWidth: 1122, 
+          windowHeight: 794,
+          width: 1122,
+          height: 794,
+          backgroundColor: '#ffffff',
+          logging: false 
+        },
+        jsPDF:        { 
+          unit: 'px', 
+          format: [1122, 794], 
+          orientation: 'landscape',
+          hotfixes: ['px_scaling'] 
+        }
       };
       
-      await html2pdf().set(opt).from(element).save();
+      await html2pdf().set(opt).from(exportElement.lastElementChild).save();
+      document.body.removeChild(exportElement);
+    } catch (e) {
+      console.error(e);
+    } finally {
       setIsExporting(false);
-    }, 100);
+    }
   };
 
   return (
@@ -140,7 +275,7 @@ export default function LeanCanvasPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={exportPDF}
+              onClick={() => exportPDF()}
               disabled={isExporting}
             >
               <Download className="w-4 h-4 mr-2" />
@@ -164,18 +299,17 @@ export default function LeanCanvasPage() {
 
       <div
         id="lean-canvas-export-area"
-        className={`mt-8 grid flex-1 gap-6 ${isExporting ? 'bg-background p-4' : 'grid-cols-1 grid-rows-9 md:grid-cols-2 md:grid-rows-5 lg:grid-cols-10 lg:grid-rows-4'}`}
-        style={isExporting ? { width: '1122px', height: '750px', gridTemplateColumns: 'repeat(10, minmax(0, 1fr))', gridTemplateRows: 'repeat(4, minmax(0, 1fr))', gap: '8px' } : undefined}
+        className="mt-8 grid flex-1 gap-6 grid-cols-1 grid-rows-9 md:grid-cols-2 md:grid-rows-5 lg:grid-cols-10 lg:grid-rows-4"
       >
-        {renderSection(0, isExporting ? "col-span-4 row-span-1" : "lg:col-span-4 md:col-span-1 h-full")}
-        {renderSection(6, isExporting ? "col-span-6 row-span-1" : "lg:col-span-6 md:col-span-1 h-full")}
-        {renderSection(1, isExporting ? "col-span-4 row-span-1" : "lg:col-span-4 md:col-span-1 h-full")}
-        {renderSection(3, isExporting ? "col-span-6 row-span-1" : "lg:col-span-6 md:col-span-1 h-full")}
-        {renderSection(5, isExporting ? "col-span-4 row-span-1" : "lg:col-span-4 md:col-span-1 h-full")}
-        {renderSection(2, isExporting ? "col-span-3 row-span-1" : "lg:col-span-3 md:col-span-1 h-full")}
-        {renderSection(4, isExporting ? "col-span-3 row-span-2" : "lg:col-span-3 md:col-span-2 h-full")}
-        {renderSection(7, isExporting ? "col-span-5 row-span-1" : "lg:col-span-5 md:col-span-1 h-full")}
-        {renderSection(8, isExporting ? "col-span-5 row-span-1" : "lg:col-span-5 md:col-span-1 h-full")}
+        {renderSection(0, "lg:col-span-4 md:col-span-1 h-full")}
+        {renderSection(6, "lg:col-span-6 md:col-span-1 h-full")}
+        {renderSection(1, "lg:col-span-4 md:col-span-1 h-full")}
+        {renderSection(3, "lg:col-span-6 md:col-span-1 h-full")}
+        {renderSection(5, "lg:col-span-4 md:col-span-1 h-full")}
+        {renderSection(2, "lg:col-span-3 md:col-span-1 h-full")}
+        {renderSection(4, "lg:col-span-3 md:col-span-2 h-full")}
+        {renderSection(7, "lg:col-span-5 md:col-span-1 h-full")}
+        {renderSection(8, "lg:col-span-5 md:col-span-1 h-full")}
       </div>
 
       <div className="mt-12 border-t pt-8">
@@ -195,6 +329,16 @@ export default function LeanCanvasPage() {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8"
+                    onClick={() => exportPDF(snapshot.data, snapshot.date)}
+                    disabled={isExporting}
+                  >
+                    <Download className="w-3 h-3 mr-2" />
+                    {language === 'fr' ? 'Exporter' : 'Export'}
+                  </Button>
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="h-8">
@@ -224,7 +368,7 @@ export default function LeanCanvasPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                    className="h-8 text-danger hover:text-danger hover:bg-danger/10"
                     onClick={() => deleteLeanCanvasSnapshot(snapshot.id)}
                   >
                     <Trash2 className="w-4 h-4" />

@@ -53,7 +53,7 @@ export function Paywall({ requiredTier, children, title = "Fonctionnalité Premi
             </p>
 
             <Link href="/pricing" passHref>
-                <Button className="bg-[#6c5ce7] hover:bg-[#6c5ce7]/90 text-white px-8 h-12 text-base font-semibold shadow-md">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 h-12 text-base font-semibold shadow-md">
                     Voir les abonnements
                 </Button>
             </Link>

@@ -36,7 +36,7 @@ const COLORS = {
   text: "#e8e9ed",
   textMuted: "#8b8fa3",
   textDim: "#5c6078",
-  accent: "#6c5ce7",
+  accent: "hsl(var(--primary))",
 };
 
 const POST_IT_COLORS = [
@@ -73,7 +73,7 @@ const Button = ({ children, onClick, variant = "default", size = "md", style, cl
   };
   const variants: Record<string, React.CSSProperties> = {
     default: { background: COLORS.surfaceHover, color: COLORS.text, border: `1px solid ${COLORS.border}` },
-    primary: { background: "#6c5ce7", color: "#fff", border: "none" },
+    primary: { background: "hsl(var(--primary))", color: "#fff", border: "none" },
   };
   return (
     <button

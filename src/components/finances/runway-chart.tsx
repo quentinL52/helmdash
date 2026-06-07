@@ -92,19 +92,27 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
 
         if (latestEntry) {
             const futureMonths = eachMonthOfInterval({ start: addMonths(today, 1), end });
-            const latestRecurringExpenses = (latestEntry.expenses || []).filter(e => e.isRecurring);
-            const latestRecurringIncomes = (latestEntry.incomes || []).filter(i => i.isRecurring);
+            const latestExpenses = (latestEntry.expenses || []);
+            const latestIncomes = (latestEntry.incomes || []);
             
             futureMonths.forEach(fm => {
-                latestRecurringExpenses.forEach(e => {
-                    const projectedDate = new Date(e.date || `${latestEntry.month}-01`);
-                    projectedDate.setFullYear(fm.getFullYear(), fm.getMonth());
-                    projectedTransactions.push({ date: projectedDate, amount: e.amount, type: 'expense' });
+                latestExpenses.forEach(e => {
+                    const isMonthly = e.frequency === 'monthly' || (e.isRecurring && !e.frequency);
+                    const isAnnual = e.frequency === 'annual';
+                    if (isMonthly || isAnnual) {
+                        const projectedDate = new Date(e.date || `${latestEntry.month}-01`);
+                        projectedDate.setFullYear(fm.getFullYear(), fm.getMonth());
+                        projectedTransactions.push({ date: projectedDate, amount: isAnnual ? e.amount / 12 : e.amount, type: 'expense' });
+                    }
                 });
-                latestRecurringIncomes.forEach(i => {
-                    const projectedDate = new Date(i.date || `${latestEntry.month}-01`);
-                    projectedDate.setFullYear(fm.getFullYear(), fm.getMonth());
-                    projectedTransactions.push({ date: projectedDate, amount: i.amount, type: 'income' });
+                latestIncomes.forEach(i => {
+                    const isMonthly = i.frequency === 'monthly' || (i.isRecurring && !i.frequency);
+                    const isAnnual = i.frequency === 'annual';
+                    if (isMonthly || isAnnual) {
+                        const projectedDate = new Date(i.date || `${latestEntry.month}-01`);
+                        projectedDate.setFullYear(fm.getFullYear(), fm.getMonth());
+                        projectedTransactions.push({ date: projectedDate, amount: isAnnual ? i.amount / 12 : i.amount, type: 'income' });
+                    }
                 });
             });
         }
@@ -215,12 +223,22 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
 
         // Calculate burn using ONLY recurring expenses and incomes
         const recurringExpenses = (latestEntry.expenses || [])
-            .filter(e => e.isRecurring)
-            .reduce((sum, e) => sum + e.amount, 0);
+            .reduce((sum, e) => {
+                const isMonthly = e.frequency === 'monthly' || (e.isRecurring && !e.frequency);
+                const isAnnual = e.frequency === 'annual';
+                if (isAnnual) return sum + (e.amount / 12);
+                if (isMonthly) return sum + e.amount;
+                return sum;
+            }, 0);
             
         const recurringIncomes = (latestEntry.incomes || [])
-            .filter(i => i.isRecurring)
-            .reduce((sum, i) => sum + i.amount, 0);
+            .reduce((sum, i) => {
+                const isMonthly = i.frequency === 'monthly' || (i.isRecurring && !i.frequency);
+                const isAnnual = i.frequency === 'annual';
+                if (isAnnual) return sum + (i.amount / 12);
+                if (isMonthly) return sum + i.amount;
+                return sum;
+            }, 0);
 
         const burn = recurringExpenses - recurringIncomes;
         if (burn <= 0) return '∞';
@@ -240,16 +258,16 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
     };
 
     return (
-        <Card className="col-span-4 bg-slate-900 border-slate-800">
+        <Card className="col-span-4">
             <CardHeader>
                 <CardTitle className="flex justify-between items-center text-foreground">
                     <span>{t.chart.title}</span>
                     <div className="flex items-center gap-4">
                         <Select value={timeframe} onValueChange={(v) => setTimeframe(v as Timeframe)}>
-                            <SelectTrigger className="w-[120px] bg-slate-800 border-slate-700 text-foreground">
+                            <SelectTrigger className="w-[120px]">
                                 <SelectValue placeholder={t.chart.timeframe.month} />
                             </SelectTrigger>
-                            <SelectContent className="bg-slate-800 border-slate-700 text-foreground">
+                            <SelectContent>
                                 <SelectItem value="week">{t.chart.timeframe.week}</SelectItem>
                                 <SelectItem value="month">{t.chart.timeframe.month}</SelectItem>
                                 <SelectItem value="quarter">{t.chart.timeframe.quarter}</SelectItem>
@@ -262,7 +280,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                     <Settings className="h-4 w-4" />
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-80 bg-slate-900 border-slate-800 text-foreground p-4">
+                            <PopoverContent className="w-80 p-4">
                                 <div className="space-y-4">
                                     <h4 className="font-medium leading-none">Settings</h4>
                                     <div className="grid gap-2">
@@ -272,7 +290,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                                 id="targetMRR"
                                                 type="number"
                                                 defaultValue={finance.targetMRR || ''}
-                                                className="col-span-2 bg-slate-800 border-slate-700"
+                                                className="col-span-2"
                                                 onBlur={(e) => updateFinanceData({ targetMRR: parseFloat(e.target.value) || undefined })}
                                             />
                                         </div>
@@ -282,7 +300,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                                 id="firstRevDate"
                                                 type="date"
                                                 defaultValue={finance.firstRevenueDate || ''}
-                                                className="col-span-2 bg-slate-800 border-slate-700"
+                                                className="col-span-2"
                                                 onBlur={(e) => updateFinanceData({ firstRevenueDate: e.target.value || undefined })}
                                             />
                                         </div>
@@ -292,7 +310,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                                 id="firstRevAmt"
                                                 type="number"
                                                 defaultValue={finance.firstRevenueAmount || ''}
-                                                className="col-span-2 bg-slate-800 border-slate-700"
+                                                className="col-span-2"
                                                 onBlur={(e) => updateFinanceData({ firstRevenueAmount: parseFloat(e.target.value) || undefined })}
                                             />
                                         </div>
@@ -328,7 +346,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                                tickFormatter={(value) => value >= 1000 || value <= -1000 ? `${(value / 1000).toFixed(0)}k` : `${value}`}
                             />
                             <YAxis
                                 yAxisId="right"
@@ -337,7 +355,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
-                                tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                                tickFormatter={(value) => value >= 1000 || value <= -1000 ? `${(value / 1000).toFixed(0)}k` : `${value}`}
                             />
                             <Tooltip
                                 contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
