@@ -38,7 +38,7 @@ export interface Hypothesis {
 }
 
 // Module 7: Finances
-export type ExpenseCategory = 'saas' | 'hosting' | 'marketing' | 'legal' | 'salary' | 'freelance' | 'other';
+export type ExpenseCategory = 'Infrastructure' | 'API IA' | 'Auth & Data' | 'Observabilité' | 'Email' | 'Outils SaaS' | 'Marketing' | 'Divers';
 
 export interface ExpenseItem {
     id: string;
@@ -71,6 +71,9 @@ export interface FinanceData {
     lastUpdated: string;
     monthlyEntries: MonthlyFinance[];
     oneTimeEntries: OneTimeEntry[];
+    targetMRR?: number;
+    firstRevenueDate?: string;
+    firstRevenueAmount?: number;
     // Scenarios can be added later
 }
 
@@ -110,35 +113,42 @@ export interface Objective {
 }
 
 // Module 10: Content Pipeline
-export type ContentPlatform = 'linkedin' | 'twitter' | 'blog' | 'newsletter' | 'youtube' | 'instagram';
+export type ContentChannel = 'LinkedIn' | 'Article' | 'Newsletter' | 'Thread';
 export type ContentStatus = 'idea' | 'draft' | 'scheduled' | 'published';
 
 export interface ContentIdea {
     id: string;
     title: string;
     description?: string;
-    platform: ContentPlatform;
+    channel: ContentChannel;
     status: ContentStatus;
     date?: string; // Scheduled or Published date
     tags: string[];
+    draftUrl?: string;
+    imageUrl?: string;
+    contentBody?: string;
     createdAt: string;
     updatedAt: string;
 }
 
 // Module 11: CRM Lite
-export type ContactStatus = 'lead' | 'contacted' | 'negotiation' | 'customer' | 'partner' | 'lost';
+export type ContactType = 'candidat' | 'entreprise' | 'investisseur' | 'école';
+export type ContactStatus = 'À contacter' | 'En discussion' | 'Qualifié' | 'Client' | 'Perdu';
 
 export interface Contact {
     id: string;
     name: string;
+    type?: ContactType;
     role?: string;
     company?: string;
     email?: string;
     linkedin?: string;
     status: ContactStatus;
     lastContactDate: string; // ISO Date
-    nextFollowUpDate?: string; // ISO Date
+    nextActionDate?: string; // ISO Date
+    nextActionLabel?: string;
     notes?: string;
+    tags?: string[];
 }
 
 // Module 12: Routine & Dashboard
@@ -392,6 +402,7 @@ export interface FounderStore {
 
     // Finances
     updateCashAvailable: (amount: number) => void;
+    updateFinanceData: (updates: Partial<FinanceData>) => void;
     addMonthlyEntry: (entry: MonthlyFinance) => void;
     updateMonthlyEntry: (id: string, updates: Partial<MonthlyFinance>) => void;
     addOneTimeEntry: (entry: OneTimeEntry) => void;
@@ -623,6 +634,14 @@ export const useFounderStore = create<FounderStore>()(
                 finance: {
                     ...state.finance,
                     cashAvailable: amount,
+                    lastUpdated: new Date().toISOString(),
+                },
+            })),
+
+            updateFinanceData: (updates) => set((state) => ({
+                finance: {
+                    ...state.finance,
+                    ...updates,
                     lastUpdated: new Date().toISOString(),
                 },
             })),

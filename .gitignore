@@ -45,4 +45,5 @@ firebase-debug.log
 firestore-debug.log
 
 # agent
-.agent
+.agents
+nul

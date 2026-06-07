@@ -65,7 +65,7 @@ export function FinanceEntryForm() {
         defaultValues: {
             label: '',
             amount: 0,
-            category: 'other',
+            category: 'Divers',
             type: 'expense',
             date: format(new Date(), 'yyyy-MM-dd'), // Default to today (local time)
         },
@@ -146,7 +146,7 @@ export function FinanceEntryForm() {
         form.reset({
             label: '',
             amount: 0,
-            category: 'other',
+            category: 'Divers',
             type: values.type, // Keep last type
             date: values.date // Keep last date
         });
@@ -266,13 +266,14 @@ export function FinanceEntryForm() {
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent className="bg-slate-800 border-slate-700 text-foreground">
-                                                    <SelectItem value="saas">SaaS</SelectItem>
-                                                    <SelectItem value="hosting">Hosting</SelectItem>
-                                                    <SelectItem value="marketing">Marketing</SelectItem>
-                                                    <SelectItem value="legal">Legal</SelectItem>
-                                                    <SelectItem value="salary">Salary</SelectItem>
-                                                    <SelectItem value="freelance">Freelance</SelectItem>
-                                                    <SelectItem value="other">Other</SelectItem>
+                                                    <SelectItem value="Infrastructure">Infrastructure</SelectItem>
+                                                    <SelectItem value="API IA">API IA</SelectItem>
+                                                    <SelectItem value="Auth & Data">Auth & Data</SelectItem>
+                                                    <SelectItem value="Observabilité">Observabilité</SelectItem>
+                                                    <SelectItem value="Email">Email</SelectItem>
+                                                    <SelectItem value="Outils SaaS">Outils SaaS</SelectItem>
+                                                    <SelectItem value="Marketing">Marketing</SelectItem>
+                                                    <SelectItem value="Divers">Divers</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             <FormMessage />

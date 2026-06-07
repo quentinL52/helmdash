@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { useFounderStore, Contact, ContactStatus } from '@/store/founder-store';
 import { ContactDialog } from '@/components/crm/contact-dialog';
 import { generateFollowUp } from '@/lib/ai-service';
+import { getGoogleProviderToken, fetchGoogleContacts } from '@/lib/google-api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -15,20 +16,20 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Plus, Search, Mail, Linkedin, RefreshCw, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Search, Mail, Linkedin, RefreshCw, Pencil, Trash2, DownloadCloud } from 'lucide-react';
 import { translations } from '@/lib/translations';
 
 const STATUS_COLORS: Record<ContactStatus, string> = {
-    lead: 'border-blue-500/50 text-blue-400',
-    contacted: 'border-yellow-500/50 text-yellow-400',
-    negotiation: 'border-orange-500/50 text-orange-400',
-    customer: 'border-green-500/50 text-green-400',
-    partner: 'border-purple-500/50 text-purple-400',
-    lost: 'border-red-500/50 text-red-400',
+    'À contacter': 'border-blue-500/50 text-blue-400',
+    'En discussion': 'border-yellow-500/50 text-yellow-400',
+    'Qualifié': 'border-orange-500/50 text-orange-400',
+    'Client': 'border-green-500/50 text-green-400',
+    'Perdu': 'border-red-500/50 text-red-400',
 };
 
 export default function CRMPage() {
     const contacts = useFounderStore(s => s.contacts);
+    const addContact = useFounderStore(s => s.addContact);
     const deleteContact = useFounderStore(s => s.deleteContact);
     const language = useFounderStore(s => s.language);
     const t = (translations[language] as any).crm || {};
@@ -38,6 +39,7 @@ export default function CRMPage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
     const [aiLoading, setAiLoading] = useState(false);
+    const [importLoading, setImportLoading] = useState(false);
 
     const filteredContacts = useMemo(() => contacts.filter(c =>
         c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -68,6 +70,51 @@ export default function CRMPage() {
         }
     }, [language]);
 
+    const handleGoogleImport = async () => {
+        setImportLoading(true);
+        try {
+            const token = await getGoogleProviderToken();
+            if (!token) {
+                alert("Vous devez être connecté avec Google pour importer vos contacts.");
+                return;
+            }
+            const googleContacts = await fetchGoogleContacts(token);
+            if (googleContacts.length === 0) {
+                alert("Aucun contact trouvé.");
+                return;
+            }
+            
+            let importedCount = 0;
+            for (const gc of googleContacts) {
+                const name = gc.names?.[0]?.displayName;
+                if (!name) continue;
+                
+                const email = gc.emailAddresses?.[0]?.value || '';
+                const company = gc.organizations?.[0]?.name || '';
+                const role = gc.organizations?.[0]?.title || '';
+                
+                // Avoid simple duplicates
+                if (!contacts.some(c => c.name === name)) {
+                    addContact({
+                        name,
+                        email,
+                        company,
+                        role,
+                        status: 'À contacter',
+                        notes: 'Importé depuis Google Contacts',
+                    });
+                    importedCount++;
+                }
+            }
+            alert(`${importedCount} contact(s) importé(s) avec succès !`);
+        } catch (error) {
+            console.error("Erreur d'import", error);
+            alert("Erreur lors de l'importation. Avez-vous accepté les permissions Google Contacts ?");
+        } finally {
+            setImportLoading(false);
+        }
+    };
+
     const locale = language === 'fr' ? 'fr-FR' : 'en-US';
 
     return (
@@ -80,12 +127,23 @@ export default function CRMPage() {
                         {t.subtitle || 'Gérez votre réseau et vos relations.'}
                     </p>
                 </div>
-                <Button
-                    onClick={handleNew}
-                    className="bg-primary hover:bg-primary/90 text-foreground"
-                >
-                    <Plus className="mr-2 h-4 w-4" /> {t.addContact || 'Ajouter un contact'}
-                </Button>
+                <div className="flex gap-2">
+                    <Button
+                        variant="outline"
+                        onClick={handleGoogleImport}
+                        disabled={importLoading}
+                        className="border-border text-foreground hover:bg-muted"
+                    >
+                        <DownloadCloud className={`mr-2 h-4 w-4 ${importLoading ? 'animate-pulse text-primary' : ''}`} />
+                        {importLoading ? 'Import en cours...' : 'Import Google'}
+                    </Button>
+                    <Button
+                        onClick={handleNew}
+                        className="bg-primary hover:bg-primary/90 text-foreground"
+                    >
+                        <Plus className="mr-2 h-4 w-4" /> {t.addContact || 'Ajouter un contact'}
+                    </Button>
+                </div>
             </div>
 
             {/* Filters */}
@@ -159,6 +217,11 @@ export default function CRMPage() {
                                     {/* Rôle & Entreprise */}
                                     <TableCell className="text-foreground">
                                         <div className="flex flex-col">
+                                            {contact.type && (
+                                                <span className="text-[10px] uppercase tracking-wider text-muted-foreground/80 mb-1">
+                                                    {contact.type}
+                                                </span>
+                                            )}
                                             <span>{contact.role || '-'}</span>
                                             {contact.company && <span className="text-xs text-muted-foreground">{contact.company}</span>}
                                         </div>
@@ -172,15 +235,22 @@ export default function CRMPage() {
                                     </TableCell>
                                     {/* Dernier contact */}
                                     <TableCell className="text-muted-foreground text-sm">
-                                        {new Date(contact.lastContactDate).toLocaleDateString(locale)}
+                                        {contact.lastContactDate ? new Date(contact.lastContactDate).toLocaleDateString(locale) : '—'}
                                     </TableCell>
 
                                     {/* Contact prévu */}
                                     <TableCell className="text-sm">
-                                        {contact.nextFollowUpDate ? (
-                                            <span className="text-[#a29bfe]">
-                                                {new Date(contact.nextFollowUpDate).toLocaleDateString(locale)}
-                                            </span>
+                                        {contact.nextActionDate ? (
+                                            <div className="flex flex-col">
+                                                <span className="text-[#a29bfe]">
+                                                    {new Date(contact.nextActionDate).toLocaleDateString(locale)}
+                                                </span>
+                                                {contact.nextActionLabel && (
+                                                    <span className="text-xs text-muted-foreground truncate max-w-[120px]" title={contact.nextActionLabel}>
+                                                        {contact.nextActionLabel}
+                                                    </span>
+                                                )}
+                                            </div>
                                         ) : (
                                             <span className="text-[#5c6078]">—</span>
                                         )}

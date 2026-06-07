@@ -43,6 +43,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Settings } from 'lucide-react';
 import { translations } from '@/lib/translations';
 
 export type Timeframe = 'week' | 'month' | 'quarter' | 'year';
@@ -54,6 +59,7 @@ interface RunwayChartProps {
 
 export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
     const finance = useFounderStore(s => s.finance);
+    const updateFinanceData = useFounderStore(s => s.updateFinanceData);
     const language = useFounderStore(s => s.language);
     const t = translations[language]?.finance;
     const formT = translations[language]?.finance?.form;
@@ -218,6 +224,50 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                 <SelectItem value="year">{t.chart.timeframe.year}</SelectItem>
                             </SelectContent>
                         </Select>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button variant="ghost" size="icon" className="text-gray-400 hover:text-white">
+                                    <Settings className="h-4 w-4" />
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80 bg-slate-900 border-slate-800 text-foreground p-4">
+                                <div className="space-y-4">
+                                    <h4 className="font-medium leading-none">Settings</h4>
+                                    <div className="grid gap-2">
+                                        <div className="grid grid-cols-3 items-center gap-4">
+                                            <Label htmlFor="targetMRR">Target MRR</Label>
+                                            <Input
+                                                id="targetMRR"
+                                                type="number"
+                                                defaultValue={finance.targetMRR || ''}
+                                                className="col-span-2 bg-slate-800 border-slate-700"
+                                                onBlur={(e) => updateFinanceData({ targetMRR: parseFloat(e.target.value) || undefined })}
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-3 items-center gap-4">
+                                            <Label htmlFor="firstRevDate">First Rev Date</Label>
+                                            <Input
+                                                id="firstRevDate"
+                                                type="date"
+                                                defaultValue={finance.firstRevenueDate || ''}
+                                                className="col-span-2 bg-slate-800 border-slate-700"
+                                                onBlur={(e) => updateFinanceData({ firstRevenueDate: e.target.value || undefined })}
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-3 items-center gap-4">
+                                            <Label htmlFor="firstRevAmt">First Rev Amt (€)</Label>
+                                            <Input
+                                                id="firstRevAmt"
+                                                type="number"
+                                                defaultValue={finance.firstRevenueAmount || ''}
+                                                className="col-span-2 bg-slate-800 border-slate-700"
+                                                onBlur={(e) => updateFinanceData({ firstRevenueAmount: parseFloat(e.target.value) || undefined })}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
                         <span className={`text-2xl font-bold ${Number(runwayMonths) < 3 && runwayMonths !== '∞' ? 'text-red-500' : 'text-green-500'}`}>
                             {runwayMonths} {t.chart.months}
                         </span>
@@ -283,6 +333,24 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                 strokeDasharray="3 3"
                                 label={{ position: 'top', value: t.chart.today, fill: '#fbbf24', fontSize: 12 }}
                             />
+                            {finance.targetMRR ? (
+                                <ReferenceLine
+                                    yAxisId="left"
+                                    y={finance.targetMRR}
+                                    stroke="#10b981"
+                                    strokeDasharray="4 4"
+                                    label={{ position: 'insideTopLeft', value: t.chart.targetMRR || 'Target MRR', fill: '#10b981', fontSize: 12 }}
+                                />
+                            ) : null}
+                            {finance.firstRevenueDate ? (
+                                <ReferenceLine
+                                    yAxisId="left"
+                                    x={new Date(finance.firstRevenueDate).getTime()}
+                                    stroke="#a855f7"
+                                    strokeDasharray="4 4"
+                                    label={{ position: 'top', value: t.chart.firstRevenue || 'First Revenue', fill: '#a855f7', fontSize: 12 }}
+                                />
+                            ) : null}
                             <ReferenceLine yAxisId="right" y={0} stroke="#ef4444" strokeDasharray="3 3" />
                         </ComposedChart>
                     </ResponsiveContainer>

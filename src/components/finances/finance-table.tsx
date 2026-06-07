@@ -329,13 +329,14 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                             <SelectValue placeholder="Select category" />
                                         </SelectTrigger>
                                         <SelectContent className="bg-slate-800 border-slate-700 text-foreground">
-                                            <SelectItem value="saas">SaaS</SelectItem>
-                                            <SelectItem value="hosting">Hosting</SelectItem>
-                                            <SelectItem value="marketing">Marketing</SelectItem>
-                                            <SelectItem value="legal">Legal</SelectItem>
-                                            <SelectItem value="salary">Salary</SelectItem>
-                                            <SelectItem value="freelance">Freelance</SelectItem>
-                                            <SelectItem value="other">Other</SelectItem>
+                                            <SelectItem value="Infrastructure">Infrastructure</SelectItem>
+                                            <SelectItem value="API IA">API IA</SelectItem>
+                                            <SelectItem value="Auth & Data">Auth & Data</SelectItem>
+                                            <SelectItem value="Observabilité">Observabilité</SelectItem>
+                                            <SelectItem value="Email">Email</SelectItem>
+                                            <SelectItem value="Outils SaaS">Outils SaaS</SelectItem>
+                                            <SelectItem value="Marketing">Marketing</SelectItem>
+                                            <SelectItem value="Divers">Divers</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>

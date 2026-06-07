@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import type { LeanCanvasSectionId } from '@/lib/constants';
-import { AISuggestionModal } from './ai-suggestion-modal';
 
 interface CanvasSectionProps {
   id: LeanCanvasSectionId;
@@ -30,10 +29,6 @@ export function CanvasSection({
   businessConcept,
   placeholder,
 }: CanvasSectionProps) {
-  const handleSelectSuggestion = (suggestion: string) => {
-    onContentChange(content ? `${content}\n- ${suggestion}` : `- ${suggestion}`);
-  };
-
   return (
     <Card className="h-full flex flex-col relative">
       <CardHeader>
@@ -48,11 +43,6 @@ export function CanvasSection({
           placeholder={placeholder || `Ideas for ${title}...`}
         />
       </CardContent>
-      <AISuggestionModal
-        sectionId={id}
-        businessConcept={businessConcept}
-        onSelectSuggestion={handleSelectSuggestion}
-      />
     </Card>
   );
 }

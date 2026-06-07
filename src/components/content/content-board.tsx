@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useFounderStore, ContentIdea, ContentStatus, ContentPlatform } from '@/store/founder-store';
+import { useFounderStore, ContentIdea, ContentStatus, ContentChannel } from '@/store/founder-store';
 import { Plus, Calendar, FileText, CheckCircle2, MoreHorizontal, PenSquare, Trash } from 'lucide-react';
 import {
     DropdownMenu,
@@ -9,6 +9,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { CreateContentDialog } from './create-content-dialog';
 
 const COLORS = {
     bg: "#0f1117",
@@ -48,7 +49,7 @@ export function ContentBoard() {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
-        platform: 'twitter' as ContentPlatform,
+        channel: 'LinkedIn' as ContentChannel,
         tags: '',
     });
 
@@ -58,7 +59,7 @@ export function ContentBoard() {
         addContentIdea({
             title: formData.title,
             description: formData.description,
-            platform: formData.platform,
+            channel: formData.channel,
             status: 'idea',
             tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
         });
@@ -66,7 +67,7 @@ export function ContentBoard() {
         setFormData({
             title: '',
             description: '',
-            platform: 'twitter',
+            channel: 'LinkedIn',
             tags: '',
         });
         setShowForm(false);
@@ -133,16 +134,13 @@ export function ContentBoard() {
                         </div>
                         <select
                             style={inputStyle}
-                            value={formData.platform}
-                            onChange={(e) => setFormData({ ...formData, platform: e.target.value as ContentPlatform })}
+                            value={formData.channel}
+                            onChange={(e) => setFormData({ ...formData, channel: e.target.value as ContentChannel })}
                         >
-                            <option value="twitter">Twitter / X</option>
-                            <option value="linkedin">LinkedIn</option>
-                            <option value="blog">Blog / SEO</option>
-                            <option value="newsletter">Newsletter</option>
-                            <option value="youtube">YouTube</option>
-                            <option value="instagram">Instagram</option>
-                            <option value="tiktok">TikTok</option>
+                            <option value="LinkedIn">LinkedIn</option>
+                            <option value="Article">Article</option>
+                            <option value="Newsletter">Newsletter</option>
+                            <option value="Thread">Thread</option>
                         </select>
                         <input
                             style={inputStyle}
@@ -209,14 +207,11 @@ export function ContentBoard() {
 }
 
 function ContentCard({ idea, onDelete, onStatusChange }: { idea: ContentIdea, onDelete: () => void, onStatusChange: (s: ContentStatus) => void }) {
-    const platformColors: Record<string, string> = {
-        twitter: '#1DA1F2',
-        linkedin: '#0A66C2',
-        blog: '#FF9F43',
-        newsletter: '#F8C291',
-        youtube: '#FF0000',
-        instagram: '#E1306C',
-        tiktok: '#000000',
+    const channelColors: Record<string, string> = {
+        LinkedIn: '#0A66C2',
+        Article: '#FF9F43',
+        Newsletter: '#F8C291',
+        Thread: '#1DA1F2',
     };
 
     return (
@@ -238,6 +233,14 @@ function ContentCard({ idea, onDelete, onStatusChange }: { idea: ContentIdea, on
                         </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-card border-border text-foreground">
+                        <CreateContentDialog 
+                            idea={idea} 
+                            trigger={
+                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                    Edit Details
+                                </DropdownMenuItem>
+                            } 
+                        />
                         <DropdownMenuItem onClick={() => onStatusChange('idea')}>Move to Idea</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onStatusChange('draft')}>Move to Draft</DropdownMenuItem>
                         <DropdownMenuItem onClick={() => onStatusChange('scheduled')}>Move to Scheduled</DropdownMenuItem>
@@ -259,12 +262,12 @@ function ContentCard({ idea, onDelete, onStatusChange }: { idea: ContentIdea, on
                 <span
                     className="px-1.5 py-0.5 rounded text-[10px] font-medium border"
                     style={{
-                        borderColor: `${platformColors[idea.platform] || COLORS.border}44`,
-                        color: platformColors[idea.platform] || COLORS.textMuted,
-                        backgroundColor: `${platformColors[idea.platform] || COLORS.border}11`,
+                        borderColor: `${channelColors[idea.channel] || COLORS.border}44`,
+                        color: channelColors[idea.channel] || COLORS.textMuted,
+                        backgroundColor: `${channelColors[idea.channel] || COLORS.border}11`,
                     }}
                 >
-                    {idea.platform}
+                    {idea.channel}
                 </span>
 
                 {idea.tags.map(tag => (

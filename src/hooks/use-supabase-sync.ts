@@ -24,11 +24,18 @@ export function useSupabaseSync() {
     useEffect(() => {
         const getUser = async () => {
             const { data: { user } } = await supabase.auth.getUser();
+            console.log('[Sync] Initial getUser identity:', {
+                id: user?.id,
+                email: user?.email,
+                provider: user?.app_metadata?.provider,
+                metadata: user?.user_metadata
+            });
             setUser(user);
         };
         getUser();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            console.log('[Sync] Auth state change event:', _event, 'User:', session?.user?.email);
             setUser(session?.user ?? null);
         });
 
@@ -44,13 +51,15 @@ export function useSupabaseSync() {
         userIdRef.current = currentUserId;
 
         if (currentUserId && currentUserId !== storedUserId) {
-            console.log('[Sync] User changed or first login, resetting store for isolation.');
-            // Reset and set userId atomically via hydrate to avoid intermediate empty state
-            const initialReset = {
-                ...useFounderStore.getState(),
-            };
-            useFounderStore.getState().reset();
-            useFounderStore.getState().setUserId(currentUserId);
+            // Check if it's a first-time login (guest -> user)
+            if (!storedUserId) {
+                console.log('[Sync] Guest -> User transition, preserving local data.');
+                useFounderStore.getState().setUserId(currentUserId);
+            } else {
+                console.log('[Sync] Account switch detected, resetting store for isolation.');
+                useFounderStore.getState().reset();
+                useFounderStore.getState().setUserId(currentUserId);
+            }
             isLoadedRef.current = false;
         } else if (!currentUserId && storedUserId) {
             console.log('[Sync] User logged out, clearing store.');
@@ -63,11 +72,14 @@ export function useSupabaseSync() {
             if (!user) return;
 
             try {
+                console.log('[Sync] Starting loadData for user:', user.id);
                 const { data, error } = await supabase
                     .from('founder_data')
                     .select('*')
                     .eq('user_id', user.id)
                     .single();
+
+                console.log('[Sync] loadData query result:', { dataFound: !!data, error: error?.message || 'None', errorCode: error?.code });
 
                 // Verify user hasn't changed during async operation
                 if (userIdRef.current !== user.id) {
@@ -90,6 +102,41 @@ export function useSupabaseSync() {
                 }
 
                 if (data) {
+                    const rawKeys = Object.keys(data);
+
+                    // Always synchronize IDs immediately
+                    if (useFounderStore.getState().userId !== user.id) {
+                        console.log(`[Sync] Store userId mismatch (${useFounderStore.getState().userId} vs ${user.id}). Correcting.`);
+                        useFounderStore.getState().setUserId(user.id);
+                    }
+
+                    // HEURISTIC: Check if Supabase has any actual content at all
+                    const hasSupaContent =
+                        (data.hypotheses?.length > 0) ||
+                        (data.objectives?.length > 0) ||
+                        (data.journal_entries?.length > 0) ||
+                        (data.contacts?.length > 0) ||
+                        (data.finance && Object.keys(data.finance).length > 2) ||
+                        (data.lean_canvas && Object.keys(data.lean_canvas).length > 0) ||
+                        (data.my_solution?.name && data.my_solution.name !== "") ||
+                        (data.roadmap?.length > 0);
+
+                    const localState = useFounderStore.getState();
+                    const hasLocalContent =
+                        localState.hypotheses.length > 0 ||
+                        localState.objectives.length > 0 ||
+                        (localState.leanCanvas && Object.keys(localState.leanCanvas).length > 0 && localState.leanCanvas.problem !== "");
+
+                    console.log('[Sync] Comparison:', { hasSupaContent, hasLocalContent, dbUserId: data.user_id });
+
+                    if (!hasSupaContent && hasLocalContent) {
+                        console.log('[Sync] Protecting local guest data. Supabase row is empty.');
+                        isLoadedRef.current = true;
+                        return;
+                    }
+
+                    // If Supabase has data OR local is empty, we must load what's on the account
+                    console.log('[Sync] Loading account data from Supabase...');
                     const stateToHydrate = {
                         hypotheses: data.hypotheses || [],
                         finance: data.finance || {},
@@ -115,23 +162,34 @@ export function useSupabaseSync() {
                         userId: user.id,
                     };
                     useFounderStore.getState().hydrate(stateToHydrate);
+                    console.log('[Sync] Hydration complete. Current store userId:', useFounderStore.getState().userId);
+                } else {
+                    console.log('[Sync] No row found in founder_data for user:', user.id);
                 }
 
-                // Fetch user plan tier
-                const { data: userData } = await supabase
+
+                // Plan tier fetch is currently failing due to missing column in 'users' table.
+                // Re-enable this once the schema is updated.
+                const { data: userData, error: userError } = await supabase
                     .from('users')
                     .select('plan_tier')
                     .eq('id', user.id)
                     .single();
 
                 if (userData?.plan_tier) {
-                    useFounderStore.getState().setPlanTier(userData.plan_tier as 'free' | 'starter' | 'growth' | 'scale');
+                    useFounderStore.getState().setPlanTier(userData.plan_tier as any);
                 }
             } catch (err: any) {
                 console.error('[Sync] Unexpected load error:', err);
+            } finally {
+                isLoadedRef.current = true;
+                const finalState = useFounderStore.getState();
+                console.log('[Sync] Load complete. Store state summary:', {
+                    userId: finalState.userId,
+                    hypothesesCount: finalState.hypotheses?.length || 0,
+                    hasLeanCanvas: !!finalState.leanCanvas,
+                });
             }
-
-            isLoadedRef.current = true;
         }
 
         loadData();
