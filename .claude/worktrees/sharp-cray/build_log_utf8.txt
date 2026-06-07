@@ -1,0 +1,109 @@
+﻿
+> nextn@0.1.0 build
+> next build
+
+node.exe :  ÔÜá 
+Warning: Next.js 
+inferred your 
+workspace root, but 
+it may not be 
+correct.
+Au caractère 
+C:\Program Files\node
+js\npm.ps1:29 : 3
++   & $NODE_EXE 
+$NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: ( ÔÜá Wa   
+ rning: N...not b    
+e correct.:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+ We detected 
+multiple lockfiles 
+and selected the 
+directory of C:\Users
+\quent\package-lock.j
+son as the root 
+directory.
+ To silence this 
+warning, set `outputF
+ileTracingRoot` in 
+your Next.js config, 
+or consider removing 
+one of the lockfiles 
+if it's not needed.
+   See https://nextjs
+.org/docs/app/api-ref
+erence/config/next-co
+nfig-js/output#caveat
+s for more 
+information.
+ Detected additional 
+lockfiles: 
+   * C:\Users\quent\D
+ocuments\Projets\airh
+founderdashboard\pack
+age-lock.json
+
+   Ôû▓ Next.js 15.5.9
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ Ô£ô Compiled successfully in 8.4s
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/28) ...
+   Generating static pages (7/28) 
+   Generating static pages (14/28) 
+   Generating static pages (21/28) 
+ Ô£ô Generating static pages (28/28)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+Ôöî Ôùï /                                    6.18 kB         170 kB
+Ôö£ Ôùï /_not-found                             1 kB         103 kB
+Ôö£ Ôùï /%28app%29/pricing                   4.56 kB         114 kB
+Ôö£ ãÆ /api/ai                                154 B         102 kB
+Ôö£ ãÆ /api/ai/competitive-intelligence       154 B         102 kB
+Ôö£ ãÆ /api/ai/competitor-profile             154 B         102 kB
+Ôö£ ãÆ /api/ai/market-scan                    154 B         102 kB
+Ôö£ ãÆ /api/ai/strategic-recommendations      154 B         102 kB
+Ôö£ ãÆ /api/ai/weekly-report                  154 B         102 kB
+Ôö£ ãÆ /api/checkout                          154 B         102 kB
+Ôö£ ãÆ /api/webhooks/stripe                   154 B         102 kB
+Ôö£ ãÆ /auth/callback                         154 B         102 kB
+Ôö£ Ôùï /brainstorm                           5.1 kB         115 kB
+Ôö£ Ôùï /competitive-watch                    169 kB         328 kB
+Ôö£ Ôùï /content                             2.46 kB         117 kB
+Ôö£ Ôùï /crm                                 8.82 kB         164 kB
+Ôö£ Ôùï /dashboard                           4.66 kB         125 kB
+Ôö£ Ôùï /finances                            3.46 kB         117 kB
+Ôö£ Ôùï /hypotheses                          4.98 kB         134 kB
+Ôö£ Ôùï /icon.png                                0 B            0 B
+Ôö£ Ôùï /journal                             20.9 kB         133 kB
+Ôö£ Ôùï /lean-canvas                         7.46 kB         142 kB
+Ôö£ Ôùï /okr                                 10.5 kB         123 kB
+Ôö£ Ôùï /roadmap                             5.26 kB         129 kB
+Ôö£ Ôùï /routine                             6.47 kB         141 kB
+Ôöö Ôùï /whiteboard                          2.63 kB         105 kB
++ First Load JS shared by all             102 kB
+  Ôö£ chunks/1255-de0c1abd22c7cccd.js      45.2 kB
+  Ôö£ chunks/4bd1b696-182b6b13bdad92e3.js  54.2 kB
+  Ôöö other shared chunks (total)          2.76 kB
+
+
+ãÆ Middleware                             80.9 kB
+
+Ôùï  (Static)   prerendered as static content
+ãÆ  (Dynamic)  server-rendered on demand
+

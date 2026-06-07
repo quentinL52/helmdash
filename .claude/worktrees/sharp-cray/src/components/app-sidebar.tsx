@@ -1,0 +1,193 @@
+'use client';
+
+import { useState, useRef, useCallback } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import { useFounderStore } from '@/store/founder-store';
+import { translations } from '@/lib/translations';
+import {
+    LayoutDashboard,
+    FlaskConical,
+    PieChart,
+    LayoutGrid,
+    KanbanSquare,
+    Repeat,
+    PenSquare,
+    Sparkles,
+    BookOpen,
+    Target,
+    Megaphone,
+    Users,
+    Languages,
+    LogOut,
+    Radar,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { createClient } from '@/utils/supabase/client';
+
+export function AppSidebar() {
+    const pathname = usePathname();
+    const router = useRouter();
+    const language = useFounderStore(s => s.language);
+    const setLanguage = useFounderStore(s => s.setLanguage);
+    const supabase = createClient();
+    const t = translations[language].nav;
+    const common = translations[language].common;
+
+    const [isVisible, setIsVisible] = useState(false);
+    const sidebarRef = useRef<HTMLDivElement>(null);
+    const triggerRef = useRef<HTMLDivElement>(null);
+    const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const navItems = [
+        { href: '/dashboard', label: t.dashboard, icon: LayoutDashboard },
+        { href: '/hypotheses', label: t.hypotheses, icon: FlaskConical },
+        { href: '/finances', label: t.finance, icon: PieChart },
+        { href: '/lean-canvas', label: t.leanCanvas, icon: LayoutGrid },
+        { href: '/roadmap', label: t.roadmap, icon: KanbanSquare },
+        { href: '/routine', label: t.routine, icon: Repeat },
+        { href: '/competitive-watch', label: (translations[language] as any).competitiveWatch?.nav || 'Veille Stratégique', icon: Radar },
+        { href: '/whiteboard', label: t.whiteboard, icon: PenSquare },
+        { href: '/brainstorm', label: t.brainstorm, icon: Sparkles },
+        { href: '/okr', label: t.okr, icon: Target },
+        { href: '/content', label: t.content, icon: Megaphone },
+        { href: '/crm', label: t.crm, icon: Users },
+        { href: '/journal', label: t.journal, icon: BookOpen },
+    ];
+
+    const showSidebar = useCallback(() => {
+        if (hideTimeoutRef.current) {
+            clearTimeout(hideTimeoutRef.current);
+            hideTimeoutRef.current = null;
+        }
+        setIsVisible(true);
+    }, []);
+
+    const hideSidebar = useCallback(() => {
+        hideTimeoutRef.current = setTimeout(() => {
+            setIsVisible(false);
+        }, 200);
+    }, []);
+
+    const toggleLanguage = () => {
+        setLanguage(language === 'fr' ? 'en' : 'fr');
+    };
+
+    const handleSignOut = async () => {
+        await supabase.auth.signOut();
+        router.push('/auth');
+    };
+
+    return (
+        <>
+            {/* Zone de détection invisible côté gauche */}
+            <div
+                ref={triggerRef}
+                className="fixed left-0 top-0 h-full w-[20px] z-[60]"
+                onMouseEnter={showSidebar}
+            />
+
+            {/* Overlay sombre quand sidebar visible */}
+            {isVisible && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-[59] transition-opacity duration-200"
+                    onClick={() => setIsVisible(false)}
+                />
+            )}
+
+            {/* Sidebar */}
+            <aside
+                ref={sidebarRef}
+                className={cn(
+                    "fixed left-0 top-0 h-full w-[240px] z-[61] flex flex-col",
+                    "bg-card border-r border-border shadow-sm",
+                    "transition-transform duration-200 ease-out",
+                    isVisible ? "translate-x-0" : "-translate-x-full"
+                )}
+                onMouseEnter={showSidebar}
+                onMouseLeave={hideSidebar}
+            >
+                {/* Logo */}
+                <div className="p-4 border-b border-border">
+                    <div className="flex items-center gap-3 px-2">
+                        <div className="relative w-8 h-8 shrink-0">
+                            <Image
+                                src="/Gemini_Generated_Image_8puxnv8puxnv8pux.png"
+                                alt="FounderOS Logo"
+                                fill
+                                className="object-contain"
+                            />
+                        </div>
+                        <span className="text-base font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-muted-foreground">
+                            FounderOS
+                        </span>
+                    </div>
+                </div>
+
+                {/* Navigation */}
+                <nav className="flex-1 overflow-y-auto py-3 px-2">
+                    <div className="flex flex-col gap-1">
+                        {navItems.map((item) => {
+                            const isActive = pathname.startsWith(item.href);
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    onClick={() => setIsVisible(false)}
+                                    className={cn(
+                                        "flex items-center gap-3 px-3 py-2 rounded-md text-[13px] font-medium transition-colors duration-150",
+                                        isActive
+                                            ? "bg-primary/10 text-primary"
+                                            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                    )}
+                                >
+                                    <item.icon className="w-4 h-4 shrink-0" />
+                                    <span className="truncate">{item.label}</span>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                </nav>
+
+                {/* Footer: Language + Account + Sign Out */}
+                <div className="p-3 border-t border-border flex flex-col gap-1">
+                    <Button
+                        variant="ghost"
+                        onClick={toggleLanguage}
+                        className="w-full flex items-center gap-2 justify-start px-3 py-2 h-auto text-muted-foreground hover:text-accent-foreground hover:bg-accent"
+                    >
+                        <Languages className="w-4 h-4" />
+                        <span className="text-sm font-medium">
+                            {language === 'fr' ? 'Français' : 'English'}
+                        </span>
+                        <span className="ml-auto text-[11px] bg-muted px-2 py-0.5 rounded text-muted-foreground">
+                            {language.toUpperCase()}
+                        </span>
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        onClick={() => router.push('/settings')}
+                        className="w-full flex items-center gap-2 justify-start px-3 py-2 h-auto text-muted-foreground hover:text-accent-foreground hover:bg-accent"
+                    >
+                        <Users className="w-4 h-4" />
+                        <span className="text-sm font-medium">
+                            {language === 'fr' ? 'Mon compte' : 'My account'}
+                        </span>
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        onClick={handleSignOut}
+                        className="w-full flex items-center gap-2 justify-start px-3 py-2 h-auto text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                        <LogOut className="w-4 h-4" />
+                        <span className="text-sm font-medium">
+                            {language === 'fr' ? 'Se déconnecter' : 'Sign out'}
+                        </span>
+                    </Button>
+                </div>
+            </aside>
+        </>
+    );
+}

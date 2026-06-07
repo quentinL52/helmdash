@@ -36,20 +36,24 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
         role: '',
         email: '',
         linkedin: '',
-        status: 'lead',
+        status: 'À contacter',
+        type: undefined,
         notes: '',
         lastContactDate: new Date().toISOString().split('T')[0],
-        nextFollowUpDate: '',
+        nextActionDate: '',
+        nextActionLabel: '',
+        tags: [],
     });
 
     useEffect(() => {
         if (contactToEdit) {
             setFormData({
                 ...contactToEdit,
-                lastContactDate: contactToEdit.lastContactDate.split('T')[0],
-                nextFollowUpDate: contactToEdit.nextFollowUpDate
-                    ? contactToEdit.nextFollowUpDate.split('T')[0]
+                lastContactDate: contactToEdit.lastContactDate ? contactToEdit.lastContactDate.split('T')[0] : '',
+                nextActionDate: contactToEdit.nextActionDate
+                    ? contactToEdit.nextActionDate.split('T')[0]
                     : '',
+                tags: contactToEdit.tags || [],
             });
         } else {
             setFormData({
@@ -58,10 +62,13 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                 role: '',
                 email: '',
                 linkedin: '',
-                status: 'lead',
+                status: 'À contacter',
+                type: undefined,
                 notes: '',
                 lastContactDate: new Date().toISOString().split('T')[0],
-                nextFollowUpDate: '',
+                nextActionDate: '',
+                nextActionLabel: '',
+                tags: [],
             });
         }
     }, [contactToEdit, open]);
@@ -72,10 +79,11 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
 
         await new Promise(resolve => setTimeout(resolve, 500));
 
-        // Nettoyer nextFollowUpDate si vide
+        // Nettoyer nextActionDate si vide
         const dataToSave = {
             ...formData,
-            nextFollowUpDate: formData.nextFollowUpDate || undefined,
+            nextActionDate: formData.nextActionDate || undefined,
+            lastContactDate: formData.lastContactDate || new Date().toISOString().split('T')[0],
         };
 
         if (contactToEdit) {
@@ -146,12 +154,11 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                                     <SelectValue placeholder="Select status" />
                                 </SelectTrigger>
                                 <SelectContent className="bg-card border-border text-foreground">
-                                    <SelectItem value="lead">Lead</SelectItem>
-                                    <SelectItem value="contacted">Contacté</SelectItem>
-                                    <SelectItem value="negotiation">Négociation</SelectItem>
-                                    <SelectItem value="customer">Client</SelectItem>
-                                    <SelectItem value="partner">Partenaire</SelectItem>
-                                    <SelectItem value="lost">Perdu</SelectItem>
+                                    <SelectItem value="À contacter">À contacter</SelectItem>
+                                    <SelectItem value="En discussion">En discussion</SelectItem>
+                                    <SelectItem value="Qualifié">Qualifié</SelectItem>
+                                    <SelectItem value="Client">Client</SelectItem>
+                                    <SelectItem value="Perdu">Perdu</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -182,7 +189,7 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                         </div>
                     </div>
 
-                    {/* Dernier contact + Contact prévu */}
+                    {/* Dernier contact + Type */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="lastContactDate">Dernier contact</Label>
@@ -195,15 +202,58 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="nextFollowUpDate">Contact prévu (optionnel)</Label>
+                            <Label htmlFor="type">Type</Label>
+                            <Select
+                                value={formData.type || ''}
+                                onValueChange={(value: any) => setFormData({ ...formData, type: value })}
+                            >
+                                <SelectTrigger className="bg-background border-border">
+                                    <SelectValue placeholder="Sélectionner le type" />
+                                </SelectTrigger>
+                                <SelectContent className="bg-card border-border text-foreground">
+                                    <SelectItem value="candidat">Candidat</SelectItem>
+                                    <SelectItem value="entreprise">Entreprise</SelectItem>
+                                    <SelectItem value="investisseur">Investisseur</SelectItem>
+                                    <SelectItem value="école">École</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </div>
+
+                    {/* Prochaine Action */}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="nextActionDate">Prochaine action (Date)</Label>
                             <input
                                 type="date"
-                                id="nextFollowUpDate"
-                                value={formData.nextFollowUpDate || ''}
-                                onChange={(e) => setFormData({ ...formData, nextFollowUpDate: e.target.value || undefined })}
+                                id="nextActionDate"
+                                value={formData.nextActionDate || ''}
+                                onChange={(e) => setFormData({ ...formData, nextActionDate: e.target.value || undefined })}
                                 style={DATE_INPUT_STYLE}
                             />
                         </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="nextActionLabel">Label Prochaine Action</Label>
+                            <Input
+                                id="nextActionLabel"
+                                value={formData.nextActionLabel || ''}
+                                onChange={(e) => setFormData({ ...formData, nextActionLabel: e.target.value })}
+                                placeholder="Relancer, Devis à envoyer..."
+                                className="bg-background border-border focus:border-primary"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Tags */}
+                    <div className="space-y-2">
+                        <Label htmlFor="tags">Tags (séparés par des virgules)</Label>
+                        <Input
+                            id="tags"
+                            value={(formData.tags || []).join(', ')}
+                            onChange={(e) => setFormData({ ...formData, tags: e.target.value.split(',').map(t => t.trim()).filter(Boolean) })}
+                            placeholder="SaaS, VIP, Tech..."
+                            className="bg-background border-border focus:border-primary"
+                        />
                     </div>
 
                     {/* Notes */}
@@ -211,7 +261,7 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
                         <Label htmlFor="notes">Notes</Label>
                         <Textarea
                             id="notes"
-                            value={formData.notes}
+                            value={formData.notes || ''}
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                             placeholder="Met at TechCrunch Disrupt..."
                             className="bg-background border-border focus:border-primary min-h-[100px]"

@@ -78,7 +78,7 @@ export function ContentCalendar() {
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <Badge variant="secondary" className="text-[10px] bg-muted text-muted-foreground hover:bg-muted">
-                                            {idea.platform}
+                                            {idea.channel}
                                         </Badge>
                                     </div>
                                 </CardContent>

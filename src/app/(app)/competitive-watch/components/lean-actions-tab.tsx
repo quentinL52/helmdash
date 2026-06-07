@@ -32,7 +32,6 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuSubContent,
 } from '@/components/ui/dropdown-menu';
-import { AiInsightsTab } from './ai-insights-tab';
 import { SwotTab } from './swot-tab';
 
 interface LeanActionsTabProps {
@@ -201,9 +200,6 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
     if (advancedMode) {
         return (
             <div className="space-y-8">
-                {/* Full AI Insights */}
-                <AiInsightsTab />
-
                 {/* Full SWOT Tab */}
                 <SwotTab />
             </div>

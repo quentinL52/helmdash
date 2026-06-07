@@ -7,11 +7,7 @@ import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
 import { CardSkeleton } from '@/components/ui/loading-skeleton';
 
-// Lazy load heavy widgets (recharts, AI, etc.)
-const WeeklyCoachWidget = dynamic(
-    () => import('@/components/dashboard/weekly-coach-widget').then(m => m.WeeklyCoachWidget),
-    { loading: () => <CardSkeleton /> }
-);
+// Lazy load heavy widgets (recharts, etc.)
 const RunwayWidget = dynamic(
     () => import('@/components/dashboard/runway-widget').then(m => m.RunwayWidget),
     { loading: () => <CardSkeleton /> }
@@ -41,10 +37,7 @@ export default function DashboardPage() {
                 <h2 className="text-3xl font-bold tracking-tight">{translations[language].nav.dashboard}</h2>
             </div>
 
-            {/* Weekly AI Coach - Full Width */}
-            <WeeklyCoachWidget />
-
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <RunwayWidget />
 
                 <Card className="h-full">

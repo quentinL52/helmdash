@@ -21,7 +21,7 @@ type ViewType = 'day' | 'week' | 'month' | 'semester' | 'year';
 
 interface CalendarEvent {
     id: string;
-    type: 'roadmap' | 'content' | 'okr' | 'routine' | 'crm';
+    type: 'roadmap' | 'content' | 'okr' | 'routine' | 'crm' | 'google';
     title: string;
     date: Date;
     startDate?: Date;
@@ -52,6 +52,7 @@ const TYPE_CONFIG: Record<CalendarEvent['type'], { color: string; label: string;
     okr: { color: '#fdcb6e', label: 'OKR', icon: <Target size={12} />, route: '/okr' },
     routine: { color: '#00b894', label: 'Routine', icon: <Clock size={12} />, route: '/routine' },
     crm: { color: '#e84393', label: 'CRM', icon: <Users size={12} />, route: '/crm' },
+    google: { color: '#4285F4', label: 'Google Cal', icon: <Calendar size={12} />, route: '#' },
 };
 
 const VIEWS: { key: ViewType; label: string }[] = [
@@ -243,6 +244,8 @@ function getPriorityScore(ev: CalendarEvent): number {
             return 10;
         case 'crm':
             return 5;
+        case 'google':
+            return 8;
     }
 }
 
@@ -812,7 +815,7 @@ function EventDetailPanel({ event, onClose }: { event: CalendarEvent; onClose: (
             )}
 
             {/* Navigation link */}
-            {event.type !== 'routine' && (
+            {event.type !== 'routine' && event.type !== 'google' && (
                 <button
                     onClick={() => router.push(cfg.route)}
                     style={{
@@ -869,11 +872,65 @@ export function CalendarWidget() {
     const [view, setView] = useState<ViewType>('month');
     const [current, setCurrent] = useState(new Date());
     const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
-    const events = useAllEvents();
+    const [activeFilters, setActiveFilters] = useState<Record<CalendarEvent['type'], boolean>>({
+        roadmap: true,
+        content: true,
+        okr: true,
+        routine: true,
+        crm: true,
+        google: true
+    });
+    const [googleEvents, setGoogleEvents] = useState<CalendarEvent[]>([]);
+    const [isSyncing, setIsSyncing] = useState(false);
+    
+    const eventsRaw = useAllEvents();
+    const events = useMemo(() => [...eventsRaw, ...googleEvents].filter(e => activeFilters[e.type]), [eventsRaw, googleEvents, activeFilters]);
 
     const handlePrev = useCallback(() => setCurrent(d => navigate(view, d, -1)), [view]);
     const handleNext = useCallback(() => setCurrent(d => navigate(view, d, 1)), [view]);
     const handleToday = useCallback(() => setCurrent(new Date()), []);
+
+    const syncGoogleCalendar = async () => {
+        setIsSyncing(true);
+        try {
+            const { getGoogleProviderToken, fetchGoogleCalendarEvents } = await import('@/lib/google-api');
+            const token = await getGoogleProviderToken();
+            if (!token) {
+                alert("Vous devez être connecté via Google pour synchroniser votre calendrier.");
+                return;
+            }
+            // Fetch events for the next 6 months
+            const timeMin = new Date();
+            const timeMax = addMonths(timeMin, 6);
+            const gEvents = await fetchGoogleCalendarEvents(token, timeMin, timeMax);
+            
+            const parsedEvents: CalendarEvent[] = gEvents.map((ge: any) => {
+                const isDevSlot = ge.summary?.toLowerCase().includes('dev') || ge.summary?.toLowerCase().includes('build');
+                const startD = ge.start.dateTime ? new Date(ge.start.dateTime) : new Date(ge.start.date);
+                const endD = ge.end.dateTime ? new Date(ge.end.dateTime) : new Date(ge.end.date);
+                return {
+                    id: `gcal-${ge.id}`,
+                    type: 'google',
+                    title: isDevSlot ? `💻 [DEV] ${ge.summary}` : ge.summary,
+                    date: startD,
+                    startDate: startD,
+                    endDate: endD,
+                    color: isDevSlot ? '#d63031' : TYPE_CONFIG.google.color,
+                    data: {
+                        description: ge.description,
+                        link: ge.htmlLink,
+                        status: isDevSlot ? 'Créneau protégé' : 'Google Calendar',
+                    }
+                };
+            });
+            setGoogleEvents(parsedEvents);
+        } catch (e) {
+            console.error(e);
+            alert("Erreur lors de la synchronisation Google Calendar.");
+        } finally {
+            setIsSyncing(false);
+        }
+    };
 
     const label = formatPeriodLabel(view, current);
 
@@ -891,6 +948,17 @@ export function CalendarWidget() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Calendar size={18} style={{ color: COLORS.accentLight }} />
                     <span style={{ fontSize: '15px', fontWeight: 600, color: COLORS.text }}>Calendrier</span>
+                    <button 
+                        onClick={syncGoogleCalendar}
+                        style={{
+                            fontSize: '11px', padding: '2px 8px', borderRadius: '4px',
+                            background: `${COLORS.accent}20`, color: COLORS.accentLight,
+                            border: `1px solid ${COLORS.accent}40`, cursor: 'pointer',
+                            marginLeft: '8px'
+                        }}
+                    >
+                        {isSyncing ? 'Sync...' : 'Sync Google'}
+                    </button>
                 </div>
 
                 {/* Navigation */}
@@ -948,17 +1016,38 @@ export function CalendarWidget() {
                 </div>
             </div>
 
-            {/* Legend */}
+            {/* Legend / Filters */}
             <div style={{
-                display: 'flex', gap: '16px', padding: '10px 20px',
+                display: 'flex', gap: '10px', padding: '10px 20px',
                 borderBottom: `1px solid ${COLORS.border}`, flexWrap: 'wrap',
             }}>
-                {(Object.entries(TYPE_CONFIG) as [CalendarEvent['type'], typeof TYPE_CONFIG['roadmap']][]).map(([type, cfg]) => (
-                    <div key={type} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: cfg.color }} />
-                        <span style={{ fontSize: '11px', color: COLORS.textMuted }}>{cfg.label}</span>
-                    </div>
-                ))}
+                {(Object.entries(TYPE_CONFIG) as [CalendarEvent['type'], typeof TYPE_CONFIG['roadmap']][]).map(([type, cfg]) => {
+                    const isActive = activeFilters[type];
+                    return (
+                        <button 
+                            key={type} 
+                            onClick={() => setActiveFilters(prev => ({ ...prev, [type]: !prev[type] }))}
+                            style={{ 
+                                display: 'flex', alignItems: 'center', gap: '6px',
+                                background: isActive ? `${cfg.color}15` : 'transparent',
+                                border: `1px solid ${isActive ? cfg.color + '50' : COLORS.border}`,
+                                padding: '4px 8px', borderRadius: '6px',
+                                cursor: 'pointer', transition: 'all 0.2s',
+                                opacity: isActive ? 1 : 0.5
+                            }}
+                        >
+                            <div style={{ 
+                                width: '12px', height: '12px', borderRadius: '3px', 
+                                background: isActive ? cfg.color : 'transparent',
+                                border: `2px solid ${cfg.color}`,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            }}>
+                                {isActive && <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#12141c" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>}
+                            </div>
+                            <span style={{ fontSize: '12px', color: isActive ? COLORS.text : COLORS.textMuted, fontWeight: isActive ? 500 : 400 }}>{cfg.label}</span>
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Calendar body */}
