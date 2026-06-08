@@ -47,6 +47,23 @@ export async function updateSession(request: NextRequest) {
         const expectedApiKey = process.env.HERMES_API_KEY;
         const providedApiKey = request.headers.get('x-api-key');
 
+        // Préparation des headers CORS pour les agents externes
+        const corsHeaders = {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key',
+        };
+
+        // Autoriser les requêtes OPTIONS (CORS preflight) immédiatement
+        if (request.method === 'OPTIONS') {
+            return NextResponse.json({}, { headers: corsHeaders });
+        }
+
+        // Ajouter les headers CORS à la réponse
+        Object.entries(corsHeaders).forEach(([key, value]) => {
+            supabaseResponse.headers.set(key, value);
+        });
+
         // Validation de l'agent externe
         if (expectedApiKey && providedApiKey === expectedApiKey) {
             return supabaseResponse;
@@ -58,7 +75,7 @@ export async function updateSession(request: NextRequest) {
         }
 
         // Refus d'accès si aucune méthode d'authentification n'est valide
-        return NextResponse.json({ error: 'Unauthorized access' }, { status: 401 });
+        return NextResponse.json({ error: 'Unauthorized access' }, { status: 401, headers: corsHeaders });
     }
 
     // 2. Protection de l'interface utilisateur web
