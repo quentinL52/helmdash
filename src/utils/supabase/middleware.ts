@@ -36,12 +36,32 @@ export async function updateSession(request: NextRequest) {
     } = await supabase.auth.getUser()
 
     // Define protected routes here
-    // For the Founder Dashboard, let's protect the entire (app) group
-    // and redirect to a login/auth page if there's no user
     const isAuthRoute = request.nextUrl.pathname.startsWith('/auth')
     const isApiRoute = request.nextUrl.pathname.startsWith('/api')
-    const isPublicRoute = request.nextUrl.pathname === '/' || isAuthRoute || isApiRoute;
+    
+    // Les routes API ne sont plus publiques par défaut
+    const isPublicRoute = request.nextUrl.pathname === '/' || isAuthRoute;
 
+    // 1. Protection et filtrage des routes API
+    if (isApiRoute) {
+        const expectedApiKey = process.env.HERMES_API_KEY;
+        const providedApiKey = request.headers.get('x-api-key');
+
+        // Validation de l'agent externe
+        if (expectedApiKey && providedApiKey === expectedApiKey) {
+            return supabaseResponse;
+        }
+
+        // Validation de l'utilisateur connecté sur l'interface
+        if (user) {
+            return supabaseResponse;
+        }
+
+        // Refus d'accès si aucune méthode d'authentification n'est valide
+        return NextResponse.json({ error: 'Unauthorized access' }, { status: 401 });
+    }
+
+    // 2. Protection de l'interface utilisateur web
     if (!user && !isPublicRoute) {
         // no user, potentially respond by redirecting the user to the login page
         const url = request.nextUrl.clone()
