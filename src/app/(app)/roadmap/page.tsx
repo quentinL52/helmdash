@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { useFounderStore, RoadmapItem } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
-import { Plus, Trash2, Edit2 } from 'lucide-react';
+import { Plus, Trash2, Edit2, Map as MapIcon } from 'lucide-react';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useGamification } from '@/hooks/use-gamification';
 
 export default function RoadmapPage() {
   const tasks = useFounderStore(s => s.roadmap);
@@ -20,6 +21,7 @@ export default function RoadmapPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", description: "", status: "todo", priority: "medium", week: "", startDate: "", dueDate: "" });
+  const { awardXP } = useGamification();
 
   const language = useFounderStore(s => s.language);
   const t = translations[language].roadmap;
@@ -57,7 +59,12 @@ export default function RoadmapPage() {
     setShowForm(false);
   };
 
-  const updateStatus = (id: string, status: any) => updateRoadmapItem(id, { status });
+  const updateStatus = (id: string, status: any) => {
+      updateRoadmapItem(id, { status });
+      if (status === 'done') {
+          awardXP('roadmap_task_completed');
+      }
+  };
   const remove = (id: string) => deleteRoadmapItem(id);
 
   const priorityColors: Record<string, string> = { 
@@ -74,7 +81,10 @@ export default function RoadmapPage() {
   return (
     <div className="h-full flex flex-col space-y-6 animate-in fade-in duration-300">
       <div className="flex justify-between items-center shrink-0">
-        <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
+        <h1 className="text-3xl font-bold tracking-tight font-pixel text-orange-500 flex items-center gap-3">
+            <MapIcon className="w-8 h-8" />
+            {t.title}
+        </h1>
         <div className="flex items-center gap-2">
           <Button onClick={() => { setShowForm(!showForm); setEditingId(null); setForm({ title: "", description: "", status: "todo", priority: "medium", week: "", startDate: "", dueDate: "" }); }}>
             <Plus className="mr-2 h-4 w-4" /> {t.new}
@@ -83,7 +93,12 @@ export default function RoadmapPage() {
       </div>
 
       {showForm && (
-        <Card className="shrink-0 border-primary/30 animate-in slide-in-from-top-4 duration-200">
+        <Card className="shrink-0 border-t-4 border-t-orange-500 animate-in slide-in-from-top-4 duration-200">
+          <CardHeader>
+              <CardTitle className="text-lg font-pixel text-orange-500">
+                {t.new}
+              </CardTitle>
+            </CardHeader>
           <CardContent className="pt-6 grid grid-cols-2 gap-4">
             <Input value={form.title} onChange={(e: any) => setForm({ ...form, title: e.target.value })} placeholder={`${t.form.title} *`} autoFocus />
             <Input value={form.week} onChange={(e: any) => setForm({ ...form, week: e.target.value })} placeholder={t.form.week} />
@@ -130,7 +145,7 @@ export default function RoadmapPage() {
               
               <div className="flex flex-col gap-3 overflow-y-auto flex-1 pr-1">
                 {filtered.map(task => (
-                  <Card key={task.id} className="p-3">
+                  <Card key={task.id} className="p-3 border-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]">
                     <div className="flex justify-between items-start gap-2">
                       <div className="flex-1">
                         <p className="text-sm font-semibold">{task.title}</p>

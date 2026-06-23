@@ -1,72 +1,23 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Target } from 'lucide-react';
+import { Target } from 'lucide-react';
 import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
-import { CardSkeleton } from '@/components/ui/loading-skeleton';
-
-// Lazy load heavy widgets (recharts, etc.)
-const RunwayWidget = dynamic(
-    () => import('@/components/dashboard/runway-widget').then(m => m.RunwayWidget),
-    { loading: () => <CardSkeleton /> }
-);
-const HypothesesWidget = dynamic(
-    () => import('@/components/dashboard/hypotheses-widget').then(m => m.HypothesesWidget),
-    { loading: () => <CardSkeleton /> }
-);
-const CalendarWidget = dynamic(
-    () => import('@/components/dashboard/calendar-widget').then(m => m.CalendarWidget),
-    { loading: () => <CardSkeleton /> }
-);
+import { WidgetGrid } from '@/components/dashboard/widget-grid';
 
 export default function DashboardPage() {
     const language = useFounderStore(s => s.language);
-    const t = translations[language].dashboard;
-    const routine = useFounderStore(s => s.routine);
-
-    // Calcul du taux de complétion réel de la semaine courante
-    const totalTasks = routine.reduce((acc, day) => acc + day.tasks.length, 0);
-    const doneTasks = routine.reduce((acc, day) => acc + day.tasks.filter(task => task.done).length, 0);
-    const consistencyRate = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
 
     return (
         <div className="flex flex-col h-full space-y-4 p-8 pt-6">
-            <div className="flex items-center justify-between space-y-2">
-                <h2 className="text-3xl font-bold tracking-tight">{translations[language].nav.dashboard}</h2>
+            <div className="flex items-center justify-between space-y-2 mb-4">
+                <h2 className="text-3xl font-bold tracking-tight font-pixel text-primary flex items-center gap-3">
+                    <Target className="w-8 h-8" />
+                    {translations[language].nav.dashboard}
+                </h2>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <RunwayWidget />
-
-                <Card className="h-full flex flex-col justify-between">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">{t.okrProgress}</CardTitle>
-                        <Target className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">0.0</div>
-                        <p className="text-xs text-muted-foreground">Target: 0.7</p>
-                    </CardContent>
-                </Card>
-
-                <Card className="h-full flex flex-col justify-between">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">{t.routineConsistency}</CardTitle>
-                        <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{consistencyRate}%</div>
-                        <p className="text-xs text-muted-foreground">{doneTasks} / {totalTasks} tâches cochées</p>
-                    </CardContent>
-                </Card>
-
-                <HypothesesWidget />
-            </div>
-
-            {/* Calendrier centralisé */}
-            <CalendarWidget />
+            <WidgetGrid />
         </div>
     );
 }

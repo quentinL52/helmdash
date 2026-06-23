@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useGamification } from '@/hooks/use-gamification';
 
 interface OkrCardProps {
     objective: Objective;
@@ -170,11 +171,18 @@ export function OkrCard({ objective }: OkrCardProps) {
 function KeyResultItem({ kr, onUpdate, onDelete }: { kr: KeyResult, onUpdate: (updates: Partial<KeyResult>) => void, onDelete: () => void }) {
     const [isEditing, setIsEditing] = useState(false);
     const [localCurrent, setLocalCurrent] = useState(kr.current);
+    const { awardXP } = useGamification();
 
     const progress = Math.min(100, Math.max(0, (kr.current / kr.target) * 100));
 
     const handleSave = () => {
         onUpdate({ current: localCurrent });
+        
+        // Gamification: Key result achieved
+        if (localCurrent >= kr.target && kr.current < kr.target) {
+            awardXP('okr_key_result_achieved');
+        }
+        
         setIsEditing(false);
     };
 

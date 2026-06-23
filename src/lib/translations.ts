@@ -259,7 +259,9 @@ export const translations = {
         },
         content: {
             title: "Pipeline de Contenu",
-            selectDate: "Sélectionnez une date pour voir ou programmer du contenu. Les jours avec du contenu sont soulignés.",
+            subtitle: "Gérez vos publications marketing.",
+            newContent: "Nouveau Contenu",
+            selectDate: "Sélectionnez une date pour voir ou programmer du contenu.",
             noContentScheduled: "Aucun contenu programmé.",
         },
         competitiveWatch: {
@@ -796,7 +798,9 @@ export const translations = {
         },
         content: {
             title: "Content Pipeline",
-            selectDate: "Select a date to view or schedule content. Days with content are underlined.",
+            subtitle: "Manage your marketing publications.",
+            newContent: "New Content",
+            selectDate: "Select a date to view or schedule content.",
             noContentScheduled: "No content scheduled.",
         },
         competitiveWatch: {

@@ -3,10 +3,13 @@
 import { useState } from "react";
 import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
-import { Trash2, Edit2, Check, X } from 'lucide-react';
+import { Trash2, Edit2, Check, X, Repeat, Sparkles } from 'lucide-react';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { AgentTriggerButton } from '@/components/dashboard/agent-trigger-button';
+import { useGamification } from '@/hooks/use-gamification';
 
 export default function RoutinePage() {
   const routine = useFounderStore(s => s.routine);
@@ -25,8 +28,18 @@ export default function RoutinePage() {
   const [editingTask, setEditingTask] = useState<{ dayId: string; taskId: string } | null>(null);
   const [editedTaskText, setEditedTaskText] = useState("");
 
+  const { awardXP, recordActivity } = useGamification();
+
   const handleToggle = (dayId: string, taskId: string) => {
     toggleRoutineTask(dayId, taskId);
+    recordActivity();
+    
+    // Evaluate if day is 100% complete
+    const updatedRoutine = useFounderStore.getState().routine || [];
+    const day = updatedRoutine.find(d => d.id === dayId);
+    if (day && day.tasks.length > 0 && day.tasks.every(t => t.done)) {
+        awardXP('routine_complete');
+    }
   };
 
   const handleAddTask = (dayId: string) => {
@@ -67,24 +80,33 @@ export default function RoutinePage() {
   const doneTasks = safeRoutine.reduce((a, d) => a + d.tasks.filter((t: any) => t.done).length, 0);
   const progress = totalTasks > 0 ? (doneTasks / totalTasks) * 100 : 0;
 
-  const dayThemes = [
-    { text: 'text-primary', border: 'border-primary/40', bg: 'bg-primary/10' },
-    { text: 'text-orange-400', border: 'border-orange-400/40', bg: 'bg-orange-400/10' },
-    { text: 'text-pink-400', border: 'border-pink-400/40', bg: 'bg-pink-400/10' },
-    { text: 'text-success', border: 'border-success/40', bg: 'bg-success/10' },
-    { text: 'text-warning', border: 'border-warning/40', bg: 'bg-warning/10' }
-  ];
-
   return (
     <div className="h-full flex flex-col animate-in fade-in duration-300">
       {/* Header & Stats */}
       <div className="p-6 lg:p-8 pb-4 shrink-0">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">{t.title}</h1>
+            <h1 className="text-3xl font-bold tracking-tight font-pixel text-emerald-500 flex items-center gap-3">
+              <Repeat className="w-8 h-8" />
+              {t.title}
+            </h1>
             <p className="text-sm text-muted-foreground mt-1">
               {doneTasks}/{totalTasks} {t.completedText}
             </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <AgentTriggerButton 
+                agentId="founder-coach"
+                label="ANALYSER ROUTINE"
+                endpoint="/api/ai/agents/coach"
+                icon={<Sparkles className="w-4 h-4 mr-2" />}
+                getContext={(store) => ({
+                    routine: store.routine,
+                    journalEntries: store.journalEntries.slice(0, 5)
+                })}
+                variant="secondary"
+                className="font-pixel text-[10px] bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border border-emerald-500/20 shadow-[2px_2px_0px_0px_rgba(16,185,129,0.3)]"
+            />
           </div>
           <div className="flex items-center gap-3">
             <div className="w-[100px] h-1.5 bg-muted rounded-full overflow-hidden">
@@ -106,19 +128,16 @@ export default function RoutinePage() {
       {/* Columns */}
       <div className="px-6 lg:px-8 pb-8 flex-1 overflow-y-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          {safeRoutine.map((day, dayIdx) => {
-            const theme = dayThemes[dayIdx % dayThemes.length];
+          {safeRoutine.map((day) => {
             return (
-              <div key={day.id} className="flex flex-col gap-3">
-                {/* Day Header */}
-                <div className={`p-3 text-center rounded-xl border ${theme.bg} ${theme.border}`}>
-                  <h4 className={`text-sm font-bold font-mono uppercase tracking-wider ${theme.text}`}>
+              <Card key={day.id} className="flex flex-col border-t-4 border-t-emerald-500">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg capitalize font-pixel text-emerald-500">
                     {(common.days as any)[day.id] || day.day}
-                  </h4>
-                </div>
-
-                {/* Tasks List */}
-                <div className="flex flex-col gap-2">
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex flex-col gap-2">
+                  {/* Tasks List */}
                   {day.tasks.map((task: any) => {
                     const isEditing = editingTask?.dayId === day.id && editingTask?.taskId === task.id;
 
@@ -218,8 +237,8 @@ export default function RoutinePage() {
                       <span className="text-lg leading-none mb-0.5">+</span> {t.add}
                     </button>
                   )}
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             );
           })}
         </div>

@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { useFounderStore, Hypothesis, HypothesisCategory, HypothesisRisk } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
 import { COLORS } from '@/lib/constants';
+import { useGamification } from '@/hooks/use-gamification';
 
 // --- INLINE ICONS ---
 const Icons = {
@@ -143,6 +144,7 @@ export function HypothesesBoard() {
     const language = useFounderStore(s => s.language);
     const t = translations[language].hypotheses;
     const common = translations[language].common;
+    const { awardXP } = useGamification();
 
     // --- Local state only (exactly like roadmap) ---
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -195,6 +197,7 @@ export function HypothesesBoard() {
                 successCriteria: form.successCriteria,
                 status: 'draft',
             });
+            awardXP('hypothesis_created');
         }
         setForm(EMPTY_FORM);
         setShowForm(false);
@@ -206,10 +209,16 @@ export function HypothesesBoard() {
         setShowForm(false);
     };
 
-    const moveToBuild = (id: string) => updateHypothesis(id, { status: 'testing', actualResult: undefined });
+    const moveToBuild = (id: string) => {
+        updateHypothesis(id, { status: 'testing', actualResult: undefined });
+        awardXP('hypothesis_tested');
+    };
     const moveToMeasure = (id: string) => updateHypothesis(id, { actualResult: 'measuring' });
     const moveToLearn = (id: string) => updateHypothesis(id, { actualResult: 'learning' });
-    const doValidate = (id: string) => updateHypothesis(id, { status: 'validated', actualResult: 'done' });
+    const doValidate = (id: string) => {
+        updateHypothesis(id, { status: 'validated', actualResult: 'done' });
+        awardXP('hypothesis_validated');
+    };
     const doInvalidate = (id: string) => updateHypothesis(id, { status: 'invalidated', actualResult: 'done' });
     const doPivot = (h: Hypothesis) => {
         updateHypothesis(h.id, { status: 'pivoted', actualResult: 'done' });

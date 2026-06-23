@@ -4,12 +4,13 @@ import { useState } from 'react';
 
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { LEAN_CANVAS_SECTIONS, type LeanCanvasSectionId, COLORS } from '@/lib/constants';
+import { useGamification } from '@/hooks/use-gamification';
 import { CanvasSection } from './components/canvas-section';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
-import { Download, Save, Trash2, Eye } from 'lucide-react';
+import { Download, Save, Trash2, Eye, LayoutDashboard, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -47,8 +48,11 @@ export default function LeanCanvasPage() {
   const language = useFounderStore(s => s.language);
   const t = translations[language].leanCanvas;
 
+  const { awardXP } = useGamification();
+
   const handleContentChange = (id: LeanCanvasSectionId, content: string) => {
     updateCanvasSection(id, content);
+    awardXP('lean_canvas_updated');
   };
 
   const sections = LEAN_CANVAS_SECTIONS;
@@ -211,7 +215,7 @@ export default function LeanCanvasPage() {
       const isEvent = dataToExport && typeof dataToExport === 'object' && ('nativeEvent' in dataToExport || 'preventDefault' in dataToExport);
       const data = (dataToExport && !isEvent) ? dataToExport as CanvasData : canvasData;
       
-      const exportElement = buildPdfElement(data, language, t);
+      const exportElement = buildPdfElement(data as CanvasData, language, t);
       document.body.appendChild(exportElement);
       
       const filename = timestamp 
@@ -221,7 +225,7 @@ export default function LeanCanvasPage() {
       const opt = {
         margin:       0,
         filename,
-        image:        { type: 'png', quality: 1 },
+        image:        { type: 'png' as const, quality: 1 },
         html2canvas:  { 
           scale: 2, 
           useCORS: true, 
@@ -234,13 +238,16 @@ export default function LeanCanvasPage() {
         },
         jsPDF:        { 
           unit: 'px', 
-          format: [1122, 794], 
-          orientation: 'landscape',
+          format: [1122, 794] as [number, number], 
+          orientation: 'landscape' as 'landscape' | 'portrait',
           hotfixes: ['px_scaling'] 
         }
       };
       
-      await html2pdf().set(opt).from(exportElement.lastElementChild).save();
+      await html2pdf()
+        .set(opt)
+        .from(exportElement as HTMLElement)
+        .save();
       document.body.removeChild(exportElement);
     } catch (e) {
       console.error(e);
@@ -252,9 +259,12 @@ export default function LeanCanvasPage() {
   return (
     <div className="flex h-full flex-col">
       <div className='space-y-4'>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
+            <h1 className="text-3xl font-bold tracking-tight font-pixel text-purple-500 flex items-center gap-3">
+              <LayoutDashboard className="w-8 h-8" />
+              {t.title}
+            </h1>
             <p className="text-muted-foreground">
               {t.subtitle}
             </p>
@@ -272,11 +282,12 @@ export default function LeanCanvasPage() {
               <Save className="w-4 h-4 mr-2" />
               {language === 'fr' ? 'Enregistrer version' : 'Save version'}
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => exportPDF()}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => exportPDF(canvasData as CanvasData)}
               disabled={isExporting}
+              className="font-pixel text-[10px]"
             >
               <Download className="w-4 h-4 mr-2" />
               {isExporting ? 'Exportation...' : 'Exporter PDF'}
@@ -313,7 +324,10 @@ export default function LeanCanvasPage() {
       </div>
 
       <div className="mt-12 border-t pt-8">
-        <h2 className="text-xl font-semibold mb-4">{language === 'fr' ? 'Historique des versions' : 'Version History'}</h2>
+        <h2 className="text-xl font-pixel text-purple-500 flex items-center gap-2 mb-4">
+          <History className="w-5 h-5" />
+          {language === 'fr' ? 'Historique des versions' : 'Version History'}
+        </h2>
         {leanCanvasSnapshots.length === 0 ? (
           <p className="text-muted-foreground text-sm">{language === 'fr' ? 'Aucune version sauvegardée pour le moment.' : 'No saved versions yet.'}</p>
         ) : (
@@ -333,7 +347,7 @@ export default function LeanCanvasPage() {
                     variant="outline" 
                     size="sm" 
                     className="h-8"
-                    onClick={() => exportPDF(snapshot.data, snapshot.date)}
+                    onClick={() => exportPDF(snapshot.data as unknown as CanvasData, snapshot.date as unknown as number)}
                     disabled={isExporting}
                   >
                     <Download className="w-3 h-3 mr-2" />

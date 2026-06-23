@@ -2,15 +2,16 @@ import { Toaster } from "@/components/ui/toaster";
 import { StoreSync } from '@/components/store-sync';
 import "./globals.css";
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, VT323 } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const vt323 = VT323({ weight: "400", subsets: ['latin'], variable: '--font-pixel' });
 
 import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'FounderOS',
-  description: 'Centralize your project logic.',
+  title: 'IgniteHQ - Founder Dashboard',
+  description: 'Le tableau de bord ultime pour préparer, gamifier et lancer votre startup avant le MVP.',
 };
 
 export default function RootLayout({
@@ -21,11 +22,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${vt323.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <StoreSync />

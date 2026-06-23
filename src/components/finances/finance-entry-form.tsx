@@ -35,6 +35,7 @@ import {
 import { useFounderStore, ExpenseCategory } from '@/store/founder-store';
 import { format } from 'date-fns';
 import { translations } from '@/lib/translations';
+import { useGamification } from '@/hooks/use-gamification';
 
 const expenseSchema = z.object({
     label: z.string().min(2, "Label must be at least 2 characters"),
@@ -72,6 +73,8 @@ export function FinanceEntryForm() {
             frequency: 'monthly'
         },
     });
+
+    const { awardXP } = useGamification();
 
     const onSubmit = (values: z.infer<typeof expenseSchema>) => {
         // Parse date string directly to avoid timezone issues
@@ -116,6 +119,9 @@ export function FinanceEntryForm() {
                     revenue: existingEntry.revenue + values.amount,
                     incomes: newIncomes
                 });
+                if (values.type === 'revenue' && values.amount > 0) {
+                    awardXP('first_revenue');
+                }
             }
         } else {
             // Create new
@@ -147,6 +153,9 @@ export function FinanceEntryForm() {
                 ] : []
             };
             addMonthlyEntry(newEntry);
+            if (values.type === 'revenue' && values.amount > 0) {
+                awardXP('first_revenue');
+            }
         }
 
         form.reset({

@@ -7,6 +7,7 @@ import { translations } from '@/lib/translations';
 import { BoardSkeleton, TableSkeleton } from '@/components/ui/loading-skeleton';
 import { Button } from '@/components/ui/button';
 import { COLORS } from '@/lib/constants';
+import { Beaker } from 'lucide-react';
 
 // Lazy load heavy board and list components
 const HypothesesBoard = dynamic(
@@ -25,10 +26,13 @@ export default function HypothesesPage() {
 
     return (
         <div className="flex flex-col h-full space-y-4 p-8 pt-6 font-sans text-foreground">
-            <div className="flex justify-between items-center">
+            <div className="flex items-center justify-between space-y-2">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">{t.title}</h1>
-                    <p className="text-muted-foreground text-sm">{t.subtitle}</p>
+                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-blue-500 flex items-center gap-3">
+                        <Beaker className="w-8 h-8" />
+                        {t.title}
+                    </h1>
+                    <p className="text-muted-foreground mt-2">{t.subtitle}</p>
                 </div>
             </div>
 

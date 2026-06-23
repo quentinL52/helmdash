@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { LayoutTemplate } from "lucide-react";
 
 // --- STORAGE HELPERS ---
 const loadState = (key: string, fallback: any) => {
@@ -155,9 +156,13 @@ export default function WhiteboardPage() {
     <div className="fade-in" style={{ fontFamily: "'DM Sans', sans-serif", color: COLORS.text }}>
       <style>{animationCSS}</style>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-        <h2 style={{ fontSize: "20px", fontWeight: 700, fontFamily: "'DM Sans', sans-serif" }}>
-          Tableau Blanc
-        </h2>
+          <div className="flex items-center gap-3 mb-2 text-primary font-pixel">
+            <LayoutTemplate className="w-8 h-8" />
+            <h1 className="text-3xl font-bold tracking-tight font-pixel">
+              Freeform Whiteboard
+            </h1>
+          </div>
+          <p className="text-muted-foreground">Espace de réflexion libre et de schématisation.</p>
         <Button variant="primary" onClick={() => setShowForm(!showForm)}>
           <Icons.Plus /> Nouvelle idée
         </Button>

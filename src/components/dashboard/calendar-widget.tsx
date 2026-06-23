@@ -178,10 +178,10 @@ function useAllEvents(): CalendarEvent[] {
             });
         });
 
-        // CRM — contacts avec nextFollowUpDate
+        // CRM — contacts avec nextActionDate
         contacts.forEach(contact => {
-            if (contact.nextFollowUpDate) {
-                const d = parseISO(contact.nextFollowUpDate);
+            if (contact.nextActionDate) {
+                const d = parseISO(contact.nextActionDate);
                 if (isValid(d)) {
                     events.push({
                         id: `crm-${contact.id}`,

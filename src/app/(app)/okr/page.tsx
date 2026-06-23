@@ -42,7 +42,10 @@ export default function OkrPage() {
             {/* Header */}
             <div className="flex justify-between items-center mb-6 shrink-0">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">OKRs & Goals</h1>
+                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-rose-500 flex items-center gap-3">
+                        <Target className="w-8 h-8" />
+                        OKRs & Goals
+                    </h1>
                     <p className="text-muted-foreground mt-1">Align your daily execution with your long-term North Star.</p>
                 </div>
                 <Button onClick={() => setShowForm(!showForm)}>

@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CreateContentDialog } from './create-content-dialog';
+import { useGamification } from '@/hooks/use-gamification';
 
 const COLUMNS: { id: ContentStatus; label: string; icon: any; colorClass: string }[] = [
     { id: 'idea', label: 'Ideas', icon: PenSquare, colorClass: 'text-muted-foreground border-muted-foreground bg-muted-foreground' },
@@ -53,8 +54,13 @@ export function ContentBoard() {
         setShowForm(false);
     };
 
+    const { awardXP } = useGamification();
+
     const handleStatusChange = (id: string, newStatus: ContentStatus) => {
         updateContentIdea(id, { status: newStatus });
+        if (newStatus === 'published') {
+            awardXP('content_published');
+        }
     };
 
     return (

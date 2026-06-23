@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import { useGamification } from "@/hooks/use-gamification";
 
 interface ContactDialogProps {
     open: boolean;
@@ -20,6 +21,7 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
     const addContact = useFounderStore(s => s.addContact);
     const updateContact = useFounderStore(s => s.updateContact);
     const [isLoading, setIsLoading] = useState(false);
+    const { awardXP } = useGamification();
 
     const [formData, setFormData] = useState<Partial<Contact>>({
         name: '',
@@ -81,6 +83,7 @@ export function ContactDialog({ open, onOpenChange, contactToEdit }: ContactDial
             updateContact(contactToEdit.id, dataToSave);
         } else {
             addContact(dataToSave as Omit<Contact, 'id'>);
+            awardXP('contact_added');
         }
 
         setIsLoading(false);

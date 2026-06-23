@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
 import { ChartSkeleton, TableSkeleton, CardSkeleton } from '@/components/ui/loading-skeleton';
+import { Wallet } from 'lucide-react';
 import type { Timeframe } from '@/components/finances/runway-chart';
 import { FinanceKPIs } from '@/components/finances/finance-kpis';
 import { FinanceCharts } from '@/components/finances/finance-charts';
@@ -33,8 +34,11 @@ export default function FinancesPage() {
         <div className="flex flex-col h-full space-y-6 p-8 pt-6">
             <div className="flex items-center justify-between space-y-2">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight">{t.title}</h2>
-                    <p className="text-muted-foreground">
+                    <h2 className="text-3xl font-bold tracking-tight font-pixel text-amber-500 flex items-center gap-3">
+                        <Wallet className="w-8 h-8" />
+                        {t.title}
+                    </h2>
+                    <p className="text-muted-foreground mt-2">
                         {t.subtitle}
                     </p>
                 </div>

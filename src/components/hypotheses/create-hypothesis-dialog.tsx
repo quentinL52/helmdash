@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/select';
 import { useFounderStore, HypothesisCategory, HypothesisRisk, Hypothesis } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
+import { useGamification } from '@/hooks/use-gamification';
 
 const COLORS = {
     bg: "#0f1117",
@@ -94,6 +95,8 @@ export function HypothesisDialog({
         },
     });
 
+    const { awardXP } = useGamification();
+
     // Update form values when hypothesisToEdit changes
     useEffect(() => {
         if (hypothesisToEdit) {
@@ -133,6 +136,7 @@ export function HypothesisDialog({
                 successCriteria: values.successCriteria,
                 status: 'draft',
             });
+            awardXP('hypothesis_created');
         }
         setOpen(false);
         form.reset();

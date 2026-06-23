@@ -21,9 +21,11 @@ import {
     Users,
     LogOut,
     Radar,
+    Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/utils/supabase/client';
+import { SidebarGamificationWidget } from '@/components/gamification/sidebar-widget';
 
 export function AppSidebar() {
     const pathname = usePathname();
@@ -47,8 +49,8 @@ export function AppSidebar() {
         { href: '/routine', label: t.routine, icon: Repeat },
         { href: '/competitive-watch', label: (translations[language] as any).competitiveWatch?.nav || 'Veille Stratégique', icon: Radar },
         { href: '/whiteboard', label: t.whiteboard, icon: PenSquare },
-        { href: '/okr', label: t.okr, icon: Target },
         { href: '/content', label: t.content, icon: Megaphone },
+        { href: '/go-to-market', label: 'Go-To-Market', icon: Target },
         { href: '/crm', label: t.crm, icon: Users },
         { href: '/journal', label: t.journal, icon: BookOpen },
     ];
@@ -120,6 +122,8 @@ export function AppSidebar() {
                     </div>
                 </div>
 
+                <SidebarGamificationWidget />
+
                 {/* Navigation */}
                 <nav className="flex-1 overflow-y-auto py-3 px-2">
                     <div className="flex flex-col gap-1">
@@ -147,6 +151,19 @@ export function AppSidebar() {
 
                 {/* Footer: Sign Out */}
                 <div className="p-3 border-t border-border flex flex-col gap-1">
+                    <Link
+                        href="/settings"
+                        onClick={() => setIsVisible(false)}
+                        className={cn(
+                            "flex items-center gap-2 px-3 py-2 rounded-md text-[13px] font-medium transition-colors duration-150",
+                            pathname.startsWith('/settings')
+                                ? "bg-primary/10 text-primary"
+                                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                        )}
+                    >
+                        <Settings className="w-4 h-4 shrink-0" />
+                        <span className="truncate">{language === 'fr' ? 'Paramètres' : 'Settings'}</span>
+                    </Link>
                     <Button
                         variant="ghost"
                         onClick={handleSignOut}

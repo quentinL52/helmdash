@@ -55,3 +55,56 @@
     --danger: 360 100% 71%;
   }
 }
+
+/* ── CRT Scanline Overlay (subtle retro effect) ────────────────── */
+@layer utilities {
+  .crt-scanlines::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+    mix-blend-mode: multiply;
+  }
+
+  /* Pixel-perfect rendering for pixel art SVGs */
+  .pixel-render {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;
+  }
+
+  /* Shimmer animation for legendary items */
+  .shimmer {
+    background: linear-gradient(
+      110deg,
+      transparent 33%,
+      rgba(251, 191, 36, 0.15) 50%,
+      transparent 67%
+    );
+    background-size: 300% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  /* Pixel glow effect for level-ups */
+  .pixel-glow {
+    filter: drop-shadow(0 0 6px hsl(var(--primary) / 0.5))
+            drop-shadow(0 0 12px hsl(var(--primary) / 0.25));
+  }
+
+  /* No scrollbar utility */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

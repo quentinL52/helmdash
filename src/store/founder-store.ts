@@ -259,6 +259,29 @@ export interface MySolution {
     pricing?: string; // Text summary
 }
 
+export interface GoToMarketStrategy {
+    // Storybrand
+    sbHero: string;
+    sbProblem: string;
+    sbGuide: string;
+    
+    // Obviously Awesome
+    oaAlternatives: string;
+    oaUniqueAttributes: string;
+    oaValue: string;
+    
+    // 1-Page Marketing Plan (Acquisition focused)
+    ompTarget: string;
+    ompMessage: string;
+    ompMedia: string;
+    
+    // Cold Start Problem
+    csAtomicNetwork: string;
+    
+    // Online Writing
+    owCadence: string;
+}
+
 export interface RoadmapItem {
     id: string;
     title: string;
@@ -377,6 +400,36 @@ export interface LeanCanvasSnapshot {
     data: Record<string, string>;
 }
 
+export type AIProviderName = 'openai' | 'anthropic' | 'gemini' | 'mistral';
+
+export interface AiSettings {
+    /** Currently active provider */
+    provider: AIProviderName | '';
+    /** Currently selected model ID (e.g. 'gpt-4o', 'claude-sonnet-4-20250514') */
+    model: string;
+    /** Per-provider API keys — allows using multiple providers */
+    apiKeys: {
+        openai: string;
+        anthropic: string;
+        gemini: string;
+        mistral: string;
+    };
+    /** @deprecated Use apiKeys[provider] instead. Kept for migration. */
+    apiKey: string;
+}
+
+/** Profil du fondateur : identité et style d'écriture pour les agents IA */
+export interface FounderProfile {
+    /** URL du profil LinkedIn */
+    linkedinUrl: string;
+    /** Exemples de posts ou description du ton d'écriture de l'utilisateur */
+    writingStyleContext: string;
+    /** Nom ou pseudo affiché */
+    displayName: string;
+    /** Secteur / niche (ex: "SaaS B2B", "HealthTech") */
+    niche: string;
+}
+
 export interface FounderStore {
     // --- State ---
     userId: string | null; // For data isolation check
@@ -401,6 +454,11 @@ export interface FounderStore {
     competitiveIntelligence: CompetitiveIntelligence | null;
     competitiveSnapshots: CompetitiveSnapshot[];
     scenarioAnalyses: ScenarioAnalysis[];
+    aiSettings: AiSettings;
+    founderProfile: FounderProfile;
+    goToMarket: GoToMarketStrategy;
+    mvpTargetDate: string | null;
+    dashboardLayout: { id: string; type: string; size: 'small' | 'medium' | 'large' | 'full' }[];
 
     // --- Actions ---
 
@@ -503,6 +561,11 @@ export interface FounderStore {
     hydrate: (state: Partial<FounderStore>) => void;
     setUserId: (id: string | null) => void;
     setPlanTier: (tier: 'free' | 'starter' | 'growth' | 'scale') => void;
+    setAiSettings: (settings: Partial<AiSettings>) => void;
+    setFounderProfile: (profile: Partial<FounderProfile>) => void;
+    updateGoToMarket: (updates: Partial<GoToMarketStrategy>) => void;
+    setMvpTargetDate: (date: string | null) => void;
+    setDashboardLayout: (layout: { id: string; type: string; size: 'small' | 'medium' | 'large' | 'full' }[]) => void;
     reset: () => void;
 }
 
@@ -605,6 +668,38 @@ const initialState = {
     competitiveSnapshots: [],
     scenarioAnalyses: [],
     showStrategicRecommendations: true, // Default to true
+    aiSettings: {
+        provider: '' as AIProviderName | '',
+        model: '',
+        apiKeys: {
+            openai: '',
+            anthropic: '',
+            gemini: '',
+            mistral: '',
+        },
+        apiKey: '',
+    },
+    founderProfile: {
+        linkedinUrl: '',
+        writingStyleContext: '',
+        displayName: '',
+        niche: '',
+    },
+    goToMarket: {
+        sbHero: '',
+        sbProblem: '',
+        sbGuide: '',
+        oaAlternatives: '',
+        oaUniqueAttributes: '',
+        oaValue: '',
+        ompTarget: '',
+        ompMessage: '',
+        ompMedia: '',
+        csAtomicNetwork: '',
+        owCadence: '',
+    },
+    mvpTargetDate: null,
+    dashboardLayout: [],
 };
 
 export const useFounderStore = create<FounderStore>()(
@@ -616,6 +711,11 @@ export const useFounderStore = create<FounderStore>()(
             setUserId: (id) => set({ userId: id }),
             setPlanTier: (tier) => set({ planTier: tier }),
             setLanguage: (lang) => set({ language: lang }),
+            setAiSettings: (settings) => set((state) => ({ aiSettings: { ...state.aiSettings, ...settings } })),
+            setFounderProfile: (profile) => set((state) => ({ founderProfile: { ...state.founderProfile, ...profile } })),
+            updateGoToMarket: (updates) => set((state) => ({ goToMarket: { ...state.goToMarket, ...updates } })),
+            setMvpTargetDate: (date) => set({ mvpTargetDate: date }),
+            setDashboardLayout: (layout) => set({ dashboardLayout: layout }),
             reset: () => set(initialState),
             hydrate: (state) => set({ ...state }),
             addHypothesis: (hypothesis) => set((state) => ({

@@ -16,8 +16,10 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Plus, Search, Mail, Linkedin, RefreshCw, Pencil, Trash2, DownloadCloud } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Mail, Users, Linkedin, RefreshCw, DownloadCloud, Pencil } from 'lucide-react';
 import { translations } from '@/lib/translations';
+import { AgentTriggerButton } from '@/components/dashboard/agent-trigger-button';
+import { Network } from 'lucide-react';
 
 const STATUS_COLORS: Record<ContactStatus, string> = {
     'À contacter': 'border-primary/50 text-primary',
@@ -58,43 +60,43 @@ export default function CRMPage() {
     }, []);
 
     const handleGenerateFollowUp = useCallback(async (contact: Contact) => {
+        if (!contact.notes) {
+            alert('Ajoutez d\'abord des notes pour générer un message pertinent.');
+            return;
+        }
         setAiLoading(true);
         try {
-            const response = await generateFollowUp(contact);
-            alert(response);
-        } catch (e) {
-            console.error(e);
-            alert(language === 'fr' ? "Échec de la génération IA." : "Failed to generate AI draft.");
+            const draft = await generateFollowUp(contact);
+            setSelectedContact({ ...contact, lastContactDate: new Date().toISOString() });
+            alert('Brouillon généré :\n\n' + draft);
+        } catch (error) {
+            console.error(error);
+            alert('Erreur lors de la génération. Vérifiez vos clés API.');
         } finally {
             setAiLoading(false);
         }
-    }, [language]);
+    }, []);
 
     const handleGoogleImport = async () => {
         setImportLoading(true);
         try {
             const token = await getGoogleProviderToken();
             if (!token) {
-                alert("Vous devez être connecté avec Google pour importer vos contacts.");
+                alert("Impossible d'obtenir le token Google. L'utilisateur doit se connecter avec Google.");
+                setImportLoading(false);
                 return;
             }
+
             const googleContacts = await fetchGoogleContacts(token);
-            if (googleContacts.length === 0) {
-                alert("Aucun contact trouvé.");
-                return;
-            }
-            
             let importedCount = 0;
+            
             for (const gc of googleContacts) {
-                const name = gc.names?.[0]?.displayName;
-                if (!name) continue;
-                
-                const email = gc.emailAddresses?.[0]?.value || '';
-                const company = gc.organizations?.[0]?.name || '';
-                const role = gc.organizations?.[0]?.title || '';
-                
-                // Avoid simple duplicates
-                if (!contacts.some(c => c.name === name)) {
+                const name = gc.names?.[0]?.displayName || 'Inconnu';
+                const email = gc.emailAddresses?.[0]?.value;
+                const company = gc.organizations?.[0]?.name;
+                const role = gc.organizations?.[0]?.title;
+
+                if (!contacts.some(c => c.email === email && email !== undefined)) {
                     addContact({
                         name,
                         email,
@@ -102,6 +104,7 @@ export default function CRMPage() {
                         role,
                         status: 'À contacter',
                         notes: 'Importé depuis Google Contacts',
+                        lastContactDate: new Date().toISOString(),
                     });
                     importedCount++;
                 }
@@ -120,14 +123,26 @@ export default function CRMPage() {
     return (
         <div className="h-full flex flex-col p-8 max-w-7xl mx-auto space-y-8">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between space-y-2">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-foreground">{t.title || 'CRM Lite'}</h1>
-                    <p className="text-muted-foreground">
-                        {t.subtitle || 'Gérez votre réseau et vos relations.'}
-                    </p>
+                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-blue-500 flex items-center gap-3">
+                        <Users className="w-8 h-8" />
+                        {t.title || 'CRM Lite'}
+                    </h1>
+                    <p className="text-muted-foreground mt-2">{t.subtitle || 'Gérez vos prospects et contacts'}</p>
                 </div>
                 <div className="flex gap-2">
+                    <AgentTriggerButton 
+                        agentId="relationship-manager"
+                        label="ANALYSER LE RÉSEAU"
+                        endpoint="/api/ai/agents/crm"
+                        icon={<Network className="w-4 h-4 mr-2" />}
+                        getContext={(store) => ({
+                            contacts: store.contacts
+                        })}
+                        variant="secondary"
+                        className="font-pixel text-[10px] bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 border border-blue-500/20 shadow-[2px_2px_0px_0px_rgba(59,130,246,0.3)]"
+                    />
                     <Button
                         variant="outline"
                         onClick={handleGoogleImport}

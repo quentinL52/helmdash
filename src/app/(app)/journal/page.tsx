@@ -6,10 +6,13 @@ import { format, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Calendar, AlertCircle, Trash2 } from 'lucide-react';
+import { Calendar, AlertCircle, Trash2, BookOpen } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CardSkeleton, ChartSkeleton } from '@/components/ui/loading-skeleton';
+import { useGamification } from '@/hooks/use-gamification';
+
+import { AgentTriggerButton } from '@/components/dashboard/agent-trigger-button';
 
 // Lazy load heavy components
 const JournalEditor = dynamic(
@@ -25,6 +28,7 @@ export default function JournalPage() {
     const journalEntries = useFounderStore(s => s.journalEntries);
     const addJournalEntry = useFounderStore(s => s.addJournalEntry);
     const deleteJournalEntry = useFounderStore(s => s.deleteJournalEntry);
+    const { awardXP } = useGamification();
 
     // Filtrer : uniquement les entrées de la semaine en cours (lundi → dimanche)
     const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
@@ -36,11 +40,27 @@ export default function JournalPage() {
 
     return (
         <div className="space-y-8 max-w-7xl mx-auto">
-            <div className="flex flex-col gap-2">
-                <h1 className="text-3xl font-bold tracking-tight">Journal de Bord</h1>
-                <p className="text-muted-foreground">
-                    Suivez votre progression, célébrez vos victoires et documentez vos blocages pour votre Coach IA.
-                </p>
+            <div className="flex items-center justify-between space-y-2">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-teal-500 flex items-center gap-3">
+                        <BookOpen className="w-8 h-8" />
+                        Journal de Bord
+                    </h1>
+                    <p className="text-muted-foreground mt-2">Suivez vos humeurs, vos accomplissements et vos doutes.</p>
+                </div>
+                <div className="flex items-center gap-3">
+                    <AgentTriggerButton 
+                        agentId="founder-coach"
+                        label="ANALYSER (COACH)"
+                        endpoint="/api/ai/agents/coach"
+                        getContext={(store) => ({
+                            journalEntries: store.journalEntries.slice(0, 10), // Take the 10 most recent
+                            routine: store.routine
+                        })}
+                        variant="secondary"
+                        className="font-pixel text-[10px] bg-teal-500/10 text-teal-500 hover:bg-teal-500/20 border border-teal-500/20 shadow-[2px_2px_0px_0px_rgba(20,184,166,0.3)]"
+                    />
+                </div>
             </div>
 
             {/* Heatmap Section */}
@@ -49,14 +69,26 @@ export default function JournalPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Left Column: Editor (New Entry) */}
                 <div className="lg:col-span-7 space-y-6">
-                    <JournalEditor
-                        onSave={(entry) => addJournalEntry(entry)}
-                    />
+                    <Card className="border-t-4 border-t-teal-500">
+                        <CardHeader>
+                            <h2 className="text-xl font-pixel text-teal-500 flex items-center gap-2">
+                                Nouvelle Entrée
+                            </h2>
+                        </CardHeader>
+                        <CardContent>
+                            <JournalEditor
+                                onSave={(entry) => {
+                                    addJournalEntry(entry);
+                                    awardXP('journal_entry');
+                                }}
+                            />
+                        </CardContent>
+                    </Card>
                 </div>
 
                 {/* Right Column: Recent Entries Stream */}
                 <div className="lg:col-span-5 space-y-4">
-                    <h2 className="text-xl font-semibold flex items-center gap-2">
+                    <h2 className="text-xl font-pixel text-teal-500 flex items-center gap-2">
                         <Calendar className="w-5 h-5 text-muted-foreground" />
                         Entrées de la semaine
                     </h2>

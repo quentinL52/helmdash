@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  projects    Project[]
+  moodEntries MoodEntry[]
+  tasks       Task[]
+  streak      Streak?
+  aiSettings  AiSettings?
+
+  @@map("users")
+}
+
+model Project {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  name             String
+  description      String?
+  targetLaunchDate DateTime? @map("target_launch_date")
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks Task[]
+
+  @@map("projects")
+}
+
+enum MoodType {
+  on_fire
+  focus
+  burnout
+  zen
+}
+
+model MoodEntry {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  date           DateTime @db.Date
+  moodType       MoodType @map("mood_type")
+  note           String?
+  sharedPublicly Boolean  @default(false) @map("shared_publicly")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, date])
+  @@map("mood_entries")
+}
+
+enum TaskStatus {
+  todo
+  in_progress
+  done
+}
+
+model Task {
+  id          String     @id @default(uuid()) @db.Uuid
+  userId      String     @map("user_id") @db.Uuid
+  projectId   String?    @map("project_id") @db.Uuid
+  title       String
+  status      TaskStatus @default(todo)
+  createdAt   DateTime   @default(now()) @map("created_at")
+  completedAt DateTime?  @map("completed_at")
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("tasks")
+}
+
+model Streak {
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @unique @map("user_id") @db.Uuid
+  currentStreak    Int       @default(0) @map("current_streak")
+  longestStreak    Int       @default(0) @map("longest_streak")
+  lastActivityDate DateTime? @db.Date @map("last_activity_date")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("streaks")
+}
+
+model AiSettings {
+  id           String  @id @default(uuid()) @db.Uuid
+  userId       String  @unique @map("user_id") @db.Uuid
+  provider     String?
+  apiKey       String? @map("api_key")
+  activeAgents Json?   @map("active_agents")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_settings")
+}

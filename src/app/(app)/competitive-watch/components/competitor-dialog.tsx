@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useFounderStore, Competitor, CompetitorRadarScores, PricingModelType } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
+import { useGamification } from '@/hooks/use-gamification';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -57,6 +58,7 @@ export function CompetitorDialog({
     const updateCompetitor = useFounderStore(s => s.updateCompetitor);
     const language = useFounderStore(s => s.language);
     const t = (translations[language] as any).competitiveWatch;
+    const { awardXP } = useGamification();
 
     const [name, setName] = useState('');
     const [website, setWebsite] = useState('');
@@ -219,6 +221,7 @@ export function CompetitorDialog({
             updateCompetitor(competitorToEdit.id, data);
         } else {
             addCompetitor(data);
+            awardXP('competitor_analyzed');
         }
         onOpenChange(false);
     };

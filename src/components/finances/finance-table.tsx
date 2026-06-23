@@ -133,7 +133,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                     id: `header-${headerValue}`,
                     label: '',
                     amount: 0,
-                    category: 'other',
+                    category: 'Divers',
                     isRecurring: false,
                     monthId: '',
                     monthLabel: '',

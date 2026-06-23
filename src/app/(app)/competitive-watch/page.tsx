@@ -6,7 +6,7 @@ import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, BarChart3, Zap } from 'lucide-react';
+import { LayoutDashboard, BarChart3, Zap, Radar } from 'lucide-react';
 import { LeanDashboardTab } from './components/lean-dashboard-tab';
 import { LeanAnalysisTab } from './components/lean-analysis-tab';
 import { LeanActionsTab } from './components/lean-actions-tab';
@@ -31,10 +31,13 @@ export default function CompetitiveWatchPage() {
     return (
         <div className="h-full flex flex-col p-8 max-w-7xl mx-auto space-y-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between space-y-2">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight text-foreground">{t.title}</h1>
-                    <p className="text-muted-foreground">{t.subtitle}</p>
+                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-yellow-500 flex items-center gap-3">
+                        <Radar className="w-8 h-8" />
+                        {t.title}
+                    </h1>
+                    <p className="text-muted-foreground mt-2">{t.subtitle}</p>
                 </div>
                 <Button
                     onClick={() => setShowMySolutionForm(!showMySolutionForm)}
