@@ -126,7 +126,20 @@ export async function POST(req: Request) {
 
             for (const toolCall of toolCalls) {
                 if ((toolCall as any).function.name === 'search_web') {
-                    const args = JSON.parse((toolCall as any).function.arguments);
+                    let args;
+                    try {
+                        args = JSON.parse((toolCall as any).function.arguments);
+                    } catch (parseError) {
+                        console.error('Failed to parse tool call arguments:', parseError);
+                        messages.push({
+                            tool_call_id: toolCall.id,
+                            role: 'tool',
+                            name: 'search_web',
+                            content: JSON.stringify({ error: 'Invalid JSON in arguments' })
+                        });
+                        continue;
+                    }
+
                     console.log(`Executing search: ${args.query}`);
                     const searchResults = await tavilySearch(args.query);
 
