@@ -1188,8 +1188,14 @@ export const useFounderStore = create<FounderStore>()(
                 );
 
                 // Calculate progress
-                const totalTasks = newRoutine.reduce((acc, day) => acc + day.tasks.length, 0);
-                const completedTasks = newRoutine.reduce((acc, day) => acc + day.tasks.filter(t => t.done).length, 0);
+                let totalTasks = 0;
+                let completedTasks = 0;
+                for (const day of newRoutine) {
+                    totalTasks += day.tasks.length;
+                    for (const task of day.tasks) {
+                        if (task.done) completedTasks++;
+                    }
+                }
                 const rate = totalTasks > 0 ? completedTasks / totalTasks : 0;
 
                 // Update History for Today
