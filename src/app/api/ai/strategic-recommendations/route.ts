@@ -1,5 +1,26 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { z } from 'zod';
+
+const requestSchema = z.object({
+    mySolution: z.object({
+        name: z.string().optional(),
+        description: z.string().optional(),
+        targetAudience: z.string().optional(),
+        valueProposition: z.string().optional(),
+        businessModel: z.string().optional(),
+    }).passthrough().optional(),
+    competitors: z.array(
+        z.object({
+            name: z.string().optional(),
+            radarScores: z.any().optional(),
+        }).passthrough()
+    ).optional().default([]),
+    leanCanvas: z.record(z.any()).optional(),
+    roadmap: z.array(z.any()).optional(),
+    hypotheses: z.array(z.any()).optional()
+});
+
 
 const apiKey = process.env.AI_API_KEY;
 const openai = apiKey ? new OpenAI({ apiKey }) : null;
@@ -57,7 +78,12 @@ export async function POST(req: Request) {
     }
 
     try {
-        const { mySolution, competitors, leanCanvas, roadmap, hypotheses } = await req.json();
+        const body = await req.json();
+        const parsed = requestSchema.safeParse(body);
+        if (!parsed.success) {
+            return NextResponse.json({ error: 'Invalid request payload', details: parsed.error.issues }, { status: 400 });
+        }
+        const { mySolution, competitors, leanCanvas, roadmap, hypotheses } = parsed.data;
 
         const systemPrompt = `You are a strategic advisor for a startup founder. 
         Your goal is to analyze the provided company data (Solution, Competitors, Lean Canvas, Roadmap, Hypotheses) and provide actionable, high-level strategic recommendations.
