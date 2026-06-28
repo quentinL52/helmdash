@@ -119,23 +119,31 @@ export async function POST(req: Request) {
         // Handle Tool Calls
         if (message.tool_calls) {
             const toolCalls = message.tool_calls;
-            const toolMessages = [];
 
             // Append assistant's "thought" (tool call request) to history
             messages.push(message);
 
-            for (const toolCall of toolCalls) {
+            const toolPromises = toolCalls.map(async (toolCall) => {
                 if ((toolCall as any).function.name === 'search_web') {
                     const args = JSON.parse((toolCall as any).function.arguments);
                     console.log(`Executing search: ${args.query}`);
                     const searchResults = await tavilySearch(args.query);
 
-                    messages.push({
+                    return {
                         tool_call_id: toolCall.id,
                         role: 'tool',
                         name: 'search_web',
                         content: JSON.stringify(searchResults)
-                    });
+                    };
+                }
+                return null;
+            });
+
+            const resolvedTools = await Promise.all(toolPromises);
+
+            for (const result of resolvedTools) {
+                if (result !== null) {
+                    messages.push(result);
                 }
             }
 
