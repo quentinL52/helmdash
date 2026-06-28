@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
 import OpenAI from 'openai';
 
 const apiKey = process.env.AI_API_KEY;
@@ -28,6 +29,13 @@ async function tavilySearch(query: string) {
 }
 
 export async function POST(req: Request) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     if (!openai) {
         return NextResponse.json({ error: 'AI API Key missing' }, { status: 500 });
     }
