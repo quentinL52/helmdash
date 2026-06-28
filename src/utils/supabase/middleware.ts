@@ -14,7 +14,7 @@ export async function updateSession(request: NextRequest) {
                 getAll() {
                     return request.cookies.getAll()
                 },
-                setAll(cookiesToSet) {
+                setAll(cookiesToSet: any[]) {
                     cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
                     supabaseResponse = NextResponse.next({
                         request,
@@ -56,7 +56,11 @@ export async function updateSession(request: NextRequest) {
 
         // Autoriser les requêtes OPTIONS (CORS preflight) immédiatement
         if (request.method === 'OPTIONS') {
-            return NextResponse.json({}, { headers: corsHeaders });
+            const response = NextResponse.json({}, { headers: corsHeaders });
+            supabaseResponse.cookies.getAll().forEach((cookie: any) => {
+                response.cookies.set(cookie.name, cookie.value, cookie)
+            });
+            return response;
         }
 
         // Ajouter les headers CORS à la réponse
@@ -75,7 +79,11 @@ export async function updateSession(request: NextRequest) {
         }
 
         // Refus d'accès si aucune méthode d'authentification n'est valide
-        return NextResponse.json({ error: 'Unauthorized access' }, { status: 401, headers: corsHeaders });
+        const errorResponse = NextResponse.json({ error: 'Unauthorized access' }, { status: 401, headers: corsHeaders });
+        supabaseResponse.cookies.getAll().forEach((cookie: any) => {
+            errorResponse.cookies.set(cookie.name, cookie.value, cookie)
+        });
+        return errorResponse;
     }
 
     // 2. Protection de l'interface utilisateur web
@@ -83,7 +91,13 @@ export async function updateSession(request: NextRequest) {
         // no user, potentially respond by redirecting the user to the login page
         const url = request.nextUrl.clone()
         url.pathname = '/auth'
-        return NextResponse.redirect(url)
+        const redirectResponse = NextResponse.redirect(url)
+
+        supabaseResponse.cookies.getAll().forEach((cookie: any) => {
+            redirectResponse.cookies.set(cookie.name, cookie.value, cookie)
+        });
+
+        return redirectResponse;
     }
 
     // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
