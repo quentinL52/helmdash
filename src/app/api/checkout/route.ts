@@ -5,6 +5,18 @@ import { createClient } from '@/utils/supabase/server';
 export async function POST(req: Request) {
     try {
         const { priceId, planTier } = await req.json();
+
+        // Validate priceId against allowed environment variables
+        const allowedPriceIds = [
+            process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER,
+            process.env.NEXT_PUBLIC_STRIPE_PRICE_GROWTH,
+            process.env.NEXT_PUBLIC_STRIPE_PRICE_SCALE,
+        ].filter(Boolean);
+
+        if (!priceId || !allowedPriceIds.includes(priceId)) {
+            return new NextResponse('Invalid Price ID', { status: 400 });
+        }
+
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
