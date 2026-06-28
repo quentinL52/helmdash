@@ -47,12 +47,14 @@ export async function POST(req: Request) {
 
         // Step 1: Search for recent news about each competitor
         const competitorNews: Record<string, any[]> = {};
-        for (const competitor of (competitors || []).slice(0, 5)) {
-            const results = await tavilySearch(
-                `"${competitor.name}" startup news ${new Date().getFullYear()}`
-            );
-            competitorNews[competitor.name] = results;
-        }
+        await Promise.all(
+            (competitors || []).slice(0, 5).map(async (competitor: any) => {
+                const results = await tavilySearch(
+                    `"${competitor.name}" startup news ${new Date().getFullYear()}`
+                );
+                competitorNews[competitor.name] = results;
+            })
+        );
 
         const lang = language === 'fr' ? 'French' : 'English';
 
