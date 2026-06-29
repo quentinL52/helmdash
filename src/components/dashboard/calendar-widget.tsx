@@ -217,22 +217,6 @@ function getEventsForDay(events: CalendarEvent[], day: Date): CalendarEvent[] {
     });
 }
 
-function getEventsForInterval(events: CalendarEvent[], start: Date, end: Date): CalendarEvent[] {
-    // Generate all days in the interval to check for recurring DoW matches
-    const intervalDays = eachDayOfInterval({ start, end });
-    const intervalDows = new Set(intervalDays.map(d => d.getDay()));
-
-    return events.filter(ev => {
-        if (ev.recurringDow !== undefined) {
-            return intervalDows.has(ev.recurringDow);
-        }
-        if (ev.startDate && ev.endDate) {
-            return ev.startDate <= end && ev.endDate >= start;
-        }
-        return ev.date >= start && ev.date <= end;
-    });
-}
-
 // ─── Priority sorting ─────────────────────────────────────────────────────────
 
 /**
@@ -585,7 +569,17 @@ function SemesterView({ current, events, onEventClick }: { current: Date; events
                 // Collect all events in this month
                 const monthStart = startOfMonth(month);
                 const monthEnd = endOfMonth(month);
-                const monthEventsRaw = getEventsForInterval(events, monthStart, monthEnd);
+                const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+                const monthEventsRaw: CalendarEvent[] = [];
+                const seen = new Set<string>();
+                monthDays.forEach(day => {
+                    getEventsForDay(events, day).forEach(ev => {
+                        if (!seen.has(ev.id)) {
+                            seen.add(ev.id);
+                            monthEventsRaw.push(ev);
+                        }
+                    });
+                });
                 const monthEvents = sortByPriority(monthEventsRaw);
 
                 return (
@@ -642,7 +636,14 @@ function YearView({ current, events, onEventClick }: { current: Date; events: Ca
             {months.map((month, mi) => {
                 const monthStart = startOfMonth(month);
                 const monthEnd = endOfMonth(month);
-                const monthEventsRaw = getEventsForInterval(events, monthStart, monthEnd);
+                const monthDays = eachDayOfInterval({ start: monthStart, end: monthEnd });
+                const seen = new Set<string>();
+                const monthEventsRaw: CalendarEvent[] = [];
+                monthDays.forEach(day => {
+                    getEventsForDay(events, day).forEach(ev => {
+                        if (!seen.has(ev.id)) { seen.add(ev.id); monthEventsRaw.push(ev); }
+                    });
+                });
                 const monthEvents = sortByPriority(monthEventsRaw);
                 const byType = monthEvents.reduce<Record<string, number>>((acc, ev) => {
                     acc[ev.type] = (acc[ev.type] || 0) + 1;

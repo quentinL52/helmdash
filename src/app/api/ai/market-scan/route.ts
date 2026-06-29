@@ -40,21 +40,19 @@ export async function POST(req: Request) {
         }
 
         // Search for each competitor (limit to 5)
-        const searchPromises = competitors.slice(0, 5).map(async (comp: any) => {
+        const allResults: { competitor: string; competitorId: string; results: any[] }[] = [];
+        for (const comp of competitors.slice(0, 5)) {
             const results = await tavilySearch(
                 `"${comp.name}" news update ${new Date().getFullYear()}`
             );
-            return {
-                competitor: comp.name,
-                competitorId: comp.id,
-                results,
-            };
-        });
-
-        const resolvedResults = await Promise.all(searchPromises);
-
-        const allResults: { competitor: string; competitorId: string; results: any[] }[] =
-            resolvedResults.filter(res => res.results.length > 0);
+            if (results.length > 0) {
+                allResults.push({
+                    competitor: comp.name,
+                    competitorId: comp.id,
+                    results,
+                });
+            }
+        }
 
         if (allResults.length === 0) {
             return NextResponse.json({ signals: [] });
