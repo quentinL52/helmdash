@@ -95,45 +95,25 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
             const latestExpenses = (latestEntry.expenses || []);
             const latestIncomes = (latestEntry.incomes || []);
             
-            const recurringExpenses: { baseDate: number, amount: number }[] = [];
-            for (const e of latestExpenses) {
-                const isMonthly = e.frequency === 'monthly' || (e.isRecurring && !e.frequency);
-                const isAnnual = e.frequency === 'annual';
-                if (isMonthly || isAnnual) {
-                    recurringExpenses.push({
-                        baseDate: new Date(e.date || `${latestEntry.month}-01`).getTime(),
-                        amount: isAnnual ? e.amount / 12 : e.amount,
-                    });
-                }
-            }
-
-            const recurringIncomes: { baseDate: number, amount: number }[] = [];
-            for (const i of latestIncomes) {
-                const isMonthly = i.frequency === 'monthly' || (i.isRecurring && !i.frequency);
-                const isAnnual = i.frequency === 'annual';
-                if (isMonthly || isAnnual) {
-                    recurringIncomes.push({
-                        baseDate: new Date(i.date || `${latestEntry.month}-01`).getTime(),
-                        amount: isAnnual ? i.amount / 12 : i.amount,
-                    });
-                }
-            }
-
             futureMonths.forEach(fm => {
-                const year = fm.getFullYear();
-                const month = fm.getMonth();
-
-                for (const e of recurringExpenses) {
-                    const projectedDate = new Date(e.baseDate);
-                    projectedDate.setFullYear(year, month);
-                    projectedTransactions.push({ date: projectedDate, amount: e.amount, type: 'expense' });
-                }
-
-                for (const i of recurringIncomes) {
-                    const projectedDate = new Date(i.baseDate);
-                    projectedDate.setFullYear(year, month);
-                    projectedTransactions.push({ date: projectedDate, amount: i.amount, type: 'income' });
-                }
+                latestExpenses.forEach(e => {
+                    const isMonthly = e.frequency === 'monthly' || (e.isRecurring && !e.frequency);
+                    const isAnnual = e.frequency === 'annual';
+                    if (isMonthly || isAnnual) {
+                        const projectedDate = new Date(e.date || `${latestEntry.month}-01`);
+                        projectedDate.setFullYear(fm.getFullYear(), fm.getMonth());
+                        projectedTransactions.push({ date: projectedDate, amount: isAnnual ? e.amount / 12 : e.amount, type: 'expense' });
+                    }
+                });
+                latestIncomes.forEach(i => {
+                    const isMonthly = i.frequency === 'monthly' || (i.isRecurring && !i.frequency);
+                    const isAnnual = i.frequency === 'annual';
+                    if (isMonthly || isAnnual) {
+                        const projectedDate = new Date(i.date || `${latestEntry.month}-01`);
+                        projectedDate.setFullYear(fm.getFullYear(), fm.getMonth());
+                        projectedTransactions.push({ date: projectedDate, amount: isAnnual ? i.amount / 12 : i.amount, type: 'income' });
+                    }
+                });
             });
         }
 

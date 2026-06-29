@@ -128,14 +128,13 @@ export function useGamification(): UseGamificationReturn {
 
       // Auto-progress quests whose steps match this action
       const currentQuests = store.quests;
-      for (let i = 0; i < currentQuests.length; i++) {
-        const quest = currentQuests[i];
+      for (const quest of currentQuests) {
         if (quest.status === 'completed') continue;
         for (const step of quest.steps) {
           if (!step.completed && step.action === action) {
             store.updateQuestProgress(quest.id, step.id);
             // Check if quest just completed
-            const updatedQuest = store.quests[i];
+            const updatedQuest = store.quests.find(q => q.id === quest.id);
             if (updatedQuest?.status === 'completed') {
               play('quest_complete');
             }

@@ -142,7 +142,7 @@ export function useSupabaseSync() {
                         userId: user.id,
                     };
                     useFounderStore.getState().hydrate(stateToHydrate);
-
+                }
 
 
                 // Plan tier fetch is currently failing due to missing column in 'users' table.
