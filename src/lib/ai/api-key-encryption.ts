@@ -12,21 +12,21 @@ const MASTER_KEY = process.env.MASTER_ENCRYPTION_KEY || 'dev-master-key-change-i
 /**
  * Récupère ou crée la clé de chiffrement utilisateur
  */
-export async function getUserEncryptionKey(userId: string): Promise<Buffer> {
+export async function getUserEncryptionKey(userId: string): Promise<Uint8Array<ArrayBuffer>> {
   // Récupérer le salt et hash stockés
   const record = await prisma.userEncryptionKey.findUnique({
     where: { userId }
   });
 
   if (!record) {
-    // Première fois : générer salt, décompte salt et stocker
+    // Première fois : générer salt, dériver clé et stocker
     const salt = generateSalt();
     const key = await deriveKey(MASTER_KEY, salt);
     
     await prisma.userEncryptionKey.create({
       data: {
         userId,
-        keyHash: key.toString('base64'), // Stockage du hash de la clé (pour vérification)
+        keyHash: Buffer.from(key).toString('base64'), // Stockage du hash de la clé (pour vérification)
         salt,
       }
     });
@@ -34,8 +34,9 @@ export async function getUserEncryptionKey(userId: string): Promise<Buffer> {
     return key;
   }
 
-  // Clé existante : re-dériver depuis master key + salt
-  return deriveKey(MASTER_KEY, record.salt);
+  // Clé existante : re-dériver depuis master key + salt stocké
+  const key = await deriveKey(MASTER_KEY, record.salt);
+  return key;
 }
 
 /**
@@ -66,7 +67,7 @@ export interface EncryptedAiSettings {
 export async function encryptAiSettings(
   provider: string,
   apiKey: string,
-  modelsConfig?: Record<string, unknown>,
+  modelsConfig: Record<string, unknown> | undefined,
   userId: string
 ): Promise<EncryptedAiSettings> {
   return {
