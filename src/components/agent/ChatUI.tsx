@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import ReactMarkdown from 'react-markdown';
 
 export function ChatUI({ userId }: { userId: string }) {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading, setInput } = useChat({
     api: '/api/ai/chat/stream',
     body: { userId },
   });
@@ -124,8 +124,11 @@ export function ChatUI({ userId }: { userId: string }) {
           className="flex items-center gap-2 max-w-4xl mx-auto"
         >
           <Input
-            value={input}
-            onChange={handleInputChange}
+            value={input || ''}
+            onChange={(e) => {
+              if (setInput) setInput(e.target.value);
+              else if (handleInputChange) handleInputChange(e);
+            }}
             placeholder="Demandez un rapport financier, une recherche de marché, ou planifiez une tâche..."
             className="flex-1 bg-background/50 focus-visible:ring-1"
             disabled={isLoading}
@@ -133,7 +136,7 @@ export function ChatUI({ userId }: { userId: string }) {
           <Button 
             type="submit" 
             size="icon" 
-            disabled={isLoading || !input.trim()}
+            disabled={isLoading || !input?.trim()}
             className="shrink-0 rounded-full w-10 h-10"
           >
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}

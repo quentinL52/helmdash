@@ -13,6 +13,7 @@ export const translations = {
             crm: "CRM",
             journal: "Journal",
             competitiveWatch: "Veille",
+            agent: "Agent Central",
         },
         dashboard: {
             weeklyCoach: "Coach Hebdo",
@@ -552,6 +553,7 @@ export const translations = {
             crm: "CRM",
             journal: "Journal",
             competitiveWatch: "Watch",
+            agent: "Central Agent",
         },
         dashboard: {
             weeklyCoach: "Weekly Coach",

@@ -22,6 +22,7 @@ import {
     LogOut,
     Radar,
     Settings,
+    Bot,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/utils/supabase/client';
@@ -53,6 +54,7 @@ export function AppSidebar() {
         { href: '/go-to-market', label: 'Go-To-Market', icon: Target },
         { href: '/crm', label: t.crm, icon: Users },
         { href: '/journal', label: t.journal, icon: BookOpen },
+        { href: '/agent', label: t.agent, icon: Bot },
     ];
 
     const showSidebar = useCallback(() => {
