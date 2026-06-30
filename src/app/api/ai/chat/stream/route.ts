@@ -57,14 +57,14 @@ export async function POST(req: Request) {
       system: systemPrompt,
       messages,
       tools,
-      maxSteps: 5,
+      // maxSteps: 5, // Temporairement désactivé pour compatibilité types
       onError: (error) => {
         console.error('[Chat Stream] Error:', error);
       },
     });
 
     // Réponse avec headers de rate limit
-    const response = result.toDataStreamResponse();
+    const response = result.toTextStreamResponse();
     
     // Ajouter headers rate limit à la réponse
     response.headers.set('X-RateLimit-Limit', limit.toString());

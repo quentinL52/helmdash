@@ -7,17 +7,19 @@ const scryptAsync = promisify(scrypt);
  * Dérive une clé de chiffrement à partir du mot de passe utilisateur + salt stocké
  * Utilise scrypt (KDF résistant au brute-force)
  */
-export async function deriveKey(password: string, salt: Buffer): Promise<Buffer> {
-  return (await scryptAsync(password, salt, 32)) as Buffer;
+export async function deriveKey(password: string, salt: Uint8Array<ArrayBuffer>): Promise<Uint8Array<ArrayBuffer>> {
+  const derived = await scryptAsync(password, new Uint8Array(salt), 32);
+  const buf = Buffer.from(derived);
+  return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
 }
 
 /**
  * Chiffre une donnée avec AES-256-GCM (authentifié)
  * Retourne: iv + ciphertext + authTag (concaténés)
  */
-export async function encrypt(plaintext: string, key: Buffer): Promise<string> {
+export async function encrypt(plaintext: string, key: Uint8Array<ArrayBuffer>): Promise<string> {
   const iv = randomBytes(12); // 96 bits pour GCM
-  const cipher = createCipheriv('aes-256-gcm', key, iv);
+  const cipher = createCipheriv('aes-256-gcm', Buffer.from(key), iv);
   
   const ciphertext = Buffer.concat([
     cipher.update(plaintext, 'utf8'),
@@ -34,14 +36,14 @@ export async function encrypt(plaintext: string, key: Buffer): Promise<string> {
 /**
  * Déchiffre une donnée chiffrée avec encrypt()
  */
-export async function decrypt(encryptedData: string, key: Buffer): Promise<string> {
+export async function decrypt(encryptedData: string, key: Uint8Array<ArrayBuffer>): Promise<string> {
   const buffer = Buffer.from(encryptedData, 'base64');
   
   const iv = buffer.subarray(0, 12);
   const authTag = buffer.subarray(buffer.length - 16);
   const ciphertext = buffer.subarray(12, buffer.length - 16);
   
-  const decipher = createDecipheriv('aes-256-gcm', key, iv);
+  const decipher = createDecipheriv('aes-256-gcm', Buffer.from(key), iv);
   decipher.setAuthTag(authTag);
   
   const plaintext = Buffer.concat([
@@ -55,8 +57,9 @@ export async function decrypt(encryptedData: string, key: Buffer): Promise<strin
 /**
  * Génère un salt aléatoire pour la dérivation de clé
  */
-export function generateSalt(): Buffer {
-  return randomBytes(16);
+export function generateSalt(): Uint8Array<ArrayBuffer> {
+  const buf = randomBytes(16);
+  return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
 }
 
 /**
