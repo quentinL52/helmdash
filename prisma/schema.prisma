@@ -1,23 +1,32 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
 }
 
 model User {
-  id        String   @id @default(uuid()) @db.Uuid
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now()) @map("created_at")
+  id                   String   @id @default(uuid()) @db.Uuid
+  email                String   @unique
+  name                 String?
+  createdAt            DateTime @default(now()) @map("created_at")
+  stripeCustomerId     String?  @map("stripe_customer_id")
+  stripeSubscriptionId String?  @map("stripe_subscription_id")
+  mrr                  Float    @default(0)
+  arr                  Float    @default(0)
+  planTier             String   @default("free") @map("plan_tier")
 
-  projects    Project[]
-  moodEntries MoodEntry[]
-  tasks       Task[]
-  streak      Streak?
-  aiSettings  AiSettings?
+  projects      Project[]
+  moodEntries   MoodEntry[]
+  tasks         Task[]
+  streak        Streak?
+  aiSettings    AiSettings?
+  encryptionKey UserEncryptionKey?
+  memoryNotes   MemoryNote[]
 
   @@map("users")
 }
@@ -84,7 +93,7 @@ model Streak {
   userId           String    @unique @map("user_id") @db.Uuid
   currentStreak    Int       @default(0) @map("current_streak")
   longestStreak    Int       @default(0) @map("longest_streak")
-  lastActivityDate DateTime? @db.Date @map("last_activity_date")
+  lastActivityDate DateTime? @map("last_activity_date") @db.Date
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -101,4 +110,34 @@ model AiSettings {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("ai_settings")
+}
+
+model UserEncryptionKey {
+  userId    String   @id @map("user_id") @db.Uuid
+  keyHash   String   @map("key_hash")
+  salt      Bytes
+  version   Int      @default(1)
+  rotatedAt DateTime @default(now()) @map("rotated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_encryption_keys")
+}
+
+model MemoryNote {
+  id        String                       @id @default(uuid()) @db.Uuid
+  userId    String                       @map("user_id") @db.Uuid
+  content   String
+  type      String
+  tags      String[]
+  links     String[]
+  entities  Json?
+  embedding Unsupported("vector(3072)")?
+  createdAt DateTime                     @default(now()) @map("created_at")
+  updatedAt DateTime                     @default(now()) @map("updated_at")
+  source    String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("memory_notes")
 }

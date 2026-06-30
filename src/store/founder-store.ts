@@ -1,5 +1,41 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
+
+// Custom StateStorage to sync with Supabase via an API route
+const supabaseStorage: StateStorage = {
+    getItem: async (name): Promise<string | null> => {
+        try {
+            const res = await fetch(`/api/store/${name}`);
+            if (res.ok) {
+                const data = await res.json();
+                return JSON.stringify(data);
+            }
+            return localStorage.getItem(name);
+        } catch (e) {
+            return localStorage.getItem(name);
+        }
+    },
+    setItem: async (name, value): Promise<void> => {
+        localStorage.setItem(name, value);
+        try {
+            await fetch(`/api/store/${name}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ data: JSON.parse(value) })
+            });
+        } catch (e) {
+            console.error('Failed to sync state to Supabase', e);
+        }
+    },
+    removeItem: async (name): Promise<void> => {
+        localStorage.removeItem(name);
+        try {
+            await fetch(`/api/store/${name}`, { method: 'DELETE' });
+        } catch (e) {
+            console.error('Failed to delete state from Supabase', e);
+        }
+    },
+};
 
 // --- Types ---
 
@@ -1375,6 +1411,7 @@ export const useFounderStore = create<FounderStore>()(
         }),
         {
             name: 'founder-os-store', // name of the item in the storage (must be unique)
+            storage: createJSONStorage(() => supabaseStorage),
         }
     )
 );
