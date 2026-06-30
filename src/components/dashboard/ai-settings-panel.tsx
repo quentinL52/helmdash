@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectGroup, SelectLabel } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useFounderStore } from "@/store/founder-store";
 import { Bot, Save, Loader2, CheckCircle2, AlertTriangle, Eye, EyeOff } from "lucide-react";
@@ -23,10 +23,18 @@ export function AISettingsPanel() {
   const [showKey, setShowKey] = useState(false);
   
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
+  const [allProviderModels, setAllProviderModels] = useState<Record<string, AIModel[]>>({});
   const [isLoadingModels, setIsLoadingModels] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const PROVIDERS: { id: ProviderName; name: string }[] = [
+    { id: 'openai', name: 'OpenAI' },
+    { id: 'anthropic', name: 'Anthropic' },
+    { id: 'gemini', name: 'Google Gemini' },
+    { id: 'mistral', name: 'Mistral AI' },
+  ];
 
   // Update local state when provider changes
   useEffect(() => {
@@ -36,6 +44,28 @@ export function AISettingsPanel() {
     setError('');
     setSuccess('');
   }, [provider, aiSettings]);
+
+  // Fetch all models for all configured providers in background
+  useEffect(() => {
+    const fetchAll = async () => {
+      const newAllModels: Record<string, AIModel[]> = {};
+      for (const p of PROVIDERS) {
+        const key = aiSettings.apiKeys?.[p.id];
+        if (key) {
+          try {
+            const res = await fetch(`/api/ai/models?provider=${p.id}`, { headers: { 'x-api-key': key } });
+            const data = await res.json();
+            if (res.ok && data.models) {
+              const unique = Array.from(new Map(data.models.map((m: any) => [m.id, m])).values());
+              newAllModels[p.id] = unique as AIModel[];
+            }
+          } catch (e) {}
+        }
+      }
+      setAllProviderModels(newAllModels);
+    };
+    fetchAll();
+  }, [aiSettings.apiKeys]);
 
   const fetchModels = async (currentKey: string) => {
     if (!currentKey) return;
@@ -54,11 +84,12 @@ export function AISettingsPanel() {
         throw new Error(data.error || 'Erreur de connexion au provider');
       }
       
-      setAvailableModels(data.models || []);
+      const uniqueModels = Array.from(new Map((data.models || []).map((m: any) => [m.id, m])).values());
+      setAvailableModels(uniqueModels as AIModel[]);
       
       // Auto-select first model if none selected
-      if (!model && data.models && data.models.length > 0) {
-        setModel(data.models[0].id);
+      if (!model && uniqueModels && uniqueModels.length > 0) {
+        setModel((uniqueModels[0] as AIModel).id);
       }
     } catch (err: any) {
       setError(err.message || 'Impossible de charger les modèles');
@@ -112,13 +143,6 @@ export function AISettingsPanel() {
       setIsSaving(false);
     }
   };
-
-  const PROVIDERS: { id: ProviderName; name: string }[] = [
-    { id: 'openai', name: 'OpenAI' },
-    { id: 'anthropic', name: 'Anthropic' },
-    { id: 'gemini', name: 'Google Gemini' },
-    { id: 'mistral', name: 'Mistral AI' },
-  ];
 
   return (
     <Card className="bg-card/50 backdrop-blur border-accent/20 relative overflow-hidden group shadow-lg">
@@ -206,8 +230,8 @@ export function AISettingsPanel() {
                   } />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableModels.map(m => (
-                    <SelectItem key={m.id} value={m.id} className="font-mono text-sm">
+                  {availableModels.map((m, idx) => (
+                    <SelectItem key={`${m.id}-${idx}`} value={m.id} className="font-mono text-sm">
                       {m.name || m.id} <span className="text-muted-foreground text-xs ml-2">({m.id})</span>
                     </SelectItem>
                   ))}
@@ -229,17 +253,34 @@ export function AISettingsPanel() {
                     <Select 
                       value={modelsConfig[agent.role] || ''} 
                       onValueChange={(val) => setModelsConfig(prev => ({ ...prev, [agent.role]: val }))} 
-                      disabled={availableModels.length === 0}
+                      disabled={Object.keys(allProviderModels).length === 0 && availableModels.length === 0}
                     >
                       <SelectTrigger className="bg-background/50 font-mono text-xs h-8">
                         <SelectValue placeholder="Modèle par défaut" />
                       </SelectTrigger>
                       <SelectContent>
-                        {availableModels.map(m => (
-                          <SelectItem key={m.id} value={m.id} className="font-mono text-xs">
-                            {m.id}
-                          </SelectItem>
-                        ))}
+                        {Object.entries(allProviderModels).length > 0 ? (
+                          Object.entries(allProviderModels).map(([prov, models]) => (
+                            <SelectGroup key={prov}>
+                              <SelectLabel>{PROVIDERS.find(p => p.id === prov)?.name || prov}</SelectLabel>
+                              {models.map((m, idx) => (
+                                <SelectItem key={`${prov}-${m.id}-${idx}`} value={`${prov}:${m.id}`} className="font-mono text-xs">
+                                  {m.id}
+                                </SelectItem>
+                              ))}
+                            </SelectGroup>
+                          ))
+                        ) : (
+                          // Fallback to currently available models if background fetch failed/pending
+                          <SelectGroup>
+                            <SelectLabel>{provider}</SelectLabel>
+                            {availableModels.map((m, idx) => (
+                              <SelectItem key={`${provider}-${m.id}-${idx}`} value={`${provider}:${m.id}`} className="font-mono text-xs">
+                                {m.id}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        )}
                       </SelectContent>
                     </Select>
                   </div>

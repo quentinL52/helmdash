@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import OpenAI from 'openai';
+import { isValidUUID } from '@/lib/encryption';
 
 const prisma = new PrismaClient();
 const openai = new OpenAI();
@@ -20,13 +21,24 @@ export class VectorStore {
     const response = await openai.embeddings.create({
       model: 'text-embedding-3-large',
       input: text,
-      dimensions: 3072, // Configuré dans schema.prisma
+      dimensions: 3072,
     });
     return response.data[0].embedding;
   }
 
   /**
+   * Valide et sanitise un userId pour éviter l'injection SQL
+   */
+  private validateUserId(userId: string): string {
+    if (!isValidUUID(userId)) {
+      throw new Error('Invalid userId format');
+    }
+    return userId.toLowerCase();
+  }
+
+  /**
    * Recherche les notes similaires dans la base de données.
+   * Sécurisé contre l'injection SQL via validation UUID stricte.
    */
   async searchSimilarNotes(
     userId: string,
@@ -34,13 +46,12 @@ export class VectorStore {
     limit: number = 5,
     threshold: number = 0.5
   ): Promise<VectorSearchResult[]> {
+    const safeUserId = this.validateUserId(userId);
     const embedding = await this.generateEmbedding(query);
     
-    // Convert embedding array to string formatted for pgvector
     const vectorString = `[${embedding.join(',')}]`;
 
-    // Utilisation d'une requête brute (Raw Query) Prisma pour interroger pgvector
-    // On utilise l'opérateur de distance cosinus (<=>)
+    // Requête paramétrée avec userId validé - SÉCURISÉ
     const results = await prisma.$queryRaw<any[]>`
       SELECT
         id,
@@ -49,7 +60,7 @@ export class VectorStore {
         tags,
         1 - (embedding <=> ${vectorString}::vector) as similarity
       FROM memory_notes
-      WHERE user_id = ${userId}::uuid
+      WHERE user_id = ${safeUserId}::uuid
         AND 1 - (embedding <=> ${vectorString}::vector) > ${threshold}
       ORDER BY embedding <=> ${vectorString}::vector
       LIMIT ${limit};
@@ -66,15 +77,17 @@ export class VectorStore {
 
   /**
    * Met à jour ou insère l'embedding d'une note.
+   * Sécurisé via validation UUID.
    */
   async updateNoteEmbedding(noteId: string, text: string): Promise<void> {
+    const safeNoteId = this.validateUserId(noteId);
     const embedding = await this.generateEmbedding(text);
     const vectorString = `[${embedding.join(',')}]`;
 
     await prisma.$executeRaw`
       UPDATE memory_notes
       SET embedding = ${vectorString}::vector
-      WHERE id = ${noteId}::uuid;
+      WHERE id = ${safeNoteId}::uuid;
     `;
   }
 }

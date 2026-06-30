@@ -6,6 +6,8 @@ const prisma = new PrismaClient();
 const openai = new OpenAI();
 const vectorStore = new VectorStore();
 
+import { memoryQueue } from '@/lib/queue/memory-queue';
+
 export interface Entity {
   name: string;
   type: string;
@@ -53,8 +55,7 @@ Texte: ${text}`;
     links?: string[];
     source?: 'user' | 'agent' | 'import' | 'webhook';
   }): Promise<void> {
-    const entities = await this.extractEntities(data.content);
-
+    // 1. Créer la note SANS entités (rapide)
     const note = await prisma.memoryNote.upsert({
       where: { id: data.id || 'new-uuid-that-doesnt-exist' }, // Will always create if no id
       create: {
@@ -64,7 +65,7 @@ Texte: ${text}`;
         type: data.type,
         tags: data.tags || [],
         links: data.links || [],
-        entities: entities as any,
+        entities: [],
         source: data.source || 'agent',
       },
       update: {
@@ -72,13 +73,20 @@ Texte: ${text}`;
         type: data.type,
         tags: data.tags,
         links: data.links,
-        entities: entities as any,
         updatedAt: new Date(),
       },
     });
 
-    // Mettre à jour l'embedding dans un processus asynchrone (ou synchrone selon le besoin)
-    await vectorStore.updateNoteEmbedding(note.id, data.content);
+    // 2. Enqueue job extraction (non-bloquant)
+    await memoryQueue.add('extract-entities', {
+      noteId: note.id,
+      userId: data.userId,
+      content: data.content,
+      type: data.type,
+    });
+    
+    // 3. Retourner immédiatement
+    return;
   }
 
   /**

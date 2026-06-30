@@ -14,6 +14,7 @@ export const translations = {
             journal: "Journal",
             competitiveWatch: "Veille",
             agent: "Agent Central",
+            progression: "Progression & Quêtes",
         },
         dashboard: {
             weeklyCoach: "Coach Hebdo",
@@ -554,6 +555,7 @@ export const translations = {
             journal: "Journal",
             competitiveWatch: "Watch",
             agent: "Central Agent",
+            progression: "Progression & Quests",
         },
         dashboard: {
             weeklyCoach: "Weekly Coach",

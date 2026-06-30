@@ -20,15 +20,26 @@ model User {
   arr                  Float    @default(0)
   planTier             String   @default("free") @map("plan_tier")
 
-  projects      Project[]
-  moodEntries   MoodEntry[]
-  tasks         Task[]
-  streak        Streak?
-  aiSettings    AiSettings?
-  encryptionKey UserEncryptionKey?
-  memoryNotes   MemoryNote[]
-  graphNodes    GraphNode[]
-  graphEdges    GraphEdge[]
+  projects            Project[]
+  moodEntries         MoodEntry[]
+  tasks               Task[]
+  streak              Streak?
+  aiSettings          AiSettings?
+  encryptionKey       UserEncryptionKey?
+  memoryNotes         MemoryNote[]
+  graphNodes          GraphNode[]
+  graphEdges          GraphEdge[]
+  
+  // Core Agent tables
+  hypotheses          Hypothesis[]
+  monthlyFinances     MonthlyFinance[]
+  financeEntries      FinanceEntry[]
+  financeOneTimeEntries FinanceOneTimeEntry[]
+  financeSettings     FinanceSettings?
+  gtmStrategy         GtmStrategy?
+  contacts            Contact[]
+  roadmapItems        RoadmapItem[]
+  leanCanvasSections  LeanCanvasSection[]
 
   @@map("users")
 }
@@ -103,12 +114,12 @@ model Streak {
 }
 
 model AiSettings {
-  id           String  @id @default(uuid()) @db.Uuid
-  userId       String  @unique @map("user_id") @db.Uuid
-  provider     String?
-  apiKey       String? @map("api_key")
-  activeAgents Json?   @map("active_agents")
-  modelsConfig Json?   @map("models_config")
+  id            String  @id @default(uuid()) @db.Uuid
+  userId        String  @unique @map("user_id") @db.Uuid
+  provider      String?
+  apiKey        String? @map("api_key")  // Chiffré via api-key-encryption.ts
+  activeAgents  Json?   @map("active_agents")
+  modelsConfig  Json?   @map("models_config")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -179,4 +190,289 @@ model GraphEdge {
 
   @@unique([sourceNodeId, targetNodeId, relationType])
   @@map("graph_edges")
+}
+
+// ==========================================
+// CORE AGENT TABLES
+// ==========================================
+
+enum HypothesisStatus {
+  draft
+  testing
+  validated
+  invalidated
+  pivoted
+}
+
+enum HypothesisRisk {
+  critical
+  high
+  medium
+  low
+}
+
+enum HypothesisCategory {
+  problem
+  solution
+  channel
+  revenue
+  segment
+}
+
+model Hypothesis {
+  id              String            @id @default(uuid()) @db.Uuid
+  userId          String            @map("user_id") @db.Uuid
+  
+  // Formulation
+  statement       String
+  category        HypothesisCategory
+  riskLevel       HypothesisRisk
+  
+  // Build phase
+  testMethod      String            @map("test_method")
+  successCriteria String            @map("success_criteria")
+  deadline        DateTime?         @db.Date
+  cost            Float?
+  
+  // Measure phase
+  measureNotes    String?           @map("measure_notes")
+  
+  // Learn phase
+  status          HypothesisStatus  @default(draft)
+  actualResult    String?           @map("actual_result")
+  learnings       String?
+  nextAction      String?           @map("next_action")
+  
+  // Pivot tracking
+  pivotedFromId   String?           @map("pivoted_from_id") @db.Uuid
+  pivotedFrom     Hypothesis?       @relation("HypothesisPivot", fields: [pivotedFromId], references: [id], onDelete: SetNull)
+  pivotedTo       Hypothesis[]      @relation("HypothesisPivot")
+  
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @default(now()) @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, status])
+  @@map("hypotheses")
+}
+
+enum ExpenseCategory {
+  Infrastructure
+  API_IA
+  Auth_Data
+  Observabilite
+  Email
+  Outils_SaaS
+  Marketing
+  Divers
+}
+
+enum ExpenseFrequency {
+  monthly
+  annual
+  one_time
+}
+
+enum TransactionType {
+  income
+  expense
+}
+
+model MonthlyFinance {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  month       String   @db.VarChar(7) // "YYYY-MM"
+  revenue     Float    @default(0)
+  notes       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @map("updated_at")
+
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entries    FinanceEntry[]
+
+  @@unique([userId, month])
+  @@map("monthly_finances")
+}
+
+model FinanceEntry {
+  id                   String            @id @default(uuid()) @db.Uuid
+  userId               String            @map("user_id") @db.Uuid
+  monthlyFinanceId     String            @map("monthly_finance_id") @db.Uuid
+  
+  label                String
+  amount               Float
+  category             ExpenseCategory
+  frequency            ExpenseFrequency  @default(monthly)
+  type                 TransactionType
+  date                 DateTime          @db.Date
+  notes                String?
+  
+  createdAt            DateTime          @default(now()) @map("created_at")
+  updatedAt            DateTime          @default(now()) @map("updated_at")
+
+  user            User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  monthlyFinance  MonthlyFinance  @relation(fields: [monthlyFinanceId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("finance_entries")
+}
+
+model FinanceOneTimeEntry {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  date      DateTime @db.Date
+  label     String
+  amount    Float    // Positif = revenu, Négatif = dépense
+  category  String
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("finance_one_time_entries")
+}
+
+model FinanceSettings {
+  userId              String   @id @map("user_id") @db.Uuid
+  targetMrr           Float    @default(0) @map("target_mrr")
+  firstRevenueDate    DateTime? @map("first_revenue_date") @db.Date
+  firstRevenueAmount  Float?   @map("first_revenue_amount")
+  cashAvailable       Float    @default(0) @map("cash_available")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @default(now()) @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("finance_settings")
+}
+
+model GtmStrategy {
+  userId          String   @id @map("user_id") @db.Uuid
+  
+  // StoryBrand
+  sbHero          String?  @map("sb_hero")
+  sbProblem       String?  @map("sb_problem")
+  sbGuide         String?  @map("sb_guide")
+  
+  // Obviously Awesome
+  oaAlternatives  String?  @map("oa_alternatives")
+  oaUniqueAttributes String? @map("oa_unique_attributes")
+  oaValue         String?  @map("oa_value")
+  
+  // 1-Page Marketing Plan
+  ompTarget       String?  @map("omp_target")
+  ompMessage      String?  @map("omp_message")
+  ompMedia        String?  @map("omp_media")
+  
+  // Cold Start Problem
+  csAtomicNetwork String?  @map("cs_atomic_network")
+  
+  // Online Writing
+  owCadence       String?  @map("ow_cadence")
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @default(now()) @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("gtm_strategies")
+}
+
+enum ContactType {
+  candidat
+  entreprise
+  investisseur
+  ecole
+}
+
+enum ContactStatus {
+  a_contacter
+  en_discussion
+  qualifie
+  client
+  perdu
+}
+
+model Contact {
+  id                String       @id @default(uuid()) @db.Uuid
+  userId            String       @map("user_id") @db.Uuid
+  name              String
+  type              ContactType?
+  role              String?
+  company           String?
+  email             String?
+  linkedin          String?
+  status            ContactStatus @default(a_contacter)
+  lastContactDate   DateTime     @map("last_contact_date") @db.Date
+  nextActionDate    DateTime?    @map("next_action_date") @db.Date
+  nextActionLabel   String?      @map("next_action_label")
+  notes             String?
+  tags              String[]
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @default(now()) @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, status])
+  @@map("contacts")
+}
+
+enum RoadmapStatus {
+  todo
+  doing
+  done
+}
+
+enum RoadmapPriority {
+  high
+  medium
+  low
+}
+
+model RoadmapItem {
+  id          String         @id @default(uuid()) @db.Uuid
+  userId      String         @map("user_id") @db.Uuid
+  title       String
+  description String?
+  status      RoadmapStatus  @default(todo)
+  priority    RoadmapPriority @default(medium)
+  week        String?
+  startDate   DateTime?      @map("start_date") @db.Date
+  dueDate     DateTime?      @map("due_date") @db.Date
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @default(now()) @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, status])
+  @@map("roadmap_items")
+}
+
+enum CanvasSection {
+  problem
+  solution
+  keyMetrics
+  uvp
+  unfairAdvantage
+  channels
+  customerSegments
+  costStructure
+  revenueStreams
+}
+
+model LeanCanvasSection {
+  userId    String        @map("user_id") @db.Uuid
+  sectionId CanvasSection @map("section_id")
+  content   String        @default("")
+  updatedAt DateTime      @default(now()) @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, sectionId])
+  @@map("lean_canvas_sections")
 }

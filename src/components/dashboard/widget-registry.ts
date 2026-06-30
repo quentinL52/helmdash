@@ -145,13 +145,11 @@ export const WIDGET_REGISTRY: Record<string, WidgetDefinition> = {
 
 export const getDefaultLayout = () => {
   return [
-    { id: 'xp-progress', size: 'medium' as WidgetSize },
-    { id: 'quests', size: 'full' as WidgetSize },
-    { id: 'pixel-mood', size: 'small' as WidgetSize },
-    { id: 'streak', size: 'small' as WidgetSize },
-    { id: 'founder-score', size: 'medium' as WidgetSize },
+    { id: 'weekly-brief', size: 'full' as WidgetSize },
     { id: 'quick-actions', size: 'medium' as WidgetSize },
-    { id: 'weekly-brief', size: 'large' as WidgetSize },
+    { id: 'pixel-mood', size: 'medium' as WidgetSize },
+    { id: 'runway', size: 'medium' as WidgetSize },
+    { id: 'hypotheses', size: 'medium' as WidgetSize },
     { id: 'agents-hub', size: 'full' as WidgetSize },
   ];
 };

@@ -114,6 +114,8 @@ export { ProviderRegistry };
 
 import { openai } from '@ai-sdk/openai';
 import { anthropic } from '@ai-sdk/anthropic';
+import { google } from '@ai-sdk/google';
+import { mistral } from '@ai-sdk/mistral';
 
 export type AgentRole = 'core' | 'pm' | 'cfo' | 'growth' | 'legal' | 'tech' | 'research';
 
@@ -138,13 +140,30 @@ export const DEFAULT_MODELS_CONFIG: UserModelsConfig = {
 };
 
 export function getModelForAgent(role: AgentRole, userConfig?: UserModelsConfig | null) {
-  const modelId = userConfig?.[role] || DEFAULT_MODELS_CONFIG[role];
-  if (modelId?.startsWith('gpt') || modelId?.startsWith('o1')) {
-    return openai(modelId as string);
-  } else if (modelId?.startsWith('claude')) {
-    return anthropic(modelId as string);
+  const configValue = userConfig?.[role] || DEFAULT_MODELS_CONFIG[role] || 'openai:gpt-4o-mini';
+  
+  let provider = '';
+  let modelId = '';
+
+  if (configValue.includes(':')) {
+    [provider, modelId] = configValue.split(':');
   } else {
-    return openai('gpt-4o-mini');
+    modelId = configValue;
+    // Fallback detection
+    if (modelId.startsWith('gpt') || modelId.startsWith('o1')) provider = 'openai';
+    else if (modelId.startsWith('claude')) provider = 'anthropic';
+    else if (modelId.startsWith('mistral') || modelId.includes('mistral')) provider = 'mistral';
+    else if (modelId.startsWith('gemini')) provider = 'gemini';
+    else provider = 'openai';
+  }
+
+  switch (provider) {
+    case 'openai': return openai(modelId);
+    case 'anthropic': return anthropic(modelId);
+    case 'google':
+    case 'gemini': return google(modelId);
+    case 'mistral': return mistral(modelId);
+    default: return openai('gpt-4o-mini');
   }
 }
 

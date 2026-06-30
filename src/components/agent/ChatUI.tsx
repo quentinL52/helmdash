@@ -125,10 +125,7 @@ export function ChatUI({ userId }: { userId: string }) {
         >
           <Input
             value={input || ''}
-            onChange={(e) => {
-              if (setInput) setInput(e.target.value);
-              else if (handleInputChange) handleInputChange(e);
-            }}
+            onChange={handleInputChange}
             placeholder="Demandez un rapport financier, une recherche de marché, ou planifiez une tâche..."
             className="flex-1 bg-background/50 focus-visible:ring-1"
             disabled={isLoading}

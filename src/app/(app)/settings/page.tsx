@@ -18,6 +18,7 @@ import {
 import { toast } from '@/hooks/use-toast';
 import { Save, MonitorSmartphone, Palette, Calendar, User, Linkedin, PenLine } from 'lucide-react';
 import { AISettingsPanel } from '@/components/dashboard/ai-settings-panel';
+import { BillingPanel } from '@/components/dashboard/billing-panel';
 
 export default function SettingsPage() {
     const { theme, setTheme } = useTheme();
@@ -183,6 +184,9 @@ export default function SettingsPage() {
                         </div>
                     </CardContent>
                 </Card>
+
+                {/* Abonnement / Billing */}
+                <BillingPanel />
                 {/* Paramètres IA */}
                 <AISettingsPanel />
             </div>

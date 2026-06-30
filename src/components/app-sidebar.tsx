@@ -23,6 +23,7 @@ import {
     Radar,
     Settings,
     Bot,
+    Trophy,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/utils/supabase/client';
@@ -43,6 +44,7 @@ export function AppSidebar() {
 
     const navItems = [
         { href: '/dashboard', label: t.dashboard, icon: LayoutDashboard },
+        { href: '/progression', label: t.progression || 'Progression', icon: Trophy },
         { href: '/hypotheses', label: t.hypotheses, icon: FlaskConical },
         { href: '/finances', label: t.finance, icon: PieChart },
         { href: '/lean-canvas', label: t.leanCanvas, icon: LayoutGrid },
