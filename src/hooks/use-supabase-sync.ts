@@ -24,18 +24,11 @@ export function useSupabaseSync() {
     useEffect(() => {
         const getUser = async () => {
             const { data: { user } } = await supabase.auth.getUser();
-            console.log('[Sync] Initial getUser identity:', {
-                id: user?.id,
-                email: user?.email,
-                provider: user?.app_metadata?.provider,
-                metadata: user?.user_metadata
-            });
             setUser(user);
         };
         getUser();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            console.log('[Sync] Auth state change event:', _event, 'User:', session?.user?.email);
             setUser(session?.user ?? null);
         });
 
@@ -53,16 +46,13 @@ export function useSupabaseSync() {
         if (currentUserId && currentUserId !== storedUserId) {
             // Check if it's a first-time login (guest -> user)
             if (!storedUserId) {
-                console.log('[Sync] Guest -> User transition, preserving local data.');
                 useFounderStore.getState().setUserId(currentUserId);
             } else {
-                console.log('[Sync] Account switch detected, resetting store for isolation.');
                 useFounderStore.getState().reset();
                 useFounderStore.getState().setUserId(currentUserId);
             }
             isLoadedRef.current = false;
         } else if (!currentUserId && storedUserId) {
-            console.log('[Sync] User logged out, clearing store.');
             useFounderStore.getState().reset();
             useFounderStore.getState().setUserId(null);
             isLoadedRef.current = false;
@@ -72,18 +62,14 @@ export function useSupabaseSync() {
             if (!user) return;
 
             try {
-                console.log('[Sync] Starting loadData for user:', user.id);
                 const { data, error } = await supabase
                     .from('founder_data')
                     .select('*')
                     .eq('user_id', user.id)
                     .single();
 
-                console.log('[Sync] loadData query result:', { dataFound: !!data, error: error?.message || 'None', errorCode: error?.code });
-
                 // Verify user hasn't changed during async operation
                 if (userIdRef.current !== user.id) {
-                    console.log('[Sync] User changed during load, aborting.');
                     return;
                 }
 
@@ -102,11 +88,9 @@ export function useSupabaseSync() {
                 }
 
                 if (data) {
-                    const rawKeys = Object.keys(data);
 
                     // Always synchronize IDs immediately
                     if (useFounderStore.getState().userId !== user.id) {
-                        console.log(`[Sync] Store userId mismatch (${useFounderStore.getState().userId} vs ${user.id}). Correcting.`);
                         useFounderStore.getState().setUserId(user.id);
                     }
 
@@ -127,16 +111,12 @@ export function useSupabaseSync() {
                         localState.objectives.length > 0 ||
                         (localState.leanCanvas && Object.keys(localState.leanCanvas).length > 0 && localState.leanCanvas.problem !== "");
 
-                    console.log('[Sync] Comparison:', { hasSupaContent, hasLocalContent, dbUserId: data.user_id });
-
                     if (!hasSupaContent && hasLocalContent) {
-                        console.log('[Sync] Protecting local guest data. Supabase row is empty.');
                         isLoadedRef.current = true;
                         return;
                     }
 
                     // If Supabase has data OR local is empty, we must load what's on the account
-                    console.log('[Sync] Loading account data from Supabase...');
                     const stateToHydrate = {
                         hypotheses: data.hypotheses || [],
                         finance: data.finance || {},
@@ -162,9 +142,6 @@ export function useSupabaseSync() {
                         userId: user.id,
                     };
                     useFounderStore.getState().hydrate(stateToHydrate);
-                    console.log('[Sync] Hydration complete. Current store userId:', useFounderStore.getState().userId);
-                } else {
-                    console.log('[Sync] No row found in founder_data for user:', user.id);
                 }
 
 
@@ -183,12 +160,6 @@ export function useSupabaseSync() {
                 console.error('[Sync] Unexpected load error:', err);
             } finally {
                 isLoadedRef.current = true;
-                const finalState = useFounderStore.getState();
-                console.log('[Sync] Load complete. Store state summary:', {
-                    userId: finalState.userId,
-                    hypothesesCount: finalState.hypotheses?.length || 0,
-                    hasLeanCanvas: !!finalState.leanCanvas,
-                });
             }
         }
 
