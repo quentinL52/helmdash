@@ -61,7 +61,9 @@ export const SUB_AGENT_CONFIG: Record<SubAgentRole, {
   legal: {
     name: 'Legal/Compliance Agent',
     description: 'CGV, Privacy Policy, DPA, contrats freelance, checklist RGPD, revue contrats',
-    tools: 8000,
+    tools: ['generate_legal_doc', 'review_contract', 'gdpr_checklist', 'dpa_generator', 'terms_generator'],
+    defaultModel: 'gpt-4o',
+    maxTokens: 8000,
     temperature: 0.1,
   },
   tech_lead: {
@@ -156,10 +158,14 @@ class SubAgentRegistry {
     }
   }
 
-  private instantiateAgent(role: SubAgentRole, context: SubAgentContext): BaseSubAgent {
+  private async instantiateAgent(role: SubAgentRole, context: SubAgentContext): Promise<BaseSubAgent> {
+    // Récupérer la config utilisateur pour le modèle
+    const { getModelForAgent } = await import('@/lib/ai/provider-registry');
+    const userConfig = await this.getUserConfig(context.userId);
+    
     switch (role) {
       case 'research':
-        return new ResearchAgent(context);
+        return new ResearchAgent(context, userConfig);
       case 'pm':
         return new PMAgent(context);
       case 'cfo':
@@ -176,6 +182,16 @@ class SubAgentRegistry {
         return new RecruitingAgent(context);
       default:
         throw new Error(`Agent ${role} not implemented`);
+    }
+  }
+
+  private async getUserConfig(userId: string): Promise<any> {
+    try {
+      const { prisma } = await import('@/lib/prisma');
+      const settings = await prisma.aiSettings.findUnique({ where: { userId } });
+      return settings?.modelsConfig || null;
+    } catch {
+      return null;
     }
   }
 

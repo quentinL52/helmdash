@@ -151,38 +151,68 @@ export const buildCoreTools = (userId: string) => {
     }),
 
     /**
-     * Délègue une tâche à un sous-agent spécialisé
-     */
-    spawn_sub_agent: tool({
-      description: "Délègue une tâche complexe à un sous-agent spécialisé (PM, CFO, Growth, Legal, Tech Lead, Research, Content, Recruiting).",
-      parameters: z.object({
-        agentRole: z.enum(['pm', 'cfo', 'growth', 'legal', 'tech_lead', 'research', 'content', 'recruiting']),
-        taskObjective: z.string().describe('L\'objectif clair et mesurable de la tâche.'),
-        context: z.record(z.any()).optional().describe('Contexte additionnel pour le sous-agent.'),
-      }),
-      execute: async ({ agentRole, taskObjective, context }) => {
-        // TODO: Implémenter la vraie délégation asynchrone via queue (BullMQ/Redis)
-        // Pour l'instant, on log et on retourne un ID de tâche
-        const subAgentId = `${agentRole}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-        
-        // Enregistrer la tâche pour suivi
-        await memory.upsertNote({
-          userId,
-          content: `Sous-agent ${agentRole} délégué: ${taskObjective}\nContexte: ${JSON.stringify(context)}`,
-          type: 'decision',
-          tags: ['sub-agent', agentRole],
-          source: 'agent',
-        });
+         * Délègue une tâche à un sous-agent spécialisé
+         */
+        spawn_sub_agent: tool({
+          description: "Délègue une tâche complexe à un sous-agent spécialisé (PM, CFO, Growth, Legal, Tech Lead, Research, Content, Recruiting).",
+          parameters: z.object({
+            agentRole: z.enum(['pm', 'cfo', 'growth', 'legal', 'tech_lead', 'research', 'content', 'recruiting']),
+            taskObjective: z.string().describe('L\'objectif clair et mesurable de la tâche.'),
+            context: z.record(z.any()).optional().describe('Contexte additionnel pour le sous-agent.'),
+            constraints: z.object({
+              budget: z.number().optional(),
+              deadline: z.string().optional(),
+              allowedTools: z.array(z.string()).optional(),
+            }).optional(),
+            successCriteria: z.array(z.string()).min(1).describe('Critères de succès mesurables.'),
+          }),
+          execute: async ({ agentRole, taskObjective, context, constraints, successCriteria }) => {
+            try {
+              // Import dynamique pour éviter les problèmes de bundle
+              const { subAgentQueue } = await import('@/lib/queue/sub-agent-queue');
+          
+              // Générer un ID de tâche unique
+              const taskId = `${agentRole}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+          
+              // Enqueue le job pour traitement asynchrone
+              await subAgentQueue.add('execute-sub-agent', {
+                taskId,
+                userId,
+                agentRole,
+                taskObjective,
+                context,
+                constraints,
+                successCriteria,
+              });
+          
+              // Enregistrer la délégation dans la mémoire pour traçabilité
+              await memory.upsertNote({
+                userId,
+                content: `Sous-agent ${agentRole} délégué: ${taskObjective}\nContexte: ${JSON.stringify(context)}\nContraintes: ${JSON.stringify(constraints)}\nCritères de succès: ${successCriteria.join(', ')}`,
+                type: 'decision',
+                tags: ['sub-agent', agentRole, 'delegated'],
+                source: 'agent',
+              });
 
-        return {
-          status: 'delegated',
-          subAgentId,
-          agentRole,
-          taskObjective,
-          message: `Tâche déléguée à l'agent ${agentRole}: ${taskObjective}. Résultats attendus dans l'historique.`,
-        };
-      },
-    }),
+              return {
+                status: 'delegated',
+                taskId,
+                agentRole,
+                taskObjective,
+                message: `Tâche déléguée à l'agent ${agentRole}: ${taskObjective}. Traitement asynchrone en cours (taskId: ${taskId}). Résultats disponibles dans l'historique.`,
+              };
+            } catch (error) {
+              console.error('[spawn_sub_agent] Error:', error);
+              return {
+                status: 'failed',
+                taskId: `${agentRole}-${Date.now()}`,
+                agentRole,
+                taskObjective,
+                message: `Échec de la délégation: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
+              };
+            }
+          },
+        }),
 
     /**
      * Planifie une tâche récurrente (cron interne)
@@ -211,45 +241,99 @@ export const buildCoreTools = (userId: string) => {
     }),
 
     /**
-     * Recherche web via Composio/SerpAPI
+     * Recherche web via Composio SerpAPI
      */
-    web_search: tool({
-      description: "Effectue une recherche web pour obtenir des informations à jour (marché, concurrents, actualités).",
-      parameters: z.object({
-        query: z.string().describe('La requête de recherche.'),
-        maxResults: z.number().optional().default(5),
-        source: z.enum(['news', 'web', 'academic']).optional().default('web'),
-      }),
-      execute: async ({ query, maxResults, source }) => {
-        // TODO: Intégrer Composio SerpAPI ou Firecrawl
-        // Pour l'instant, retourner structure attendue
-        return {
-          query,
-          results: [
-            { title: 'Résultat simulé', url: 'https://example.com', snippet: 'Contenu simulé...' }
-          ],
-          message: 'Recherche web non encore implémentée - intégration Composio/SerpAPI requise',
-        };
-      },
-    }),
+        web_search: tool({
+          description: "Effectue une recherche web pour obtenir des informations à jour (marché, concurrents, actualités).",
+          parameters: z.object({
+            query: z.string().describe('La requête de recherche.'),
+            maxResults: z.number().optional().default(5),
+            source: z.enum(['news', 'web', 'academic']).optional().default('web'),
+          }),
+          execute: async ({ query, maxResults, source }) => {
+            try {
+              // Import dynamique pour éviter les problèmes de bundle
+              const { executeComposioTool } = await import('@/lib/integrations/composio-client');
+          
+              const toolName = source === 'news' ? 'serpapi_search_news' : 'serpapi_search';
+              const result = await executeComposioTool(toolName, { 
+                query, 
+                num: maxResults,
+                ...(source === 'news' && { tbs: 'qdr:w' }) // Dernière semaine pour news
+              }, userId);
+          
+              const results = result?.data?.organic_results || result?.data?.news_results || [];
+          
+              return {
+                query,
+                results: results.slice(0, maxResults).map((r: any) => ({
+                  title: r.title,
+                  url: r.link,
+                  snippet: r.snippet || r.description,
+                  source: source,
+                  date: r.date || r.published_date,
+                })),
+                message: `Trouvé ${results.length} résultats pour "${query}"`,
+              };
+            } catch (error) {
+              console.error('[web_search] Error:', error);
+              // Fallback mock si Composio pas configuré
+              return {
+                query,
+                results: [],
+                message: `Recherche web échouée: ${error instanceof Error ? error.message : 'Configuration Composio manquante'}`,
+              };
+            }
+          },
+        }),
 
     /**
-     * Sync Stripe - récupère MRR, clients, abonnements
-     */
-    stripe_sync: tool({
-      description: "Synchronise les données Stripe (MRR, clients, abonnements, factures) et met à jour les finances.",
-      parameters: z.object({
-        forceFullSync: z.boolean().optional().default(false),
-      }),
-      execute: async ({ forceFullSync }) => {
-        // TODO: Appeler l'API Stripe via route serveur sécurisée
-        return {
-          success: true,
-          message: 'Sync Stripe non encore implémenté - webhook + route API requis',
-          synced: { customers: 0, subscriptions: 0, invoices: 0 },
-        };
-      },
-    }),
+         * Sync Stripe - récupère MRR, clients, abonnements
+         */
+        stripe_sync: tool({
+          description: "Synchronise les données Stripe (MRR, clients, abonnements, factures) et met à jour les finances.",
+          parameters: z.object({
+            forceFullSync: z.boolean().optional().default(false),
+          }),
+          execute: async ({ forceFullSync }) => {
+            try {
+              // Appeler la route API serveur pour la sync
+              const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/billing/stripe/sync`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ forceFullSync }),
+              });
+          
+              if (!response.ok) {
+                throw new Error(`Sync failed: ${response.statusText}`);
+              }
+          
+              const result = await response.json();
+          
+              // Sauvegarder dans la mémoire
+              await memory.upsertNote({
+                userId,
+                content: `Sync Stripe effectué: MRR ${result.synced?.mrr || 0}€, ${result.synced?.subscriptions || 0} abonnements, ${result.synced?.invoices || 0} factures`,
+                type: 'decision',
+                tags: ['stripe', 'sync', 'finances'],
+                source: 'agent',
+              });
+          
+              return {
+                success: true,
+                message: result.message || 'Sync Stripe terminé avec succès',
+                synced: result.synced || { customers: 0, subscriptions: 0, invoices: 0, mrr: 0 },
+              };
+            } catch (error) {
+              console.error('[stripe_sync] Error:', error);
+              return {
+                success: false,
+                message: `Sync Stripe échouée: ${error instanceof Error ? error.message : 'Erreur inconnue'}`,
+                synced: { customers: 0, subscriptions: 0, invoices: 0, mrr: 0 },
+              };
+            }
+          },
+        }),
   };
 };
 
