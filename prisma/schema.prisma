@@ -27,6 +27,8 @@ model User {
   aiSettings    AiSettings?
   encryptionKey UserEncryptionKey?
   memoryNotes   MemoryNote[]
+  graphNodes    GraphNode[]
+  graphEdges    GraphEdge[]
 
   @@map("users")
 }
@@ -106,6 +108,7 @@ model AiSettings {
   provider     String?
   apiKey       String? @map("api_key")
   activeAgents Json?   @map("active_agents")
+  modelsConfig Json?   @map("models_config")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -140,4 +143,40 @@ model MemoryNote {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("memory_notes")
+}
+
+model GraphNode {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  type        String // e.g. "Concept", "Person", "Project"
+  name        String
+  description String?
+  metadata    Json?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations
+  outgoingEdges GraphEdge[] @relation("sourceNode")
+  incomingEdges GraphEdge[] @relation("targetNode")
+
+  @@unique([userId, type, name])
+  @@map("graph_nodes")
+}
+
+model GraphEdge {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  sourceNodeId String   @map("source_node_id") @db.Uuid
+  targetNodeId String   @map("target_node_id") @db.Uuid
+  relationType String // e.g. "RELATES_TO", "CAUSED_BY"
+  weight       Float    @default(1.0)
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceNode GraphNode @relation("sourceNode", fields: [sourceNodeId], references: [id], onDelete: Cascade)
+  targetNode GraphNode @relation("targetNode", fields: [targetNodeId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceNodeId, targetNodeId, relationType])
+  @@map("graph_edges")
 }

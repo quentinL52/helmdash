@@ -452,6 +452,8 @@ export interface AiSettings {
     };
     /** @deprecated Use apiKeys[provider] instead. Kept for migration. */
     apiKey: string;
+    /** Configuration of models per sub-agent role */
+    modelsConfig: Record<string, string>;
 }
 
 /** Profil du fondateur : identité et style d'écriture pour les agents IA */
@@ -714,6 +716,7 @@ const initialState = {
             mistral: '',
         },
         apiKey: '',
+        modelsConfig: {},
     },
     founderProfile: {
         linkedinUrl: '',

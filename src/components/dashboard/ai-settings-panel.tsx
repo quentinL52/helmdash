@@ -19,6 +19,7 @@ export function AISettingsPanel() {
   const [provider, setProvider] = useState<ProviderName>(aiSettings.provider || 'openai');
   const [apiKey, setApiKey] = useState<string>(aiSettings.apiKeys?.[provider] || '');
   const [model, setModel] = useState<string>(aiSettings.model || '');
+  const [modelsConfig, setModelsConfig] = useState<Record<string, string>>(aiSettings.modelsConfig || {});
   const [showKey, setShowKey] = useState(false);
   
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
@@ -95,7 +96,8 @@ export function AISettingsPanel() {
       setAiSettings({
         provider: providerName,
         model,
-        apiKeys: newApiKeys
+        apiKeys: newApiKeys,
+        modelsConfig
       });
 
       setSuccess('Configuration sauvegardée avec succès !');
@@ -194,7 +196,7 @@ export function AISettingsPanel() {
             </div>
 
             <div className="space-y-2">
-              <Label className="font-pixel text-xs text-muted-foreground">MODÈLE</Label>
+              <Label className="font-pixel text-xs text-muted-foreground">MODÈLE PRINCIPAL (Agent Core)</Label>
               <Select value={model} onValueChange={setModel} disabled={availableModels.length === 0}>
                 <SelectTrigger className="bg-background/50 font-mono text-sm">
                   <SelectValue placeholder={
@@ -211,6 +213,38 @@ export function AISettingsPanel() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-4 pt-4 border-t border-border/50">
+              <Label className="font-pixel text-xs text-muted-foreground">MODÈLES PAR SOUS-AGENT</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { role: 'pm', label: 'Product Manager' },
+                  { role: 'cfo', label: 'Directeur Financier' },
+                  { role: 'growth', label: 'Growth Hacker' },
+                  { role: 'research', label: 'Chercheur / Veille' },
+                ].map(agent => (
+                  <div key={agent.role} className="space-y-1">
+                    <Label className="text-xs">{agent.label}</Label>
+                    <Select 
+                      value={modelsConfig[agent.role] || ''} 
+                      onValueChange={(val) => setModelsConfig(prev => ({ ...prev, [agent.role]: val }))} 
+                      disabled={availableModels.length === 0}
+                    >
+                      <SelectTrigger className="bg-background/50 font-mono text-xs h-8">
+                        <SelectValue placeholder="Modèle par défaut" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableModels.map(m => (
+                          <SelectItem key={m.id} value={m.id} className="font-mono text-xs">
+                            {m.id}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {error && (

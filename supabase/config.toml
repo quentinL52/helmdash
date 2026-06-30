@@ -1,0 +1,15 @@
+project_id = "default"
+
+[functions.daily-brief]
+verify_jwt = false
+
+[functions.daily-brief.schedule]
+cron = "0 8 * * *" # Every day at 8:00 AM
+timezone = "Europe/Paris"
+
+[functions.finance-sync]
+verify_jwt = false
+
+[functions.finance-sync.schedule]
+cron = "0 2 * * *" # Every day at 2:00 AM
+timezone = "Europe/Paris"
