@@ -4,102 +4,84 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 224 71% 4%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71% 4%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 4%;
-    --primary: 247 68% 63%;
-    --primary-foreground: 0 0% 98%;
-    --primary-light: 244 97% 80%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 247 68% 63%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 247 68% 63%;
-    --success: 168 100% 36%;
-    --warning: 39 98% 71%;
-    --danger: 360 100% 71%;
+    /* Helmdash palette — light */
+    --background: 42 39% 93%;       /* craie #F5F1E8 */
+    --foreground: 215 52% 12%;      /* marine #0E1B2E */
+    --card: 40 50% 96%;             /* craie clair */
+    --card-foreground: 215 52% 12%;
+    --popover: 42 39% 93%;
+    --popover-foreground: 215 52% 12%;
+    --primary: 11 86% 56%;          /* signal #F0522E */
+    --primary-foreground: 42 39% 93%;
+    --primary-light: 11 86% 65%;
+    --secondary: 214 50% 16%;       /* acier #14263D */
+    --secondary-foreground: 42 39% 93%;
+    --muted: 42 28% 88%;            /* fond #E9E4D8 */
+    --muted-foreground: 215 20% 40%;
+    --accent: 11 86% 56%;
+    --accent-foreground: 42 39% 93%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 42 39% 93%;
+    --border: 215 20% 80%;
+    --input: 215 20% 85%;
+    --ring: 11 86% 56%;
+    --success: 150 58% 40%;
+    --warning: 36 82% 52%;
+    --danger: 0 84% 60%;
+
+    /* Sidebar */
+    --sidebar-background: 215 52% 8%;
+    --sidebar-foreground: 42 39% 88%;
+    --sidebar-primary: 11 86% 56%;
+    --sidebar-primary-foreground: 42 39% 93%;
+    --sidebar-accent: 214 50% 12%;
+    --sidebar-accent-foreground: 42 39% 88%;
+    --sidebar-border: 214 40% 18%;
+    --sidebar-ring: 11 86% 56%;
+
+    --radius: 0.625rem;
   }
 
   .dark {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
-    --card: 224 71% 4%;
-    --card-foreground: 213 31% 91%;
-    --popover: 224 71% 4%;
-    --popover-foreground: 215 20.2% 65.1%;
-    --primary: 247 68% 63%;
-    --primary-foreground: 210 40% 98%;
-    --primary-light: 244 97% 80%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 230 11% 59%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 247 68% 63%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 360 100% 71%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 0 0% 100% / 0.1;
-    --input: 0 0% 100% / 0.05;
-    --ring: 247 68% 63%;
-    --success: 168 100% 36%;
-    --warning: 39 98% 71%;
-    --danger: 360 100% 71%;
+    --background: 215 52% 8%;        /* marine foncé */
+    --foreground: 42 39% 88%;
+    --card: 214 50% 12%;              /* acier #14263D */
+    --card-foreground: 42 39% 88%;
+    --popover: 215 52% 10%;
+    --popover-foreground: 42 39% 88%;
+    --primary: 11 86% 56%;
+    --primary-foreground: 215 52% 8%;
+    --primary-light: 11 86% 65%;
+    --secondary: 214 50% 18%;
+    --secondary-foreground: 42 39% 88%;
+    --muted: 215 30% 20%;
+    --muted-foreground: 215 20% 55%;
+    --accent: 11 86% 56%;
+    --accent-foreground: 42 39% 88%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 42 39% 93%;
+    --border: 214 40% 20%;
+    --input: 214 40% 18%;
+    --ring: 11 86% 56%;
+    --success: 150 58% 40%;
+    --warning: 36 82% 52%;
+    --danger: 0 70% 50%;
+
+    --sidebar-background: 215 52% 6%;
+    --sidebar-foreground: 42 39% 80%;
+    --sidebar-primary: 11 86% 56%;
+    --sidebar-primary-foreground: 215 52% 8%;
+    --sidebar-accent: 214 50% 16%;
+    --sidebar-accent-foreground: 42 39% 80%;
+    --sidebar-border: 214 40% 16%;
+    --sidebar-ring: 11 86% 56%;
+
+    --radius: 0.625rem;
   }
 }
 
-/* ── CRT Scanline Overlay (subtle retro effect) ────────────────── */
+/* ── Animations ────────────────── */
 @layer utilities {
-  .crt-scanlines::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 9999;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.03) 2px,
-      rgba(0, 0, 0, 0.03) 4px
-    );
-    mix-blend-mode: multiply;
-  }
-
-  /* Pixel-perfect rendering for pixel art SVGs */
-  .pixel-render {
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    -ms-interpolation-mode: nearest-neighbor;
-  }
-
-  /* Shimmer animation for legendary items */
-  .shimmer {
-    background: linear-gradient(
-      110deg,
-      transparent 33%,
-      rgba(251, 191, 36, 0.15) 50%,
-      transparent 67%
-    );
-    background-size: 300% 100%;
-    animation: shimmer 3s ease-in-out infinite;
-  }
-
-  /* Pixel glow effect for level-ups */
-  .pixel-glow {
-    filter: drop-shadow(0 0 6px hsl(var(--primary) / 0.5))
-            drop-shadow(0 0 12px hsl(var(--primary) / 0.25));
-  }
-
-  /* No scrollbar utility */
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }

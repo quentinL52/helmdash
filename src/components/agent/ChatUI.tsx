@@ -29,7 +29,7 @@ export function ChatUI({ userId }: { userId: string }) {
       <div className="flex items-center p-4 border-b bg-card/50 backdrop-blur-sm">
         <BrainCircuit className="w-6 h-6 mr-3 text-primary" />
         <div>
-          <h2 className="text-lg font-semibold tracking-tight">Agent Central (Founder OS)</h2>
+          <h2 className="text-lg font-semibold tracking-tight font-mono">Barreur</h2>
           <p className="text-xs text-muted-foreground">Orchestrateur & Mémoire Active</p>
         </div>
       </div>

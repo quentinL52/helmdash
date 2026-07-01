@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useFounderStore, HypothesisStatus, HypothesisRisk, HypothesisCategory } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
@@ -8,6 +9,8 @@ import { BoardSkeleton, TableSkeleton } from '@/components/ui/loading-skeleton';
 import { Button } from '@/components/ui/button';
 import { COLORS } from '@/lib/constants';
 import { Beaker } from 'lucide-react';
+import { PageAgent } from '@/components/agent/PageAgent';
+import { createClient } from '@/utils/supabase/client';
 
 // Lazy load heavy board and list components
 const HypothesesBoard = dynamic(
@@ -20,9 +23,23 @@ const HypothesesList = dynamic(
 );
 
 export default function HypothesesPage() {
+    const [userId, setUserId] = useState<string | null>(null);
     const language = useFounderStore(s => s.language);
     const t = translations[language].hypotheses;
     const addHypothesis = useFounderStore(s => s.addHypothesis);
+    const hypotheses = useFounderStore(s => s.hypotheses);
+
+    useEffect(() => {
+        const supabase = createClient();
+        supabase.auth.getUser().then(({ data }) => {
+            if (data?.user) setUserId(data.user.id);
+        });
+    }, []);
+
+    const activeHypotheses = hypotheses?.filter(h => h.status === 'testing' || h.status === 'draft');
+    const pageContext = activeHypotheses?.length
+        ? `${activeHypotheses.length} hypothèses actives : ${activeHypotheses.map(h => `${h.statement.slice(0, 80)} (${h.status})`).join(' | ')}`
+        : 'Aucune hypothèse en cours.';
 
     return (
         <div className="flex flex-col h-full space-y-4 p-8 pt-6 font-sans text-foreground">
@@ -48,6 +65,10 @@ export default function HypothesesPage() {
                     <HypothesesList />
                 </TabsContent>
             </Tabs>
+
+            {userId && (
+                <PageAgent userId={userId} pageLabel="Hypothèses" pageContext={pageContext} />
+            )}
         </div>
     );
 }
