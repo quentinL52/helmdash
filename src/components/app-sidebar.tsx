@@ -43,6 +43,7 @@ export function AppSidebar() {
     const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const navItems = [
+        { href: '/agent', label: t.agent, icon: Bot },
         { href: '/dashboard', label: t.dashboard, icon: LayoutDashboard },
         { href: '/progression', label: t.progression || 'Progression', icon: Trophy },
         { href: '/hypotheses', label: t.hypotheses, icon: FlaskConical },
@@ -56,7 +57,6 @@ export function AppSidebar() {
         { href: '/go-to-market', label: 'Go-To-Market', icon: Target },
         { href: '/crm', label: t.crm, icon: Users },
         { href: '/journal', label: t.journal, icon: BookOpen },
-        { href: '/agent', label: t.agent, icon: Bot },
     ];
 
     const showSidebar = useCallback(() => {
