@@ -23,8 +23,8 @@ export async function GET(req: Request) {
     const results: PromiseSettledResult<{ userId: string; status: string }>[] = await Promise.allSettled(
       users.map(async (user: { id: string; stripeCustomerId: string | null }) => {
         // Appeler la fonction de sync existante
-        const mockEvent = { data: { object: { customer: user.stripeCustomerId } } };
-        await syncStripeToFinances(mockEvent.data.object, 'cron.sync');
+        const stripeCustomerRef = { customer: user.stripeCustomerId };
+        await syncStripeToFinances(stripeCustomerRef, 'cron.sync');
         return { userId: user.id, status: 'synced' as const };
       })
     );
