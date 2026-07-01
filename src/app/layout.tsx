@@ -2,10 +2,19 @@ import { Toaster } from "@/components/ui/toaster";
 import { StoreSync } from '@/components/store-sync';
 import "./globals.css";
 import type { Metadata } from 'next';
-import { Inter, VT323 } from 'next/font/google';
+import { IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
-const vt323 = VT323({ weight: "400", subsets: ['latin'], variable: '--font-pixel' });
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-mono',
+});
+
+const ibmPlexSans = IBM_Plex_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-sans',
+});
 
 import { ThemeProvider } from '@/components/theme-provider';
 
@@ -20,9 +29,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="fr" suppressHydrationWarning>
       <head />
-      <body className={`${inter.variable} ${vt323.variable} font-sans antialiased`}>
+      <body className={`${ibmPlexMono.variable} ${ibmPlexSans.variable} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
