@@ -5,7 +5,7 @@ if (!process.env.COMPOSIO_API_KEY) {
 }
 
 export const composio = new Composio({ 
-  apiKey: process.env.COMPOSIO_API_KEY || 'dummy_key' 
+  apiKey: process.env.COMPOSIO_API_KEY || '' 
 });
 
 export const AVAILABLE_TOOLS = {
