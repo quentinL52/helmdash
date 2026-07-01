@@ -178,6 +178,20 @@ export const buildCoreTools = (userId: string) => {
           // Générer un ID de tâche unique
           const taskId = `${agentRole}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
      
+          // Persister la tâche en base pour traçabilité
+          const { PrismaClient } = await import('@prisma/client');
+          const prisma = new PrismaClient();
+          await prisma.agentTask.create({
+            data: {
+              userId,
+              taskId,
+              agentRole,
+              taskObjective,
+              status: 'pending',
+            },
+          });
+          await prisma.$disconnect();
+
           // Enqueue le job pour traitement asynchrone
           await subAgentQueue.add('execute-sub-agent', {
             taskId,

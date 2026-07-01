@@ -100,19 +100,47 @@ export async function processSubAgentQueue() {
   return { processed: processed.length, failed: failed.length, processedIds: processed, failedIds: failed };
 }
 
-// Helpers pour persistence (à implémenter avec Prisma model Task ou table dédiée)
+// Helpers pour persistence (table agent_tasks)
 
 async function updateTaskStatus(taskId: string, status: string) {
-  // TODO: Implémenter avec Prisma model AgentTask
-  console.log(`[SubAgentQueue] Task ${taskId} status: ${status}`);
+  const { PrismaClient } = await import('@prisma/client');
+  const prisma = new PrismaClient();
+  try {
+    await prisma.agentTask.update({
+      where: { taskId },
+      data: {
+        status,
+        ...(status === 'running' ? { startedAt: new Date() } : {}),
+        ...(['success', 'partial', 'failed', 'needs_approval'].includes(status) ? { completedAt: new Date() } : {}),
+      },
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
 }
 
 async function saveTaskResult(taskId: string, result: any) {
-  // TODO: Implémenter avec Prisma model AgentTask
-  console.log(`[SubAgentQueue] Task ${taskId} result:`, result.status);
+  const { PrismaClient } = await import('@prisma/client');
+  const prisma = new PrismaClient();
+  try {
+    await prisma.agentTask.update({
+      where: { taskId },
+      data: { result: result as any },
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
 }
 
 async function saveTaskError(taskId: string, error: string) {
-  // TODO: Implémenter avec Prisma model AgentTask
-  console.log(`[SubAgentQueue] Task ${taskId} error:`, error);
+  const { PrismaClient } = await import('@prisma/client');
+  const prisma = new PrismaClient();
+  try {
+    await prisma.agentTask.update({
+      where: { taskId },
+      data: { errorMessage: error },
+    });
+  } finally {
+    await prisma.$disconnect();
+  }
 }
