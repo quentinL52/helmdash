@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFounderStore, RoadmapItem } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
 import { Plus, Trash2, Edit2, Map as MapIcon } from 'lucide-react';
+import { PageAgent } from '@/components/agent/PageAgent';
+import { createClient } from '@/utils/supabase/client';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,9 +15,21 @@ import { Badge } from "@/components/ui/badge";
 import { useGamification } from '@/hooks/use-gamification';
 
 export default function RoadmapPage() {
+  const [userId, setUserId] = useState<string | null>(null);
   const tasks = useFounderStore(s => s.roadmap);
   const addRoadmapItem = useFounderStore(s => s.addRoadmapItem);
   const updateRoadmapItem = useFounderStore(s => s.updateRoadmapItem);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (data?.user) setUserId(data.user.id);
+    });
+  }, []);
+
+  const pageContext = tasks?.length
+    ? `${tasks.length} tâches, ${tasks.filter(t => t.status === 'doing').length} en cours.`
+    : 'Aucune tâche dans la roadmap.';
   const deleteRoadmapItem = useFounderStore(s => s.deleteRoadmapItem);
 
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -183,5 +197,9 @@ export default function RoadmapPage() {
         })}
       </div>
     </div>
+
+    {userId && (
+      <PageAgent userId={userId} pageLabel="Roadmap" pageContext={pageContext} />
+    )}
   );
 }
