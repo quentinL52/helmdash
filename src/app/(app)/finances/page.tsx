@@ -31,7 +31,7 @@ export default function FinancesPage() {
     const [userId, setUserId] = useState<string | null>(null);
     const language = useFounderStore(s => s.language);
     const t = translations[language].finance;
-    const finances = useFounderStore(s => s.monthlyFinances);
+    const finances = useFounderStore(s => s.finance);
 
     useEffect(() => {
         const supabase = createClient();
@@ -40,8 +40,8 @@ export default function FinancesPage() {
         });
     }, []);
 
-    const pageContext = finances?.length
-        ? `Finances actuelles : ${finances.length} mois de données. Dernier mois : ${JSON.stringify(finances[0]).slice(0, 500)}`
+    const pageContext = finances?.monthlyEntries?.length
+        ? `Finances actuelles : ${finances.monthlyEntries.length} mois de données.`
         : 'Aucune donnée financière pour le moment.';
 
     return (
