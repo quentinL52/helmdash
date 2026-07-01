@@ -65,8 +65,7 @@ export const buildCoreTools = (userId: string) => {
         id: z.string().uuid().optional().describe('Requis pour update/delete'),
         data: z.record(z.any()).describe("Les données à créer ou modifier (validées selon l'onglet)."),
       })),
-      }),
-            execute: async ({ tabName, action, id, data }: { tabName: TabName; action: 'create' | 'update' | 'delete'; id?: string; data: Record<string, any> }) => {
+      execute: async ({ tabName, action, id, data }: { tabName: TabName; action: 'create' | 'update' | 'delete'; id?: string; data: Record<string, any> }) => {
         const PrismaModel = await getPrismaModel(tabName);
         
         // Valider les données selon le schéma de l'onglet

@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Import stripe pour récupérer les données
-    const { stripe } = await import('@/lib/stripe/server');
+    const { stripe } = await import('@/lib/billing/stripe-client');
 
     // 1. Récupérer les abonnements actifs
     const subscriptions = await stripe.subscriptions.list({
