@@ -355,10 +355,10 @@ export default function GoToMarketPage() {
                     </Card>
                 </div>
             )}
+            {/* PageAgent */}
+            {userId && (
+                <PageAgent userId={userId} pageLabel="GTM" pageContext={`Stratégie GTM active. Onglet courant : ${activeTab}.`} />
+            )}
         </div>
-
-        {userId && (
-            <PageAgent userId={userId} pageLabel="GTM" pageContext={`Stratégie GTM active. Onglet courant : ${activeTab}.`} />
-        )}
     );
 }

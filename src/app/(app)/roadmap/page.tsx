@@ -196,10 +196,10 @@ export default function RoadmapPage() {
           );
         })}
       </div>
-    </div>
 
-    {userId && (
-      <PageAgent userId={userId} pageLabel="Roadmap" pageContext={pageContext} />
-    )}
+      {userId && (
+        <PageAgent userId={userId} pageLabel="Roadmap" pageContext={pageContext} />
+      )}
+    </div>
   );
 }

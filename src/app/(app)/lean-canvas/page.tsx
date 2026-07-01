@@ -402,10 +402,10 @@ export default function LeanCanvasPage() {
           </div>
         )}
       </div>
-    </div>
 
-    {userId && (
-      <PageAgent userId={userId} pageLabel="Lean Canvas" pageContext="Canvas de business model Lean." />
-    )}
+      {userId && (
+        <PageAgent userId={userId} pageLabel="Lean Canvas" pageContext="Canvas de business model Lean." />
+      )}
+    </div>
   );
 }
