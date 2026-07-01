@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { stripe } from '@/lib/stripe/server';
+import { stripe } from '@/lib/billing/stripe-client';
 
 export async function handleTrialEnding(subscriptionId: string) {
   const sub = await stripe.subscriptions.retrieve(subscriptionId);

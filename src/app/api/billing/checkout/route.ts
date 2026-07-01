@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe/server';
+import { stripe } from '@/lib/billing/stripe-client';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/utils/supabase/server';
 
