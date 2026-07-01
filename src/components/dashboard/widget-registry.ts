@@ -23,7 +23,17 @@ export interface WidgetDefinition {
   defaultSize: WidgetSize;
   minSize?: WidgetSize;
   component: React.ComponentType<any>;
+  category?: 'business' | 'gamification';
 }
+
+/** Widgets réservés à la page Progression (gamification) */
+export const GAMIFICATION_WIDGET_IDS = [
+  'founder-score',
+  'xp-progress',
+  'streak',
+  'quests',
+  'achievements',
+] as const;
 
 export const WIDGET_COMPONENTS: Record<string, React.ComponentType<any>> = {
   'mvp-countdown': MvpCountdown,
