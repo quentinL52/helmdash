@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
@@ -10,8 +10,9 @@ import type { Timeframe } from '@/components/finances/runway-chart';
 import { FinanceKPIs } from '@/components/finances/finance-kpis';
 import { FinanceCharts } from '@/components/finances/finance-charts';
 import { RecurringExpensesList } from '@/components/finances/recurring-expenses-list';
+import { PageAgent } from '@/components/agent/PageAgent';
+import { createClient } from '@/utils/supabase/client';
 
-// Lazy load heavy components (recharts, complex tables)
 const RunwayChart = dynamic(
     () => import('@/components/finances/runway-chart').then(m => m.RunwayChart),
     { loading: () => <ChartSkeleton /> }
@@ -27,8 +28,21 @@ const FinanceTable = dynamic(
 
 export default function FinancesPage() {
     const [timeframe, setTimeframe] = useState<Timeframe>('month');
+    const [userId, setUserId] = useState<string | null>(null);
     const language = useFounderStore(s => s.language);
     const t = translations[language].finance;
+    const finances = useFounderStore(s => s.monthlyFinances);
+
+    useEffect(() => {
+        const supabase = createClient();
+        supabase.auth.getUser().then(({ data }) => {
+            if (data?.user) setUserId(data.user.id);
+        });
+    }, []);
+
+    const pageContext = finances?.length
+        ? `Finances actuelles : ${finances.length} mois de données. Dernier mois : ${JSON.stringify(finances[0]).slice(0, 500)}`
+        : 'Aucune donnée financière pour le moment.';
 
     return (
         <div className="flex flex-col h-full space-y-6 p-8 pt-6">
@@ -61,6 +75,14 @@ export default function FinancesPage() {
                     <FinanceTable timeframe={timeframe} />
                 </div>
             </div>
+
+            {userId && (
+                <PageAgent
+                    userId={userId}
+                    pageLabel="Finances"
+                    pageContext={pageContext}
+                />
+            )}
         </div>
     );
 }

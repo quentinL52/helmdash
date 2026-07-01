@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useFounderStore, Contact, ContactStatus } from '@/store/founder-store';
 import { ContactDialog } from '@/components/crm/contact-dialog';
 import { generateFollowUp } from '@/lib/ai-service';
@@ -20,6 +20,8 @@ import { Plus, Search, Edit2, Trash2, Mail, Users, Linkedin, RefreshCw, Download
 import { translations } from '@/lib/translations';
 import { AgentTriggerButton } from '@/components/dashboard/agent-trigger-button';
 import { Network } from 'lucide-react';
+import { PageAgent } from '@/components/agent/PageAgent';
+import { createClient } from '@/utils/supabase/client';
 
 const STATUS_COLORS: Record<ContactStatus, string> = {
     'À contacter': 'border-primary/50 text-primary',
@@ -30,12 +32,24 @@ const STATUS_COLORS: Record<ContactStatus, string> = {
 };
 
 export default function CRMPage() {
+    const [userId, setUserId] = useState<string | null>(null);
     const contacts = useFounderStore(s => s.contacts);
     const addContact = useFounderStore(s => s.addContact);
     const deleteContact = useFounderStore(s => s.deleteContact);
     const language = useFounderStore(s => s.language);
     const t = (translations[language] as any).crm || {};
     const common = translations[language].common;
+
+    useEffect(() => {
+        const supabase = createClient();
+        supabase.auth.getUser().then(({ data }) => {
+            if (data?.user) setUserId(data.user.id);
+        });
+    }, []);
+
+    const pageContext = contacts?.length
+        ? `${contacts.length} contacts, ${contacts.filter(c => c.status === 'À contacter' || c.status === 'En discussion').length} en cours.`
+        : 'Aucun contact pour le moment.';
 
     const [searchTerm, setSearchTerm] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -317,6 +331,10 @@ export default function CRMPage() {
                 onOpenChange={setIsDialogOpen}
                 contactToEdit={selectedContact}
             />
+
+            {userId && (
+                <PageAgent userId={userId} pageLabel="CRM" pageContext={pageContext} />
+            )}
         </div>
     );
 }
