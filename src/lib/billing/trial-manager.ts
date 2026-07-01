@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { stripe } from '@/lib/billing/stripe-client';
+import { sendTrialEndingEmail } from '@/lib/email/email-service';
 
 export async function handleTrialEnding(subscriptionId: string) {
   const sub = await stripe.subscriptions.retrieve(subscriptionId);
@@ -45,10 +46,14 @@ export async function notifyTrialExpiringSoon() {
   for (const sub of subscriptions.data) {
     const daysLeft = Math.ceil((sub.trial_end * 1000 - Date.now()) / (1000 * 60 * 60 * 24));
     if (daysLeft === 3) {
-      // TODO: Envoyer email "Votre essai se termine dans 3 jours" via Resend
       if (sub.metadata.userId) {
-        console.log(`Sending trial ending soon email to user ${sub.metadata.userId}`);
-        // await sendTrialEndingEmail(sub.metadata.userId, daysLeft);
+        const user = await prisma.user.findUnique({
+          where: { id: sub.metadata.userId },
+          select: { email: true, name: true },
+        });
+        if (user?.email) {
+          await sendTrialEndingEmail(user.email, user.name || 'Fondateur', daysLeft);
+        }
       }
     }
   }

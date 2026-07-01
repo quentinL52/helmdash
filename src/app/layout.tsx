@@ -10,8 +10,8 @@ const vt323 = VT323({ weight: "400", subsets: ['latin'], variable: '--font-pixel
 import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'IgniteHQ - Founder Dashboard',
-  description: 'Le tableau de bord ultime pour préparer, gamifier et lancer votre startup avant le MVP.',
+  title: 'Helmdash — Poste de pilotage du solo founder',
+  description: "Dashboard, agent IA, hypothèses, finances, roadmap. Le poste de pilotage qui réunit tes outils et lit dans tes données.",
 };
 
 export default function RootLayout({

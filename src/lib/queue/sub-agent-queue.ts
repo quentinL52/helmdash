@@ -2,6 +2,7 @@ import { Queue, Worker, Job } from 'bullmq';
 import Redis from 'ioredis';
 import { subAgentRegistry } from '@/lib/ai/sub-agents/registry';
 import { SubAgentContext } from '@/lib/ai/sub-agents/base-agent';
+import { agentTaskService } from '@/lib/ai/delegation';
 
 // Use UPSTASH_REDIS_URL which is the Redis URI (rediss://...)
 // Note: BullMQ requires a standard Redis connection (ioredis), not the HTTP REST client.
@@ -100,47 +101,16 @@ export async function processSubAgentQueue() {
   return { processed: processed.length, failed: failed.length, processedIds: processed, failedIds: failed };
 }
 
-// Helpers pour persistence (table agent_tasks)
+// Helpers pour persistence — délégués à agentTaskService (delegation.ts)
 
 async function updateTaskStatus(taskId: string, status: string) {
-  const { PrismaClient } = await import('@prisma/client');
-  const prisma = new PrismaClient();
-  try {
-    await prisma.agentTask.update({
-      where: { taskId },
-      data: {
-        status,
-        ...(status === 'running' ? { startedAt: new Date() } : {}),
-        ...(['success', 'partial', 'failed', 'needs_approval'].includes(status) ? { completedAt: new Date() } : {}),
-      },
-    });
-  } finally {
-    await prisma.$disconnect();
-  }
+  await agentTaskService.updateStatus(taskId, status as any);
 }
 
 async function saveTaskResult(taskId: string, result: any) {
-  const { PrismaClient } = await import('@prisma/client');
-  const prisma = new PrismaClient();
-  try {
-    await prisma.agentTask.update({
-      where: { taskId },
-      data: { result: result as any },
-    });
-  } finally {
-    await prisma.$disconnect();
-  }
+  await agentTaskService.saveResult(taskId, result);
 }
 
 async function saveTaskError(taskId: string, error: string) {
-  const { PrismaClient } = await import('@prisma/client');
-  const prisma = new PrismaClient();
-  try {
-    await prisma.agentTask.update({
-      where: { taskId },
-      data: { errorMessage: error },
-    });
-  } finally {
-    await prisma.$disconnect();
-  }
+  await agentTaskService.saveError(taskId, error);
 }

@@ -19,7 +19,7 @@ import {
   rectSortingStrategy,
 } from '@dnd-kit/sortable';
 import { WidgetWrapper } from './widget-wrapper';
-import { WIDGET_REGISTRY, WidgetSize, getDefaultLayout } from './widget-registry';
+import { WIDGET_REGISTRY, WidgetSize, getDefaultLayout, GAMIFICATION_WIDGET_IDS } from './widget-registry';
 import { useFounderStore } from '@/store/founder-store';
 import { Button } from '@/components/ui/button';
 import { Plus, Save, X, LayoutDashboard } from 'lucide-react';
@@ -146,7 +146,9 @@ export function WidgetGrid() {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel className="font-pixel text-[10px]">WIDGETS DISPONIBLES</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {Object.values(WIDGET_REGISTRY).map(def => (
+                {Object.values(WIDGET_REGISTRY)
+                  .filter(def => !(GAMIFICATION_WIDGET_IDS as readonly string[]).includes(def.id))
+                  .map(def => (
                   <DropdownMenuItem 
                     key={def.id}
                     disabled={widgets.some(w => w.type === def.id)}
