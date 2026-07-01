@@ -4,7 +4,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
   console.warn('STRIPE_SECRET_KEY is missing');
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'dummy_key', {
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2026-01-28.clover',
   appInfo: {
     name: 'AirH Founder OS',

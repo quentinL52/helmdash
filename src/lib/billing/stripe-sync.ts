@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { stripe } from '@/lib/stripe/server';
+import { stripe } from '@/lib/billing/stripe-client';
 import { recalculateRunway } from './runway-calculator';
 
 export async function syncStripeToFinances(stripeObject: any, eventType: string) {

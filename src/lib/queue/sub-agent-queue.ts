@@ -78,6 +78,28 @@ export function startSubAgentWorker() {
   return worker;
 }
 
+// Fonction pour traiter la queue depuis un cron job
+export async function processSubAgentQueue() {
+  const maxJobs = 10;
+  const processed: string[] = [];
+  const failed: string[] = [];
+
+  for (let i = 0; i < maxJobs; i++) {
+    const job = await subAgentQueue.getNextJob();
+    if (!job) break;
+
+    try {
+      await job.process();
+      processed.push(job.id || 'unknown');
+    } catch (error) {
+      failed.push(job.id || 'unknown');
+      console.error(`Failed to process job ${job.id}:`, error);
+    }
+  }
+
+  return { processed: processed.length, failed: failed.length, processedIds: processed, failedIds: failed };
+}
+
 // Helpers pour persistence (à implémenter avec Prisma model Task ou table dédiée)
 
 async function updateTaskStatus(taskId: string, status: string) {
