@@ -41,6 +41,7 @@ model User {
   roadmapItems        RoadmapItem[]
   leanCanvasSections  LeanCanvasSection[]
   scheduledTasks      ScheduledTask[]
+  agentTasks          AgentTask[]
 
   @@map("users")
 }
@@ -495,4 +496,24 @@ model ScheduledTask {
   @@index([userId])
   @@index([nextRunAt])
   @@map("scheduled_tasks")
+}
+
+model AgentTask {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  taskId        String   @unique @map("task_id") // ID métier (ex: "pm-1234567890-abc123")
+  agentRole     String   @map("agent_role")
+  taskObjective String   @map("task_objective")
+  status        String   @default("pending") // pending, running, success, partial, failed, needs_approval
+  result        Json?    // SubAgentResult sérialisé
+  errorMessage  String?  @map("error_message")
+  startedAt     DateTime? @map("started_at")
+  completedAt   DateTime? @map("completed_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, status])
+  @@map("agent_tasks")
 }

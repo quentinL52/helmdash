@@ -42,7 +42,7 @@ export class CFOAgent extends BaseSubAgent {
 
   private async fetchStripeData(): Promise<any> {
     try {
-      const { stripe } = await import('@/lib/stripe/server');
+      const { stripe } = await import('@/lib/billing/stripe-client');
       const user = await prisma.user.findUnique({ where: { id: this.userId }, select: { stripeCustomerId: true } });
       if (!user?.stripeCustomerId) return null;
 

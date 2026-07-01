@@ -65,8 +65,7 @@ export const buildCoreTools = (userId: string) => {
         id: z.string().uuid().optional().describe('Requis pour update/delete'),
         data: z.record(z.any()).describe("Les données à créer ou modifier (validées selon l'onglet)."),
       })),
-      }),
-            execute: async ({ tabName, action, id, data }: { tabName: TabName; action: 'create' | 'update' | 'delete'; id?: string; data: Record<string, any> }) => {
+      execute: async ({ tabName, action, id, data }: { tabName: TabName; action: 'create' | 'update' | 'delete'; id?: string; data: Record<string, any> }) => {
         const PrismaModel = await getPrismaModel(tabName);
         
         // Valider les données selon le schéma de l'onglet
@@ -179,6 +178,20 @@ export const buildCoreTools = (userId: string) => {
           // Générer un ID de tâche unique
           const taskId = `${agentRole}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
      
+          // Persister la tâche en base pour traçabilité
+          const { PrismaClient } = await import('@prisma/client');
+          const prisma = new PrismaClient();
+          await prisma.agentTask.create({
+            data: {
+              userId,
+              taskId,
+              agentRole,
+              taskObjective,
+              status: 'pending',
+            },
+          });
+          await prisma.$disconnect();
+
           // Enqueue le job pour traitement asynchrone
           await subAgentQueue.add('execute-sub-agent', {
             taskId,
