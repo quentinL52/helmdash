@@ -4,9 +4,20 @@ import { Target } from 'lucide-react';
 import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
 import { WidgetGrid } from '@/components/dashboard/widget-grid';
+import { PageAgent } from '@/components/agent/PageAgent';
+import { createClient } from '@/utils/supabase/client';
+import { useState, useEffect } from 'react';
 
 export default function DashboardPage() {
     const language = useFounderStore(s => s.language);
+    const [userId, setUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const supabase = createClient();
+        supabase.auth.getUser().then(({ data }) => {
+            if (data.user) setUserId(data.user.id);
+        });
+    }, []);
 
     return (
         <div className="flex flex-col h-full space-y-4 p-8 pt-6">
@@ -18,6 +29,7 @@ export default function DashboardPage() {
             </div>
 
             <WidgetGrid />
+            {userId && <PageAgent userId={userId} pageLabel={translations[language].nav.dashboard} />}
         </div>
     );
 }
