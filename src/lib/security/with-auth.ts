@@ -20,7 +20,7 @@ import { createClient } from '@/utils/supabase/server';
 
 export type AuthenticatedHandler<T = unknown> = (
   req: NextRequest,
-  context: { userId: string; params: T },
+  context: { userId: string; params?: T },
 ) => Promise<NextResponse>;
 
 export type AuthResult =
@@ -62,13 +62,27 @@ export async function getAuthenticatedUser(): Promise<AuthResult> {
 /**
  * Wraps an API route handler with Supabase session authentication.
  * The handler receives `userId` in its context — guaranteed to be defined.
+ *
+ * Supports both AuthenticatedHandler (standard) and handlers with
+ * richer context types (e.g. composed with withValidation).
  */
-export function withAuth<T = unknown>(
+export function withAuth<T>(
   handler: AuthenticatedHandler<T>,
-): (req: NextRequest, context?: { params: T }) => Promise<NextResponse> {
-  return async (req: NextRequest, context?: { params: T }) => {
+): (req: NextRequest, context?: { params: T }) => Promise<NextResponse>;
+
+export function withAuth<C extends { userId: string }>(
+  handler: (req: NextRequest, context: C) => Promise<NextResponse>,
+): (req: NextRequest, context?: { params: unknown }) => Promise<NextResponse>;
+
+export function withAuth<T>(
+  handler: ((req: NextRequest, context: { userId: string; params?: T }) => Promise<NextResponse>) | ((req: NextRequest, context: Record<string, unknown>) => Promise<NextResponse>),
+): (req: NextRequest, context?: { params: T | unknown }) => Promise<NextResponse> {
+  return async (req: NextRequest, context?: { params: T | unknown }) => {
     const auth = await getAuthenticatedUser();
     if (auth.error) return auth.error;
-    return handler(req, { userId: auth.user.id, params: (context?.params ?? {}) as T });
+    return (handler as (req: NextRequest, context: { userId: string; params?: unknown }) => Promise<NextResponse>)(
+      req,
+      { userId: auth.user.id, params: (context?.params ?? {}) },
+    );
   };
 }

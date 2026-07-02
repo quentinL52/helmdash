@@ -108,7 +108,7 @@ export function getAgentSummaries() {
 export async function executeAgent<T = unknown>(
   agentId: AgentId,
   context: AgentContext,
-  settings: { provider: ProviderName; model: string; apiKey: string },
+  settings: { provider: ProviderName; model: string },
   options?: ChatOptions
 ): Promise<AgentResult<T>> {
   try {
@@ -124,12 +124,10 @@ export async function executeAgent<T = unknown>(
       { role: 'user', content: userMessage },
     ];
     
-    // The chat method on the provider adapter expects the messages array, the model, and options
     const response = await provider.chat(messages, settings.model, {
-      ...options,
-      apiKey: settings.apiKey,
-      systemPrompt: undefined, // System prompt is already in messages array
-    });
+          ...options,
+          systemPrompt: undefined, // System prompt is already in messages array
+        });
     
     let parsedData: unknown;
     try {
