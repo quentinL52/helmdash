@@ -44,6 +44,13 @@ next-env.d.ts
 firebase-debug.log
 firestore-debug.log
 
+# Sensitive / strategic documents
+build_log*.txt
+.idx/
+.claude/worktrees/
+.FullName
+.modified
+
 # agent
 .agents
 nul
