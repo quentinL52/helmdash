@@ -14,6 +14,7 @@ export const translations = {
             journal: "Journal",
             competitiveWatch: "Veille",
             agent: "Agent Central",
+            memory: "Mémoire",
             progression: "Progression & Quêtes",
         },
         dashboard: {
@@ -555,6 +556,7 @@ export const translations = {
             journal: "Journal",
             competitiveWatch: "Watch",
             agent: "Central Agent",
+            memory: "Memory",
             progression: "Progression & Quests",
         },
         dashboard: {

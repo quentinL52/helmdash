@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { openai } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 import { CoreAgent } from '@/lib/ai/core-agent';
@@ -21,9 +21,9 @@ async function handler(
     const { messages } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
-      return new Response(
-        JSON.stringify({ error: 'Messages array is required' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } },
+      return NextResponse.json(
+        { error: 'Messages array is required' },
+        { status: 400 },
       );
     }
 
@@ -43,12 +43,12 @@ async function handler(
       },
     });
 
-    return result.toTextStreamResponse();
+    return result.toTextStreamResponse() as unknown as NextResponse;
   } catch (error) {
     console.error('Error in chat stream route:', error);
-    return new Response(
-      JSON.stringify({ error: 'Internal Server Error' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } },
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 },
     );
   }
 }
