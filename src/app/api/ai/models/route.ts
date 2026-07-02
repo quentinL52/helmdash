@@ -3,12 +3,14 @@
  * @description Next.js API route for dynamic AI model discovery.
  * GET /api/ai/models?provider=openai — returns available models for the given provider.
  * Reads the API key from the `x-api-key` header or falls back to environment variables.
+ * Requires authentication via Supabase session.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import type { ProviderName } from '@/lib/ai/provider-interface';
 import { discoverModels } from '@/lib/ai/model-discovery';
 import { getProviderRegistry } from '@/lib/ai/provider-registry';
+import { withAuth } from '@/lib/security/with-auth';
 
 /** Maps provider names to their expected environment variable keys. */
 const ENV_KEY_MAP: Record<ProviderName, string[]> = {
@@ -52,7 +54,7 @@ function resolveApiKey(request: NextRequest, provider: ProviderName): string | n
  *
  * Response: `{ provider, models: AIModel[] }`
  */
-export async function GET(request: NextRequest) {
+async function handlerGet(request: NextRequest, { userId }: { userId: string }) {
   const { searchParams } = new URL(request.url);
   const provider = searchParams.get('provider') as ProviderName | null;
 
@@ -107,3 +109,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export const GET = withAuth(handlerGet);

@@ -2,12 +2,13 @@
  * @module api/ai
  * @description Main AI chat route with multi-provider support.
  * Supports OpenAI (default), Anthropic, Gemini, and Mistral via the provider registry.
- * Maintains full backward compatibility: requests without a `provider` field default to OpenAI.
+ * Requires authentication via Supabase session.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import type { ChatMessage, ChatOptions, ProviderName } from '@/lib/ai/provider-interface';
 import { getProviderRegistry } from '@/lib/ai/provider-registry';
+import { withAuth } from '@/lib/security/with-auth';
 
 /** Default provider when none is specified (backward compatibility). */
 const DEFAULT_PROVIDER: ProviderName = 'openai';
@@ -62,7 +63,7 @@ function resolveApiKey(provider: ProviderName): string | null {
  * }
  * ```
  */
-export async function POST(request: NextRequest) {
+async function handler(request: NextRequest, { userId }: { userId: string }) {
   try {
     const body = await request.json();
     const {
@@ -87,9 +88,6 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
-
-    // Set the env var so the adapter can pick it up
-    // (adapters read from process.env internally)
 
     const registry = getProviderRegistry();
     const providerInstance = registry.get(provider);
@@ -139,6 +137,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
+
+export const POST = withAuth(handler);
 
 // ---------------------------------------------------------------------------
 // Legacy action handlers (refactored to use the provider abstraction)
@@ -237,7 +237,7 @@ Tone: Analytical but encouraging. Short and actionable.
 `;
 
   return [
-    { role: 'system', content: 'You are a productivity expert.' },
+    { role: 'system', content: 'I am a productivity expert.' },
     { role: 'user', content: prompt },
   ];
 }
