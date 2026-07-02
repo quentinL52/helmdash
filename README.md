@@ -1,43 +1,44 @@
-# 🚀 IgniteHQ - Founder Dashboard
+# 🚀 Helmdash — AI Co-Founder for Solo Founders
 
-IgniteHQ est le tableau de bord ultime pour les fondateurs en phase de préparation (Pre-MVP). Conçu avec un design rétro-pixel captivant et un moteur de gamification puissant, il vous aide à structurer vos idées, suivre votre trésorerie, vos stratégies Go-To-Market et interagir avec des agents IA spécialisés.
+**Helmdash** is the ultimate dashboard for pre-MVP founders. Designed with a captivating retro-pixel theme and a powerful gamification engine, it helps you structure ideas, track runway, manage GTM strategies, and interact with specialized AI agents.
 
-## ✨ Fonctionnalités Principales
+## ✨ Key Features
 
-- **🎮 Moteur de Gamification complet** : Système de points d'expérience (XP), niveaux (Dreamer à Unicorn), quêtes hebdomadaires, "streaks" (assiduité) et succès (Achievements).
-- **🤖 IA Multi-Providers** : Des agents spécialisés (Coach, Content Creator, CRM Manager) alimentés par le modèle de votre choix (Mistral, Anthropic, OpenAI, Gemini).
-- **📊 14 Widgets dynamiques** : Finance (Runway), OKR, CRM, Lean Canvas, etc. Tous personnalisables avec drag & drop sur une grille adaptative.
-- **📱 Responsive & Dark Mode** : Interface rétro (fonts pixel art, palette dark-mode) fluide sur mobile et desktop.
+- **🎮 Full Gamification Engine**: XP system, levels (Dreamer → Unicorn), weekly quests, streaks, and achievements.
+- **🤖 Multi-Provider AI**: Specialized agents (Co-Founder, CFO, Growth, Research, Content) powered by your choice of model (Mistral, Anthropic, OpenAI, Gemini).
+- **📊 Dynamic Dashboard**: Finance (Runway), OKR, CRM, Lean Canvas, and more — all customizable with drag & drop on an adaptive grid.
+- **📱 Responsive & Dark Mode**: Retro pixel-art fonts, dark-mode palette, fluid on mobile and desktop.
 
-## ⚙️ Installation & Lancement
+## ⚙️ Installation & Setup
 
-1. **Cloner ou télécharger le projet.**
-2. **Installer les dépendances** :
+1. **Install dependencies**:
    ```bash
    npm install
    ```
-3. **Configurer les variables d'environnement** :
-   Copiez le fichier d'exemple et renseignez vos clés d'API. Vous n'avez besoin que d'une seule clé pour que l'IA fonctionne, mais vous pouvez configurer les 4.
+2. **Configure environment variables**:
    ```bash
    cp .env.example .env.local
    ```
-4. **Lancer l'application en développement** :
+   Fill in at least one AI provider key and your Supabase credentials.
+
+3. **Run the development server**:
    ```bash
    npm run dev
    ```
-5. **Accéder à l'application** via `http://localhost:3000`.
+4. **Access the app** at `http://localhost:3000`.
 
-## 🧠 Architecture des Agents IA
+## 🧠 AI Agent Architecture
 
-IgniteHQ utilise une architecture hybride. Le `AgentOrchestrator` gère le routage vers le bon adaptateur en fonction des clés d'API fournies.
+Helmdash uses a hybrid agent architecture. The `AgentOrchestrator` routes requests to the right adapter based on configured API keys.
 
-- **Adaptateurs** : `/src/lib/ai/adapters/` (OpenAI, Mistral, Anthropic, Gemini).
-- **Store** : Les clés peuvent être renseignées de manière dynamique dans l'application (via les paramètres de l'UI), ce qui override les variables du `.env.local`.
+- **Adapters**: `/src/lib/ai/adapters/` (OpenAI, Mistral, Anthropic, Gemini).
+- **BYOK**: API keys can be configured dynamically in-app (Settings → AI & API Keys), overriding `.env.local` values.
 
-## 🏗️ Build de Production
+## 🏗️ Production Build
 
-Le projet compile à 100% avec TypeScript Strict :
 ```bash
 npm run build
 npm start
 ```
+
+Built with Next.js 14, TypeScript Strict, Tailwind CSS, Prisma + Supabase.

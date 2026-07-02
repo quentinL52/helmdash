@@ -24,7 +24,7 @@ const emailProvider: EmailProvider =
         const { Resend } = await import('resend');
         const resend = new Resend(process.env.RESEND_API_KEY);
         await resend.emails.send({
-          from: 'AirH Founder OS <noreply@airh.app>',
+          from: 'Helmdash <noreply@helmdash.app>',
           ...payload,
         });
       }
@@ -46,14 +46,14 @@ export async function sendTrialEndingEmail(
 ): Promise<void> {
   await sendEmail({
     to: email,
-    subject: `Votre essai AirH Founder OS se termine dans ${daysLeft} jours`,
+    subject: `Votre essai Helmdash se termine dans ${daysLeft} jours`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
         <h2>Bonjour ${userName},</h2>
-        <p>Votre essai gratuit de 14 jours sur <strong>AirH Founder OS</strong> 
+        <p>Votre essai gratuit de 14 jours sur <strong>Helmdash</strong> 
            se termine dans <strong>${daysLeft} jours</strong>.</p>
         <p>Pour continuer à utiliser votre dashboard, vos agents IA et votre mémoire persistante, 
-           passez au plan Starter (49€/an) ou Growth (199€/an).</p>
+           souscrivez à un abonnement.</p>
         <p>
           <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/settings/billing"
              style="background: #7B2ED6; color: white; padding: 12px 24px; 
@@ -62,7 +62,7 @@ export async function sendTrialEndingEmail(
           </a>
         </p>
         <p style="color: #666; font-size: 0.9em; margin-top: 24px;">
-          AirH Founder OS — Votre co-fondateur IA.
+          Helmdash — Votre co-fondateur IA.
         </p>
       </div>
     `,

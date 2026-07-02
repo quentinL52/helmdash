@@ -1,12 +1,15 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useState, useEffect } from 'react';
 import { BoardSkeleton } from '@/components/ui/loading-skeleton';
 import { Button } from '@/components/ui/button';
 import { Megaphone, Plus, PenTool } from 'lucide-react';
 import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
 import { AgentTriggerButton } from '@/components/dashboard/agent-trigger-button';
+import { PageAgent } from '@/components/agent/PageAgent';
+import { createClient } from '@/utils/supabase/client';
 
 const ContentBoard = dynamic(
     () => import('@/components/content/content-board').then(m => m.ContentBoard),
@@ -14,8 +17,16 @@ const ContentBoard = dynamic(
 );
 
 export default function ContentPage() {
+    const [userId, setUserId] = useState<string | null>(null);
     const language = useFounderStore(s => s.language);
     const t = translations[language].content;
+
+    useEffect(() => {
+        const supabase = createClient();
+        supabase.auth.getUser().then(({ data }) => {
+            if (data?.user) setUserId(data.user.id);
+        });
+    }, []);
 
     return (
         <div className="flex flex-col h-full space-y-4 p-8 pt-6 font-sans text-foreground">
@@ -50,6 +61,10 @@ export default function ContentPage() {
             <div className="flex-1 min-h-0 mt-0">
                 <ContentBoard />
             </div>
+
+            {userId && (
+                <PageAgent userId={userId} pageLabel="Content" pageContext="Génération et suivi de contenu." />
+            )}
         </div>
     );
 }

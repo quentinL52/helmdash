@@ -114,14 +114,14 @@ export function AppSidebar() {
                     <div className="flex items-center gap-3 px-2">
                         <div className="relative w-8 h-8 shrink-0">
                             <Image
-                                src="/AIrh_logo.png"
-                                alt="AIRH Logo"
+                                alt="Helmdash Logo"
+                                                                src="/helmdash_logo.png"
                                 fill
                                 className="object-contain"
                             />
                         </div>
                         <span className="text-base font-bold bg-clip-text text-transparent bg-gradient-to-r from-foreground to-muted-foreground">
-                            AIRH Founder Central
+                            Helmdash
                         </span>
                     </div>
                 </div>

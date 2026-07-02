@@ -87,7 +87,7 @@ export function AuthFormsWrapper() {
             <CardHeader>
                 <CardTitle>{isSignUp ? "Créer un compte" : "Se connecter"}</CardTitle>
                 <CardDescription className="text-muted-foreground">
-                    {isSignUp ? "Entrez vos informations pour commencer." : "Bienvenue sur FounderOS."}
+                    {isSignUp ? "Entrez vos informations pour commencer." : "Bienvenue sur Helmdash."}
                 </CardDescription>
             </CardHeader>
             <form onSubmit={handleAuth}>

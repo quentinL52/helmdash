@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { Target, BookOpen, Map, Zap, PenTool, Save, BarChart3, Play, Lightbulb } from 'lucide-react';
 import { useGamification } from '@/hooks/use-gamification';
+import { PageAgent } from '@/components/agent/PageAgent';
+import { createClient } from '@/utils/supabase/client';
 
 type GtmTab = 'strategie' | 'execution' | 'mesure';
 
@@ -20,11 +22,19 @@ const TABS: { id: GtmTab; label: string; icon: typeof Lightbulb; description: st
 ];
 
 export default function GoToMarketPage() {
+    const [userId, setUserId] = useState<string | null>(null);
     const { goToMarket, updateGoToMarket } = useFounderStore();
     const [localData, setLocalData] = useState<GoToMarketStrategy>(goToMarket);
     const [mounted, setMounted] = useState(false);
     const [activeTab, setActiveTab] = useState<GtmTab>('strategie');
     const { awardXP } = useGamification();
+
+    useEffect(() => {
+        const supabase = createClient();
+        supabase.auth.getUser().then(({ data }) => {
+            if (data?.user) setUserId(data.user.id);
+        });
+    }, []);
 
     useEffect(() => {
         setLocalData(goToMarket);
@@ -344,6 +354,10 @@ export default function GoToMarketPage() {
                         </CardContent>
                     </Card>
                 </div>
+            )}
+            {/* PageAgent */}
+            {userId && (
+                <PageAgent userId={userId} pageLabel="GTM" pageContext={`Stratégie GTM active. Onglet courant : ${activeTab}.`} />
             )}
         </div>
     );

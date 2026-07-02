@@ -1,13 +1,14 @@
-"use client";
+'use client';
 
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { LEAN_CANVAS_SECTIONS, type LeanCanvasSectionId, COLORS } from '@/lib/constants';
 import { useGamification } from '@/hooks/use-gamification';
 import { CanvasSection } from './components/canvas-section';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PageAgent } from '@/components/agent/PageAgent';
+import { createClient } from '@/utils/supabase/client';
 import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
 import { Download, Save, Trash2, Eye, LayoutDashboard, History } from 'lucide-react';
@@ -33,14 +34,22 @@ const initialCanvasData: CanvasData = LEAN_CANVAS_SECTIONS.reduce(
 );
 
 export default function LeanCanvasPage() {
+  const [userId, setUserId] = useState<string | null>(null);
   const canvasData = useFounderStore(s => s.leanCanvas || {});
   const updateCanvasSection = useFounderStore(s => s.updateCanvasSection);
   const leanCanvasSnapshots = useFounderStore(s => s.leanCanvasSnapshots || []);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (data?.user) setUserId(data.user.id);
+    });
+  }, []);
   const saveLeanCanvasSnapshot = useFounderStore(s => s.saveLeanCanvasSnapshot);
   const deleteLeanCanvasSnapshot = useFounderStore(s => s.deleteLeanCanvasSnapshot);
 
   const [businessConcept, setBusinessConcept] = useLocalStorage<string>(
-    'ignitehq-business-concept',
+    'helmdash-business-concept',
     ''
   );
   const [isExporting, setIsExporting] = useState(false);
@@ -393,6 +402,10 @@ export default function LeanCanvasPage() {
           </div>
         )}
       </div>
+
+      {userId && (
+        <PageAgent userId={userId} pageLabel="Lean Canvas" pageContext="Canvas de business model Lean." />
+      )}
     </div>
   );
 }
