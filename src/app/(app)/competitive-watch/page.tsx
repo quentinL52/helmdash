@@ -11,6 +11,9 @@ import { LeanDashboardTab } from './components/lean-dashboard-tab';
 import { LeanAnalysisTab } from './components/lean-analysis-tab';
 import { LeanActionsTab } from './components/lean-actions-tab';
 import { CompetitorInlineForm } from './components/competitor-inline-form';
+import { PageAgent } from '@/components/agent/PageAgent';
+import { createClient } from '@/utils/supabase/client';
+import { useEffect } from 'react';
 // Kept for future advanced mode reactivation
 // import { MarketSignalsTab } from './components/market-signals-tab';
 
@@ -24,6 +27,14 @@ export default function CompetitiveWatchPage() {
     const language = useFounderStore((s) => s.language);
     const t = (translations[language] as any).competitiveWatch;
     const [activeTab, setActiveTab] = useState('dashboard');
+    const [userId, setUserId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const supabase = createClient();
+        supabase.auth.getUser().then(({ data }) => {
+            if (data.user) setUserId(data.user.id);
+        });
+    }, []);
 
     const [showMySolutionForm, setShowMySolutionForm] = useState(false);
     const mySolution = useFounderStore((s) => s.mySolution);
@@ -86,6 +97,7 @@ export default function CompetitiveWatchPage() {
                     <LeanActionsTab advancedMode={false} />
                 </TabsContent>
             </Tabs>
+            {userId && <PageAgent userId={userId} pageLabel={(translations[language] as any).competitiveWatch?.nav || 'Veille'} />}
         </div>
     );
 }

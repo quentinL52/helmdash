@@ -1,5 +1,6 @@
 import { GraphView } from '@/components/memory/GraphView';
 import { QuickNoteForm } from '@/components/memory/QuickNoteForm';
+import { MemoryPageAgent } from '@/components/memory/MemoryPageAgent';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 
@@ -38,6 +39,7 @@ export default async function MemoryPage() {
           </div>
         </div>
       </div>
+      <MemoryPageAgent userId={user.id} pageLabel="Mémoire" />
     </div>
   );
 }
