@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { withAuth } from '@/lib/security';
 
 const apiKey = process.env.AI_API_KEY;
 const openai = apiKey ? new OpenAI({ apiKey }) : null;
@@ -51,7 +52,7 @@ const searchToolDefinition = {
     }
 };
 
-export async function POST(req: Request) {
+async function handler(req: NextRequest, { userId }: { userId: string }) {
     if (!openai) {
         return NextResponse.json({ error: 'AI API Key missing' }, { status: 500 });
     }
@@ -158,3 +159,5 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
+
+export const POST = withAuth(handler);

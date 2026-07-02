@@ -78,7 +78,8 @@ function parseEnv(): Env {
       process.exit(1);
     }
     // In dev/test, return partial defaults to avoid crashing on every restart
-    return result.data as Env;
+    // Cast through unknown since result.data may be undefined on failure
+    return (result.data ?? {}) as Env;
   }
   return result.data;
 }

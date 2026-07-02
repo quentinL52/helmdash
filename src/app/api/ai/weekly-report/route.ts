@@ -1,12 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import OpenAI from 'openai';
+import { withAuth } from '@/lib/security/with-auth';
 
 const openai = new OpenAI({
     apiKey: process.env.AI_API_KEY || '',
 });
 
-export async function POST(req: Request) {
+export const maxDuration = 60;
+
+async function handler(req: Request, { userId }: { userId: string }) {
     try {
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
@@ -15,99 +18,107 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
         }
 
-        // Fetch user plan to ensure they have access (Growth or Scale)
-        const { data: userData } = await supabase
-            .from('users')
-            .select('plan_tier')
-            .eq('id', user.id)
-            .single();
-
-        const planTier = userData?.plan_tier || 'free';
-        if (planTier !== 'growth' && planTier !== 'scale') {
-            return NextResponse.json({ error: 'Le plan Growth ou Scale est requis pour cette fonctionnalité.' }, { status: 403 });
-        }
-
         // Parse optional request parameters
         const body = await req.json().catch(() => ({}));
+        const { period = 'week', focus = 'general' } = body;
 
-        // Fetch user data from Supabase to provide as context
-        const { data: founderData, error: dbError } = await supabase
-            .from('founder_data')
-            .select('*')
+        // Fetch founder data
+        const { data: hypData } = await supabase
+            .from('hypotheses')
+            .select('statement, status, actual_result')
+            .eq('user_id', user.id);
+
+        const { data: financeData } = await supabase
+            .from('finances')
+            .select('amount, type, created_at')
+            .eq('user_id', user.id);
+
+        const { data: journalData } = await supabase
+            .from('mood_entries')
+            .select('mood, created_at')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(7);
+
+        const { data: streakData } = await supabase
+            .from('streaks')
+            .select('current_streak')
             .eq('user_id', user.id)
             .single();
 
-        if (dbError || !founderData) {
-            return NextResponse.json({ error: 'Données utilisateur introuvables' }, { status: 404 });
-        }
+        const hypotheses = hypData || [];
+        const finances = financeData || [];
+        const moods = journalData || [];
+        const streak = streakData?.current_streak || 0;
 
-        // Aggregate data for the prompt
-        const objectives = founderData.objectives || [];
-        const hypotheses = founderData.hypotheses || [];
-        const finances = founderData.finance || { cashAvailable: 0 };
-        const routineHistory = founderData.routine_history || [];
+        // Calculate metrics
+        const totalBurn = finances
+            .filter((f: any) => f.type === 'expense')
+            .reduce((sum: number, f: any) => sum + Number(f.amount), 0);
+        const totalRevenue = finances
+            .filter((f: any) => f.type === 'revenue')
+            .reduce((sum: number, f: any) => sum + Number(f.amount), 0);
+
+        const hypothesesTested = hypotheses.filter((h: any) => h.status !== 'draft').length;
+        const hypothesesValidated = hypotheses.filter((h: any) => h.status === 'validated').length;
+
+        const averageMood = moods.length
+            ? (moods.reduce((sum: number, m: any) => sum + m.mood, 0) / moods.length).toFixed(1)
+            : 'N/A';
 
         const prompt = `
-En tant que Coach d'Affaires Expert en IA pour les fondateurs de startups (méthode Lean Startup), générez un rapport stratégique hebdomadaire pour ce fondateur.
+Tu es un coach startup spécialisé dans l'analyse hebdomadaire des fondateurs.
 
-Voici les données de la semaine :
-Objectifs (OKRs) :
-${JSON.stringify(objectives, null, 2)}
+**Période analysée**: ${period}
+**Focus demandé**: ${focus}
 
-Hypothèses testées :
-${JSON.stringify(hypotheses.filter((h: any) => h.status === 'testing' || h.status === 'validated' || h.status === 'invalidated'), null, 2)}
+**Données du fondateur (ID: ${user.id}):**
+- Hypothèses: ${hypotheses.length} total, ${hypothesesTested} testées, ${hypothesesValidated} validées
+- Finances: ${totalRevenue}€ revenus, ${totalBurn}€ burn
+- Humeur moyenne (7 jours): ${averageMood}
+- Streak actuel: ${streak} jours
+- Morning Pages (journal): ${moods.length} entrées cette semaine
 
-Finances :
-Cash disponible : ${finances.cashAvailable}
+Analyse et retourne:
+1. **Focus Score** (1-10): Évalue la capacité du fondateur à se concentrer sur ce qui compte.
+2. **Validation Score** (1-10): Évalue la progression dans la validation des hypothèses.
+3. **Health Score** (1-10): Évalue la santé globale (finance + bien-être).
+4. **One Key Insight**: Un insight transversal.
+5. **Top Priority**: Une recommandation unique et prioritaire.
+6. **Mood Trend**: Courte analyse de la tendance émotionnelle.
+7. **Next Week Focus**: Suggère où concentrer l'énergie la semaine prochaine.
 
-Dernières routines complétées :
-${JSON.stringify(routineHistory.slice(0, 5), null, 2)}
-
-Génère un rapport en Markdown structuré avec :
-1. Résumé exécutif de la semaine (Ton encourageant mais rigoureux)
-2. Analyse de la progression des OKRs
-3. Insights sur les hypothèses testées (Qu'avons-nous appris ?)
-4. Recommandations actionnables pour la semaine prochaine (3 priorités claires)
-5. Santé du projet (Analyse rapide cash/runway et momentum)
-
-Reste concis, orienté action et direct. Utilise un format Markdown agréable à lire.
+Réponds en JSON avec les clés: focusScore, validationScore, healthScore, insight, priority, moodTrend, nextFocus.
 `;
 
-        const response = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
+        const completion = await openai.chat.completions.create({
+            model: 'gpt-4o',
             messages: [
-                { role: "system", content: "Vous êtes un mentor exigeant et bienveillant spécialisé en early-stage startups." },
-                { role: "user", content: prompt }
+                { role: 'system', content: 'Tu es un assistant analyste startup. Réponds TOUJOURS en JSON valide uniquement.' },
+                { role: 'user', content: prompt },
             ],
-            temperature: 0.7,
+            response_format: { type: 'json_object' },
         });
 
-        const reportContent = response.choices[0].message.content;
+        const analysis = completion.choices[0]?.message?.content;
 
-        const newReport = {
-            id: crypto.randomUUID(),
-            date: new Date().toISOString(),
-            content: reportContent,
-            status: 'generated'
-        };
-
-        // Optionally, save the generated report back to the database
-        // We retrieve the existing weekly reports to append the new one
-        const existingReports = founderData.weekly_report ? [founderData.weekly_report] : [];
-        if (founderData.weekly_reports_history) {
-            existingReports.push(...founderData.weekly_reports_history);
+        if (!analysis) {
+            return NextResponse.json({ error: 'Failed to generate analysis.' }, { status: 500 });
         }
 
-        // Wait, usually it saves the latest as `weekly_report` object.
-        await supabase
-            .from('founder_data')
-            .update({ weekly_report: newReport })
-            .eq('user_id', user.id);
+        return NextResponse.json({
+            analysis: JSON.parse(analysis),
+            generatedAt: new Date().toISOString(),
+            period,
+        });
 
-        return NextResponse.json({ report: newReport });
-
-    } catch (error: any) {
-        console.error('Weekly Report Error:', error);
-        return NextResponse.json({ error: error.message || 'Une erreur est survenue lors de la génération du rapport' }, { status: 500 });
+    } catch (error) {
+        console.error('[Weekly Report] Error:', error);
+        return NextResponse.json(
+            { error: 'Erreur lors de la génération du rapport hebdomadaire.' },
+            { status: 500 }
+        );
     }
 }
+
+export const POST = withAuth(handler);

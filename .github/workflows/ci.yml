@@ -7,6 +7,9 @@
 # rule on `main` that requires status checks (lint, typecheck, build) to pass
 # before merging. Configure via Settings > Branches > Add rule > main.
 #
+# Security guard:
+# - Fails if SUPABASE_SERVICE_ROLE_KEY appears in client-side components
+#
 # Steps:
 #   1. npm ci (cached)  — clean, reproducible install
 #   2. env.example check — verify env template exists
@@ -54,6 +57,16 @@ jobs:
             exit 1
           fi
           echo ".env.example found."
+
+      - name: Check SERVICE_ROLE not in client code
+        run: |
+          FOUND=$(grep -r "SUPABASE_SERVICE_ROLE_KEY" src/components src/app/\(app\) 2>/dev/null || true)
+          if [ -n "$FOUND" ]; then
+            echo "::error::SUPABASE_SERVICE_ROLE_KEY found in client-side code!"
+            echo "$FOUND"
+            exit 1
+          fi
+          echo "SERVICE_ROLE check passed."
 
       - name: Run lint
         run: npm run lint

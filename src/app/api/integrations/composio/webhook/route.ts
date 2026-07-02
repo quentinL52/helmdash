@@ -1,16 +1,59 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 
+/**
+ * POST /api/integrations/composio/webhook
+ *
+ * Webhook endpoint for Composio integration events.
+ * Verifies the request signature using HMAC-SHA256 with COMPOSIO_WEBHOOK_SECRET.
+ * Returns 401 if the signature is invalid or missing.
+ */
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    console.log('Received Composio webhook:', body);
-    
-    // Process webhook logic if required, like storing tokens or logging
-    // Composio usually handles oauth tokens on their end, but we can sync state.
-    
+    // Verify HMAC signature
+    const secret = process.env.COMPOSIO_WEBHOOK_SECRET;
+    if (!secret) {
+      console.warn('[Composio Webhook] COMPOSIO_WEBHOOK_SECRET not configured — skipping signature check');
+      // Fall through — in production this should be configured
+    }
+
+    const body = await req.text();
+    const signature = req.headers.get('x-signature') || req.headers.get('x-composio-signature');
+
+    if (secret) {
+      if (!signature) {
+        return NextResponse.json(
+          { error: 'Missing signature header' },
+          { status: 401 }
+        );
+      }
+
+      // Verify HMAC-SHA256
+      const expectedSignature = crypto
+        .createHmac('sha256', secret)
+        .update(body)
+        .digest('hex');
+
+      if (signature !== expectedSignature) {
+        console.warn('[Composio Webhook] Invalid signature — possible forgery attempt');
+        return NextResponse.json(
+          { error: 'Invalid signature' },
+          { status: 401 }
+        );
+      }
+    }
+
+    // Process webhook
+    const data = JSON.parse(body);
+    console.log('Received Composio webhook:', JSON.stringify(data).slice(0, 500));
+
+    // Composio handles OAuth tokens on their end — we just log for now
     return NextResponse.json({ received: true });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Composio webhook handling error:', error);
-    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Webhook handler failed' },
+      { status: 500 }
+    );
   }
 }

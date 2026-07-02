@@ -1,58 +1,60 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+import { withAuth, withValidation } from '@/lib/security';
 import { executeAgent } from '@/lib/ai/agent-orchestrator';
 import type { ProviderName } from '@/lib/ai/provider-interface';
 
 // Ensure the agent is registered
 import '@/lib/ai/agents/relationship-manager';
 
-interface CrmRequest {
-  provider: ProviderName;
-  model: string;
-  apiKey: string;
-  context: {
-    contacts: any[];
-    projectPhase: string;
-    goToMarket: { ompTarget?: string };
-    userInstruction?: string;
-  };
-  locale?: 'fr' | 'en';
-}
+const crmSchema = z.object({
+  provider: z.enum(['openai', 'anthropic', 'gemini', 'mistral']),
+  model: z.string().min(1),
+  context: z.object({
+    contacts: z.array(z.any()),
+    projectPhase: z.string(),
+    goToMarket: z.object({
+      ompTarget: z.string().optional(),
+    }),
+    userInstruction: z.string().optional(),
+  }),
+  locale: z.enum(['fr', 'en']).optional(),
+});
 
-export async function POST(req: Request) {
-  try {
-    const body = await req.json() as Partial<CrmRequest>;
+const handler = withAuth(
+  withValidation(crmSchema)(
+    async (
+      req: NextRequest,
+      { userId, body }: { userId: string; body: z.infer<typeof crmSchema> },
+    ) => {
+      try {
+        const result = await executeAgent(
+          'relationship-manager',
+          {
+            storeData: body.context as Record<string, unknown>,
+            userInstruction: body.context.userInstruction,
+            locale: body.locale || 'fr',
+          },
+          {
+            provider: body.provider as ProviderName,
+            model: body.model,
+          },
+        );
 
-    if (!body.provider || !body.model || !body.apiKey || !body.context) {
-      return NextResponse.json(
-        { error: 'Missing required fields (provider, model, apiKey, context)' },
-        { status: 400 }
-      );
-    }
+        if (result.status === 'error') {
+          return NextResponse.json(result, { status: 500 });
+        }
 
-    const result = await executeAgent(
-      'relationship-manager',
-      {
-        storeData: body.context as Record<string, unknown>,
-        userInstruction: body.context.userInstruction,
-        locale: body.locale || 'fr',
-      },
-      {
-        provider: body.provider,
-        model: body.model,
-        apiKey: body.apiKey,
+        return NextResponse.json(result);
+      } catch (error) {
+        console.error('[CRM API Route] Error:', error);
+        return NextResponse.json(
+          { error: 'Internal server error while executing relationship manager.' },
+          { status: 500 },
+        );
       }
-    );
+    },
+  ),
+);
 
-    if (result.status === 'error') {
-      return NextResponse.json(result, { status: 500 });
-    }
-
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error('[CRM API Route] Error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error while executing relationship manager.' },
-      { status: 500 }
-    );
-  }
-}
+export const POST = handler;

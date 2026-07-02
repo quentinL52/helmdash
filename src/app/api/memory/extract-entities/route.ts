@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { startMemoryWorker } from '@/lib/queue/memory-queue';
+import { withAuth } from '@/lib/security/with-auth';
 
 // This is a simple route that can be called to ensure the worker is started.
 // In a true serverless environment like Vercel, long-running processes (BullMQ Worker) 
@@ -9,7 +10,7 @@ import { startMemoryWorker } from '@/lib/queue/memory-queue';
 
 let workerStarted = false;
 
-export async function GET() {
+async function handler() {
   try {
     if (!workerStarted) {
       startMemoryWorker();
@@ -21,3 +22,5 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export const GET = withAuth(handler);
