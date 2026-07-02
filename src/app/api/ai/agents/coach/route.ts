@@ -1,60 +1,62 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { executeAgent } from '@/lib/ai/agent-orchestrator';
+import { withAuth } from '@/lib/security/with-auth';
+import { withValidation } from '@/lib/security/with-validation';
 import type { ProviderName } from '@/lib/ai/provider-interface';
 
 // Ensure the agent is registered by importing it
 import '@/lib/ai/agents/founder-coach';
 
-interface CoachRequest {
-  provider: ProviderName;
-  model: string;
-  apiKey: string;
-  context: {
-    hypotheses: { total: number; tested: number; validated: number };
-    finance: { cash: number; runway: number; burnRate: number };
-    streak: number;
-    okrProgress: number;
-    journalMoods: string[];
-    canvasCompleteness: number;
-    contactsCount: number;
-  };
-  locale?: 'fr' | 'en';
-}
+const schema = z.object({
+  provider: z.string().min(1),
+  model: z.string().min(1),
+  context: z.object({
+    hypotheses: z.object({
+      total: z.number(),
+      tested: z.number(),
+      validated: z.number(),
+    }),
+    finance: z.object({
+      cash: z.number(),
+      runway: z.number(),
+      burnRate: z.number(),
+    }),
+    streak: z.number(),
+    okrProgress: z.number(),
+    journalMoods: z.array(z.string()),
+    canvasCompleteness: z.number(),
+    contactsCount: z.number(),
+  }),
+  locale: z.enum(['fr', 'en']).optional(),
+});
 
-export async function POST(req: Request) {
-  try {
-    const body = await req.json() as Partial<CoachRequest>;
+export const POST = withAuth(
+  withValidation(schema)(async (req: NextRequest, { userId, body }) => {
+    try {
+      const result = await executeAgent(
+        'founder-coach',
+        {
+          storeData: body.context as Record<string, unknown>,
+          locale: body.locale || 'fr',
+        },
+        {
+          provider: body.provider as ProviderName,
+          model: body.model,
+        },
+      );
 
-    if (!body.provider || !body.model || !body.apiKey || !body.context) {
+      if (result.status === 'error') {
+        return NextResponse.json(result, { status: 500 });
+      }
+
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('[Coach API Route] Error:', error);
       return NextResponse.json(
-        { error: 'Missing required fields (provider, model, apiKey, context)' },
-        { status: 400 }
+        { error: 'Internal server error while executing founder coach.' },
+        { status: 500 },
       );
     }
-
-    const result = await executeAgent(
-      'founder-coach',
-      {
-        storeData: body.context as Record<string, unknown>,
-        locale: body.locale || 'fr',
-      },
-      {
-        provider: body.provider,
-        model: body.model,
-        apiKey: body.apiKey,
-      }
-    );
-
-    if (result.status === 'error') {
-      return NextResponse.json(result, { status: 500 });
-    }
-
-    return NextResponse.json(result);
-  } catch (error) {
-    console.error('[Coach API Route] Error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error while executing founder coach.' },
-      { status: 500 }
-    );
-  }
-}
+  }),
+);
