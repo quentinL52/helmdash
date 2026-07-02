@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { withAuth } from '@/lib/security/with-auth';
 
-export async function POST(req: NextRequest) {
+/**
+ * POST /api/billing/stripe/sync
+ * Synchronise les données Stripe (MRR, abonnements, factures) pour l'utilisateur authentifié.
+ * userId est extrait de la session — jamais du body client.
+ */
+async function handler(req: NextRequest, { userId }: { userId: string }) {
   try {
-    const { userId, forceFullSync } = await req.json();
-
-    if (!userId) {
-      return NextResponse.json({ error: 'userId required' }, { status: 400 });
-    }
+    const { forceFullSync } = await req.json().catch(() => ({ forceFullSync: false }));
+    const forceSync = Boolean(forceFullSync);
 
     // Vérifier que l'utilisateur existe et a un customer Stripe
     const user = await prisma.user.findUnique({
@@ -56,7 +59,10 @@ export async function POST(req: NextRequest) {
       limit: 100,
     });
     
-    const monthlyRevenue = invoices.data.reduce((sum: number, inv: { amount_paid?: number }) => sum + (inv.amount_paid || 0) / 100, 0);
+    const monthlyRevenue = invoices.data.reduce(
+      (sum: number, inv: { amount_paid?: number }) => sum + (inv.amount_paid || 0) / 100, 
+      0
+    );
 
     // 4. Mettre à jour MonthlyFinance (upsert)
     const now = new Date();
@@ -68,11 +74,11 @@ export async function POST(req: NextRequest) {
         userId,
         month: monthKey,
         revenue: monthlyRevenue,
-        notes: forceFullSync ? 'Full sync from Stripe' : 'Monthly sync from Stripe',
+        notes: forceSync ? 'Full sync from Stripe' : 'Monthly sync from Stripe',
       },
       update: {
         revenue: monthlyRevenue,
-        notes: forceFullSync ? 'Full sync from Stripe' : 'Monthly sync from Stripe',
+        notes: forceSync ? 'Full sync from Stripe' : 'Monthly sync from Stripe',
         updatedAt: new Date(),
       },
     });
@@ -106,3 +112,5 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export const POST = withAuth(handler);
