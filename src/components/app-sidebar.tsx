@@ -24,6 +24,7 @@ import {
     Settings,
     Bot,
     Trophy,
+    BrainCircuit,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/utils/supabase/client';
@@ -52,6 +53,7 @@ export function AppSidebar() {
         { href: '/roadmap', label: t.roadmap, icon: KanbanSquare },
         { href: '/routine', label: t.routine, icon: Repeat },
         { href: '/competitive-watch', label: (translations[language] as any).competitiveWatch?.nav || 'Veille Stratégique', icon: Radar },
+        { href: '/memory', label: (t as any).memory || 'Mémoire', icon: BrainCircuit },
         { href: '/whiteboard', label: t.whiteboard, icon: PenSquare },
         { href: '/content', label: t.content, icon: Megaphone },
         { href: '/go-to-market', label: 'Go-To-Market', icon: Target },
