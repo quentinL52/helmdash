@@ -9,7 +9,7 @@ import {
 
 const server = new Server(
   {
-    name: "airh-founder-dashboard-mcp",
+    name: "helmdash-mcp",
     version: "1.0.0",
   },
   {
@@ -96,7 +96,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("AIRH Founder Dashboard MCP server running on stdio");
+  console.error("Helmdash MCP server running on stdio");
 }
 
 main().catch((error) => {

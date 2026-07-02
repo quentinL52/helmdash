@@ -49,7 +49,7 @@ export default function LeanCanvasPage() {
   const deleteLeanCanvasSnapshot = useFounderStore(s => s.deleteLeanCanvasSnapshot);
 
   const [businessConcept, setBusinessConcept] = useLocalStorage<string>(
-    'ignitehq-business-concept',
+    'helmdash-business-concept',
     ''
   );
   const [isExporting, setIsExporting] = useState(false);

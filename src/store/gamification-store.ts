@@ -4,7 +4,7 @@
  * Dedicated Zustand store for all gamification state, persisted to localStorage.
  * Fully independent from `founder-store.ts` — no cross-store mutations.
  *
- * Persistence key: 'ignitehq-gamification-store'
+ * Persistence key: 'helmdash-gamification-store'
  */
 
 import { create } from 'zustand';
@@ -245,7 +245,7 @@ export const useGamificationStore = create<GamificationStore>()(
       resetGamification: () => set(createInitialState()),
     }),
     {
-      name: 'ignitehq-gamification-store',
+      name: 'helmdash-gamification-store',
     },
   ),
 );
