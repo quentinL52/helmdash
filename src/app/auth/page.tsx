@@ -1,8 +1,8 @@
 import { AuthFormsWrapper } from '@/components/auth/auth-forms-wrapper';
 
 export const metadata = {
-  title: 'Connexion | FounderOS',
-  description: 'Connectez-vous à votre espace FounderOS',
+  title: 'Login | Helmdash',
+  description: 'Sign in to your Helmdash workspace',
 };
 
 export default function AuthPage() {

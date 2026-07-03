@@ -1,131 +1,130 @@
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/billing/stripe-client';
 import { prisma } from '@/lib/prisma';
+import {
+  incrementTotal,
+  releaseSeat,
+} from '@/lib/billing/cohort-service';
+import { computeLockedUntil } from '@/lib/billing/cohort-service';
+import type { Cohort } from '@/lib/billing/cohort-config';
 
-/**
- * POST /api/billing/webhook
- *
- * Reçoit les webhooks Stripe en temps réel.
- * Endpoint public (signé par Stripe, pas d'auth standard).
- *
- * Événements gérés :
- * - checkout.session.completed → activation abonnement
- * - customer.subscription.updated → changement de plan
- * - customer.subscription.deleted → downgrade free
- * - invoice.payment_succeeded → sync MRR/ARR
- * - invoice.payment_failed → alerte utilisateur
- */
 export async function POST(req: Request) {
+  const body = await req.text();
+  const sig = req.headers.get('stripe-signature');
+
+  if (!sig) {
+    return NextResponse.json(
+      { error: 'Missing stripe-signature header' },
+      { status: 401 },
+    );
+  }
+
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    console.error('[Stripe Webhook] STRIPE_WEBHOOK_SECRET not configured');
+    return NextResponse.json(
+      { error: 'Webhook secret not configured' },
+      { status: 500 },
+    );
+  }
+
+  let event: ReturnType<typeof stripe.webhooks.constructEvent>;
   try {
-    const body = await req.text();
-    const sig = req.headers.get('stripe-signature');
+    event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
+  } catch (err) {
+    console.error('[Stripe Webhook] Invalid signature:', err);
+    return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
+  }
 
-    if (!sig) {
-      return NextResponse.json({ error: 'Missing stripe-signature header' }, { status: 401 });
-    }
+  // Idempotence
+  try {
+    await prisma.stripeEventLog.create({
+      data: { eventId: event.id, type: event.type },
+    });
+  } catch {
+    return NextResponse.json({ received: true });
+  }
 
-    let event: ReturnType<typeof stripe.webhooks.constructEvent>;
-    try {
-      event = stripe.webhooks.constructEvent(
-        body,
-        sig,
-        process.env.STRIPE_WEBHOOK_SECRET || '',
-      );
-    } catch (err) {
-      console.error('[Stripe Webhook] Invalid signature:', err);
-      return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
-    }
-
-    // Traiter l'événement
+  try {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as any;
-        const userId = session.metadata?.userId;
-        const subscriptionId = session.subscription;
-        const priceId = session.metadata?.priceId;
+        const userId = session.metadata?.userId as string | undefined;
+        const cohort = session.metadata?.cohort as Cohort | undefined;
+        const subscriptionId = session.subscription as string | undefined;
 
-        if (userId && subscriptionId) {
-          // Activer l'abonnement
-          await prisma.user.update({
+        if (!userId || !cohort || !subscriptionId) break;
+
+        await prisma.$transaction(async (tx: any) => {
+          // Delete the seat reservation
+          await tx.seatReservation
+            .deleteMany({ where: { sessionId: session.id } });
+
+          const cohortRank = await incrementTotal(tx);
+          const cohortLockedUntil = computeLockedUntil(cohort);
+
+          await tx.user.update({
             where: { id: userId },
             data: {
+              planStatus: 'active',
+              cohort,
+              cohortRank,
+              cohortLockedUntil,
               stripeSubscriptionId: subscriptionId,
-              planTier: getTierFromPriceId(priceId || ''),
+              stripeCustomerId: session.customer as string,
             },
           });
-
-          // Sync MRR immédiatement
-          await triggerSync(userId);
-        }
+        });
         break;
       }
 
-      case 'customer.subscription.updated': {
-        const subscription = event.data.object as any;
-        const subUserId = subscription.metadata?.userId;
+      case 'checkout.session.expired': {
+        const session = event.data.object as any;
+        const sessionId = session.id as string;
 
-        if (subUserId) {
-          const status = subscription.status;
-          const items = subscription.items?.data || [];
-          const price = items[0]?.price;
+        const reservation = await prisma.seatReservation.findUnique({
+          where: { sessionId },
+        });
 
-          if (status === 'active' || status === 'trialing') {
-            await prisma.user.update({
-              where: { id: subUserId },
-              data: {
-                planTier: getTierFromPriceId(price?.id || ''),
-                stripeSubscriptionId: subscription.id,
-              },
-            });
-          } else if (status === 'past_due' || status === 'canceled' || status === 'unpaid') {
-            await prisma.user.update({
-              where: { id: subUserId },
-              data: { planTier: 'free', stripeSubscriptionId: null },
-            });
-          }
-
-          await triggerSync(subUserId);
+        if (reservation) {
+          await prisma.$transaction(async (tx: any) => {
+            await tx.seatReservation.delete({ where: { sessionId } });
+            if (
+              reservation.cohort === 'founders' ||
+              reservation.cohort === 'early'
+            ) {
+              await releaseSeat(tx, reservation.cohort);
+            }
+          });
         }
         break;
       }
 
       case 'customer.subscription.deleted': {
-        const deletedSub = event.data.object as any;
-        const deletedUserId = deletedSub.metadata?.userId;
+        const subscription = event.data.object as any;
+        const userId = subscription.metadata?.userId as string | undefined;
 
-        if (deletedUserId) {
+        if (userId) {
           await prisma.user.update({
-            where: { id: deletedUserId },
-            data: { planTier: 'free', stripeSubscriptionId: null },
+            where: { id: userId },
+            data: { planStatus: 'readonly' },
           });
-        }
-        break;
-      }
-
-      case 'invoice.payment_succeeded': {
-        const invoice = event.data.object as any;
-        const invUserId = invoice.metadata?.userId || invoice.subscription_details?.metadata?.userId;
-
-        if (invUserId) {
-          await triggerSync(invUserId);
         }
         break;
       }
 
       case 'invoice.payment_failed': {
-        const failedInvoice = event.data.object as any;
-        const failUserId = failedInvoice.metadata?.userId || failedInvoice.subscription_details?.metadata?.userId;
+        const invoice = event.data.object as any;
+        const userId =
+          (invoice.metadata?.userId as string | undefined) ||
+          (invoice.subscription_details?.metadata?.userId as
+            | string
+            | undefined);
 
-        if (failUserId) {
-          // Logger dans la mémoire pour alerte agent
-          const { memory } = await import('@/lib/ai/memory/obsidian-memory');
-          await memory.upsertNote({
-            userId: failUserId,
-            content: `🔴 Paiement Stripe échoué: ${failedInvoice.amount_due / 100}€ — Facture ${failedInvoice.id}`,
-            type: 'insight',
-            tags: ['stripe', 'payment_failed', 'alert'],
-            source: 'webhook',
-          });
+        if (userId) {
+          console.warn(
+            `[Stripe Webhook] Payment failed for user ${userId}, invoice ${invoice.id}`,
+          );
         }
         break;
       }
@@ -140,37 +139,3 @@ export async function POST(req: Request) {
     );
   }
 }
-
-/** Convertir un Stripe priceId en tier */
-function getTierFromPriceId(priceId: string): string {
-  if (priceId.includes('starter')) return 'starter';
-  if (priceId.includes('growth')) return 'growth';
-  if (priceId.includes('scale')) return 'scale';
-  return 'free';
-}
-
-/** Déclencher une sync MRR/ARR */
-async function triggerSync(userId: string) {
-  try {
-    const { recalculateRunway } = await import('@/lib/billing/runway-calculator');
-    await recalculateRunway(userId);
-
-    // Logger discrètement
-    const { memory } = await import('@/lib/ai/memory/obsidian-memory');
-    await memory.upsertNote({
-      userId,
-      content: `Sync Stripe automatique déclenchée suite à événement webhook (${new Date().toISOString()}).`,
-      type: 'decision',
-      tags: ['stripe', 'sync', 'automatic'],
-      source: 'webhook',
-    });
-  } catch (err) {
-    console.error(`[Stripe Webhook] Sync failed for ${userId}:`, err);
-  }
-}
-
-export const config = {
-  api: {
-    bodyParser: false, // Stripe nécessite le body brut pour la vérification de signature
-  },
-};

@@ -1,15 +1,14 @@
 'use client';
 
 import { Target } from 'lucide-react';
-import { useFounderStore } from '@/store/founder-store';
-import { translations } from '@/lib/translations';
+import { useTranslations } from 'next-intl';
 import { WidgetGrid } from '@/components/dashboard/widget-grid';
 import { PageAgent } from '@/components/agent/PageAgent';
 import { createClient } from '@/utils/supabase/client';
 import { useState, useEffect } from 'react';
 
 export default function DashboardPage() {
-    const language = useFounderStore(s => s.language);
+    const t = useTranslations('nav');
     const [userId, setUserId] = useState<string | null>(null);
 
     useEffect(() => {
@@ -24,12 +23,12 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between space-y-2 mb-4">
                 <h2 className="text-3xl font-bold tracking-tight font-pixel text-primary flex items-center gap-3">
                     <Target className="w-8 h-8" />
-                    {translations[language].nav.dashboard}
+                    {t('dashboard')}
                 </h2>
             </div>
 
             <WidgetGrid />
-            {userId && <PageAgent userId={userId} pageLabel={translations[language].nav.dashboard} />}
+            {userId && <PageAgent userId={userId} pageLabel={t('dashboard')} />}
         </div>
     );
 }

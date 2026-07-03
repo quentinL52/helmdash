@@ -1,35 +1,80 @@
 'use client';
 
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CreditCard, Rocket, Star, Zap } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { CreditCard, Crown, Sparkles, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useFounderStore } from '@/store/founder-store';
+import {
+  COHORT_CONFIG,
+  getAvailablePeriods,
+  type Cohort,
+  type Period,
+} from '@/lib/billing/cohort-config';
 
-export function BillingPanel({ currentPlan = 'free' }: { currentPlan?: string }) {
+interface CohortStatus {
+  current: Cohort;
+  seatsLeft: number | null;
+  cohorts: {
+    founders: { taken: number; max: number };
+    early: { taken: number; max: number };
+  };
+}
+
+const COHORT_BADGES: Record<Cohort, { icon: typeof Crown; className: string }> = {
+  founders: { icon: Crown, className: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
+  early: { icon: Sparkles, className: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
+  full: { icon: CreditCard, className: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+};
+
+export function BillingPanel() {
   const [isLoading, setIsLoading] = useState(false);
+  const [cohortStatus, setCohortStatus] = useState<CohortStatus | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>('semi_annual');
   const { toast } = useToast();
+  const t = useTranslations('billing');
+  const tc = useTranslations('cohort');
+  const te = useTranslations('errors');
 
-  const handleCheckout = async (priceId: string) => {
+  const planStatus = useFounderStore((s) => s.planStatus);
+  const cohort = useFounderStore((s) => s.cohort);
+  const cohortRank = useFounderStore((s) => s.cohortRank);
+
+  useEffect(() => {
+    fetch('/api/billing/cohort-status')
+      .then((r) => r.json())
+      .then(setCohortStatus)
+      .catch(() => {});
+  }, []);
+
+  const isSubscribed = planStatus === 'active' && cohort;
+
+  const handleCheckout = async () => {
     setIsLoading(true);
     try {
       const res = await fetch('/api/billing/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId }),
+        body: JSON.stringify({ period: selectedPeriod }),
       });
       const data = await res.json();
-      
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error(data.error || 'Erreur lors de la redirection');
-      }
+
+      if (!res.ok) throw new Error(data.error || te('checkoutFailed'));
+      if (data.url) window.location.href = data.url;
     } catch (error: any) {
       toast({
-        title: "Erreur",
+        title: te('checkoutFailed'),
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -41,114 +86,191 @@ export function BillingPanel({ currentPlan = 'free' }: { currentPlan?: string })
     try {
       const res = await fetch('/api/billing/portal', { method: 'POST' });
       const data = await res.json();
-      
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error(data.error || 'Erreur lors de la redirection');
-      }
+      if (data.url) window.location.href = data.url;
+      else throw new Error(data.error || te('generic'));
     } catch (error: any) {
       toast({
-        title: "Erreur",
+        title: te('generic'),
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
     }
   };
 
+  const currentCohort = cohortStatus?.current ?? 'full';
+  const availablePeriods = getAvailablePeriods(currentCohort);
+
+  useEffect(() => {
+    if (!availablePeriods.includes(selectedPeriod)) {
+      setSelectedPeriod(availablePeriods[0]);
+    }
+  }, [currentCohort, availablePeriods, selectedPeriod]);
+
   return (
-    <Card className="border-t-4 border-t-emerald-500">
+    <Card className="border-t-4 border-t-primary">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 font-pixel text-emerald-500">
+        <CardTitle className="flex items-center gap-2">
           <CreditCard className="w-5 h-5" />
-          Abonnement & Facturation
+          {t('title')}
         </CardTitle>
         <CardDescription>
-          Gérez votre forfait et vos informations de paiement.
-          {currentPlan !== 'free' && (
-            <span className="block mt-2 font-medium text-primary">Forfait actuel : {currentPlan.toUpperCase()}</span>
-          )}
+          {isSubscribed
+            ? t('subscribedDescription')
+            : t('unsubscribedDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        
-        {currentPlan === 'free' ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <PlanCard 
-              title="Starter" 
-              price="49€" 
-              period="/an"
-              features={['Fonctionnalités de base', '1 Agent', 'Support email']}
-              icon={<Star className="w-5 h-5 text-blue-500" />}
-              onSelect={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PRICE_STARTER!)}
-              isLoading={isLoading}
-            />
-            <PlanCard 
-              title="Growth" 
-              price="99€" 
-              period="/mois"
-              features={['Toutes les fonctionnalités', 'Agents illimités', 'Essai gratuit 14j']}
-              icon={<Rocket className="w-5 h-5 text-emerald-500" />}
-              onSelect={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PRICE_GROWTH!)}
-              isLoading={isLoading}
-              highlighted
-            />
-            <PlanCard 
-              title="Scale" 
-              price="299€" 
-              period="/mois"
-              features={['Marque blanche', 'API dédiée', 'Support prioritaire']}
-              icon={<Zap className="w-5 h-5 text-purple-500" />}
-              onSelect={() => handleCheckout(process.env.NEXT_PUBLIC_STRIPE_PRICE_SCALE!)}
-              isLoading={isLoading}
-            />
-          </div>
+        {isSubscribed && cohort ? (
+          <SubscribedView
+            cohort={cohort}
+            cohortRank={cohortRank}
+            onPortal={handlePortal}
+            isLoading={isLoading}
+          />
         ) : (
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button onClick={handlePortal} disabled={isLoading} className="w-full sm:w-auto font-pixel">
-              Accéder au Portail Client Stripe
-            </Button>
-          </div>
+          <CheckoutView
+            planStatus={planStatus}
+            currentCohort={currentCohort}
+            cohortStatus={cohortStatus}
+            availablePeriods={availablePeriods}
+            selectedPeriod={selectedPeriod}
+            onSelectPeriod={setSelectedPeriod}
+            onCheckout={handleCheckout}
+            isLoading={isLoading}
+          />
         )}
-
       </CardContent>
     </Card>
   );
 }
 
-function PlanCard({ title, price, period, features, icon, onSelect, isLoading, highlighted = false }: any) {
+function SubscribedView({
+  cohort,
+  cohortRank,
+  onPortal,
+  isLoading,
+}: {
+  cohort: Cohort;
+  cohortRank: number | null;
+  onPortal: () => void;
+  isLoading: boolean;
+}) {
+  const t = useTranslations('billing');
+  const tc = useTranslations('cohort');
+  const BadgeIcon = COHORT_BADGES[cohort].icon;
+  const config = COHORT_CONFIG[cohort];
+  const lockLabel =
+    config.lockMonths === null
+      ? t('priceLockedForLife')
+      : t('priceLockedFor', { months: config.lockMonths });
+
   return (
-    <div className={`p-4 rounded-lg border flex flex-col h-full ${highlighted ? 'border-emerald-500 shadow-sm relative' : 'border-border'}`}>
-      {highlighted && (
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
-          Recommandé
-        </span>
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <Badge
+          variant="outline"
+          className={`text-sm px-3 py-1 ${COHORT_BADGES[cohort].className}`}
+        >
+          <BadgeIcon className="w-4 h-4 mr-1.5" />
+          {tc(cohort)}
+          {cohortRank ? ` #${cohortRank}` : ''}
+        </Badge>
+      </div>
+
+      <p className="text-sm text-muted-foreground">{lockLabel}</p>
+
+      <Button onClick={onPortal} disabled={isLoading} variant="outline">
+        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {t('manageSubscription')}
+      </Button>
+    </div>
+  );
+}
+
+function CheckoutView({
+  planStatus,
+  currentCohort,
+  cohortStatus,
+  availablePeriods,
+  selectedPeriod,
+  onSelectPeriod,
+  onCheckout,
+  isLoading,
+}: {
+  planStatus: string;
+  currentCohort: Cohort;
+  cohortStatus: CohortStatus | null;
+  availablePeriods: Period[];
+  selectedPeriod: Period;
+  onSelectPeriod: (p: Period) => void;
+  onCheckout: () => void;
+  isLoading: boolean;
+}) {
+  const t = useTranslations('billing');
+  const tc = useTranslations('cohort');
+  const config = COHORT_CONFIG[currentCohort];
+  const priceEntry = config.prices[selectedPeriod];
+
+  const periodSuffixKey = selectedPeriod === 'monthly' ? 'perMonth' : selectedPeriod === 'semi_annual' ? 'perSemiAnnual' : 'perYear';
+
+  return (
+    <div className="space-y-6">
+      {planStatus === 'readonly' && (
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
+          {t('readonlyNotice')}
+        </div>
       )}
-      <div className="flex items-center gap-2 mb-2">
-        {icon}
-        <h3 className="font-bold text-lg">{title}</h3>
-      </div>
-      <div className="mb-4">
-        <span className="text-2xl font-black">{price}</span>
-        <span className="text-sm text-muted-foreground">{period}</span>
-      </div>
-      <ul className="space-y-2 mb-6 flex-1">
-        {features.map((f: string, i: number) => (
-          <li key={i} className="text-sm flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary/50" />
-            {f}
-          </li>
+
+      {planStatus === 'trialing' && (
+        <div className="rounded-lg border border-blue-500/30 bg-blue-500/10 p-4 text-sm">
+          {t('trialNotice')}
+        </div>
+      )}
+
+      {cohortStatus && currentCohort !== 'full' && (
+        <div className="flex items-center gap-2">
+          <Badge
+            variant="outline"
+            className={COHORT_BADGES[currentCohort].className}
+          >
+            {currentCohort === 'founders'
+              ? tc('foundingSeatsLeft', { count: cohortStatus.seatsLeft ?? 0 })
+              : tc('earlySeatsLeft', { count: cohortStatus.seatsLeft ?? 0 })}
+          </Badge>
+        </div>
+      )}
+
+      <div className="flex gap-2">
+        {availablePeriods.map((p) => (
+          <Button
+            key={p}
+            variant={selectedPeriod === p ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => onSelectPeriod(p)}
+          >
+            {t(p === 'semi_annual' ? 'semiAnnual' : p)}
+          </Button>
         ))}
-      </ul>
-      <Button 
-        onClick={onSelect} 
-        disabled={isLoading} 
-        variant={highlighted ? 'default' : 'outline'}
-        className="w-full"
-      >
-        Choisir ce forfait
+      </div>
+
+      {priceEntry && (
+        <div className="text-3xl font-bold">
+          {(priceEntry.amount / 100).toFixed(2)}€
+          <span className="text-base font-normal text-muted-foreground ml-1">
+            {t(periodSuffixKey)}
+          </span>
+        </div>
+      )}
+
+      <p className="text-sm text-muted-foreground">
+        {t('allFeaturesIncluded')}
+      </p>
+
+      <Button onClick={onCheckout} disabled={isLoading} className="w-full">
+        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        {t('subscribeNow')}
       </Button>
     </div>
   );

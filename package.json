@@ -2,7 +2,7 @@
   "name": "helmdash",
   "version": "0.1.0",
   "private": true,
-"scripts": {
+  "scripts": {
     "dev": "next dev -p 9002",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
@@ -76,6 +76,7 @@
     "lodash": "^4.17.23",
     "lucide-react": "^0.475.0",
     "next": "15.5.9",
+    "next-intl": "^4.13.1",
     "next-themes": "^0.4.6",
     "openai": "^6.22.0",
     "ora": "^5.4.1",

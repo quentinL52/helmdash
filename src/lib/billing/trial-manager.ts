@@ -1,61 +1,43 @@
 import { prisma } from '@/lib/prisma';
-import { stripe } from '@/lib/billing/stripe-client';
 import { sendTrialEndingEmail } from '@/lib/email/email-service';
 
-export async function handleTrialEnding(subscriptionId: string) {
-  const sub = await stripe.subscriptions.retrieve(subscriptionId);
-  const userId = sub.metadata.userId;
-  if (!userId) return;
-  
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) return;
-  
-  // Si trial se termine ET qu'il a une méthode de paiement → passer en Starter payant
-  const hasPaymentMethod = sub.default_payment_method != null;
+export async function expireTrials() {
+  const now = new Date();
+  const result = await prisma.user.updateMany({
+    where: {
+      planStatus: 'trialing',
+      trialEndsAt: { lt: now },
+    },
+    data: { planStatus: 'readonly' },
+  });
 
-  if (hasPaymentMethod) {
-    // Downgrade vers Starter (€49/an)
-    const starterPrice = process.env.STRIPE_PRICE_STARTER_YEARLY;
-    if (starterPrice) {
-      await stripe.subscriptions.update(subscriptionId, {
-        items: [{ id: sub.items.data[0].id, price: starterPrice }],
-        proration_behavior: 'none',
-      });
-      await prisma.user.update({
-        where: { id: userId },
-        data: { planTier: 'starter' },
-      });
-    }
-  } else {
-    // Pas de CB → annuler l'abonnement, passer en Free
-    await stripe.subscriptions.cancel(subscriptionId);
-    await prisma.user.update({
-      where: { id: userId },
-      data: { planTier: 'free', stripeSubscriptionId: null },
-    });
+  if (result.count > 0) {
+    console.log(`[TrialManager] Expired ${result.count} trials → readonly`);
   }
+
+  return result.count;
 }
 
-// Cron job quotidien : vérifier les trials qui expirent dans 3 jours
 export async function notifyTrialExpiringSoon() {
-  const subscriptions = await stripe.subscriptions.list({
-    status: 'trialing',
-    limit: 100,
+  const now = new Date();
+  const inFourDays = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000);
+  const inThreeDays = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+
+  const users = await prisma.user.findMany({
+    where: {
+      planStatus: 'trialing',
+      trialEndsAt: { gte: inThreeDays, lt: inFourDays },
+    },
+    select: { email: true, name: true, locale: true },
   });
-  
-  for (const sub of subscriptions.data) {
-    if (!sub.trial_end) continue;
-    const daysLeft = Math.ceil((sub.trial_end * 1000 - Date.now()) / (1000 * 60 * 60 * 24));
-    if (daysLeft === 3) {
-      if (sub.metadata.userId) {
-        const user = await prisma.user.findUnique({
-          where: { id: sub.metadata.userId },
-          select: { email: true, name: true },
-        });
-        if (user?.email) {
-          await sendTrialEndingEmail(user.email, user.name || 'Fondateur', daysLeft);
-        }
-      }
-    }
+
+  for (const user of users) {
+    await sendTrialEndingEmail(
+      user.email,
+      user.name || 'Founder',
+      4,
+    );
   }
+
+  return users.length;
 }

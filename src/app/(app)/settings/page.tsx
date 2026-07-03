@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
+import { useTranslations } from 'next-intl';
 import { useFounderStore } from '@/store/founder-store';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -24,7 +25,8 @@ import { IntegrationsPanel } from '@/components/dashboard/integrations-panel';
 export default function SettingsPage() {
     const { theme, setTheme } = useTheme();
     const { mvpTargetDate, setMvpTargetDate, founderProfile, setFounderProfile } = useFounderStore();
-    
+    const t = useTranslations('settings');
+
     const [localMvpDate, setLocalMvpDate] = useState(mvpTargetDate || '');
     const [localProfile, setLocalProfile] = useState(founderProfile);
     const [mounted, setMounted] = useState(false);
@@ -39,8 +41,8 @@ export default function SettingsPage() {
         setMvpTargetDate(localMvpDate);
         setFounderProfile(localProfile);
         toast({
-            title: "Paramètres sauvegardés",
-            description: "Vos préférences générales et votre profil ont été mis à jour.",
+            title: t('savedTitle'),
+            description: t('savedDescription'),
         });
     };
 
@@ -52,29 +54,29 @@ export default function SettingsPage() {
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight font-pixel text-primary flex items-center gap-3">
                         <MonitorSmartphone className="w-8 h-8" />
-                        Paramètres (Settings)
+                        {t('title')}
                     </h1>
                     <p className="text-muted-foreground mt-2">
-                        Configurez votre profil, l&apos;interface, les agents IA et la date de votre MVP.
+                        {t('subtitle')}
                     </p>
                 </div>
                 <Button onClick={handleSave} className="flex items-center gap-2 font-pixel tracking-wide">
                     <Save className="w-4 h-4" />
-                    SAUVEGARDER
+                    {t('saveButton')}
                 </Button>
             </div>
 
             <div className="grid gap-6">
 
-                {/* Profil & Identité */}
+                {/* Profile & Identity */}
                 <Card className="border-t-4 border-t-cyan-500">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 font-pixel text-cyan-500">
                             <User className="w-5 h-5" />
-                            Profil &amp; Identité
+                            {t('profileIdentity')}
                         </CardTitle>
                         <CardDescription>
-                            Ces informations sont utilisées par l&apos;agent Créateur de Contenu pour personnaliser vos posts.
+                            {t('profileIdentityDesc')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-5">
@@ -82,10 +84,10 @@ export default function SettingsPage() {
                             <div className="space-y-2">
                                 <Label className="flex items-center gap-1.5">
                                     <User className="w-3.5 h-3.5" />
-                                    Nom / Pseudo
+                                    {t('displayName')}
                                 </Label>
                                 <Input
-                                    placeholder="Ex: Quentin L."
+                                    placeholder={t('displayNamePlaceholder')}
                                     value={localProfile.displayName}
                                     onChange={(e) => setLocalProfile({ ...localProfile, displayName: e.target.value })}
                                 />
@@ -93,20 +95,20 @@ export default function SettingsPage() {
                             <div className="space-y-2">
                                 <Label className="flex items-center gap-1.5">
                                     <Linkedin className="w-3.5 h-3.5" />
-                                    URL LinkedIn
+                                    {t('linkedinUrl')}
                                 </Label>
                                 <Input
                                     type="url"
-                                    placeholder="https://linkedin.com/in/votre-profil"
+                                    placeholder={t('linkedinPlaceholder')}
                                     value={localProfile.linkedinUrl}
                                     onChange={(e) => setLocalProfile({ ...localProfile, linkedinUrl: e.target.value })}
                                 />
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label>Niche / Secteur</Label>
+                            <Label>{t('niche')}</Label>
                             <Input
-                                placeholder="Ex: SaaS B2B, HealthTech, EdTech…"
+                                placeholder={t('nichePlaceholder')}
                                 value={localProfile.niche}
                                 onChange={(e) => setLocalProfile({ ...localProfile, niche: e.target.value })}
                             />
@@ -114,15 +116,13 @@ export default function SettingsPage() {
                         <div className="space-y-2">
                             <Label className="flex items-center gap-1.5">
                                 <PenLine className="w-3.5 h-3.5" />
-                                Style d&apos;écriture &amp; Exemples de posts
+                                {t('writingStyle')}
                             </Label>
                             <p className="text-xs text-muted-foreground">
-                                Collez 2-3 de vos meilleurs posts LinkedIn ou décrivez votre ton (ex: &quot;Ton cash, phrases courtes, emojis fréquents, storytelling personnel&quot;).
-                                L&apos;agent de contenu clonera ce style.
+                                {t('writingStyleDesc')}
                             </p>
                             <Textarea
                                 className="min-h-[160px] font-mono text-sm"
-                                placeholder={"Exemple de post :\n\nJ'ai quitté mon CDI il y a 6 mois.\n\nVoici ce que personne ne vous dit sur l'entrepreneuriat :\n\n1. Les premiers mois, vous doutez de tout.\n2. Le syndrome de l'imposteur ne part jamais.\n3. Chaque petit win compte.\n\nMon style : phrases courtes, direct, emojis modérés, toujours une leçon concrète."}
                                 value={localProfile.writingStyleContext}
                                 onChange={(e) => setLocalProfile({ ...localProfile, writingStyleContext: e.target.value })}
                             />
@@ -130,21 +130,21 @@ export default function SettingsPage() {
                     </CardContent>
                 </Card>
 
-                {/* Lancement MVP */}
+                {/* MVP Date */}
                 <Card className="border-t-4 border-t-indigo-500">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 font-pixel text-indigo-500">
                             <Calendar className="w-5 h-5" />
-                            Date cible du MVP
+                            {t('mvpDateTitle')}
                         </CardTitle>
                         <CardDescription>
-                            Cette date alimente le compte à rebours de votre Dashboard.
+                            {t('mvpDateDesc')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-2 max-w-sm">
-                            <Label>Date de lancement (MVP)</Label>
-                            <Input 
+                            <Label>{t('mvpDateLabel')}</Label>
+                            <Input
                                 type="date"
                                 value={localMvpDate}
                                 onChange={(e) => setLocalMvpDate(e.target.value)}
@@ -153,31 +153,31 @@ export default function SettingsPage() {
                     </CardContent>
                 </Card>
 
-                {/* Thème */}
+                {/* Theme */}
                 <Card className="border-t-4 border-t-amber-500">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 font-pixel text-amber-500">
                             <Palette className="w-5 h-5" />
-                            Apparence
+                            {t('appearance')}
                         </CardTitle>
                         <CardDescription>
-                            Choisissez le thème de l&apos;application. Le mode sombre est recommandé pour l&apos;esthétique Pixel Art.
+                            {t('appearanceDesc')}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="flex flex-col gap-3">
-                            <Label>Thème actuel</Label>
+                            <Label>{t('currentTheme')}</Label>
                             <Select value={theme} onValueChange={setTheme}>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Sélectionnez un thème" />
+                                    <SelectValue placeholder={t('selectTheme')} />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="light">Clair</SelectItem>
-                                    <SelectItem value="dark">Sombre</SelectItem>
+                                    <SelectItem value="light">{t('lightMode')}</SelectItem>
+                                    <SelectItem value="dark">{t('darkMode')}</SelectItem>
                                     <SelectItem value="system">
                                         <div className="flex items-center gap-2">
                                             <MonitorSmartphone className="w-4 h-4" />
-                                            Système
+                                            {t('system')}
                                         </div>
                                     </SelectItem>
                                 </SelectContent>
@@ -186,18 +186,15 @@ export default function SettingsPage() {
                     </CardContent>
                 </Card>
 
-                {/* Abonnement / Billing */}
                 <BillingPanel />
-                {/* Intégrations externes */}
                 <IntegrationsPanel />
-                {/* Paramètres IA */}
                 <AISettingsPanel />
             </div>
 
             <div className="flex justify-end mt-8">
                 <Button onClick={handleSave} className="font-pixel">
                     <Save className="w-4 h-4 mr-2" />
-                    Sauvegarder les paramètres
+                    {t('saveSettings')}
                 </Button>
             </div>
         </div>

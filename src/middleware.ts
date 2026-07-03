@@ -1,38 +1,19 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { type NextRequest } from 'next/server';
 import { updateSession } from '@/utils/supabase/middleware';
 
-/**
- * Middleware Helmdash — session + subdomain routing
- *
- * HD-100 · Split marketing/app : app.helmdash.app → (app)
- * Les routes protégées (dashboard, agent, etc.) ne sont accessibles
- * que depuis le sous-domaine app. ou après authentification.
- */
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const host = request.headers.get('host') || '';
+  const res = await updateSession(request);
 
-  // === Subdomain routing : app.helmdash.app ===
-  // Si on est sur app.*, on autorise l'accès aux routes protégées
-  const isAppSubdomain = host.startsWith('app.') || host.startsWith('localhost:');
-  const isProtectedRoute =
-    pathname.startsWith('/dashboard') ||
-    pathname.startsWith('/agent') ||
-    pathname.startsWith('/memory') ||
-    pathname.startsWith('/hypotheses') ||
-    pathname.startsWith('/finances') ||
-    pathname.startsWith('/settings') ||
-    pathname.startsWith('/admin');
-
-  // Rediriger les tentatives d'accès aux routes protégées depuis le domaine principal
-  // vers la page de login (si pas sur app.*)
-  if (isProtectedRoute && !isAppSubdomain) {
-    // Laisser passer — l'auth gérera la redirection si non connecté
-    // On ne bloque pas ici pour permettre le développement local
+  if (!request.cookies.get('NEXT_LOCALE')) {
+    const acceptLang = request.headers.get('accept-language') || '';
+    const detected = acceptLang.toLowerCase().startsWith('fr') ? 'fr' : 'en';
+    res.cookies.set('NEXT_LOCALE', detected, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365,
+    });
   }
 
-  // === Session Supabase (existante) ===
-  return await updateSession(request);
+  return res;
 }
 
 export const config = {

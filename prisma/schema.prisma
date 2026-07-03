@@ -10,15 +10,21 @@ datasource db {
 }
 
 model User {
-  id                   String   @id @default(uuid()) @db.Uuid
-  email                String   @unique
+  id                   String    @id @default(uuid()) @db.Uuid
+  email                String    @unique
   name                 String?
-  createdAt            DateTime @default(now()) @map("created_at")
-  stripeCustomerId     String?  @map("stripe_customer_id")
-  stripeSubscriptionId String?  @map("stripe_subscription_id")
-  mrr                  Float    @default(0)
-  arr                  Float    @default(0)
-  planTier             String   @default("free") @map("plan_tier")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  stripeCustomerId     String?   @unique @map("stripe_customer_id")
+  stripeSubscriptionId String?   @map("stripe_subscription_id")
+  mrr                  Float     @default(0)
+  arr                  Float     @default(0)
+  planStatus           String    @default("trialing") @map("plan_status")
+  trialEndsAt          DateTime? @map("trial_ends_at")
+  cohort               String?   @map("cohort")
+  cohortRank           Int?      @map("cohort_rank")
+  cohortLockedUntil    DateTime? @map("cohort_locked_until")
+  locale               String    @default("en")
+  timezone             String    @default("Europe/Paris")
 
   projects            Project[]
   moodEntries         MoodEntry[]
@@ -29,7 +35,7 @@ model User {
   memoryNotes         MemoryNote[]
   graphNodes          GraphNode[]
   graphEdges          GraphEdge[]
-  
+
   // Core Agent tables
   hypotheses          Hypothesis[]
   monthlyFinances     MonthlyFinance[]
@@ -45,6 +51,36 @@ model User {
   gamificationProfile GamificationProfile?
 
   @@map("users")
+}
+
+model CohortCounter {
+  id        String   @id @default("singleton")
+  founders  Int      @default(0)
+  early     Int      @default(0)
+  total     Int      @default(0)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("cohort_counter")
+}
+
+model SeatReservation {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  cohort    String
+  sessionId String   @unique @map("session_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([expiresAt])
+  @@map("seat_reservation")
+}
+
+model StripeEventLog {
+  eventId   String   @id @map("event_id")
+  type      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("stripe_event_log")
 }
 
 model Project {

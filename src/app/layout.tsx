@@ -3,6 +3,8 @@ import { StoreSync } from '@/components/store-sync';
 import "./globals.css";
 import type { Metadata } from 'next';
 import { IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['latin'],
@@ -19,29 +21,34 @@ const ibmPlexSans = IBM_Plex_Sans({
 import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
-  title: 'Helmdash — Poste de pilotage du solo founder',
-  description: "Dashboard, agent IA, hypothèses, finances, roadmap. Le poste de pilotage qui réunit tes outils et lit dans tes données.",
+  title: 'Helmdash — Solo founder cockpit',
+  description: "Dashboard, AI agent, hypotheses, finances, roadmap. The cockpit that unifies your tools and reads your data.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head />
       <body className={`${ibmPlexMono.variable} ${ibmPlexSans.variable} font-sans antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <StoreSync />
-          {children}
-          <Toaster />
-        </ThemeProvider>
+        <NextIntlClientProvider messages={messages}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+            <StoreSync />
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
