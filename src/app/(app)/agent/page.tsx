@@ -1,4 +1,3 @@
-import { ChatUI } from '@/components/agent/ChatUI';
 import { AgentTaskHistory } from '@/components/agent/AgentTaskHistory';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
@@ -29,9 +28,9 @@ export default async function AgentPage() {
         </div>
 
         <div className="flex-1 grid grid-cols-1 xl:grid-cols-4 gap-4 min-h-0">
-          {/* Chat principal */}
-          <div className="xl:col-span-3 min-h-0">
-            <ChatUI userId={user.id} />
+          {/* Chat principal (migré) */}
+          <div className="xl:col-span-3 min-h-0 flex items-center justify-center border rounded-lg bg-background">
+            <p className="text-muted-foreground">L'interface de chat a été retirée (migration en cours).</p>
           </div>
 
           {/* Panneau latéral : historique des tâches */}
