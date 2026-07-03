@@ -25,9 +25,15 @@
     --border: 215 20% 80%;
     --input: 215 20% 85%;
     --ring: 11 86% 56%;
-    --success: 150 58% 40%;
-    --warning: 36 82% 52%;
-    --danger: 0 84% 60%;
+    --success: 152 35% 38%;
+    --warning: 38 70% 45%;
+    --danger: 0 55% 45%;
+    --info: 215 52% 40%;
+    --chart-1: 215 52% 20%;
+    --chart-2: 215 52% 45%;
+    --chart-3: 11 86% 56%;
+    --chart-4: 11 86% 70%;
+    --chart-5: 42 10% 60%;
 
     /* Sidebar */
     --sidebar-background: 215 52% 8%;
@@ -63,9 +69,15 @@
     --border: 214 40% 20%;
     --input: 214 40% 18%;
     --ring: 11 86% 56%;
-    --success: 150 58% 40%;
-    --warning: 36 82% 52%;
-    --danger: 0 70% 50%;
+    --success: 152 30% 55%;
+    --warning: 38 60% 60%;
+    --danger: 0 50% 62%;
+    --info: 215 52% 60%;
+    --chart-1: 215 52% 40%;
+    --chart-2: 215 52% 65%;
+    --chart-3: 11 86% 56%;
+    --chart-4: 11 86% 75%;
+    --chart-5: 42 10% 40%;
 
     --sidebar-background: 215 52% 6%;
     --sidebar-foreground: 42 39% 80%;
@@ -82,6 +94,17 @@
 
 /* ── Animations ────────────────── */
 @layer utilities {
+  .text-success { color: hsl(var(--success)); }
+  .bg-success\/10 { background-color: hsl(var(--success) / 0.1); }
+  .text-warning { color: hsl(var(--warning)); }
+  .bg-warning\/10 { background-color: hsl(var(--warning) / 0.1); }
+  .text-danger { color: hsl(var(--danger)); }
+  .bg-danger\/10 { background-color: hsl(var(--danger) / 0.1); }
+  .text-info { color: hsl(var(--info)); }
+  .bg-info\/10 { background-color: hsl(var(--info) / 0.1); }
+  .text-neutral { color: hsl(var(--muted-foreground)); }
+  .bg-neutral\/10 { background-color: hsl(var(--muted) / 0.5); }
+
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }

@@ -55,6 +55,9 @@ export default {
         danger: {
           DEFAULT: 'hsl(var(--danger))',
         },
+        info: {
+          DEFAULT: 'hsl(var(--info))',
+        },
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
