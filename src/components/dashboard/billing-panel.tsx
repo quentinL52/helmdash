@@ -31,9 +31,9 @@ interface CohortStatus {
 }
 
 const COHORT_BADGES: Record<Cohort, { icon: typeof Crown; className: string }> = {
-  founders: { icon: Crown, className: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
-  early: { icon: Sparkles, className: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
-  full: { icon: CreditCard, className: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+  founders: { icon: Crown, className: 'bg-warning/20 text-warning border-warning/30' },
+  early: { icon: Sparkles, className: 'bg-secondary/20 text-secondary border-secondary/30' },
+  full: { icon: CreditCard, className: 'bg-info/20 text-info border-info/30' },
 };
 
 export function BillingPanel() {
@@ -218,13 +218,13 @@ function CheckoutView({
   return (
     <div className="space-y-6">
       {planStatus === 'readonly' && (
-        <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
+        <div className="rounded-lg border border-warning/30 bg-warning/10 p-4 text-sm">
           {t('readonlyNotice')}
         </div>
       )}
 
       {planStatus === 'trialing' && (
-        <div className="rounded-lg border border-blue-500/30 bg-blue-500/10 p-4 text-sm">
+        <div className="rounded-lg border border-info/30 bg-info/10 p-4 text-sm">
           {t('trialNotice')}
         </div>
       )}

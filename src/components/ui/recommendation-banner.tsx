@@ -65,23 +65,23 @@ export function RecommendationBanner({
 
     return (
         <div className={cn("mb-6 animate-in fade-in slide-in-from-top-4 duration-500", className)}>
-            <Card className="border-indigo-500/30 bg-indigo-500/5 overflow-hidden">
+            <Card className="border-info/30 bg-info/5 overflow-hidden">
                 <div className="p-4">
                     <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-2">
-                            <div className="p-2 rounded-full bg-indigo-500/20 text-indigo-400">
+                            <div className="p-2 rounded-full bg-info/20 text-info">
                                 <Sparkles className="h-5 w-5" />
                             </div>
                             <div>
-                                <h3 className="font-semibold text-indigo-100">{displayTitle}</h3>
-                                {displayDescription && <p className="text-sm text-indigo-300/80">{displayDescription}</p>}
+                                <h3 className="font-semibold text-info">{displayTitle}</h3>
+                                {displayDescription && <p className="text-sm text-info/80">{displayDescription}</p>}
                             </div>
                         </div>
                         <Button
                             variant="ghost"
                             size="icon"
                             onClick={handleDismiss}
-                            className="h-8 w-8 text-indigo-300 hover:text-indigo-100 hover:bg-indigo-500/20"
+                            className="h-8 w-8 text-info hover:text-info hover:bg-info/20"
                         >
                             <X className="h-4 w-4" />
                         </Button>
@@ -96,49 +96,49 @@ export function RecommendationBanner({
                             if (type === 'lean-canvas') {
                                 content = (
                                     <div className="flex-1">
-                                        <div className="text-xs font-mono text-indigo-400 mb-1 uppercase tracking-wider">{item.section}</div>
-                                        <p className="text-sm text-indigo-100">{item.suggestion}</p>
+                                        <div className="text-xs font-mono text-info mb-1 uppercase tracking-wider">{item.section}</div>
+                                        <p className="text-sm text-info">{item.suggestion}</p>
                                     </div>
                                 );
                             } else if (type === 'roadmap') {
                                 content = (
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-sm font-medium text-indigo-100">{item.title}</span>
-                                            <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase ${item.priority === 'high' ? 'bg-red-500/20 text-red-400' :
-                                                item.priority === 'medium' ? 'bg-orange-500/20 text-orange-400' :
-                                                    'bg-teal-500/20 text-teal-400'
+                                            <span className="text-sm font-medium text-info">{item.title}</span>
+                                            <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase ${item.priority === 'high' ? 'bg-danger/20 text-danger' :
+                                                item.priority === 'medium' ? 'bg-primary/20 text-primary' :
+                                                    'bg-info/20 text-info'
                                                 }`}>{item.priority}</span>
                                         </div>
-                                        <p className="text-xs text-indigo-300/80">{item.timeframe}</p>
+                                        <p className="text-xs text-info/80">{item.timeframe}</p>
                                     </div>
                                 );
                             } else if (type === 'hypotheses') {
                                 content = (
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <span className="text-xs font-mono text-indigo-400 uppercase tracking-wider">{item.category}</span>
+                                            <span className="text-xs font-mono text-info uppercase tracking-wider">{item.category}</span>
                                         </div>
-                                        <p className="text-sm text-indigo-100 font-medium mb-1">{item.statement}</p>
-                                        <p className="text-xs text-indigo-300/80">Test: {item.testMethod}</p>
+                                        <p className="text-sm text-info font-medium mb-1">{item.statement}</p>
+                                        <p className="text-xs text-info/80">Test: {item.testMethod}</p>
                                     </div>
                                 );
                             } else if (type === 'routine') {
                                 content = (
                                     <div className="flex-1">
-                                        <p className="text-sm text-indigo-100 mb-1">{item.suggestion}</p>
-                                        <p className="text-xs text-green-400/80 flex items-center gap-1">
+                                        <p className="text-sm text-info mb-1">{item.suggestion}</p>
+                                        <p className="text-xs text-success/80 flex items-center gap-1">
                                             <ArrowRight className="h-3 w-3" /> {t.strategicRecommendations.benefit} {item.benefit}
                                         </p>
                                     </div>
                                 );
                             } else {
                                 // Default fallback
-                                content = <p className="text-sm text-indigo-100">{JSON.stringify(item)}</p>;
+                                content = <p className="text-sm text-info">{JSON.stringify(item)}</p>;
                             }
 
                             return (
-                                <div key={index} className="flex items-center gap-3 bg-indigo-950/30 p-3 rounded-lg border border-indigo-500/10">
+                                <div key={index} className="flex items-center gap-3 bg-indigo-950/30 p-3 rounded-lg border border-info/10">
                                     {content}
                                     {onApply && (
                                         <Button
@@ -147,8 +147,8 @@ export function RecommendationBanner({
                                             className={cn(
                                                 "shrink-0 h-8",
                                                 isApplied
-                                                    ? "bg-green-500/10 text-green-400 hover:bg-green-500/20"
-                                                    : "bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 hover:text-foreground"
+                                                    ? "bg-success/10 text-success hover:bg-success/20"
+                                                    : "bg-info/20 text-info hover:bg-info/30 hover:text-foreground"
                                             )}
                                             onClick={() => !isApplied && handleApply(item, index)}
                                             disabled={isApplied}

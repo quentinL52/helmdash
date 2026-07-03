@@ -14,22 +14,22 @@ interface MoodHeatmapProps {
 
 const getMoodColor = (mood?: Mood) => {
     switch (mood) {
-        case 'great': return 'bg-green-500';
-        case 'good': return 'bg-emerald-400';
-        case 'neutral': return 'bg-yellow-500';
-        case 'bad': return 'bg-orange-500';
-        case 'terrible': return 'bg-red-500';
+        case 'great': return 'bg-primary';
+        case 'good': return 'bg-primary/80';
+        case 'neutral': return 'bg-primary/60';
+        case 'bad': return 'bg-primary/40';
+        case 'terrible': return 'bg-primary/20';
         default: return 'bg-muted-foreground/10';
     }
 };
 
 const getMoodTextColor = (mood: Mood): string => {
     switch (mood) {
-        case 'great': return '#22c55e'; // keeping exact colors for heatmap scale
-        case 'good': return '#34d399';
-        case 'neutral': return '#eab308';
-        case 'bad': return '#f97316';
-        case 'terrible': return '#ef4444';
+        case 'great': return 'hsl(var(--primary))';
+        case 'good': return 'hsl(var(--primary) / 0.8)';
+        case 'neutral': return 'hsl(var(--primary) / 0.6)';
+        case 'bad': return 'hsl(var(--primary) / 0.4)';
+        case 'terrible': return 'hsl(var(--primary) / 0.2)';
     }
 };
 
@@ -155,11 +155,11 @@ export function MoodHeatmap({ entries, year = new Date().getFullYear() }: MoodHe
                     <h3 className="text-lg font-semibold">Humeur ({year})</h3>
                     <div className="flex gap-2 text-xs text-muted-foreground items-center">
                         <span>Difficile</span>
-                        <div className="w-3 h-3 rounded-sm bg-red-500"></div>
-                        <div className="w-3 h-3 rounded-sm bg-orange-500"></div>
-                        <div className="w-3 h-3 rounded-sm bg-yellow-500"></div>
-                        <div className="w-3 h-3 rounded-sm bg-emerald-400"></div>
-                        <div className="w-3 h-3 rounded-sm bg-green-500"></div>
+                        <div className="w-3 h-3 rounded-sm bg-primary/20"></div>
+                        <div className="w-3 h-3 rounded-sm bg-primary/40"></div>
+                        <div className="w-3 h-3 rounded-sm bg-primary/60"></div>
+                        <div className="w-3 h-3 rounded-sm bg-primary/80"></div>
+                        <div className="w-3 h-3 rounded-sm bg-primary"></div>
                         <span>Excellent</span>
                     </div>
                 </div>

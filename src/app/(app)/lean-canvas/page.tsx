@@ -270,7 +270,7 @@ export default function LeanCanvasPage() {
       <div className='space-y-4'>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight font-pixel text-purple-500 flex items-center gap-3">
+            <h1 className="text-3xl font-bold tracking-tight font-pixel text-secondary flex items-center gap-3">
               <LayoutDashboard className="w-8 h-8" />
               {t.title}
             </h1>
@@ -333,7 +333,7 @@ export default function LeanCanvasPage() {
       </div>
 
       <div className="mt-12 border-t pt-8">
-        <h2 className="text-xl font-pixel text-purple-500 flex items-center gap-2 mb-4">
+        <h2 className="text-xl font-pixel text-secondary flex items-center gap-2 mb-4">
           <History className="w-5 h-5" />
           {language === 'fr' ? 'Historique des versions' : 'Version History'}
         </h2>

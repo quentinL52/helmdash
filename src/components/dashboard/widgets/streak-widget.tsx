@@ -22,7 +22,7 @@ export function StreakWidget({ isEditMode }: StreakWidgetProps) {
           <span>STREAK DISCIPLINE</span>
           <div className="flex items-center gap-1">
             {Array.from({ length: streak.freezesRemaining }).map((_, i) => (
-              <Snowflake key={i} className="w-3 h-3 text-blue-400" />
+              <Snowflake key={i} className="w-3 h-3 text-info" />
             ))}
           </div>
         </CardTitle>
@@ -30,8 +30,8 @@ export function StreakWidget({ isEditMode }: StreakWidgetProps) {
       <CardContent>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className={`relative flex items-center justify-center w-16 h-16 rounded-full border-2 ${hasStreak ? (isAtRisk ? 'border-orange-500/50 bg-orange-500/10' : 'border-red-500/50 bg-red-500/10') : 'border-muted bg-muted/20'}`}>
-              <Flame className={`w-8 h-8 ${hasStreak ? (isAtRisk ? 'text-orange-500 animate-pulse' : 'text-red-500') : 'text-muted-foreground grayscale opacity-50'}`} />
+            <div className={`relative flex items-center justify-center w-16 h-16 rounded-full border-2 ${hasStreak ? (isAtRisk ? 'border-primary/50 bg-primary/10' : 'border-danger/50 bg-danger/10') : 'border-muted bg-muted/20'}`}>
+              <Flame className={`w-8 h-8 ${hasStreak ? (isAtRisk ? 'text-primary animate-pulse' : 'text-danger') : 'text-muted-foreground grayscale opacity-50'}`} />
             </div>
             <div>
               <div className="text-4xl font-pixel flex items-end gap-1">

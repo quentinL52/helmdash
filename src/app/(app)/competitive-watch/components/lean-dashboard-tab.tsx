@@ -135,17 +135,17 @@ export function LeanDashboardTab({ onTabChange }: LeanDashboardTabProps) {
 
     const impactIcon = (impact: string) => {
         switch (impact) {
-            case 'negative': return <TrendingDown className="h-4 w-4 text-red-400" />;
-            case 'positive': return <TrendingUp className="h-4 w-4 text-emerald-400" />;
+            case 'negative': return <TrendingDown className="h-4 w-4 text-danger" />;
+            case 'positive': return <TrendingUp className="h-4 w-4 text-success" />;
             default: return <Minus className="h-4 w-4 text-muted-foreground" />;
         }
     };
 
     const severityColor = (severity: string) => {
         switch (severity) {
-            case 'critical': return 'bg-red-500/20 text-red-400 border-red-500/30';
-            case 'high': return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
-            case 'medium': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+            case 'critical': return 'bg-danger/20 text-danger border-danger/30';
+            case 'high': return 'bg-primary/20 text-primary border-primary/30';
+            case 'medium': return 'bg-warning/20 text-warning border-warning/30';
             default: return 'bg-muted text-muted-foreground';
         }
     };
@@ -272,7 +272,7 @@ export function LeanDashboardTab({ onTabChange }: LeanDashboardTabProps) {
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem
                                                                     onClick={() => deleteCompetitor(competitor.id)}
-                                                                    className="text-red-400 hover:bg-red-500/10 hover:text-red-400"
+                                                                    className="text-danger hover:bg-danger/10 hover:text-danger"
                                                                 >
                                                                     <Trash2 className="mr-2 h-4 w-4" />
                                                                     {language === 'fr' ? 'Supprimer' : 'Delete'}
@@ -308,7 +308,7 @@ export function LeanDashboardTab({ onTabChange }: LeanDashboardTabProps) {
                 <Card>
                     <CardContent className="pt-6 text-center">
                         <div className="flex items-center justify-center gap-2">
-                            <Trophy className="h-5 w-5 text-amber-400" />
+                            <Trophy className="h-5 w-5 text-warning" />
                             <span className="text-3xl font-bold">#{rank.rank}</span>
                             <span className="text-sm text-muted-foreground">/ {rank.total}</span>
                         </div>
@@ -320,7 +320,7 @@ export function LeanDashboardTab({ onTabChange }: LeanDashboardTabProps) {
                 <Card>
                     <CardContent className="pt-6 text-center">
                         <div className="flex items-center justify-center gap-2">
-                            <AlertTriangle className={`h-5 w-5 ${activeThreats > 0 ? 'text-red-400' : 'text-emerald-400'}`} />
+                            <AlertTriangle className={`h-5 w-5 ${activeThreats > 0 ? 'text-danger' : 'text-success'}`} />
                             <span className="text-3xl font-bold">{activeThreats}</span>
                         </div>
                         <div className="text-sm text-muted-foreground">{t.intelligence.activeThreats}</div>

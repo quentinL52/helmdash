@@ -42,7 +42,7 @@ export default function OkrPage() {
             {/* Header */}
             <div className="flex justify-between items-center mb-6 shrink-0">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-rose-500 flex items-center gap-3">
+                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-danger flex items-center gap-3">
                         <Target className="w-8 h-8" />
                         OKRs & Goals
                     </h1>

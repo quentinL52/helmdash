@@ -18,19 +18,19 @@ import { translations } from '@/lib/translations';
 
 const PHASE_COLORS: Record<string, string> = {
     draft: "bg-slate-500/10 text-slate-500",
-    build: "bg-blue-500/10 text-blue-500",
-    measure: "bg-yellow-500/10 text-yellow-500",
-    learn: "bg-teal-500/10 text-teal-500",
-    validated: "bg-emerald-500/10 text-emerald-500",
-    invalidated: "bg-red-500/10 text-red-500",
-    pivoted: "bg-purple-500/10 text-purple-500",
+    build: "bg-info/10 text-info",
+    measure: "bg-warning/10 text-warning",
+    learn: "bg-info/10 text-info",
+    validated: "bg-success/10 text-success",
+    invalidated: "bg-danger/10 text-danger",
+    pivoted: "bg-secondary/10 text-secondary",
 };
 
 const RISK_COLORS: Record<string, string> = {
-    critical: "text-red-500",
-    high: "text-orange-500",
-    medium: "text-yellow-500",
-    low: "text-emerald-500",
+    critical: "text-danger",
+    high: "text-primary",
+    medium: "text-warning",
+    low: "text-success",
 };
 
 function getPhase(h: Hypothesis): string {
@@ -118,7 +118,7 @@ export function HypothesesList() {
                                                 {getPhaseLabel(phase, language)}
                                             </Badge>
                                             {hypothesis.pivotedFromId && (
-                                                <RotateCcw className="w-3 h-3 text-purple-400" />
+                                                <RotateCcw className="w-3 h-3 text-secondary" />
                                             )}
                                         </div>
                                     </TableCell>
@@ -154,7 +154,7 @@ export function HypothesesList() {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => handleDelete(hypothesis.id)}
-                                                className="h-8 w-8 text-muted-foreground hover:text-red-400 hover:bg-muted"
+                                                className="h-8 w-8 text-muted-foreground hover:text-danger hover:bg-muted"
                                             >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>

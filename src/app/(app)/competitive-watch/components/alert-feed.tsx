@@ -125,8 +125,8 @@ export function AlertFeed({ alerts, onAcknowledge, language }: AlertFeedProps) {
                         {/* Acknowledge button / check */}
                         <div className="shrink-0 mt-0.5">
                             {isAcknowledged ? (
-                                <div className="flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500/15">
-                                    <Check className="h-3.5 w-3.5 text-emerald-500" />
+                                <div className="flex items-center justify-center w-7 h-7 rounded-full bg-success/15">
+                                    <Check className="h-3.5 w-3.5 text-success" />
                                 </div>
                             ) : (
                                 <Button

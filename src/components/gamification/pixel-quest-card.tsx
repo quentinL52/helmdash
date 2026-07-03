@@ -28,17 +28,17 @@ const TYPE_CONFIG = {
   onboarding: {
     label: 'ONBOARDING',
     border: '#10b981',
-    badge: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+    badge: 'bg-success/15 text-success border-success/30',
   },
   weekly: {
     label: 'WEEKLY',
     border: '#3b82f6',
-    badge: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+    badge: 'bg-info/15 text-info border-info/30',
   },
   epic: {
     label: 'EPIC',
     border: '#fbbf24',
-    badge: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30',
+    badge: 'bg-warning/15 text-warning border-warning/30',
   },
 } as const;
 
@@ -143,7 +143,7 @@ export function PixelQuestCard({ quest, className }: PixelQuestCardProps) {
                 {step.label}
               </span>
             </div>
-            <span className="flex-shrink-0 font-pixel text-[10px] text-emerald-400/70">
+            <span className="flex-shrink-0 font-pixel text-[10px] text-success/70">
               +{step.xpReward}
             </span>
           </div>

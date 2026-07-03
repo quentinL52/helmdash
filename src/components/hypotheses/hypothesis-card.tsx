@@ -95,7 +95,7 @@ export const HypothesisCard = memo(function HypothesisCard({ hypothesis, onEdit,
                                 {common.edit}
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                                className="text-red-500 focus:text-red-500 text-xs"
+                                className="text-danger focus:text-danger text-xs"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     deleteHypothesis(hypothesis.id);

@@ -36,15 +36,15 @@ import {
 } from 'lucide-react';
 
 const probabilityColors: Record<string, string> = {
-    low: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-    medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-    high: 'bg-red-500/20 text-red-400 border-red-500/30',
+    low: 'bg-info/20 text-info border-info/30',
+    medium: 'bg-warning/20 text-warning border-warning/30',
+    high: 'bg-danger/20 text-danger border-danger/30',
 };
 
 const impactColors: Record<string, string> = {
-    low: 'bg-green-500/20 text-green-400 border-green-500/30',
-    medium: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-    high: 'bg-red-500/20 text-red-400 border-red-500/30',
+    low: 'bg-success/20 text-success border-success/30',
+    medium: 'bg-primary/20 text-primary border-primary/30',
+    high: 'bg-danger/20 text-danger border-danger/30',
 };
 
 interface ScenarioPanelProps {
@@ -297,7 +297,7 @@ export function ScenarioPanel({ aiSuggestions = [] }: ScenarioPanelProps) {
                                 size="sm"
                                 variant="ghost"
                                 onClick={() => deleteScenarioAnalysis(s.id)}
-                                className="shrink-0 text-muted-foreground hover:text-red-400 hover:bg-red-500/10"
+                                className="shrink-0 text-muted-foreground hover:text-danger hover:bg-danger/10"
                             >
                                 <Trash2 className="h-4 w-4" />
                             </Button>

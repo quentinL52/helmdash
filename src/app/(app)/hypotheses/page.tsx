@@ -45,7 +45,7 @@ export default function HypothesesPage() {
         <div className="flex flex-col h-full space-y-4 p-8 pt-6 font-sans text-foreground">
             <div className="flex items-center justify-between space-y-2">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-blue-500 flex items-center gap-3">
+                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-info flex items-center gap-3">
                         <Beaker className="w-8 h-8" />
                         {t.title}
                     </h1>

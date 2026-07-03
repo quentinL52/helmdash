@@ -40,10 +40,10 @@ export function QuickActionsWidget({ isEditMode }: QuickActionsWidgetProps) {
             getContext={(s) => ({})}
           />
           <Button variant="outline" className="w-full justify-start font-pixel text-[10px] h-9" onClick={() => window.location.href = '/hypotheses'}>
-            <Target className="w-4 h-4 mr-2 text-blue-500" /> Hypothèse
+            <Target className="w-4 h-4 mr-2 text-info" /> Hypothèse
           </Button>
           <Button variant="outline" className="w-full justify-start font-pixel text-[10px] h-9" onClick={() => window.location.href = '/finances'}>
-            <TrendingUp className="w-4 h-4 mr-2 text-green-500" /> Finance
+            <TrendingUp className="w-4 h-4 mr-2 text-success" /> Finance
           </Button>
         </div>
       </CardContent>

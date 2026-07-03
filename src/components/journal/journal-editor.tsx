@@ -35,11 +35,11 @@ export function JournalEditor({ onSave, initialDate = new Date() }: JournalEdito
     const locale = language === 'fr' ? fr : enUS;
 
     const moodOptions: { value: Mood; label: string; icon: React.ReactNode; color: string }[] = [
-        { value: 'great', label: t.moods?.great || 'Great', icon: <Smile className="w-5 h-5" />, color: 'text-green-500' },
-        { value: 'good', label: t.moods?.good || 'Good', icon: <Smile className="w-5 h-5" />, color: 'text-emerald-400' },
-        { value: 'neutral', label: t.moods?.neutral || 'Neutral', icon: <Meh className="w-5 h-5" />, color: 'text-yellow-500' },
-        { value: 'bad', label: t.moods?.bad || 'Bad', icon: <Frown className="w-5 h-5" />, color: 'text-orange-500' },
-        { value: 'terrible', label: t.moods?.terrible || 'Terrible', icon: <Angry className="w-5 h-5" />, color: 'text-red-500' },
+        { value: 'great', label: t.moods?.great || 'Great', icon: <Smile className="w-5 h-5" />, color: 'text-success' },
+        { value: 'good', label: t.moods?.good || 'Good', icon: <Smile className="w-5 h-5" />, color: 'text-success' },
+        { value: 'neutral', label: t.moods?.neutral || 'Neutral', icon: <Meh className="w-5 h-5" />, color: 'text-warning' },
+        { value: 'bad', label: t.moods?.bad || 'Bad', icon: <Frown className="w-5 h-5" />, color: 'text-primary' },
+        { value: 'terrible', label: t.moods?.terrible || 'Terrible', icon: <Angry className="w-5 h-5" />, color: 'text-danger' },
     ];
 
     const handleSave = () => {

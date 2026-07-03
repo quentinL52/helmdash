@@ -153,7 +153,7 @@ export function IntegrationsPanel() {
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="shrink-0">
                         {integration.status === 'connected' ? (
-                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <CheckCircle className="w-4 h-4 text-success" />
                         ) : (
                           <XCircle className="w-4 h-4 text-muted-foreground" />
                         )}

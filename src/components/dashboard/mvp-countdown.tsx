@@ -45,7 +45,7 @@ export function MvpCountdown() {
     <Card className="border-2 shadow-sm overflow-hidden relative">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-pixel text-indigo-500 flex items-center gap-2">
+        <CardTitle className="text-sm font-pixel text-info flex items-center gap-2">
           <Clock className="w-4 h-4" />
           MVP Launch Countdown
         </CardTitle>
@@ -53,7 +53,7 @@ export function MvpCountdown() {
       <CardContent>
         <div className="flex items-center justify-between mt-2">
           <div className="flex flex-col items-center">
-            <span className="text-4xl md:text-5xl font-pixel text-indigo-600 dark:text-indigo-400">
+            <span className="text-4xl md:text-5xl font-pixel text-info dark:text-info">
               {timeLeft.days.toString().padStart(2, "0")}
             </span>
             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-pixel mt-1">Days</span>
@@ -61,7 +61,7 @@ export function MvpCountdown() {
           <span className="text-3xl font-pixel text-muted-foreground/30 -mt-5">:</span>
           
           <div className="flex flex-col items-center">
-            <span className="text-4xl md:text-5xl font-pixel text-indigo-600 dark:text-indigo-400">
+            <span className="text-4xl md:text-5xl font-pixel text-info dark:text-info">
               {timeLeft.hours.toString().padStart(2, "0")}
             </span>
             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-pixel mt-1">Hours</span>
@@ -69,7 +69,7 @@ export function MvpCountdown() {
           <span className="text-3xl font-pixel text-muted-foreground/30 -mt-5">:</span>
           
           <div className="flex flex-col items-center">
-            <span className="text-4xl md:text-5xl font-pixel text-indigo-600 dark:text-indigo-400">
+            <span className="text-4xl md:text-5xl font-pixel text-info dark:text-info">
               {timeLeft.minutes.toString().padStart(2, "0")}
             </span>
             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-pixel mt-1">Mins</span>
@@ -77,7 +77,7 @@ export function MvpCountdown() {
           <span className="text-3xl font-pixel text-muted-foreground/30 -mt-5">:</span>
           
           <div className="flex flex-col items-center">
-            <span className="text-4xl md:text-5xl font-pixel text-indigo-600 dark:text-indigo-400">
+            <span className="text-4xl md:text-5xl font-pixel text-info dark:text-info">
               {timeLeft.seconds.toString().padStart(2, "0")}
             </span>
             <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-pixel mt-1">Secs</span>

@@ -10,15 +10,15 @@ import { format, subMonths, eachMonthOfInterval } from 'date-fns';
 import { designTokens } from '@/lib/design-tokens';
 
 const CATEGORY_COLORS: Record<string, string> = {
-    'Infrastructure': designTokens.colors.primary,
-    'API IA': designTokens.colors.primaryLight,
-    'Auth & Data': designTokens.colors.status.success.text,
-    'Observabilité': designTokens.colors.status.warning.text,
-    'Email': designTokens.colors.status.danger.text,
-    'Outils SaaS': designTokens.colors.status.neutral.text,
-    'Marketing': designTokens.colors.cta.bg,
-    'Divers': '#64748b',
-    'other': '#64748b',
+    'Infrastructure': 'hsl(var(--chart-1))',
+    'API IA': 'hsl(var(--chart-2))',
+    'Auth & Data': 'hsl(var(--success))',
+    'Observabilité': 'hsl(var(--warning))',
+    'Email': 'hsl(var(--danger))',
+    'Outils SaaS': 'hsl(var(--info))',
+    'Marketing': 'hsl(var(--chart-3))',
+    'Divers': 'hsl(var(--muted-foreground))',
+    'other': 'hsl(var(--muted-foreground))',
 };
 
 export function FinanceCharts() {
@@ -113,7 +113,7 @@ export function FinanceCharts() {
                                     </Pie>
                                     <Tooltip 
                                         formatter={(value: number) => [formatCurrency(value), 'Montant']}
-                                        contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
+                                        contentStyle={{ backgroundColor: 'hsl(var(--card))', border: 'none', borderRadius: '8px', color: 'hsl(var(--card-foreground))' }}
                                     />
                                     <Legend />
                                 </PieChart>
@@ -136,13 +136,13 @@ export function FinanceCharts() {
                     <div className="h-[300px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={barData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" />
-                                <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-                                <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => val >= 1000 ? `${(val/1000).toFixed(0)}k` : val} />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                                <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
+                                <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => val >= 1000 ? `${(val/1000).toFixed(0)}k` : val} />
                                 <Tooltip 
                                     formatter={(value: number) => [formatCurrency(value), '']}
-                                    contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
-                                    labelStyle={{ color: '#94a3b8' }}
+                                    contentStyle={{ backgroundColor: 'hsl(var(--card))', border: 'none', borderRadius: '8px', color: 'hsl(var(--card-foreground))' }}
+                                    labelStyle={{ color: 'hsl(var(--muted-foreground))' }}
                                 />
                                 <Legend />
                                 {Object.keys(CATEGORY_COLORS).map(cat => {

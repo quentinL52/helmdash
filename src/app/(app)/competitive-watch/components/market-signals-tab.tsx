@@ -139,12 +139,12 @@ export function MarketSignalsTab() {
 
     const impactConfig: Record<MarketSignalImpact, { color: string; icon: React.ReactNode; label: string }> = {
         positive: {
-            color: 'bg-green-500/20 text-green-400 border-green-500/30',
+            color: 'bg-success/20 text-success border-success/30',
             icon: <TrendingUp className="h-4 w-4" />,
             label: t.signals.impact.positive,
         },
         negative: {
-            color: 'bg-red-500/20 text-red-400 border-red-500/30',
+            color: 'bg-danger/20 text-danger border-danger/30',
             icon: <TrendingDown className="h-4 w-4" />,
             label: t.signals.impact.negative,
         },
@@ -156,10 +156,10 @@ export function MarketSignalsTab() {
     };
 
     const urgencyColors: Record<string, string> = {
-        critical: 'bg-red-500/20 text-red-400 border-red-500/30',
-        high: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-        medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-        low: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+        critical: 'bg-danger/20 text-danger border-danger/30',
+        high: 'bg-primary/20 text-primary border-primary/30',
+        medium: 'bg-warning/20 text-warning border-warning/30',
+        low: 'bg-info/20 text-info border-info/30',
     };
 
     const getCompetitorName = (id?: string) => {
@@ -217,19 +217,19 @@ export function MarketSignalsTab() {
                 </Card>
                 <Card className="bg-card border-border">
                     <CardContent className="p-3 text-center">
-                        <p className="text-2xl font-bold text-green-400">{stats.positive}</p>
+                        <p className="text-2xl font-bold text-success">{stats.positive}</p>
                         <p className="text-xs text-muted-foreground">{t.signals.impact.positive}</p>
                     </CardContent>
                 </Card>
                 <Card className="bg-card border-border">
                     <CardContent className="p-3 text-center">
-                        <p className="text-2xl font-bold text-red-400">{stats.negative}</p>
+                        <p className="text-2xl font-bold text-danger">{stats.negative}</p>
                         <p className="text-xs text-muted-foreground">{t.signals.impact.negative}</p>
                     </CardContent>
                 </Card>
                 <Card className="bg-card border-border">
                     <CardContent className="p-3 text-center">
-                        <p className="text-2xl font-bold text-orange-400">{stats.critical}</p>
+                        <p className="text-2xl font-bold text-primary">{stats.critical}</p>
                         <p className="text-xs text-muted-foreground">{language === 'fr' ? 'Urgents' : 'Urgent'}</p>
                     </CardContent>
                 </Card>
@@ -379,7 +379,7 @@ export function MarketSignalsTab() {
                                         <Button
                                             size="icon"
                                             variant="ghost"
-                                            className="h-8 w-8 text-muted-foreground hover:text-red-400 shrink-0"
+                                            className="h-8 w-8 text-muted-foreground hover:text-danger shrink-0"
                                             onClick={() => deleteMarketSignal(signal.id)}
                                         >
                                             <Trash2 className="h-4 w-4" />

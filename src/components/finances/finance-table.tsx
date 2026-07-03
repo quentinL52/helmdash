@@ -202,8 +202,8 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                         <TableCell>
                                             <div className="flex flex-col gap-1 items-start">
                                                 <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${entry.type === 'income'
-                                                    ? 'bg-green-500/10 text-green-400'
-                                                    : 'bg-red-500/10 text-red-400'
+                                                    ? 'bg-success/10 text-success'
+                                                    : 'bg-danger/10 text-danger'
                                                     }`}>
                                                     {entry.type === 'income' ? formT.income : formT.expense}
                                                 </span>
@@ -231,7 +231,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+                                                    className="text-danger hover:text-danger hover:bg-danger/20"
                                                     onClick={() => setDeleteId({
                                                         monthId: entry.monthId,
                                                         entryId: entry.id,
@@ -261,7 +261,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel className="text-black bg-white hover:bg-gray-200">{common.cancel}</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className="bg-red-600 text-foreground hover:bg-red-700">
+                        <AlertDialogAction onClick={handleDelete} className="bg-danger text-foreground hover:bg-danger">
                             {common.delete || "Delete"}
                         </AlertDialogAction>
                     </AlertDialogFooter>

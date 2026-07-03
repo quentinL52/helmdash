@@ -160,7 +160,7 @@ export function OverviewTab() {
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem
                                                         onClick={() => deleteCompetitor(competitor.id)}
-                                                        className="text-red-400 hover:bg-red-500/10 hover:text-red-400"
+                                                        className="text-danger hover:bg-danger/10 hover:text-danger"
                                                     >
                                                         <Trash2 className="mr-2 h-4 w-4" />
                                                         {language === 'fr' ? 'Supprimer' : 'Delete'}

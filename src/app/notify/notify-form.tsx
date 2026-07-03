@@ -47,7 +47,7 @@ export function NotifyForm() {
 
         {submitted ? (
           <div className="p-6 rounded-xl bg-primary/10 border border-primary/20">
-            <p className="text-lg font-medium text-green-500">{t('onList')}</p>
+            <p className="text-lg font-medium text-success">{t('onList')}</p>
             <p className="text-sm text-muted-foreground mt-2">
               {t('followUs')} <a href="https://twitter.com/helmdash" className="underline">Twitter</a>.
             </p>

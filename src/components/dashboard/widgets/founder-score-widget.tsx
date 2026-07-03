@@ -38,23 +38,23 @@ export function FounderScoreWidget({ isEditMode }: FounderScoreWidgetProps) {
         <div className="space-y-4">
           <div className="space-y-1.5">
             <div className="flex justify-between text-xs font-pixel">
-              <span className="flex items-center text-red-500"><Heart className="w-3 h-3 mr-1 fill-current" /> RUNWAY (HP)</span>
+              <span className="flex items-center text-danger"><Heart className="w-3 h-3 mr-1 fill-current" /> RUNWAY (HP)</span>
               <span className="text-muted-foreground">{runwayMonths.toFixed(1)} mois</span>
             </div>
-            <Progress value={runwayPercentage} className="h-2 rounded-none bg-muted border border-border [&>div]:bg-red-500" />
+            <Progress value={runwayPercentage} className="h-2 rounded-none bg-muted border border-border [&>div]:bg-danger" />
           </div>
           
           <div className="space-y-1.5">
             <div className="flex justify-between text-xs font-pixel">
-              <span className="flex items-center text-blue-500"><Zap className="w-3 h-3 mr-1 fill-current" /> VALIDATION (MP)</span>
+              <span className="flex items-center text-info"><Zap className="w-3 h-3 mr-1 fill-current" /> VALIDATION (MP)</span>
               <span className="text-muted-foreground">{validatedHypotheses}/{totalHypotheses}</span>
             </div>
-            <Progress value={validationPercentage} className="h-2 rounded-none bg-muted border border-border [&>div]:bg-blue-500" />
+            <Progress value={validationPercentage} className="h-2 rounded-none bg-muted border border-border [&>div]:bg-info" />
           </div>
           
           <div className="space-y-1.5">
             <div className="flex justify-between text-xs font-pixel">
-              <span className="flex items-center text-yellow-500"><Coins className="w-3 h-3 mr-1 fill-current" /> CASH</span>
+              <span className="flex items-center text-warning"><Coins className="w-3 h-3 mr-1 fill-current" /> CASH</span>
               <span className="text-muted-foreground">{finance.cashAvailable.toLocaleString()} €</span>
             </div>
           </div>

@@ -63,7 +63,7 @@ export function RecurringExpensesList() {
                         {recurringExpenses.map((expense) => {
                             const isAnnual = expense.frequency === 'annual';
                             const freqLabel = isAnnual ? 'Annuel' : 'Mensuel';
-                            const badgeColor = isAnnual ? 'bg-purple-500/20 text-purple-400 border-purple-500/50' : 'bg-blue-500/20 text-blue-400 border-blue-500/50';
+                            const badgeColor = isAnnual ? 'bg-secondary/20 text-secondary border-secondary/50' : 'bg-info/20 text-info border-info/50';
 
                             return (
                                 <TableRow key={expense.id}>
@@ -92,7 +92,7 @@ export function RecurringExpensesList() {
                                         <Button 
                                             variant="ghost" 
                                             size="icon" 
-                                            className="text-slate-400 hover:text-red-400 hover:bg-red-400/10"
+                                            className="text-slate-400 hover:text-danger hover:bg-danger/10"
                                             onClick={() => handleDelete(expense.id)}
                                         >
                                             <Trash2 className="h-4 w-4" />

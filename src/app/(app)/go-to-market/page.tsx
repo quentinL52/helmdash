@@ -140,7 +140,7 @@ export default function GoToMarketPage() {
                     {/* Building a StoryBrand */}
                     <Card className="border-t-4 border-t-blue-500">
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2 font-pixel text-blue-500">
+                            <CardTitle className="flex items-center gap-2 font-pixel text-info">
                                 <BookOpen className="w-5 h-5" />
                                 Building a StoryBrand
                             </CardTitle>
@@ -179,7 +179,7 @@ export default function GoToMarketPage() {
                     {/* Obviously Awesome */}
                     <Card className="border-t-4 border-t-purple-500">
                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2 font-pixel text-purple-500">
+                            <CardTitle className="flex items-center gap-2 font-pixel text-secondary">
                                 <Zap className="w-5 h-5" />
                                 Obviously Awesome
                             </CardTitle>
@@ -219,7 +219,7 @@ export default function GoToMarketPage() {
                         {/* The Cold Start Problem */}
                         <Card className="border-t-4 border-t-orange-500">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2 font-pixel text-orange-500">
+                                <CardTitle className="flex items-center gap-2 font-pixel text-primary">
                                     <Target className="w-5 h-5" />
                                     The Cold Start Problem
                                 </CardTitle>
@@ -242,7 +242,7 @@ export default function GoToMarketPage() {
                         {/* Compound Effect / Online Writing */}
                         <Card className="border-t-4 border-t-emerald-500">
                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2 font-pixel text-emerald-500">
+                                <CardTitle className="flex items-center gap-2 font-pixel text-success">
                                     <PenTool className="w-5 h-5" />
                                     Build in Public (Consistance)
                                 </CardTitle>

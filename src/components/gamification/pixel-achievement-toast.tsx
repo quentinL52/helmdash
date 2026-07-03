@@ -151,7 +151,7 @@ export function PixelAchievementToast({
             >
               {rarityLabel}
             </span>
-            <span className="text-emerald-400">+{achievement.xpReward} XP</span>
+            <span className="text-success">+{achievement.xpReward} XP</span>
           </div>
         </div>
       </div>

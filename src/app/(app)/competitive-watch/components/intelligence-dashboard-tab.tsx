@@ -138,20 +138,20 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
         const level = threatLevel ?? 0;
         if (level > 60) {
             return (
-                <Badge className="bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30">
+                <Badge className="bg-danger/20 text-danger border-danger/30 hover:bg-danger/30">
                     {language === 'fr' ? 'Haute' : 'High'}
                 </Badge>
             );
         }
         if (level > 30) {
             return (
-                <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/30">
+                <Badge className="bg-warning/20 text-warning border-warning/30 hover:bg-warning/30">
                     {language === 'fr' ? 'Moyenne' : 'Medium'}
                 </Badge>
             );
         }
         return (
-            <Badge className="bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30">
+            <Badge className="bg-success/20 text-success border-success/30 hover:bg-success/30">
                 {language === 'fr' ? 'Faible' : 'Low'}
             </Badge>
         );
@@ -160,9 +160,9 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
     const getMomentumIcon = (momentum?: string) => {
         switch (momentum) {
             case 'rising':
-                return <TrendingUp className="h-4 w-4 text-red-400" />;
+                return <TrendingUp className="h-4 w-4 text-danger" />;
             case 'declining':
-                return <TrendingDown className="h-4 w-4 text-green-400" />;
+                return <TrendingDown className="h-4 w-4 text-success" />;
             default:
                 return <Minus className="h-4 w-4 text-muted-foreground" />;
         }
@@ -196,9 +196,9 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
 
     const getThreatDotColor = (threatLevel?: number) => {
         const level = threatLevel ?? 0;
-        if (level > 60) return 'bg-red-400';
-        if (level > 30) return 'bg-yellow-400';
-        return 'bg-green-400';
+        if (level > 60) return 'bg-danger';
+        if (level > 30) return 'bg-warning';
+        return 'bg-success';
     };
 
     return (
@@ -223,11 +223,11 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                     <CardContent className="flex flex-col items-center justify-center pt-6 pb-4 gap-2">
                         <div className="flex items-center gap-2">
                             <Shield
-                                className={`h-6 w-6 ${activeThreatsCount > 0 ? 'text-red-400' : 'text-muted-foreground'
+                                className={`h-6 w-6 ${activeThreatsCount > 0 ? 'text-danger' : 'text-muted-foreground'
                                     }`}
                             />
                             <span
-                                className={`text-3xl font-bold ${activeThreatsCount > 0 ? 'text-red-400' : 'text-foreground'
+                                className={`text-3xl font-bold ${activeThreatsCount > 0 ? 'text-danger' : 'text-foreground'
                                     }`}
                             >
                                 {activeThreatsCount}
@@ -526,7 +526,7 @@ export function IntelligenceDashboardTab({ onTabChange }: IntelligenceDashboardT
                                                     <Button
                                                         size="icon"
                                                         variant="ghost"
-                                                        className="h-8 w-8 text-muted-foreground hover:text-red-400"
+                                                        className="h-8 w-8 text-muted-foreground hover:text-danger"
                                                         onClick={() =>
                                                             deleteCompetitor(competitor.id)
                                                         }

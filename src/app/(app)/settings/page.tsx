@@ -71,7 +71,7 @@ export default function SettingsPage() {
                 {/* Profile & Identity */}
                 <Card className="border-t-4 border-t-cyan-500">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2 font-pixel text-cyan-500">
+                        <CardTitle className="flex items-center gap-2 font-pixel text-info">
                             <User className="w-5 h-5" />
                             {t('profileIdentity')}
                         </CardTitle>
@@ -133,7 +133,7 @@ export default function SettingsPage() {
                 {/* MVP Date */}
                 <Card className="border-t-4 border-t-indigo-500">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2 font-pixel text-indigo-500">
+                        <CardTitle className="flex items-center gap-2 font-pixel text-info">
                             <Calendar className="w-5 h-5" />
                             {t('mvpDateTitle')}
                         </CardTitle>
@@ -156,7 +156,7 @@ export default function SettingsPage() {
                 {/* Theme */}
                 <Card className="border-t-4 border-t-amber-500">
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2 font-pixel text-amber-500">
+                        <CardTitle className="flex items-center gap-2 font-pixel text-warning">
                             <Palette className="w-5 h-5" />
                             {t('appearance')}
                         </CardTitle>

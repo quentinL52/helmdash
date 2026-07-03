@@ -86,7 +86,7 @@ export default function RoutinePage() {
       <div className="p-6 lg:p-8 pb-4 shrink-0">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight font-pixel text-emerald-500 flex items-center gap-3">
+            <h1 className="text-3xl font-bold tracking-tight font-pixel text-success flex items-center gap-3">
               <Repeat className="w-8 h-8" />
               {t.title}
             </h1>
@@ -105,7 +105,7 @@ export default function RoutinePage() {
                     journalEntries: store.journalEntries.slice(0, 5)
                 })}
                 variant="secondary"
-                className="font-pixel text-[10px] bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border border-emerald-500/20 shadow-[2px_2px_0px_0px_rgba(16,185,129,0.3)]"
+                className="font-pixel text-[10px] bg-success/10 text-success hover:bg-success/20 border border-success/20 shadow-[2px_2px_0px_0px_rgba(16,185,129,0.3)]"
             />
           </div>
           <div className="flex items-center gap-3">
@@ -132,7 +132,7 @@ export default function RoutinePage() {
             return (
               <Card key={day.id} className="flex flex-col border-t-4 border-t-emerald-500">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg capitalize font-pixel text-emerald-500">
+                  <CardTitle className="text-lg capitalize font-pixel text-success">
                     {(common.days as any)[day.id] || day.day}
                   </CardTitle>
                 </CardHeader>

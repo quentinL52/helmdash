@@ -110,7 +110,7 @@ export function TopNav() {
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-muted" />
                             <DropdownMenuItem
-                                className="cursor-pointer text-red-400 hover:text-red-300 hover:bg-muted focus:bg-muted"
+                                className="cursor-pointer text-danger hover:text-danger hover:bg-muted focus:bg-muted"
                                 onClick={handleSignOut}
                             >
                                 <LogOut className="mr-2 h-4 w-4" />

@@ -20,11 +20,11 @@ interface AgentTask {
 
 const STATUS_CONFIG: Record<string, { label: string; icon: typeof Clock; color: string }> = {
   pending: { label: 'En attente', icon: Clock, color: 'text-muted-foreground' },
-  running: { label: 'En cours', icon: Play, color: 'text-blue-500' },
-  success: { label: 'Succès', icon: CheckCircle, color: 'text-green-500' },
-  partial: { label: 'Partiel', icon: AlertTriangle, color: 'text-yellow-500' },
-  failed: { label: 'Échec', icon: XCircle, color: 'text-red-500' },
-  needs_approval: { label: 'Approbation', icon: AlertTriangle, color: 'text-orange-500' },
+  running: { label: 'En cours', icon: Play, color: 'text-info' },
+  success: { label: 'Succès', icon: CheckCircle, color: 'text-success' },
+  partial: { label: 'Partiel', icon: AlertTriangle, color: 'text-warning' },
+  failed: { label: 'Échec', icon: XCircle, color: 'text-danger' },
+  needs_approval: { label: 'Approbation', icon: AlertTriangle, color: 'text-primary' },
 };
 
 const ROLE_LABELS: Record<string, string> = {
@@ -111,7 +111,7 @@ export function AgentTaskHistory({ userId }: { userId: string }) {
                     </p>
                   </div>
                   {task.errorMessage && (
-                    <span className="text-[10px] text-red-500 max-w-[200px] truncate shrink-0" title={task.errorMessage}>
+                    <span className="text-[10px] text-danger max-w-[200px] truncate shrink-0" title={task.errorMessage}>
                       ⚠ Erreur
                     </span>
                   )}

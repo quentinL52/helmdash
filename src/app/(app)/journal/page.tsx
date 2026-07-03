@@ -42,7 +42,7 @@ export default function JournalPage() {
         <div className="space-y-8 max-w-7xl mx-auto">
             <div className="flex items-center justify-between space-y-2">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-teal-500 flex items-center gap-3">
+                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-info flex items-center gap-3">
                         <BookOpen className="w-8 h-8" />
                         Journal de Bord
                     </h1>
@@ -58,7 +58,7 @@ export default function JournalPage() {
                             routine: store.routine
                         })}
                         variant="secondary"
-                        className="font-pixel text-[10px] bg-teal-500/10 text-teal-500 hover:bg-teal-500/20 border border-teal-500/20 shadow-[2px_2px_0px_0px_rgba(20,184,166,0.3)]"
+                        className="font-pixel text-[10px] bg-info/10 text-info hover:bg-info/20 border border-info/20 shadow-[2px_2px_0px_0px_rgba(20,184,166,0.3)]"
                     />
                 </div>
             </div>
@@ -71,7 +71,7 @@ export default function JournalPage() {
                 <div className="lg:col-span-7 space-y-6">
                     <Card className="border-t-4 border-t-teal-500">
                         <CardHeader>
-                            <h2 className="text-xl font-pixel text-teal-500 flex items-center gap-2">
+                            <h2 className="text-xl font-pixel text-info flex items-center gap-2">
                                 Nouvelle Entrée
                             </h2>
                         </CardHeader>
@@ -88,7 +88,7 @@ export default function JournalPage() {
 
                 {/* Right Column: Recent Entries Stream */}
                 <div className="lg:col-span-5 space-y-4">
-                    <h2 className="text-xl font-pixel text-teal-500 flex items-center gap-2">
+                    <h2 className="text-xl font-pixel text-info flex items-center gap-2">
                         <Calendar className="w-5 h-5 text-muted-foreground" />
                         Entrées de la semaine
                     </h2>

@@ -44,7 +44,7 @@ export default function CompetitiveWatchPage() {
             {/* Header */}
             <div className="flex items-center justify-between space-y-2">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-yellow-500 flex items-center gap-3">
+                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-warning flex items-center gap-3">
                         <Radar className="w-8 h-8" />
                         {t.title}
                     </h1>

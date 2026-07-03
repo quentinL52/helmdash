@@ -161,20 +161,20 @@ export function FeatureMatrixTab() {
 
     const getStatusIcon = (status?: FeatureStatus) => {
         switch (status) {
-            case 'yes': return <CheckCircle2 className="h-5 w-5 text-green-500" />;
-            case 'no': return <XCircle className="h-5 w-5 text-red-500" />;
-            case 'partial': return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
-            case 'planned': return <Clock className="h-5 w-5 text-blue-500" />;
+            case 'yes': return <CheckCircle2 className="h-5 w-5 text-success" />;
+            case 'no': return <XCircle className="h-5 w-5 text-danger" />;
+            case 'partial': return <AlertTriangle className="h-5 w-5 text-warning" />;
+            case 'planned': return <Clock className="h-5 w-5 text-info" />;
             default: return <HelpCircle className="h-5 w-5 text-muted-foreground" />;
         }
     };
 
     const getHeatmapColor = (status?: FeatureStatus) => {
         switch (status) {
-            case 'yes': return 'bg-green-500/30 border-green-500/20';
-            case 'no': return 'bg-red-500/30 border-red-500/20';
-            case 'partial': return 'bg-yellow-500/30 border-yellow-500/20';
-            case 'planned': return 'bg-blue-500/30 border-blue-500/20';
+            case 'yes': return 'bg-success/30 border-success/20';
+            case 'no': return 'bg-danger/30 border-danger/20';
+            case 'partial': return 'bg-warning/30 border-warning/20';
+            case 'planned': return 'bg-info/30 border-info/20';
             default: return 'bg-muted/30 border-border/20';
         }
     };
@@ -221,15 +221,15 @@ export function FeatureMatrixTab() {
     };
 
     const gapColors = {
-        advantage: 'text-green-400',
+        advantage: 'text-success',
         parity: 'text-muted-foreground',
-        disadvantage: 'text-red-400',
+        disadvantage: 'text-danger',
     };
 
     const gapBg = {
-        advantage: 'bg-green-500/5',
+        advantage: 'bg-success/5',
         parity: '',
-        disadvantage: 'bg-red-500/5',
+        disadvantage: 'bg-danger/5',
     };
 
     const myCoverage = calcCoverage(mySolution.featureAnalysis, mySolution.keyFeatures);
@@ -378,7 +378,7 @@ export function FeatureMatrixTab() {
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => deleteComparisonCriterion(feature)}
-                                                    className="h-8 w-8 text-muted-foreground hover:text-red-400"
+                                                    className="h-8 w-8 text-muted-foreground hover:text-danger"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
@@ -393,9 +393,9 @@ export function FeatureMatrixTab() {
                                     <TableCell className="text-center bg-primary/5">
                                         <Badge
                                             variant="outline"
-                                            className={`text-xs ${myCoverage >= 70 ? 'bg-green-500/20 text-green-400 border-green-500/30' :
-                                                myCoverage >= 40 ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
-                                                    'bg-red-500/20 text-red-400 border-red-500/30'
+                                            className={`text-xs ${myCoverage >= 70 ? 'bg-success/20 text-success border-success/30' :
+                                                myCoverage >= 40 ? 'bg-warning/20 text-warning border-warning/30' :
+                                                    'bg-danger/20 text-danger border-danger/30'
                                                 }`}
                                         >
                                             {myCoverage}%
@@ -407,9 +407,9 @@ export function FeatureMatrixTab() {
                                             <TableCell key={c.id} className="text-center">
                                                 <Badge
                                                     variant="outline"
-                                                    className={`text-xs ${cov >= 70 ? 'bg-green-500/20 text-green-400 border-green-500/30' :
-                                                        cov >= 40 ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
-                                                            'bg-red-500/20 text-red-400 border-red-500/30'
+                                                    className={`text-xs ${cov >= 70 ? 'bg-success/20 text-success border-success/30' :
+                                                        cov >= 40 ? 'bg-warning/20 text-warning border-warning/30' :
+                                                            'bg-danger/20 text-danger border-danger/30'
                                                         }`}
                                                 >
                                                     {cov}%
@@ -427,15 +427,15 @@ export function FeatureMatrixTab() {
             </div>
 
             <div className="flex gap-4 text-xs text-muted-foreground justify-center pt-2">
-                <div className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-500" /> {t.status.yes}</div>
-                <div className="flex items-center gap-1"><XCircle className="h-3 w-3 text-red-500" /> {t.status.no}</div>
-                <div className="flex items-center gap-1"><AlertTriangle className="h-3 w-3 text-yellow-500" /> {t.status.partial}</div>
-                <div className="flex items-center gap-1"><Clock className="h-3 w-3 text-blue-500" /> {t.status.planned}</div>
+                <div className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-success" /> {t.status.yes}</div>
+                <div className="flex items-center gap-1"><XCircle className="h-3 w-3 text-danger" /> {t.status.no}</div>
+                <div className="flex items-center gap-1"><AlertTriangle className="h-3 w-3 text-warning" /> {t.status.partial}</div>
+                <div className="flex items-center gap-1"><Clock className="h-3 w-3 text-info" /> {t.status.planned}</div>
                 <span className="border-l border-border pl-4 flex items-center gap-1">
-                    <span className="text-green-400">▲</span> {t.advantage}
+                    <span className="text-success">▲</span> {t.advantage}
                 </span>
                 <span className="flex items-center gap-1">
-                    <span className="text-red-400">▼</span> {t.disadvantage}
+                    <span className="text-danger">▼</span> {t.disadvantage}
                 </span>
             </div>
         </div>

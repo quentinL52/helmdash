@@ -45,10 +45,10 @@ interface ActionItemsPanelProps {
 }
 
 const impactColors: Record<string, string> = {
-    critical: 'bg-red-500/20 text-red-400 border-red-500/30',
-    high: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-    medium: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-    low: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+    critical: 'bg-danger/20 text-danger border-danger/30',
+    high: 'bg-primary/20 text-primary border-primary/30',
+    medium: 'bg-warning/20 text-warning border-warning/30',
+    low: 'bg-info/20 text-info border-info/30',
 };
 
 const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
@@ -126,7 +126,7 @@ export function ActionItemsPanel({
                     </div>
                     {totalActions > 0 && (
                         <div className="flex items-center gap-2 text-sm">
-                            <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20">
+                            <Badge variant="outline" className="bg-success/10 text-success border-success/20">
                                 <CheckCircle2 className="h-3 w-3 mr-1" />
                                 {appliedCount} {t.actionItems.applied}
                             </Badge>
@@ -162,7 +162,7 @@ export function ActionItemsPanel({
                 {sortedGaps.length > 0 && (
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                            <Zap className="h-4 w-4 text-orange-400" />
+                            <Zap className="h-4 w-4 text-primary" />
                             <h4 className="text-sm font-semibold text-foreground">
                                 {language === 'fr' ? 'Gaps Features Prioritaires' : 'Priority Feature Gaps'}
                             </h4>
@@ -176,7 +176,7 @@ export function ActionItemsPanel({
                                         key={key}
                                         className={`rounded-lg border p-3 transition-colors ${
                                             isApplied
-                                                ? 'bg-green-500/5 border-green-500/20'
+                                                ? 'bg-success/5 border-success/20'
                                                 : 'bg-background border-border'
                                         }`}
                                     >
@@ -209,7 +209,7 @@ export function ActionItemsPanel({
                                                 </Button>
                                             )}
                                             {isApplied && (
-                                                <CheckCircle2 className="h-5 w-5 text-green-400 shrink-0" />
+                                                <CheckCircle2 className="h-5 w-5 text-success shrink-0" />
                                             )}
                                         </div>
                                     </div>
@@ -223,7 +223,7 @@ export function ActionItemsPanel({
                 {roadmapRecs.length > 0 && (
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                            <Target className="h-4 w-4 text-teal-400" />
+                            <Target className="h-4 w-4 text-info" />
                             <h4 className="text-sm font-semibold text-foreground">
                                 {language === 'fr' ? 'Recommandations Roadmap' : 'Roadmap Recommendations'}
                             </h4>
@@ -237,7 +237,7 @@ export function ActionItemsPanel({
                                         key={key}
                                         className={`rounded-lg border p-3 transition-colors ${
                                             isApplied
-                                                ? 'bg-green-500/5 border-green-500/20'
+                                                ? 'bg-success/5 border-success/20'
                                                 : 'bg-background border-border'
                                         }`}
                                     >
@@ -262,7 +262,7 @@ export function ActionItemsPanel({
                                                     Roadmap
                                                 </Button>
                                             ) : (
-                                                <CheckCircle2 className="h-5 w-5 text-green-400 shrink-0" />
+                                                <CheckCircle2 className="h-5 w-5 text-success shrink-0" />
                                             )}
                                         </div>
                                     </div>
@@ -276,7 +276,7 @@ export function ActionItemsPanel({
                 {hypothesisRecs.length > 0 && (
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                            <Lightbulb className="h-4 w-4 text-yellow-400" />
+                            <Lightbulb className="h-4 w-4 text-warning" />
                             <h4 className="text-sm font-semibold text-foreground">
                                 {language === 'fr' ? 'Hypothèses Suggérées' : 'Suggested Hypotheses'}
                             </h4>
@@ -290,7 +290,7 @@ export function ActionItemsPanel({
                                         key={key}
                                         className={`rounded-lg border p-3 transition-colors ${
                                             isApplied
-                                                ? 'bg-green-500/5 border-green-500/20'
+                                                ? 'bg-success/5 border-success/20'
                                                 : 'bg-background border-border'
                                         }`}
                                     >
@@ -309,13 +309,13 @@ export function ActionItemsPanel({
                                                     size="sm"
                                                     variant="ghost"
                                                     onClick={() => handleCreateHypothesis(hyp.statement, hyp.category, key)}
-                                                    className="shrink-0 text-yellow-400 hover:text-yellow-200 hover:bg-yellow-400/10"
+                                                    className="shrink-0 text-warning hover:text-warning hover:bg-warning/10"
                                                 >
                                                     <Plus className="h-3.5 w-3.5 mr-1" />
                                                     {language === 'fr' ? 'Hypothèse' : 'Hypothesis'}
                                                 </Button>
                                             ) : (
-                                                <CheckCircle2 className="h-5 w-5 text-green-400 shrink-0" />
+                                                <CheckCircle2 className="h-5 w-5 text-success shrink-0" />
                                             )}
                                         </div>
                                     </div>
@@ -349,7 +349,7 @@ export function ActionItemsPanel({
                             {routineRecs.map((rec, i) => (
                                 <div key={`routine-${i}`} className="rounded-lg bg-background border border-border p-3">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <Badge variant="outline" className="text-xs bg-teal-400/10 text-teal-400 border-teal-400/30">
+                                        <Badge variant="outline" className="text-xs bg-info/10 text-info border-info/30">
                                             Routine
                                         </Badge>
                                     </div>

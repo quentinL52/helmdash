@@ -32,7 +32,7 @@ export default function ContentPage() {
         <div className="flex flex-col h-full space-y-4 p-8 pt-6 font-sans text-foreground">
             <div className="flex items-center justify-between space-y-2">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-pink-500 flex items-center gap-3">
+                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-secondary flex items-center gap-3">
                         <Megaphone className="w-8 h-8" />
                         {t.title}
                     </h1>
@@ -50,7 +50,7 @@ export default function ContentPage() {
                             existingContent: [] // Could be mapped from store.columns
                         })}
                         variant="secondary"
-                        className="font-pixel text-[10px] bg-pink-500/10 text-pink-500 hover:bg-pink-500/20 border border-pink-500/20 shadow-[2px_2px_0px_0px_rgba(236,72,153,0.3)]"
+                        className="font-pixel text-[10px] bg-secondary/10 text-secondary hover:bg-secondary/20 border border-secondary/20 shadow-[2px_2px_0px_0px_rgba(236,72,153,0.3)]"
                     />
                     <Button className="flex items-center gap-2 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none">
                         <Plus className="w-4 h-4" />

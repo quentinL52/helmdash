@@ -124,7 +124,7 @@ export function ThreatMatrix() {
             <Card className="bg-card border-border">
                 <CardHeader className="pb-2">
                     <CardTitle className="text-base text-foreground flex items-center gap-2">
-                        <Target className="h-4 w-4 text-red-400" />
+                        <Target className="h-4 w-4 text-danger" />
                         {language === 'fr' ? 'Probabilité vs Impact' : 'Probability vs Impact'}
                     </CardTitle>
                 </CardHeader>
@@ -219,10 +219,10 @@ export function ThreatMatrix() {
                         <div className="absolute top-6 left-8 text-xs text-muted-foreground/50 pointer-events-none">
                             {quadrantLabels.topLeft}
                         </div>
-                        <div className="absolute top-6 right-10 text-xs text-red-400/50 pointer-events-none">
+                        <div className="absolute top-6 right-10 text-xs text-danger/50 pointer-events-none">
                             {quadrantLabels.topRight}
                         </div>
-                        <div className="absolute bottom-10 left-8 text-xs text-green-400/50 pointer-events-none">
+                        <div className="absolute bottom-10 left-8 text-xs text-success/50 pointer-events-none">
                             {quadrantLabels.bottomLeft}
                         </div>
                         <div className="absolute bottom-10 right-10 text-xs text-muted-foreground/50 pointer-events-none">
@@ -259,9 +259,9 @@ export function ThreatMatrix() {
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Critical threats */}
-                <Card className="bg-red-500/5 border-red-500/20">
+                <Card className="bg-danger/5 border-danger/20">
                     <CardContent className="pt-4 pb-3">
-                        <p className="text-sm font-medium text-red-400 mb-2">
+                        <p className="text-sm font-medium text-danger mb-2">
                             {quadrantLabels.topRight}
                         </p>
                         <div className="space-y-1">
@@ -274,7 +274,7 @@ export function ThreatMatrix() {
                                             style={{ backgroundColor: MOMENTUM_COLORS[d.momentum] }}
                                         />
                                         <span className="text-sm text-foreground">{d.name}</span>
-                                        <Badge className="ml-auto bg-red-500/20 text-red-400 border-red-500/30 text-xs">
+                                        <Badge className="ml-auto bg-danger/20 text-danger border-danger/30 text-xs">
                                             {Math.round(d.x)}%
                                         </Badge>
                                     </div>
@@ -289,9 +289,9 @@ export function ThreatMatrix() {
                 </Card>
 
                 {/* Watch list */}
-                <Card className="bg-yellow-500/5 border-yellow-500/20">
+                <Card className="bg-warning/5 border-warning/20">
                     <CardContent className="pt-4 pb-3">
-                        <p className="text-sm font-medium text-yellow-400 mb-2">
+                        <p className="text-sm font-medium text-warning mb-2">
                             {language === 'fr' ? 'À surveiller' : 'Watch list'}
                         </p>
                         <div className="space-y-1">
@@ -316,9 +316,9 @@ export function ThreatMatrix() {
                 </Card>
 
                 {/* Low risk */}
-                <Card className="bg-green-500/5 border-green-500/20">
+                <Card className="bg-success/5 border-success/20">
                     <CardContent className="pt-4 pb-3">
-                        <p className="text-sm font-medium text-green-400 mb-2">
+                        <p className="text-sm font-medium text-success mb-2">
                             {quadrantLabels.bottomLeft}
                         </p>
                         <div className="space-y-1">

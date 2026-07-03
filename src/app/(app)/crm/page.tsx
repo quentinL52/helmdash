@@ -26,7 +26,7 @@ import { createClient } from '@/utils/supabase/client';
 const STATUS_COLORS: Record<ContactStatus, string> = {
     'À contacter': 'border-primary/50 text-primary',
     'En discussion': 'border-warning/50 text-warning',
-    'Qualifié': 'border-cyan-500/50 text-cyan-400',
+    'Qualifié': 'border-info/50 text-info',
     'Client': 'border-success/50 text-success',
     'Perdu': 'border-danger/50 text-danger',
 };
@@ -139,7 +139,7 @@ export default function CRMPage() {
             {/* Header */}
             <div className="flex items-center justify-between space-y-2">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-blue-500 flex items-center gap-3">
+                    <h1 className="text-3xl font-bold tracking-tight font-pixel text-info flex items-center gap-3">
                         <Users className="w-8 h-8" />
                         {t.title || 'CRM Lite'}
                     </h1>
@@ -155,7 +155,7 @@ export default function CRMPage() {
                             contacts: store.contacts
                         })}
                         variant="secondary"
-                        className="font-pixel text-[10px] bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 border border-blue-500/20 shadow-[2px_2px_0px_0px_rgba(59,130,246,0.3)]"
+                        className="font-pixel text-[10px] bg-info/10 text-info hover:bg-info/20 border border-info/20 shadow-[2px_2px_0px_0px_rgba(59,130,246,0.3)]"
                     />
                     <Button
                         variant="outline"
@@ -223,7 +223,7 @@ export default function CRMPage() {
                                                             title={contact.email}
                                                             onClick={(e) => e.stopPropagation()}
                                                         >
-                                                            <Mail className="w-3.5 h-3.5 text-muted-foreground hover:text-cyan-400 transition-colors" />
+                                                            <Mail className="w-3.5 h-3.5 text-muted-foreground hover:text-info transition-colors" />
                                                         </a>
                                                     )}
                                                     {contact.linkedin && (
@@ -234,7 +234,7 @@ export default function CRMPage() {
                                                             title="LinkedIn"
                                                             onClick={(e) => e.stopPropagation()}
                                                         >
-                                                            <Linkedin className="w-3.5 h-3.5 text-muted-foreground hover:text-blue-500 transition-colors" />
+                                                            <Linkedin className="w-3.5 h-3.5 text-muted-foreground hover:text-info transition-colors" />
                                                         </a>
                                                     )}
                                                 </div>
@@ -311,7 +311,7 @@ export default function CRMPage() {
                                             <Button
                                                 size="icon"
                                                 variant="ghost"
-                                                className="h-8 w-8 text-muted-foreground hover:text-red-400"
+                                                className="h-8 w-8 text-muted-foreground hover:text-danger"
                                                 onClick={() => deleteContact(contact.id)}
                                                 title={common.delete}
                                             >

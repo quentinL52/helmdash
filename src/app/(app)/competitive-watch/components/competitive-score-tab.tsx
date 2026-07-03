@@ -176,22 +176,22 @@ export function CompetitiveScoreTab() {
     }, [competitors, mySolution, weights, factorWeights, marketSignals]);
 
     const getRankIcon = (index: number) => {
-        if (index === 0) return <Trophy className="h-6 w-6 text-yellow-400" />;
+        if (index === 0) return <Trophy className="h-6 w-6 text-warning" />;
         if (index === 1) return <Medal className="h-6 w-6 text-gray-300" />;
-        if (index === 2) return <Award className="h-6 w-6 text-orange-400" />;
+        if (index === 2) return <Award className="h-6 w-6 text-primary" />;
         return <span className="text-muted-foreground font-bold text-lg w-6 text-center">{index + 1}</span>;
     };
 
     const getMomentumIcon = (momentum: string | null) => {
-        if (momentum === 'rising') return <TrendingUp className="h-3.5 w-3.5 text-green-400" />;
-        if (momentum === 'declining') return <TrendingDown className="h-3.5 w-3.5 text-red-400" />;
+        if (momentum === 'rising') return <TrendingUp className="h-3.5 w-3.5 text-success" />;
+        if (momentum === 'declining') return <TrendingDown className="h-3.5 w-3.5 text-danger" />;
         return null;
     };
 
     const getScoreColor = (score: number) => {
-        if (score >= 70) return 'text-green-400';
-        if (score >= 40) return 'text-yellow-400';
-        return 'text-red-400';
+        if (score >= 70) return 'text-success';
+        if (score >= 40) return 'text-warning';
+        return 'text-danger';
     };
 
     return (
@@ -247,9 +247,9 @@ export function CompetitiveScoreTab() {
                             <CardContent className="space-y-3">
                                 {([
                                     { key: 'radar', label: t.radarWeight, color: 'text-primary' },
-                                    { key: 'features', label: t.featuresWeight, color: 'text-teal-400' },
+                                    { key: 'features', label: t.featuresWeight, color: 'text-info' },
                                     { key: 'signals', label: t.signalsWeight, color: 'text-destructive' },
-                                    { key: 'dataQuality', label: t.dataWeight, color: 'text-yellow-400' },
+                                    { key: 'dataQuality', label: t.dataWeight, color: 'text-warning' },
                                 ] as const).map(({ key, label, color }) => (
                                     <div key={key} className="space-y-1">
                                         <div className="flex justify-between text-sm">
@@ -356,7 +356,7 @@ export function CompetitiveScoreTab() {
                                                 <span className="font-mono">{entity.breakdown.radar}/100</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-teal-400">{t.breakdown.features}</span>
+                                                <span className="text-info">{t.breakdown.features}</span>
                                                 <span className="font-mono">{entity.breakdown.features}/100</span>
                                             </div>
                                             <div className="flex justify-between">
@@ -364,7 +364,7 @@ export function CompetitiveScoreTab() {
                                                 <span className="font-mono">{entity.breakdown.signals}/100</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-yellow-400">{t.breakdown.dataQuality}</span>
+                                                <span className="text-warning">{t.breakdown.dataQuality}</span>
                                                 <span className="font-mono">{entity.breakdown.dataQuality}/100</span>
                                             </div>
                                             <hr className="border-border" />

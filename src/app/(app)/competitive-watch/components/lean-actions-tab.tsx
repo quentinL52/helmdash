@@ -120,29 +120,29 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
             key: 'strengths' as const,
             label: language === 'fr' ? 'Forces' : 'Strengths',
             icon: Shield,
-            color: 'text-emerald-400',
-            bg: 'bg-emerald-500/10 border-emerald-500/20',
+            color: 'text-success',
+            bg: 'bg-success/10 border-success/20',
         },
         {
             key: 'weaknesses' as const,
             label: language === 'fr' ? 'Faiblesses' : 'Weaknesses',
             icon: AlertTriangle,
-            color: 'text-red-400',
-            bg: 'bg-red-500/10 border-red-500/20',
+            color: 'text-danger',
+            bg: 'bg-danger/10 border-danger/20',
         },
         {
             key: 'opportunities' as const,
             label: language === 'fr' ? 'Opportunités' : 'Opportunities',
             icon: Lightbulb,
-            color: 'text-blue-400',
-            bg: 'bg-blue-500/10 border-blue-500/20',
+            color: 'text-info',
+            bg: 'bg-info/10 border-info/20',
         },
         {
             key: 'threats' as const,
             label: language === 'fr' ? 'Menaces' : 'Threats',
             icon: Target,
-            color: 'text-orange-400',
-            bg: 'bg-orange-500/10 border-orange-500/20',
+            color: 'text-primary',
+            bg: 'bg-primary/10 border-primary/20',
         },
     ];
 
@@ -239,7 +239,7 @@ export function LeanActionsTab({ advancedMode }: LeanActionsTabProps) {
                                             <li className="mt-2">
                                                 <div className="flex gap-2 items-center">
                                                     <input
-                                                        className="flex-1 text-xs bg-transparent border-b border-dashed border-muted-foreground/30 focus:border-violet-500 outline-none py-1 placeholder:text-muted-foreground/40"
+                                                        className="flex-1 text-xs bg-transparent border-b border-dashed border-muted-foreground/30 focus:border-secondary outline-none py-1 placeholder:text-muted-foreground/40"
                                                         placeholder={language === 'fr' ? "+ Ajouter..." : "+ Add item..."}
                                                         value={newItemTexts[key] || ''}
                                                         onChange={(e) => setNewItemTexts(prev => ({ ...prev, [key]: e.target.value }))}

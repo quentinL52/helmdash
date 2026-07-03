@@ -319,7 +319,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                                 </div>
                             </PopoverContent>
                         </Popover>
-                        <span className={`text-2xl font-bold ${Number(runwayMonths) < 3 && runwayMonths !== '∞' ? 'text-red-500' : 'text-green-500'}`}>
+                        <span className={`text-2xl font-bold ${Number(runwayMonths) < 3 && runwayMonths !== '∞' ? 'text-danger' : 'text-success'}`}>
                             {runwayMonths} {t.chart.months}
                         </span>
                     </div>
@@ -329,21 +329,21 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                 <div className="h-[400px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <ComposedChart data={data} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" />
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                             <XAxis
                                 dataKey="date"
                                 type="number"
                                 scale="time"
                                 domain={['auto', 'auto']}
                                 tickFormatter={formatXAxis}
-                                stroke="#94a3b8"
+                                stroke="hsl(var(--muted-foreground))"
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
                             />
                             <YAxis
                                 yAxisId="left"
-                                stroke="#94a3b8"
+                                stroke="hsl(var(--muted-foreground))"
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
@@ -352,57 +352,57 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                             <YAxis
                                 yAxisId="right"
                                 orientation="right"
-                                stroke="#94a3b8"
+                                stroke="hsl(var(--muted-foreground))"
                                 fontSize={12}
                                 tickLine={false}
                                 axisLine={false}
                                 tickFormatter={(value) => value >= 1000 || value <= -1000 ? `${(value / 1000).toFixed(0)}k` : `${value}`}
                             />
                             <Tooltip
-                                contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
+                                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: 'none', borderRadius: '8px', color: 'hsl(var(--card-foreground))' }}
                                 formatter={(value: number) => [`${value.toFixed(0)} €`, '']}
                                 labelFormatter={(label) => formatXAxis(label)}
-                                labelStyle={{ color: '#94a3b8' }}
+                                labelStyle={{ color: 'hsl(var(--muted-foreground))' }}
                             />
                             <Legend />
-                            <Bar yAxisId="left" dataKey="income" name={formT.income} fill="#22c55e" radius={[4, 4, 0, 0]} maxBarSize={50} />
-                            <Bar yAxisId="left" dataKey="expense" name={formT.expense} fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={50} />
+                            <Bar yAxisId="left" dataKey="income" name={formT.income} fill="hsl(var(--success))" radius={[4, 4, 0, 0]} maxBarSize={50} />
+                            <Bar yAxisId="left" dataKey="expense" name={formT.expense} fill="hsl(var(--danger))" radius={[4, 4, 0, 0]} maxBarSize={50} />
                             <Line
                                 yAxisId="right"
                                 type="monotone"
                                 dataKey="balance"
                                 name={t.chart.cash}
-                                stroke="#3b82f6"
+                                stroke="hsl(var(--info))"
                                 strokeWidth={3}
-                                dot={{ r: 4, fill: '#3b82f6' }}
+                                dot={{ r: 4, fill: 'hsl(var(--info))' }}
                                 activeDot={{ r: 6 }}
                             />
                             <ReferenceLine
                                 yAxisId="left"
                                 x={new Date().getTime()}
-                                stroke="#fbbf24"
+                                stroke="hsl(var(--warning))"
                                 strokeDasharray="3 3"
-                                label={{ position: 'top', value: t.chart.today, fill: '#fbbf24', fontSize: 12 }}
+                                label={{ position: 'top', value: t.chart.today, fill: 'hsl(var(--warning))', fontSize: 12 }}
                             />
                             {finance.targetMRR ? (
                                 <ReferenceLine
                                     yAxisId="left"
                                     y={finance.targetMRR}
-                                    stroke="#10b981"
+                                    stroke="hsl(var(--success))"
                                     strokeDasharray="4 4"
-                                    label={{ position: 'insideTopLeft', value: t.chart.targetMRR || 'Target MRR', fill: '#10b981', fontSize: 12 }}
+                                    label={{ position: 'insideTopLeft', value: t.chart.targetMRR || 'Target MRR', fill: 'hsl(var(--success))', fontSize: 12 }}
                                 />
                             ) : null}
                             {finance.firstRevenueDate ? (
                                 <ReferenceLine
                                     yAxisId="left"
                                     x={new Date(finance.firstRevenueDate).getTime()}
-                                    stroke="#a855f7"
+                                    stroke="hsl(var(--secondary))"
                                     strokeDasharray="4 4"
-                                    label={{ position: 'top', value: t.chart.firstRevenue || 'First Revenue', fill: '#a855f7', fontSize: 12 }}
+                                    label={{ position: 'top', value: t.chart.firstRevenue || 'First Revenue', fill: 'hsl(var(--secondary))', fontSize: 12 }}
                                 />
                             ) : null}
-                            <ReferenceLine yAxisId="right" y={0} stroke="#ef4444" strokeDasharray="3 3" />
+                            <ReferenceLine yAxisId="right" y={0} stroke="hsl(var(--danger))" strokeDasharray="3 3" />
                         </ComposedChart>
                     </ResponsiveContainer>
                 </div>

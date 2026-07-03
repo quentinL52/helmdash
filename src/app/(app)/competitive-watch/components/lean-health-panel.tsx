@@ -22,15 +22,15 @@ import { cn } from '@/lib/utils';
  * Returns the appropriate color class based on score value.
  */
 function getScoreColor(score: number): string {
-    if (score >= 70) return 'bg-emerald-500';
-    if (score >= 40) return 'bg-amber-400';
-    return 'bg-red-400';
+    if (score >= 70) return 'bg-success';
+    if (score >= 40) return 'bg-warning';
+    return 'bg-danger';
 }
 
 function getScoreTextColor(score: number): string {
-    if (score >= 70) return 'text-emerald-500';
-    if (score >= 40) return 'text-amber-400';
-    return 'text-red-400';
+    if (score >= 70) return 'text-success';
+    if (score >= 40) return 'text-warning';
+    return 'text-danger';
 }
 
 /**

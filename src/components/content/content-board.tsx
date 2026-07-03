@@ -158,10 +158,10 @@ export function ContentBoard() {
 
 function ContentCard({ idea, onDelete, onStatusChange }: { idea: ContentIdea, onDelete: () => void, onStatusChange: (s: ContentStatus) => void }) {
     const channelColors: Record<string, string> = {
-        LinkedIn: 'text-blue-500 bg-blue-500/10 border-blue-500/20',
-        Article: 'text-orange-500 bg-orange-500/10 border-orange-500/20',
-        Newsletter: 'text-amber-500 bg-amber-500/10 border-amber-500/20',
-        Thread: 'text-sky-500 bg-sky-500/10 border-sky-500/20',
+        LinkedIn: 'text-info bg-info/10 border-info/20',
+        Article: 'text-primary bg-primary/10 border-primary/20',
+        Newsletter: 'text-warning bg-warning/10 border-warning/20',
+        Thread: 'text-info bg-info/10 border-info/20',
     };
 
     const defaultChannelClass = 'text-muted-foreground bg-muted border-border';

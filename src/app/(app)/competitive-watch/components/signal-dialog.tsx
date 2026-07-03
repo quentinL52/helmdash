@@ -220,12 +220,12 @@ export function SignalDialog({
                             className="flex gap-4"
                         >
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="positive" id="sig-positive" className="border-green-500 text-green-500" />
-                                <Label htmlFor="sig-positive" className="text-green-400 cursor-pointer">{t.signals.impact.positive}</Label>
+                                <RadioGroupItem value="positive" id="sig-positive" className="border-success text-success" />
+                                <Label htmlFor="sig-positive" className="text-success cursor-pointer">{t.signals.impact.positive}</Label>
                             </div>
                             <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="negative" id="sig-negative" className="border-red-500 text-red-500" />
-                                <Label htmlFor="sig-negative" className="text-red-400 cursor-pointer">{t.signals.impact.negative}</Label>
+                                <RadioGroupItem value="negative" id="sig-negative" className="border-danger text-danger" />
+                                <Label htmlFor="sig-negative" className="text-danger cursor-pointer">{t.signals.impact.negative}</Label>
                             </div>
                             <div className="flex items-center space-x-2">
                                 <RadioGroupItem value="neutral" id="sig-neutral" className="border-gray-500 text-gray-500" />

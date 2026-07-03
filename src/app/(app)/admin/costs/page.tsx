@@ -83,7 +83,7 @@ export default function AICostsDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight font-mono flex items-center gap-3">
-          <DollarSign className="w-8 h-8 text-emerald-500" />
+          <DollarSign className="w-8 h-8 text-success" />
           Coûts IA
         </h1>
         <p className="text-muted-foreground mt-1">
@@ -113,7 +113,7 @@ export default function AICostsDashboard() {
             <CardTitle className="text-sm font-medium text-muted-foreground">Coût estimé</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-emerald-500">
+            <div className="text-3xl font-bold text-success">
               ${(stats?.estimatedCost || 0).toFixed(2)}
             </div>
           </CardContent>

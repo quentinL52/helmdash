@@ -21,7 +21,7 @@ export function SidebarGamificationWidget() {
                         <span className="text-sm font-bold font-pixel text-primary truncate max-w-[100px]">
                             NIV {currentLevel.level}
                         </span>
-                        <div className="flex items-center gap-1 text-xs font-bold text-orange-500">
+                        <div className="flex items-center gap-1 text-xs font-bold text-primary">
                             <Flame className="w-3 h-3" />
                             {streak.currentStreak}
                         </div>

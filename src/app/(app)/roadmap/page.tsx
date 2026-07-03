@@ -95,7 +95,7 @@ export default function RoadmapPage() {
   return (
     <div className="h-full flex flex-col space-y-6 animate-in fade-in duration-300">
       <div className="flex justify-between items-center shrink-0">
-        <h1 className="text-3xl font-bold tracking-tight font-pixel text-orange-500 flex items-center gap-3">
+        <h1 className="text-3xl font-bold tracking-tight font-pixel text-primary flex items-center gap-3">
             <MapIcon className="w-8 h-8" />
             {t.title}
         </h1>
@@ -109,7 +109,7 @@ export default function RoadmapPage() {
       {showForm && (
         <Card className="shrink-0 border-t-4 border-t-orange-500 animate-in slide-in-from-top-4 duration-200">
           <CardHeader>
-              <CardTitle className="text-lg font-pixel text-orange-500">
+              <CardTitle className="text-lg font-pixel text-primary">
                 {t.new}
               </CardTitle>
             </CardHeader>
