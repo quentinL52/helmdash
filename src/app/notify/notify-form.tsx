@@ -1,17 +1,18 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 export function NotifyForm() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const t = useTranslations('notify');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
     setLoading(true);
-    // Simuler l'enregistrement (à connecter à une liste d'attente réelle)
     await new Promise((r) => setTimeout(r, 1000));
     setSubmitted(true);
     setLoading(false);
@@ -20,7 +21,6 @@ export function NotifyForm() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-6 bg-gradient-to-b from-background to-muted/30">
       <div className="max-w-md w-full text-center space-y-8">
-        {/* Logo */}
         <div className="inline-flex items-center gap-3 mb-4">
           <svg width="40" height="40" viewBox="0 0 100 100" fill="none" className="text-primary">
             <circle cx="50" cy="50" r="37" fill="none" stroke="currentColor" strokeWidth="9" />
@@ -38,18 +38,18 @@ export function NotifyForm() {
         </div>
 
         <h1 className="text-4xl font-bold tracking-tight">
-          Take the helm of your startup
+          {t('heroTitle')}
         </h1>
         <p className="text-lg text-muted-foreground">
-          The AI assistant that orchestrates your data, agents, and memory.
-          <br />Get notified when we launch.
+          {t('heroSubtitle')}
+          <br />{t('getNotified')}
         </p>
 
         {submitted ? (
           <div className="p-6 rounded-xl bg-primary/10 border border-primary/20">
-            <p className="text-lg font-medium text-green-500">✅ You are on the list!</p>
+            <p className="text-lg font-medium text-green-500">{t('onList')}</p>
             <p className="text-sm text-muted-foreground mt-2">
-              We will keep you informed about the launch. In the meantime, follow us on <a href="https://twitter.com/helmdash" className="underline">Twitter</a>.
+              {t('followUs')} <a href="https://twitter.com/helmdash" className="underline">Twitter</a>.
             </p>
           </div>
         ) : (
@@ -67,14 +67,14 @@ export function NotifyForm() {
               disabled={loading || !email.trim()}
               className="px-6 py-3 rounded-lg bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-colors disabled:opacity-50"
             >
-              {loading ? 'Subscribing...' : 'Notify me'}
+              {loading ? t('subscribing') : t('notifyMe')}
             </button>
           </form>
         )}
 
         <p className="text-xs text-muted-foreground">
-          No spam. Unsubscribe anytime. Data processed according to our{' '}
-          <a href="/legal/privacy" className="underline">Privacy Policy</a>.
+          {t('noSpam')}{' '}
+          <a href="/legal/privacy" className="underline">{t('privacyPolicy')}</a>.
         </p>
       </div>
     </main>

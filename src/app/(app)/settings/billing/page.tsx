@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { BillingPanel } from '@/components/dashboard/billing-panel';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CreditCard, ArrowLeft } from 'lucide-react';
@@ -7,6 +8,9 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
 export default function BillingSettingsPage() {
+  const t = useTranslations('billing');
+  const tc = useTranslations('common');
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-12">
       <div className="flex items-center gap-4">
@@ -18,28 +22,28 @@ export default function BillingSettingsPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-mono text-primary flex items-center gap-3">
             <CreditCard className="w-8 h-8" />
-            Abonnement
+            {t('subscriptionTitle')}
           </h1>
           <p className="text-muted-foreground mt-1">
-            Gérez votre forfait, votre méthode de paiement et vos factures.
+            {t('subscriptionSubtitle')}
           </p>
         </div>
       </div>
 
-      <BillingPanel currentPlan="free" />
+      <BillingPanel />
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm">Informations de facturation</CardTitle>
+          <CardTitle className="text-sm">{t('billingInfo')}</CardTitle>
           <CardDescription>
-            Tous les paiements sont sécurisés via Stripe. Vos coordonnées bancaires ne sont jamais stockées sur nos serveurs.
+            {t('paymentSecure')}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground space-y-2">
-          <p>🔒 Paiement chiffré via Stripe (PCI DSS Level 1)</p>
-          <p>📧 Factures envoyées par email après chaque paiement</p>
-          <p>🔄 Upgrade/downgrade à tout moment, sans frais</p>
-          <p>❌ Pas d'engagement — annulation possible depuis votre portail Stripe</p>
+          <p>{t('paymentEncrypted')}</p>
+          <p>{t('invoiceByEmail')}</p>
+          <p>{t('upgradeAnytime')}</p>
+          <p>{t('cancelAnytime')}</p>
         </CardContent>
       </Card>
     </div>

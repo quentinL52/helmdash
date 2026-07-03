@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { toast } from '@/hooks/use-toast';
+import type { Cohort, PlanStatus } from '@/lib/billing/cohort-config';
 
 
 
@@ -422,8 +423,10 @@ export interface FounderProfile {
 
 export interface FounderStore {
     // --- State ---
-    userId: string | null; // For data isolation check
-    planTier: 'free' | 'starter' | 'growth' | 'scale';
+    userId: string | null;
+    planStatus: PlanStatus;
+    cohort: Cohort | null;
+    cohortRank: number | null;
     hypotheses: Hypothesis[];
     finance: FinanceData;
     journalEntries: JournalEntry[];
@@ -551,7 +554,9 @@ export interface FounderStore {
     setLanguage: (lang: 'fr' | 'en') => void;
     hydrate: (state: Partial<FounderStore>) => void;
     setUserId: (id: string | null) => void;
-    setPlanTier: (tier: 'free' | 'starter' | 'growth' | 'scale') => void;
+    setPlanStatus: (status: PlanStatus) => void;
+    setCohort: (cohort: Cohort | null) => void;
+    setCohortRank: (rank: number | null) => void;
     setAiSettings: (settings: Partial<AiSettings>) => void;
     setFounderProfile: (profile: Partial<FounderProfile>) => void;
     updateGoToMarket: (updates: Partial<GoToMarketStrategy>) => void;
@@ -574,7 +579,9 @@ const calculateObjectiveProgress = (krs: KeyResult[]): number => {
 
 const initialState = {
     userId: null,
-    planTier: 'free' as const,
+    planStatus: 'trialing' as PlanStatus,
+    cohort: null as Cohort | null,
+    cohortRank: null as number | null,
     language: 'fr' as const,
     hypotheses: [],
     finance: {
@@ -695,7 +702,9 @@ export const useFounderStore = create<FounderStore>()(
             language: 'fr', // Explicit override if needed, but initialState has it
 
             setUserId: (id) => set({ userId: id }),
-            setPlanTier: (tier) => set({ planTier: tier }),
+            setPlanStatus: (status) => set({ planStatus: status }),
+            setCohort: (cohort) => set({ cohort }),
+            setCohortRank: (rank) => set({ cohortRank: rank }),
             setLanguage: (lang) => set({ language: lang }),
             setAiSettings: (settings) => set((state) => ({ aiSettings: { ...state.aiSettings, ...settings } })),
             setFounderProfile: (profile) => set((state) => ({ founderProfile: { ...state.founderProfile, ...profile } })),

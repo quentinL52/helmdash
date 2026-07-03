@@ -21,6 +21,7 @@ import {
 import { WidgetWrapper } from './widget-wrapper';
 import { WIDGET_REGISTRY, WidgetSize, getDefaultLayout, GAMIFICATION_WIDGET_IDS } from './widget-registry';
 import { useFounderStore } from '@/store/founder-store';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Plus, Save, X, LayoutDashboard } from 'lucide-react';
 import {
@@ -40,6 +41,7 @@ export interface WidgetInstance {
 
 export function WidgetGrid() {
   const store = useFounderStore();
+  const t = useTranslations('dashboard');
   const [isEditMode, setIsEditMode] = useState(false);
   
   // Local state for widgets
@@ -112,7 +114,7 @@ export function WidgetGrid() {
 
   const handleAddWidget = (type: string) => {
     if (widgets.some(w => w.type === type)) {
-      alert("Ce widget est déjà sur votre dashboard.");
+      alert(t('widgetAlreadyAdded'));
       return;
     }
     
@@ -140,11 +142,11 @@ export function WidgetGrid() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="font-pixel text-[10px]">
-                  <Plus className="w-4 h-4 mr-1" /> WIDGET
+                  <Plus className="w-4 h-4 mr-1" /> {t('addWidget')}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel className="font-pixel text-[10px]">WIDGETS DISPONIBLES</DropdownMenuLabel>
+                <DropdownMenuLabel className="font-pixel text-[10px]">{t('availableWidgets')}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {Object.values(WIDGET_REGISTRY)
                   .filter(def => !(GAMIFICATION_WIDGET_IDS as readonly string[]).includes(def.id))
@@ -165,12 +167,12 @@ export function WidgetGrid() {
               <X className="w-4 h-4 mr-1" />
             </Button>
             <Button size="sm" onClick={handleSaveLayout} className="font-pixel text-[10px] bg-primary text-primary-foreground">
-              <Save className="w-4 h-4 mr-1" /> SAUVEGARDER
+              <Save className="w-4 h-4 mr-1" /> {t('saveLayout')}
             </Button>
           </div>
         ) : (
           <Button variant="outline" size="sm" onClick={() => setIsEditMode(true)} className="font-pixel text-[10px]">
-            PERSONNALISER
+            {t('customize')}
           </Button>
         )}
       </div>

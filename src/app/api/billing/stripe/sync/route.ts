@@ -15,7 +15,7 @@ async function handler(req: NextRequest, { userId }: { userId: string }) {
     // Vérifier que l'utilisateur existe et a un customer Stripe
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { stripeCustomerId: true, planTier: true },
+      select: { stripeCustomerId: true, planStatus: true },
     });
 
     if (!user?.stripeCustomerId) {

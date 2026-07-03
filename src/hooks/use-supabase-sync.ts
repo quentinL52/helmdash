@@ -145,16 +145,17 @@ export function useSupabaseSync() {
                 }
 
 
-                // Plan tier fetch is currently failing due to missing column in 'users' table.
-                // Re-enable this once the schema is updated.
-                const { data: userData, error: userError } = await supabase
+                const { data: userData } = await supabase
                     .from('users')
-                    .select('plan_tier')
+                    .select('plan_status, cohort, cohort_rank')
                     .eq('id', user.id)
                     .single();
 
-                if (userData?.plan_tier) {
-                    useFounderStore.getState().setPlanTier(userData.plan_tier as any);
+                if (userData) {
+                    const store = useFounderStore.getState();
+                    if (userData.plan_status) store.setPlanStatus(userData.plan_status as any);
+                    if (userData.cohort) store.setCohort(userData.cohort as any);
+                    if (userData.cohort_rank != null) store.setCohortRank(userData.cohort_rank);
                 }
             } catch (err: any) {
                 console.error('[Sync] Unexpected load error:', err);

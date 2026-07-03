@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { createClient } from '@/utils/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +19,8 @@ export function AuthFormsWrapper() {
     const router = useRouter();
     const supabase = createClient();
     const { toast } = useToast();
+    const t = useTranslations('auth');
+    const tc = useTranslations('common');
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -34,8 +37,8 @@ export function AuthFormsWrapper() {
                 });
                 if (error) throw error;
                 toast({
-                    title: "Vérifiez vos emails",
-                    description: "Un lien de confirmation vous a été envoyé.",
+                    title: t('checkEmailTitle'),
+                    description: t('checkEmailDesc'),
                 });
             } else {
                 const { error } = await supabase.auth.signInWithPassword({
@@ -48,8 +51,8 @@ export function AuthFormsWrapper() {
             }
         } catch (error: any) {
             toast({
-                title: "Erreur",
-                description: error.message || "Une erreur est survenue",
+                title: tc('error'),
+                description: error.message || t('errorGeneric'),
                 variant: "destructive",
             });
         } finally {
@@ -74,8 +77,8 @@ export function AuthFormsWrapper() {
             if (error) throw error;
         } catch (error: any) {
             toast({
-                title: "Erreur Google",
-                description: error.message || "Impossible de se connecter avec Google",
+                title: t('googleErrorTitle'),
+                description: error.message || t('googleErrorDesc'),
                 variant: "destructive",
             });
             setLoading(false);
@@ -85,19 +88,19 @@ export function AuthFormsWrapper() {
     return (
         <Card className="w-full bg-card border-border text-foreground">
             <CardHeader>
-                <CardTitle>{isSignUp ? "Créer un compte" : "Se connecter"}</CardTitle>
+                <CardTitle>{isSignUp ? t('signupTitle') : t('loginTitle')}</CardTitle>
                 <CardDescription className="text-muted-foreground">
-                    {isSignUp ? "Entrez vos informations pour commencer." : "Bienvenue sur Helmdash."}
+                    {isSignUp ? t('signupSubtitle') : t('loginSubtitle')}
                 </CardDescription>
             </CardHeader>
             <form onSubmit={handleAuth}>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="email" className="text-foreground">Email</Label>
+                        <Label htmlFor="email" className="text-foreground">{t('email')}</Label>
                         <Input
                             id="email"
                             type="email"
-                            placeholder="fondateur@startup.com"
+                            placeholder="founder@startup.com"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -105,7 +108,7 @@ export function AuthFormsWrapper() {
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="password" className="text-foreground">Mot de passe</Label>
+                        <Label htmlFor="password" className="text-foreground">{t('password')}</Label>
                         <Input
                             id="password"
                             type="password"
@@ -123,14 +126,14 @@ export function AuthFormsWrapper() {
                         disabled={loading}
                     >
                         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {isSignUp ? "S'inscrire" : "Se connecter"}
+                        {isSignUp ? tc('signup') : tc('login')}
                     </Button>
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
                             <span className="w-full border-t border-border" />
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-card px-2 text-muted-foreground">Ou</span>
+                            <span className="bg-card px-2 text-muted-foreground">{tc('or')}</span>
                         </div>
                     </div>
                     <Button
@@ -159,16 +162,16 @@ export function AuthFormsWrapper() {
                             />
                             <path d="M1 1h22v22H1z" fill="none" />
                         </svg>
-                        Continuer avec Google
+                        {t('continueWithGoogle')}
                     </Button>
                     <div className="text-sm text-center text-muted-foreground">
-                        {isSignUp ? "Déjà un compte ?" : "Pas encore de compte ?"}
+                        {isSignUp ? t('hasAccount') : t('noAccount')}
                         <button
                             type="button"
                             onClick={() => setIsSignUp(!isSignUp)}
                             className="ml-2 text-primary hover:underline"
                         >
-                            {isSignUp ? "Se connecter" : "S'inscrire"}
+                            {isSignUp ? tc('login') : tc('signup')}
                         </button>
                     </div>
                 </CardFooter>

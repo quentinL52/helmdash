@@ -4,9 +4,8 @@ import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-import { useFounderStore } from '@/store/founder-store';
-import { translations } from '@/lib/translations';
 import {
     LayoutDashboard,
     FlaskConical,
@@ -33,10 +32,8 @@ import { SidebarGamificationWidget } from '@/components/gamification/sidebar-wid
 export function AppSidebar() {
     const pathname = usePathname();
     const router = useRouter();
-    const language = useFounderStore(s => s.language);
+    const t = useTranslations('nav');
     const supabase = createClient();
-    const t = translations[language].nav;
-    const common = translations[language].common;
 
     const [isVisible, setIsVisible] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
@@ -44,21 +41,21 @@ export function AppSidebar() {
     const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const navItems = [
-        { href: '/agent', label: t.agent, icon: Bot },
-        { href: '/dashboard', label: t.dashboard, icon: LayoutDashboard },
-        { href: '/progression', label: t.progression || 'Progression', icon: Trophy },
-        { href: '/hypotheses', label: t.hypotheses, icon: FlaskConical },
-        { href: '/finances', label: t.finance, icon: PieChart },
-        { href: '/lean-canvas', label: t.leanCanvas, icon: LayoutGrid },
-        { href: '/roadmap', label: t.roadmap, icon: KanbanSquare },
-        { href: '/routine', label: t.routine, icon: Repeat },
-        { href: '/competitive-watch', label: (translations[language] as any).competitiveWatch?.nav || 'Veille Stratégique', icon: Radar },
-        { href: '/memory', label: (t as any).memory || 'Mémoire', icon: BrainCircuit },
-        { href: '/whiteboard', label: t.whiteboard, icon: PenSquare },
-        { href: '/content', label: t.content, icon: Megaphone },
-        { href: '/go-to-market', label: 'Go-To-Market', icon: Target },
-        { href: '/crm', label: t.crm, icon: Users },
-        { href: '/journal', label: t.journal, icon: BookOpen },
+        { href: '/agent', label: t('agent'), icon: Bot },
+        { href: '/dashboard', label: t('dashboard'), icon: LayoutDashboard },
+        { href: '/progression', label: t('progression'), icon: Trophy },
+        { href: '/hypotheses', label: t('hypotheses'), icon: FlaskConical },
+        { href: '/finances', label: t('finances'), icon: PieChart },
+        { href: '/lean-canvas', label: t('leanCanvas'), icon: LayoutGrid },
+        { href: '/roadmap', label: t('roadmap'), icon: KanbanSquare },
+        { href: '/routine', label: t('routine'), icon: Repeat },
+        { href: '/competitive-watch', label: t('competitive'), icon: Radar },
+        { href: '/memory', label: t('memory'), icon: BrainCircuit },
+        { href: '/whiteboard', label: t('whiteboard'), icon: PenSquare },
+        { href: '/content', label: t('content'), icon: Megaphone },
+        { href: '/go-to-market', label: t('goToMarket'), icon: Target },
+        { href: '/crm', label: t('crm'), icon: Users },
+        { href: '/journal', label: t('journal'), icon: BookOpen },
     ];
 
     const showSidebar = useCallback(() => {
@@ -168,7 +165,7 @@ export function AppSidebar() {
                         )}
                     >
                         <Settings className="w-4 h-4 shrink-0" />
-                        <span className="truncate">{language === 'fr' ? 'Paramètres' : 'Settings'}</span>
+                        <span className="truncate">{t('settings')}</span>
                     </Link>
                     <Button
                         variant="ghost"
@@ -177,7 +174,7 @@ export function AppSidebar() {
                     >
                         <LogOut className="w-4 h-4" />
                         <span className="text-sm font-medium">
-                            {language === 'fr' ? 'Se déconnecter' : 'Sign out'}
+                            {t('signOut')}
                         </span>
                     </Button>
                 </div>

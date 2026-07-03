@@ -131,30 +131,15 @@ class SubAgentRegistry {
     }
   }
 
-  private async checkPermissions(userId: string, role: SubAgentRole): Promise<void> {
+  private async checkPermissions(userId: string, _role: SubAgentRole): Promise<void> {
     const { prisma } = await import('@/lib/prisma');
-    const user = await prisma.user.findUnique({ 
+    const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { planTier: true }
+      select: { planStatus: true },
     });
-    
-    const requiredTier: Record<SubAgentRole, string> = {
-      research: 'starter',
-      pm: 'starter',
-      cfo: 'growth',
-      growth: 'growth',
-      legal: 'growth',
-      tech_lead: 'starter',
-      content: 'starter',
-      recruiting: 'scale',
-    };
 
-    const tierOrder = ['free', 'starter', 'growth', 'scale'];
-    const userTierIndex = tierOrder.indexOf(user?.planTier || 'free');
-    const requiredTierIndex = tierOrder.indexOf(requiredTier[role]);
-    
-    if (userTierIndex < requiredTierIndex) {
-      throw new Error(`Role ${role} requires ${requiredTier[role]} plan or higher`);
+    if (!user || user.planStatus === 'readonly') {
+      throw new Error('Active subscription required to use agents');
     }
   }
 
