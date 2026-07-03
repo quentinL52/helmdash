@@ -21,6 +21,7 @@ import { Save, MonitorSmartphone, Palette, Calendar, User, Linkedin, PenLine } f
 import { AISettingsPanel } from '@/components/dashboard/ai-settings-panel';
 import { BillingPanel } from '@/components/dashboard/billing-panel';
 import { IntegrationsPanel } from '@/components/dashboard/integrations-panel';
+import { DataPrivacyPanel } from '@/components/dashboard/data-privacy-panel';
 
 export default function SettingsPage() {
     const { theme, setTheme } = useTheme();
@@ -186,6 +187,7 @@ export default function SettingsPage() {
                     </CardContent>
                 </Card>
 
+                <DataPrivacyPanel />
                 <BillingPanel />
                 <IntegrationsPanel />
                 <AISettingsPanel />

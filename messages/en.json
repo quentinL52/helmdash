@@ -103,7 +103,15 @@
     "theme": "Theme",
     "darkMode": "Dark mode",
     "lightMode": "Light mode",
-    "system": "System"
+    "system": "System",
+    "dataPrivacy": "Data & Privacy",
+    "dataPrivacyDesc": "Manage your personal data. Exporting generates a JSON file with all your history. Deletion is permanent.",
+    "exportData": "Export my data",
+    "deleteAccount": "Delete my account",
+    "deleteAccountConfirmTitle": "Are you absolutely sure?",
+    "deleteAccountConfirmDesc": "This action cannot be undone. This will permanently delete your account, your hypotheses, your financial data and cancel your active subscription.",
+    "exportSuccess": "Your data has been exported.",
+    "deleteSuccess": "Your account has been deleted."
   },
   "billing": {
     "title": "Subscription & Billing",
