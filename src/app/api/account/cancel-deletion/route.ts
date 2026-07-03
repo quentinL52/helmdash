@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { withAuth } from '@/lib/security/with-auth';
+import { stripe } from '@/lib/billing/stripe-client';
 
 async function handler(req: NextRequest, { userId }: { userId: string }) {
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { deletionRequestedAt: true }
+      select: { deletionRequestedAt: true, stripeSubscriptionId: true }
     });
 
     if (!user) {
@@ -17,11 +18,24 @@ async function handler(req: NextRequest, { userId }: { userId: string }) {
       return NextResponse.json({ ok: true, message: 'Deletion not requested' });
     }
 
+    let nextStatus = 'readonly';
+
+    if (user.stripeSubscriptionId) {
+      try {
+        const sub = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+        if (sub.status === 'active' || sub.status === 'trialing') {
+          nextStatus = 'active'; // ou trialing
+        }
+      } catch (err: any) {
+        console.error(`[CANCEL_DELETION] Failed to retrieve Stripe subscription: ${err.message}`);
+      }
+    }
+
     await prisma.user.update({
       where: { id: userId },
       data: {
         deletionRequestedAt: null,
-        planStatus: 'trialing' // ou logic métier appropriée
+        planStatus: nextStatus
       }
     });
 
