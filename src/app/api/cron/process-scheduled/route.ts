@@ -2,8 +2,22 @@ import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { memory } from '@/lib/ai/memory/obsidian-memory';
 import { processSubAgentQueue } from '@/lib/queue/sub-agent-queue';
+import { createClient } from '@supabase/supabase-js';
+import { env } from '@/lib/env';
 
 const prisma = new PrismaClient();
+
+// Initialise un client Supabase avec les droits admin (Service Role Key)
+const supabaseAdmin = createClient(
+  env.NEXT_PUBLIC_SUPABASE_URL,
+  env.SUPABASE_SERVICE_ROLE_KEY,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
+);
 
 /**
  * GET /api/cron/process-scheduled
@@ -37,7 +51,34 @@ export async function GET() {
       },
     });
 
-    // 3. Traiter chaque tâche échue
+    // 3. Purge des comptes (soft delete > 48h)
+    const fortyEightHoursAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
+    const usersToDelete = await prisma.user.findMany({
+      where: {
+        deletionRequestedAt: { lte: fortyEightHoursAgo }
+      },
+      select: { id: true }
+    });
+
+    for (const user of usersToDelete) {
+      try {
+        // Cascade supprime les données Prisma
+        await prisma.user.delete({ where: { id: user.id } });
+        
+        // Supprimer de Supabase Auth
+        // Justification : nous utilisons supabaseAdmin.auth.admin.deleteUser ici car cette purge
+        // est effectuée de manière asynchrone par un cron (sans la session de l'utilisateur).
+        const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(user.id);
+        if (authError) {
+           console.error(`[Cron] Failed to delete Supabase user ${user.id}:`, authError);
+        }
+        results.push(`User ${user.id} permanently deleted`);
+      } catch(err) {
+        console.error(`[Cron] Failed to delete user ${user.id}:`, err);
+      }
+    }
+
+    // 4. Traiter chaque tâche échue
     for (const task of dueTasks) {
       try {
         await processScheduledTask(task);

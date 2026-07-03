@@ -68,3 +68,32 @@ export async function sendTrialEndingEmail(
     `,
   });
 }
+
+export async function sendDeletionScheduledEmail(
+  email: string,
+  userName: string | null,
+): Promise<void> {
+  const name = userName || 'Fondateur';
+  await sendEmail({
+    to: email,
+    subject: `Suppression de votre compte Helmdash programmée`,
+    html: `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>Bonjour ${name},</h2>
+        <p>Nous avons bien reçu votre demande de suppression de compte.</p>
+        <p>Votre compte et toutes vos données seront <strong>définitivement supprimés dans 48 heures</strong>.</p>
+        <p>Si vous changez d'avis d'ici là, vous pouvez annuler cette suppression en vous reconnectant simplement à votre compte.</p>
+        <p>
+          <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/login"
+             style="background: #333; color: white; padding: 12px 24px; 
+                    text-decoration: none; border-radius: 8px; display: inline-block;">
+            Annuler la suppression
+          </a>
+        </p>
+        <p style="color: #666; font-size: 0.9em; margin-top: 24px;">
+          L'équipe Helmdash
+        </p>
+      </div>
+    `,
+  });
+}
