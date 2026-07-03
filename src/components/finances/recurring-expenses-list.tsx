@@ -1,4 +1,5 @@
 'use client';
+import { getMonthlyEntries } from '@/lib/finance-utils';
 
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -11,19 +12,19 @@ import { Trash2 } from 'lucide-react';
 
 export function RecurringExpensesList() {
     const finance = useFounderStore(s => s.finance);
-    const deleteFinancialEntry = useFounderStore(s => s.deleteFinancialEntry);
+    const deleteEntry = useFounderStore(s => s.deleteEntry);
 
     const { recurringExpenses, latestMonthId } = useMemo(() => {
         const today = new Date();
         const currentMonthStr = format(today, 'yyyy-MM');
         
-        const sortedEntries = [...finance.monthlyEntries].sort((a, b) => b.month.localeCompare(a.month));
+        const sortedEntries = [...getMonthlyEntries(finance.entries)].sort((a, b) => b.month.localeCompare(a.month));
         const latestEntry = sortedEntries.find(e => e.month === currentMonthStr) || sortedEntries[0];
 
         if (!latestEntry) return { recurringExpenses: [], latestMonthId: null };
 
         const activeRecurring = (latestEntry.expenses || []).filter(e => {
-            const isMonthly = e.frequency === 'monthly' || (e.isRecurring && !e.frequency);
+            const isMonthly = e.frequency === 'monthly' ;
             const isAnnual = e.frequency === 'annual';
             return isMonthly || isAnnual;
         });
@@ -36,9 +37,7 @@ export function RecurringExpensesList() {
     }
 
     const handleDelete = (id: string) => {
-        if (latestMonthId) {
-            deleteFinancialEntry(latestMonthId, id, 'expense');
-        }
+        deleteEntry(id);
     };
 
     return (

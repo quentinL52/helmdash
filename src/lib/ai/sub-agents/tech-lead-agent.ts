@@ -24,7 +24,8 @@ PRODUIS: Architecture Decision Records (ADR), specs techniques, plan de migratio
         model,
         prompt,
         temperature: 0.2,
-        maxTokens: 8000,
+        // @ts-ignore
+      maxTokens: 5000,
       });
 
       await this.saveDeliverable({

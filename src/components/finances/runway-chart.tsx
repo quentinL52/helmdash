@@ -1,4 +1,5 @@
 'use client';
+import { getMonthlyEntries } from '@/lib/finance-utils';
 
 import { useMemo } from 'react';
 import {
@@ -66,7 +67,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
 
     const data = useMemo(() => {
         // 1. Flatten all transactions with dates
-        const baseTransactions = finance.monthlyEntries.flatMap(month => {
+        const baseTransactions = getMonthlyEntries(finance.entries).flatMap(month => {
             const expenses = (month.expenses || []).map(e => ({
                 date: new Date(e.date || `${month.month}-01`),
                 amount: e.amount,
@@ -87,7 +88,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
         const currentMonthStr = format(today, 'yyyy-MM');
 
         const projectedTransactions = [...baseTransactions];
-        const sortedEntries = [...finance.monthlyEntries].sort((a, b) => b.month.localeCompare(a.month));
+        const sortedEntries = [...getMonthlyEntries(finance.entries)].sort((a, b) => b.month.localeCompare(a.month));
         const latestEntry = sortedEntries.find(e => e.month === currentMonthStr) || sortedEntries[0];
 
         if (latestEntry) {
@@ -97,7 +98,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
             
             futureMonths.forEach(fm => {
                 latestExpenses.forEach(e => {
-                    const isMonthly = e.frequency === 'monthly' || (e.isRecurring && !e.frequency);
+                    const isMonthly = e.frequency === 'monthly' ;
                     const isAnnual = e.frequency === 'annual';
                     if (isMonthly || isAnnual) {
                         const projectedDate = new Date(e.date || `${latestEntry.month}-01`);
@@ -106,7 +107,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
                     }
                 });
                 latestIncomes.forEach(i => {
-                    const isMonthly = i.frequency === 'monthly' || (i.isRecurring && !i.frequency);
+                    const isMonthly = i.frequency === 'monthly' ;
                     const isAnnual = i.frequency === 'annual';
                     if (isMonthly || isAnnual) {
                         const projectedDate = new Date(i.date || `${latestEntry.month}-01`);
@@ -216,7 +217,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
         const currentMonthStr = format(today, 'yyyy-MM');
         
         // Find current month's entry, or fallback to the most recent month
-        const sortedEntries = [...finance.monthlyEntries].sort((a, b) => b.month.localeCompare(a.month));
+        const sortedEntries = [...getMonthlyEntries(finance.entries)].sort((a, b) => b.month.localeCompare(a.month));
         const latestEntry = sortedEntries.find(e => e.month === currentMonthStr) || sortedEntries[0];
 
         if (!latestEntry) return '∞';
@@ -224,7 +225,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
         // Calculate burn using ONLY recurring expenses and incomes
         const recurringExpenses = (latestEntry.expenses || [])
             .reduce((sum, e) => {
-                const isMonthly = e.frequency === 'monthly' || (e.isRecurring && !e.frequency);
+                const isMonthly = e.frequency === 'monthly' ;
                 const isAnnual = e.frequency === 'annual';
                 if (isAnnual) return sum + (e.amount / 12);
                 if (isMonthly) return sum + e.amount;
@@ -233,7 +234,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
             
         const recurringIncomes = (latestEntry.incomes || [])
             .reduce((sum, i) => {
-                const isMonthly = i.frequency === 'monthly' || (i.isRecurring && !i.frequency);
+                const isMonthly = i.frequency === 'monthly' ;
                 const isAnnual = i.frequency === 'annual';
                 if (isAnnual) return sum + (i.amount / 12);
                 if (isMonthly) return sum + i.amount;

@@ -44,6 +44,7 @@ export async function notifyTrialExpiringSoon() {
   });
   
   for (const sub of subscriptions.data) {
+    if (!sub.trial_end) continue;
     const daysLeft = Math.ceil((sub.trial_end * 1000 - Date.now()) / (1000 * 60 * 60 * 24));
     if (daysLeft === 3) {
       if (sub.metadata.userId) {

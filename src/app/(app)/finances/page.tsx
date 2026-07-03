@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useFounderStore } from '@/store/founder-store';
 import { translations } from '@/lib/translations';
+import { getMonthlyEntries } from '@/lib/finance-utils';
 import { ChartSkeleton, TableSkeleton, CardSkeleton } from '@/components/ui/loading-skeleton';
 import { Wallet } from 'lucide-react';
 import type { Timeframe } from '@/components/finances/runway-chart';
@@ -40,8 +41,9 @@ export default function FinancesPage() {
         });
     }, []);
 
-    const pageContext = finances?.monthlyEntries?.length
-        ? `Finances actuelles : ${finances.monthlyEntries.length} mois de données.`
+    const monthlyEntries = getMonthlyEntries(finances?.entries || []);
+    const pageContext = monthlyEntries?.length
+        ? `Finances actuelles : ${monthlyEntries.length} mois de données.`
         : 'Aucune donnée financière pour le moment.';
 
     return (

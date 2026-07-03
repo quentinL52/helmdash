@@ -36,14 +36,14 @@ async function handler(
         userId,
         provider: body.provider,
         apiKey: apiKeyStr,
-        activeAgents: body.activeAgents ?? null,
-        modelsConfig: body.modelsConfig ?? null,
+        activeAgents: body.activeAgents ? (body.activeAgents as any) : undefined,
+        modelsConfig: body.modelsConfig ? (body.modelsConfig as any) : undefined,
       },
       update: {
         provider: body.provider,
         apiKey: apiKeyStr,
-        activeAgents: body.activeAgents ?? null,
-        modelsConfig: body.modelsConfig ?? null,
+        activeAgents: body.activeAgents ? (body.activeAgents as any) : undefined,
+        modelsConfig: body.modelsConfig ? (body.modelsConfig as any) : undefined,
       },
     });
 
@@ -60,5 +60,25 @@ async function handler(
     );
   }
 }
+}
+
+export const GET = withAuth(async (req: NextRequest, { userId }: { userId: string }) => {
+  try {
+    const keys = await prisma.aiSettings.findMany({
+      where: { userId },
+      select: { provider: true },
+    });
+    return NextResponse.json({
+      ok: true,
+      configuredProviders: keys.map(k => k.provider),
+    });
+  } catch (error) {
+    console.error('[Settings AI Keys] Error fetching keys:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch API keys status' },
+      { status: 500 },
+    );
+  }
+});
 
 export const PUT = withAuth(withValidation(upsertSchema)(handler));

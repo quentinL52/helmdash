@@ -1,41 +1,8 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
+import { toast } from '@/hooks/use-toast';
 
-// Custom StateStorage to sync with Supabase via an API route
-const supabaseStorage: StateStorage = {
-    getItem: async (name): Promise<string | null> => {
-        try {
-            const res = await fetch(`/api/store/${name}`);
-            if (res.ok) {
-                const data = await res.json();
-                return JSON.stringify(data);
-            }
-            return localStorage.getItem(name);
-        } catch (e) {
-            return localStorage.getItem(name);
-        }
-    },
-    setItem: async (name, value): Promise<void> => {
-        localStorage.setItem(name, value);
-        try {
-            await fetch(`/api/store/${name}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ data: JSON.parse(value) })
-            });
-        } catch (e) {
-            console.error('Failed to sync state to Supabase', e);
-        }
-    },
-    removeItem: async (name): Promise<void> => {
-        localStorage.removeItem(name);
-        try {
-            await fetch(`/api/store/${name}`, { method: 'DELETE' });
-        } catch (e) {
-            console.error('Failed to delete state from Supabase', e);
-        }
-    },
-};
+
 
 // --- Types ---
 
@@ -81,18 +48,10 @@ export interface ExpenseItem {
     id: string;
     label: string;
     amount: number;
-    category: ExpenseCategory;
-    isRecurring: boolean; // Keep for backwards compatibility
+    category: string;
     frequency?: ExpenseFrequency;
-    date?: string; // ISO Date "YYYY-MM-DD"
-}
-
-export interface MonthlyFinance {
-    id: string;
-    month: string; // "YYYY-MM"
-    revenue: number;
-    expenses: ExpenseItem[];
-    incomes: ExpenseItem[];
+    type: 'income' | 'expense';
+    date: string; // ISO Date "YYYY-MM-DD"
     notes?: string;
 }
 
@@ -102,17 +61,17 @@ export interface OneTimeEntry {
     label: string;
     amount: number; // Positive = income, Negative = expense
     category: string;
+    notes?: string;
 }
 
 export interface FinanceData {
     cashAvailable: number;
     lastUpdated: string;
-    monthlyEntries: MonthlyFinance[];
+    entries: ExpenseItem[];
     oneTimeEntries: OneTimeEntry[];
     targetMRR?: number;
     firstRevenueDate?: string;
     firstRevenueAmount?: number;
-    // Scenarios can be added later
 }
 
 // Module 12: Dashboard (Aggregated Data is derived, but we need types for OKRs and Routine if we strictly follow spec)
@@ -443,15 +402,6 @@ export interface AiSettings {
     provider: AIProviderName | '';
     /** Currently selected model ID (e.g. 'gpt-4o', 'claude-sonnet-4-20250514') */
     model: string;
-    /** Per-provider API keys — allows using multiple providers */
-    apiKeys: {
-        openai: string;
-        anthropic: string;
-        gemini: string;
-        mistral: string;
-    };
-    /** @deprecated Use apiKeys[provider] instead. Kept for migration. */
-    apiKey: string;
     /** Configuration of models per sub-agent role */
     modelsConfig: Record<string, string>;
 }
@@ -508,11 +458,12 @@ export interface FounderStore {
     // Finances
     updateCashAvailable: (amount: number) => void;
     updateFinanceData: (updates: Partial<FinanceData>) => void;
-    addMonthlyEntry: (entry: MonthlyFinance) => void;
-    updateMonthlyEntry: (id: string, updates: Partial<MonthlyFinance>) => void;
-    addOneTimeEntry: (entry: OneTimeEntry) => void;
-    deleteFinancialEntry: (monthId: string, entryId: string, type: 'expense' | 'revenue') => void;
-    updateFinancialEntry: (monthId: string, entryId: string, type: 'expense' | 'revenue', updates: Partial<ExpenseItem>) => void;
+    hydrateFinances: (data: { settings: any, entries: any[], oneTimeEntries: any[] }) => void;
+    addEntry: (entry: Omit<ExpenseItem, 'id'>) => Promise<void>;
+    updateEntry: (id: string, updates: Partial<ExpenseItem>) => Promise<void>;
+    deleteEntry: (id: string) => Promise<void>;
+    addOneTimeEntry: (entry: Omit<OneTimeEntry, 'id'>) => Promise<void>;
+    deleteOneTimeEntry: (id: string) => Promise<void>;
 
     // Journal
     addJournalEntry: (entry: Omit<JournalEntry, 'id'>) => void;
@@ -627,7 +578,7 @@ const initialState = {
     finance: {
         cashAvailable: 0,
         lastUpdated: new Date().toISOString(),
-        monthlyEntries: [],
+        entries: [],
         oneTimeEntries: [],
     },
     journalEntries: [],
@@ -707,15 +658,8 @@ const initialState = {
     scenarioAnalyses: [],
     showStrategicRecommendations: true, // Default to true
     aiSettings: {
-        provider: '' as AIProviderName | '',
-        model: '',
-        apiKeys: {
-            openai: '',
-            anthropic: '',
-            gemini: '',
-            mistral: '',
-        },
-        apiKey: '',
+        provider: 'openai',
+        model: 'gpt-4o',
         modelsConfig: {},
     },
     founderProfile: {
@@ -781,140 +725,224 @@ export const useFounderStore = create<FounderStore>()(
                 hypotheses: state.hypotheses.filter((h) => h.id !== id),
             })),
 
-            updateCashAvailable: (amount) => set((state) => ({
-                finance: {
-                    ...state.finance,
-                    cashAvailable: amount,
-                    lastUpdated: new Date().toISOString(),
-                },
-            })),
-
-            updateFinanceData: (updates) => set((state) => ({
-                finance: {
-                    ...state.finance,
-                    ...updates,
-                    lastUpdated: new Date().toISOString(),
-                },
-            })),
-
-            addMonthlyEntry: (entry) => set((state) => {
-                // Ensure all items have a date. If not, default to 1st of month.
-                const defaultDate = `${entry.month}-01`;
-                const enrichItem = (item: ExpenseItem) => ({ ...item, id: item.id || crypto.randomUUID(), date: item.date || defaultDate });
-
-                const enrichedEntry = {
-                    ...entry,
-                    id: crypto.randomUUID(),
-                    expenses: entry.expenses.map(enrichItem),
-                    incomes: (entry.incomes || []).map(enrichItem)
-                };
-
-                // Check if month already exists
-                const existingMonthIndex = state.finance.monthlyEntries.findIndex(m => m.month === entry.month);
-
-                let newMonthlyEntries = [...state.finance.monthlyEntries];
-                if (existingMonthIndex >= 0) {
-                    const existing = newMonthlyEntries[existingMonthIndex];
-                    newMonthlyEntries[existingMonthIndex] = {
-                        ...existing,
-                        revenue: existing.revenue + enrichedEntry.revenue,
-                        expenses: [...existing.expenses, ...enrichedEntry.expenses],
-                        incomes: [...(existing.incomes || []), ...enrichedEntry.incomes]
+            updateCashAvailable: async (amount) => {
+                let previousAmount: number;
+                set((state) => {
+                    previousAmount = state.finance.cashAvailable;
+                    return {
+                        finance: {
+                            ...state.finance,
+                            cashAvailable: amount,
+                            lastUpdated: new Date().toISOString(),
+                        },
                     };
-                } else {
-                    newMonthlyEntries.push(enrichedEntry);
-                }
-
-                return {
-                    finance: {
-                        ...state.finance,
-                        monthlyEntries: newMonthlyEntries,
-                    },
-                };
-            }),
-
-            updateMonthlyEntry: (id, updates) => set((state) => ({
-                finance: {
-                    ...state.finance,
-                    monthlyEntries: state.finance.monthlyEntries.map((entry) =>
-                        entry.id === id ? { ...entry, ...updates } : entry
-                    ),
-                },
-            })),
-
-            addOneTimeEntry: (entry) => set((state) => ({
-                finance: {
-                    ...state.finance,
-                    oneTimeEntries: [...state.finance.oneTimeEntries, { ...entry, id: crypto.randomUUID() }],
-                },
-            })),
-
-            deleteFinancialEntry: (monthId, entryId, type) => set((state) => {
-                const monthEntry = state.finance.monthlyEntries.find(m => m.id === monthId);
-                if (!monthEntry) return state;
-
-                let newExpenses = monthEntry.expenses || [];
-                let newIncomes = monthEntry.incomes || [];
-                let newRevenue = monthEntry.revenue;
-
-                if (type === 'expense') {
-                    newExpenses = newExpenses.filter(e => e.id !== entryId);
-                } else {
-                    const incomeToRemove = newIncomes.find(i => i.id === entryId);
-                    if (incomeToRemove) {
-                        newRevenue -= incomeToRemove.amount;
-                    }
-                    newIncomes = newIncomes.filter(i => i.id !== entryId);
-                }
-
-                return {
-                    finance: {
-                        ...state.finance,
-                        monthlyEntries: state.finance.monthlyEntries.map(m =>
-                            m.id === monthId
-                                ? { ...m, expenses: newExpenses, incomes: newIncomes, revenue: newRevenue }
-                                : m
-                        )
-                    }
-                };
-            }),
-
-            updateFinancialEntry: (monthId, entryId, type, updates) => set((state) => {
-                const monthEntry = state.finance.monthlyEntries.find(m => m.id === monthId);
-                if (!monthEntry) return state;
-
-                let newExpenses = monthEntry.expenses || [];
-                let newIncomes = monthEntry.incomes || [];
-                let newRevenue = monthEntry.revenue;
-
-                if (type === 'expense') {
-                    newExpenses = newExpenses.map(e => e.id === entryId ? { ...e, ...updates } : e);
-                } else {
-                    newIncomes = newIncomes.map(i => {
-                        if (i.id === entryId) {
-                            const oldAmount = i.amount;
-                            const newAmount = updates.amount !== undefined ? updates.amount : oldAmount;
-                            // Only update aggregate if amount changed
-                            if (updates.amount !== undefined) {
-                                newRevenue = newRevenue - oldAmount + newAmount;
-                            }
-                            return { ...i, ...updates };
-                        }
-                        return i;
+                });
+                
+                try {
+                    const state = get();
+                    const payload = {
+                        cashAvailable: amount,
+                        targetMrr: state.finance.targetMRR,
+                        firstRevenueDate: state.finance.firstRevenueDate,
+                        firstRevenueAmount: state.finance.firstRevenueAmount
+                    };
+                    const res = await fetch('/api/data/finances', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'updateSettings', payload })
                     });
+                    if (!res.ok) throw new Error('API Error');
+                } catch (e) {
+                    toast({ title: 'Erreur', description: 'Impossible de sauvegarder', variant: 'destructive' });
+                    set((state) => ({ finance: { ...state.finance, cashAvailable: previousAmount } }));
                 }
+            },
 
-                return {
-                    finance: {
-                        ...state.finance,
-                        monthlyEntries: state.finance.monthlyEntries.map(m =>
-                            m.id === monthId
-                                ? { ...m, expenses: newExpenses, incomes: newIncomes, revenue: newRevenue }
-                                : m
-                        )
+            updateFinanceData: async (updates) => {
+                let previousFinance: any;
+                set((state) => {
+                    previousFinance = { ...state.finance };
+                    return {
+                        finance: {
+                            ...state.finance,
+                            ...updates,
+                            lastUpdated: new Date().toISOString(),
+                        },
+                    };
+                });
+
+                try {
+                    const state = get();
+                    const payload = {
+                        cashAvailable: state.finance.cashAvailable,
+                        targetMrr: state.finance.targetMRR,
+                        firstRevenueDate: state.finance.firstRevenueDate,
+                        firstRevenueAmount: state.finance.firstRevenueAmount,
+                        // Override with updates just in case state wasn't updated synchronously in time (though it should be)
+                        ...updates
+                    };
+                    const res = await fetch('/api/data/finances', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'updateSettings', payload })
+                    });
+                    if (!res.ok) throw new Error('API Error');
+                } catch (e) {
+                    toast({ title: 'Erreur', description: 'Impossible de sauvegarder', variant: 'destructive' });
+                    if (previousFinance) {
+                        set((state) => ({ finance: previousFinance }));
                     }
-                };
-            }),
+                }
+            },
+
+            hydrateFinances: (data) => set((state) => ({
+                finance: {
+                    ...state.finance,
+                    cashAvailable: data.settings?.cashAvailable ?? 0,
+                    targetMRR: data.settings?.targetMrr ?? 0,
+                    firstRevenueDate: data.settings?.firstRevenueDate,
+                    firstRevenueAmount: data.settings?.firstRevenueAmount,
+                    entries: data.entries || [],
+                    oneTimeEntries: data.oneTimeEntries || [],
+                    lastUpdated: new Date().toISOString(),
+                }
+            })),
+
+            addEntry: async (entry) => {
+                const id = crypto.randomUUID();
+                const newEntry = { ...entry, id };
+                
+                set((state) => ({
+                    finance: { ...state.finance, entries: [...state.finance.entries, newEntry] }
+                }));
+
+                try {
+                    const res = await fetch('/api/data/finances', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'addEntry', payload: newEntry })
+                    });
+                    if (!res.ok) throw new Error('API Error');
+                    const data = await res.json();
+                    if (data.gamification?.xpAdded) {
+                        toast({ title: 'XP Gained!', description: `+${data.gamification.xpAdded} XP` });
+                    }
+                } catch (e) {
+                    toast({ title: 'Erreur', description: 'Impossible de sauvegarder', variant: 'destructive' });
+                    set((state) => ({
+                        finance: { ...state.finance, entries: state.finance.entries.filter(e => e.id !== id) }
+                    }));
+                }
+            },
+
+            updateEntry: async (id, updates) => {
+                let previousEntry: ExpenseItem | undefined;
+                set((state) => {
+                    previousEntry = state.finance.entries.find(e => e.id === id);
+                    return {
+                        finance: {
+                            ...state.finance,
+                            entries: state.finance.entries.map(e => e.id === id ? { ...e, ...updates } : e)
+                        }
+                    };
+                });
+
+                try {
+                    const res = await fetch('/api/data/finances', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'updateEntry', payload: { id, ...updates } })
+                    });
+                    if (!res.ok) throw new Error('API Error');
+                } catch (e) {
+                    toast({ title: 'Erreur', description: 'Impossible de modifier', variant: 'destructive' });
+                    if (previousEntry) {
+                        set((state) => ({
+                            finance: {
+                                ...state.finance,
+                                entries: state.finance.entries.map(e => e.id === id ? previousEntry! : e)
+                            }
+                        }));
+                    }
+                }
+            },
+
+            deleteEntry: async (id) => {
+                let previousEntry: ExpenseItem | undefined;
+                set((state) => {
+                    previousEntry = state.finance.entries.find(e => e.id === id);
+                    return {
+                        finance: {
+                            ...state.finance,
+                            entries: state.finance.entries.filter(e => e.id !== id)
+                        }
+                    };
+                });
+
+                try {
+                    const res = await fetch('/api/data/finances', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'deleteEntry', payload: { id } })
+                    });
+                    if (!res.ok) throw new Error('API Error');
+                } catch (e) {
+                    toast({ title: 'Erreur', description: 'Impossible de supprimer', variant: 'destructive' });
+                    if (previousEntry) {
+                        set((state) => ({
+                            finance: { ...state.finance, entries: [...state.finance.entries, previousEntry!] }
+                        }));
+                    }
+                }
+            },
+
+            addOneTimeEntry: async (entry) => {
+                const id = crypto.randomUUID();
+                const newEntry = { ...entry, id };
+                set((state) => ({
+                    finance: { ...state.finance, oneTimeEntries: [...state.finance.oneTimeEntries, newEntry] }
+                }));
+
+                try {
+                    const res = await fetch('/api/data/finances', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'addOneTimeEntry', payload: newEntry })
+                    });
+                    if (!res.ok) throw new Error('API Error');
+                } catch (e) {
+                    toast({ title: 'Erreur', description: 'Impossible d\'ajouter', variant: 'destructive' });
+                    set((state) => ({
+                        finance: { ...state.finance, oneTimeEntries: state.finance.oneTimeEntries.filter(e => e.id !== id) }
+                    }));
+                }
+            },
+
+            deleteOneTimeEntry: async (id) => {
+                let previousEntry: OneTimeEntry | undefined;
+                set((state) => {
+                    previousEntry = state.finance.oneTimeEntries.find(e => e.id === id);
+                    return {
+                        finance: { ...state.finance, oneTimeEntries: state.finance.oneTimeEntries.filter(e => e.id !== id) }
+                    };
+                });
+                
+                try {
+                    const res = await fetch('/api/data/finances', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'deleteOneTimeEntry', payload: { id } })
+                    });
+                    if (!res.ok) throw new Error('API Error');
+                } catch (e) {
+                    toast({ title: 'Erreur', description: 'Impossible de supprimer', variant: 'destructive' });
+                    if (previousEntry) {
+                        set((state) => ({
+                            finance: { ...state.finance, oneTimeEntries: [...state.finance.oneTimeEntries, previousEntry!] }
+                        }));
+                    }
+                }
+            },
 
             addJournalEntry: (entry) => set((state) => {
                 const entryDate = entry.date.split('T')[0]; // Simple YYYY-MM-DD check
@@ -1414,7 +1442,10 @@ export const useFounderStore = create<FounderStore>()(
         }),
         {
             name: 'founder-os-store', // name of the item in the storage (must be unique)
-            storage: createJSONStorage(() => supabaseStorage),
+            partialize: (state) => {
+                const { finance, ...rest } = state;
+                return rest;
+            },
         }
     )
 );

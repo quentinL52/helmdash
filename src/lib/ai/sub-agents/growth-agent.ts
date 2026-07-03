@@ -74,7 +74,8 @@ PRODUIS UN PLAN JSON:
       model,
       prompt,
       temperature: 0.4,
-      maxTokens: 6000,
+      // @ts-ignore
+      maxTokens: 5000,
     });
 
     try {

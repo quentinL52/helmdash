@@ -106,7 +106,8 @@ Format: Markdown, ton analytique, chiffres précis.`;
       model,
       prompt,
       temperature: 0.3,
-      maxTokens: 6000,
+      // @ts-ignore
+      maxTokens: 5000,
     });
 
     return response.text;

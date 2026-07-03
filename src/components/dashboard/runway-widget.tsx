@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { getMonthlyEntries } from '@/lib/finance-utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useFounderStore } from '@/store/founder-store';
 import { ArrowDown, ArrowUp, DollarSign, Wallet } from 'lucide-react';
@@ -10,7 +11,7 @@ export function RunwayWidget() {
 
     const metrics = useMemo(() => {
         // Simple calculation similar to chart
-        const sortedEntries = [...finance.monthlyEntries].sort((a, b) =>
+        const sortedEntries = [...getMonthlyEntries(finance.entries)].sort((a, b) =>
             b.month.localeCompare(a.month)
         );
 
@@ -22,7 +23,7 @@ export function RunwayWidget() {
             
             const recurringExpenses = (lastMonth.expenses || [])
                 .reduce((sum, e) => {
-                    const isMonthly = e.frequency === 'monthly' || (e.isRecurring && !e.frequency);
+                    const isMonthly = e.frequency === 'monthly' ;
                     const isAnnual = e.frequency === 'annual';
                     if (isAnnual) return sum + (e.amount / 12);
                     if (isMonthly) return sum + e.amount;
@@ -31,7 +32,7 @@ export function RunwayWidget() {
                 
             const recurringIncomes = (lastMonth.incomes || [])
                 .reduce((sum, i) => {
-                    const isMonthly = i.frequency === 'monthly' || (i.isRecurring && !i.frequency);
+                    const isMonthly = i.frequency === 'monthly' ;
                     const isAnnual = i.frequency === 'annual';
                     if (isAnnual) return sum + (i.amount / 12);
                     if (isMonthly) return sum + i.amount;

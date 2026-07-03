@@ -23,7 +23,8 @@ PRODUIS: Job description complète, grille entretien (technique/soft/culture), b
         model,
         prompt,
         temperature: 0.3,
-        maxTokens: 6000,
+        // @ts-ignore
+      maxTokens: 5000,
       });
 
       await this.saveDeliverable({

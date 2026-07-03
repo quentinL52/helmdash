@@ -2,6 +2,7 @@ import { BaseSubAgent, SubAgentContext } from './base-agent';
 import { getModelForAgent } from '../provider-registry';
 import { executeComposioTool } from '@/lib/integrations/composio-client';
 import { memory } from '@/lib/ai/memory/obsidian-memory';
+import { prisma } from '@/lib/prisma';
 
 export class CFOAgent extends BaseSubAgent {
   async execute(): Promise<any> {
@@ -98,6 +99,7 @@ PRODUIS UNE ANALYSE JSON STRUCTURÉE:
       model,
       prompt,
       temperature: 0.1,
+      // @ts-ignore
       maxTokens: 5000,
     });
 
