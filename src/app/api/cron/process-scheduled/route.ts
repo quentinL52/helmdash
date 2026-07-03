@@ -4,6 +4,7 @@ import { memory } from '@/lib/ai/memory/obsidian-memory';
 import { processSubAgentQueue } from '@/lib/queue/sub-agent-queue';
 import { createClient } from '@supabase/supabase-js';
 import { env } from '@/lib/env';
+import { stripe } from '@/lib/billing/stripe-client';
 
 const prisma = new PrismaClient();
 
@@ -57,11 +58,24 @@ export async function GET() {
       where: {
         deletionRequestedAt: { lte: fortyEightHoursAgo }
       },
-      select: { id: true }
+      select: { id: true, stripeSubscriptionId: true }
     });
 
     for (const user of usersToDelete) {
       try {
+        if (user.stripeSubscriptionId) {
+          try {
+            await stripe.subscriptions.cancel(user.stripeSubscriptionId);
+          } catch (err: any) {
+            const isAlreadyCanceled = err?.code === 'resource_missing' || err?.message?.includes('already canceled');
+            if (!isAlreadyCanceled) {
+              console.error(`[Cron] Stripe cancel failed for user ${user.id}: ${err.message}. Skipping purge.`);
+              results.push(`User ${user.id} skipped (Stripe error)`);
+              continue;
+            }
+          }
+        }
+
         // Cascade supprime les données Prisma
         await prisma.user.delete({ where: { id: user.id } });
         

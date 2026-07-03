@@ -1,31 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { withAuth } from '@/lib/security/with-auth';
-import { stripe } from '@/lib/billing/stripe-client';
 import { sendDeletionScheduledEmail } from '@/lib/email/email-service';
+import { createClient } from '@supabase/supabase-js';
+import { env } from '@/lib/env';
+
+const supabaseAdmin = createClient(
+  env.NEXT_PUBLIC_SUPABASE_URL,
+  env.SUPABASE_SERVICE_ROLE_KEY,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
+);
 
 async function handler(req: NextRequest, { userId }: { userId: string }) {
   try {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { email: true, name: true, stripeCustomerId: true, stripeSubscriptionId: true }
+      select: { email: true, name: true }
     });
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    if (user.stripeSubscriptionId) {
-      try {
-        await stripe.subscriptions.cancel(user.stripeSubscriptionId);
-      } catch (err: any) {
-        console.error(`[DELETE_ACCOUNT] Failed to cancel Stripe subscription: ${err.message}`);
-      }
-    }
-    
-    // Au lieu de supprimer le client Stripe immédiatement, on peut annuler l'abonnement
-    // mais on garde le soft delete sur le compte Helmdash.
-
+    // 1. Soft delete côté Prisma
     await prisma.user.update({
       where: { id: userId },
       data: {
@@ -34,15 +36,22 @@ async function handler(req: NextRequest, { userId }: { userId: string }) {
       }
     });
 
+    // 2. Envoi de l'email
     try {
       await sendDeletionScheduledEmail(user.email, user.name);
     } catch (err) {
       console.error('[DELETE_ACCOUNT] Failed to send deletion scheduled email', err);
     }
 
-    // Note: on ne supprime pas l'utilisateur de Supabase Auth ici (soft delete).
-    // Les sessions existantes peuvent rester ou le front peut forcer un signOut().
-    
+    // 3. Invalidation des sessions
+    const authHeader = req.headers.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      await supabaseAdmin.auth.admin.signOut(token, 'global').catch(e => {
+        console.error('[DELETE_ACCOUNT] Failed to invalidate sessions:', e);
+      });
+    }
+
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error('[DELETE_ACCOUNT_ERROR]', error);
