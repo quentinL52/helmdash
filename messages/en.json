@@ -173,7 +173,7 @@
     "heroBadge": "Cohort #{cohort} · {seats} spots left · starts {date}",
     "ctaPrimary": "Take the Helm →",
     "ctaSecondary": "View product",
-    "noCreditCard": "No credit card · Notion & CSV import in 2 mins",
+    "noCreditCard": "No credit card",
     "socialProof": "They stopped juggling",
     "problemSurtitle": "01 / THE PROBLEM",
     "problemTitle": "You're not running your business. You're chasing it.",
@@ -182,7 +182,7 @@
       {
         "tag": "01",
         "title": "Context evaporates",
-        "body": "Yesterday's decision is in Notion, the justifying metric in a sheet. Reconstructing takes 20 mins."
+        "body": "Yesterday's decision is in a doc, the justifying metric in a sheet. Reconstructing takes 20 mins."
       },
       {
         "tag": "02",

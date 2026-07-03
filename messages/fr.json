@@ -173,7 +173,7 @@
     "heroBadge": "Cohorte #{cohort} · {seats} places restantes · démarrage {date}",
     "ctaPrimary": "Prendre la barre →",
     "ctaSecondary": "Voir le produit",
-    "noCreditCard": "Pas de carte bancaire · Import Notion & CSV en 2 min",
+    "noCreditCard": "Pas de carte bancaire",
     "socialProof": "Ils ont arrêté de jongler",
     "problemSurtitle": "01 / LE PROBLÈME",
     "problemTitle": "Tu ne diriges pas ton business. Tu cours après lui.",
@@ -182,7 +182,7 @@
       {
         "tag": "01",
         "title": "Le contexte s'évapore",
-        "body": "Ta décision d'hier est dans un doc Notion, le chiffre qui la justifie dans un tableur. Reconstituer prend 20 min."
+        "body": "Ta décision d'hier est dans un doc un doc, le chiffre qui la justifie dans un tableur. Reconstituer prend 20 min."
       },
       {
         "tag": "02",
