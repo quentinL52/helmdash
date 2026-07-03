@@ -5,19 +5,30 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// On vérifie les fichiers JSON de traduction qui contiennent les claims de la landing
 const filesToCheck = [
   path.join(__dirname, '../messages/fr.json'),
   path.join(__dirname, '../messages/en.json'),
   path.join(__dirname, '../src/app/(marketing)/page.tsx')
 ];
 
-// Mots interdits ou promesses non tenues (selon claims-register)
+// V3 Spec strict forbidden keywords
 const forbiddenKeywords = [
-  'suppression de compte',
-  'account deletion',
-  'export en 1 clic',
-  '1-click export'
+  'sso',
+  'sla',
+  'seats',
+  'on-premise',
+  'audit logs',
+  'automatic monitoring',
+  'automated monitoring',
+  'custom mcp',
+  'openrouter',
+  'local models',
+  'unlimited agents',
+  'notion',
+  'gmail',
+  'calendar',
+  'social publishing',
+  '<Roadmap>'
 ];
 
 let hasError = false;
@@ -27,8 +38,9 @@ filesToCheck.forEach(file => {
   const content = fs.readFileSync(file, 'utf8').toLowerCase();
   
   forbiddenKeywords.forEach(keyword => {
+    // Note: <Roadmap> checking lowercase
     if (content.includes(keyword.toLowerCase())) {
-      console.error(`❌ [ERREUR] Le claim interdit "${keyword}" a été trouvé dans ${path.basename(file)}.`);
+      console.error(`❌ [ERREUR] Le claim interdit V3 "${keyword}" a été trouvé dans ${path.basename(file)}.`);
       hasError = true;
     }
   });
