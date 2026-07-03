@@ -168,9 +168,125 @@
     "privacyPolicy": "Privacy Policy"
   },
   "landing": {
-    "heroTitle": "The cockpit that reads your data",
-    "heroSubtitle": "Dashboard, AI agent, hypotheses, finances, roadmap — everything a solo founder needs in one place.",
-    "cta": "Start free trial",
-    "trustedBy": "Trusted by solo founders"
+    "heroTitle": "Six open tools.\\nZero overview.\\nOne helm to steer.",
+    "heroSubtitle": "Helmdash gathers your finances, hypotheses, roadmap and watch in a single cockpit — steered by an agent that reads and writes directly to your data. No more copy-pasting.",
+    "heroBadge": "Cohort #{cohort} · {seats} spots left · starts {date}",
+    "ctaPrimary": "Take the Helm →",
+    "ctaSecondary": "View product",
+    "noCreditCard": "No credit card",
+    "socialProof": "They stopped juggling",
+    "problemSurtitle": "01 / THE PROBLEM",
+    "problemTitle": "You're not running your business. You're chasing it.",
+    "problemSubtitle": "Coding alone at midnight is hard enough. The real cost is the time lost piecing together scattered info.",
+    "pains": [
+      {
+        "tag": "01",
+        "title": "Context evaporates",
+        "body": "Yesterday's decision is in a doc, the justifying metric in a sheet. Reconstructing takes 20 mins."
+      },
+      {
+        "tag": "02",
+        "title": "Flying blind",
+        "body": "« Can we afford this? » means opening three files. So you just guess."
+      },
+      {
+        "tag": "03",
+        "title": "No one follows up",
+        "body": "Competitive watch, hypothesis tracking, CRM: nothing moves unless you do it."
+      },
+      {
+        "tag": "04",
+        "title": "AI is disconnected",
+        "body": "ChatGPT answers well — but cold. It has no data, no history."
+      }
+    ],
+    "productSurtitle": "02 / THE SOLUTION",
+    "productTitle": "A cockpit. An agent with its hands dirty.",
+    "productSubtitle": "The central agent reads metrics, updates hypotheses, delegates — and gives you a decision, not a wall of text.",
+    "productFeatures": [
+      {
+        "title": "It writes, doesn't just read",
+        "body": "The agent updates directly in your data, with your approval."
+      },
+      {
+        "title": "Specialized sub-agents",
+        "body": "Research, finance, growth: the central agent orchestrates and synthesizes."
+      },
+      {
+        "title": "The memory of your ship",
+        "body": "Every decision keeps its context. You never start from scratch."
+      }
+    ],
+    "transparencySurtitle": "03 / TRANSPARENCY",
+    "transparencyTitle": "What Helmdash IS NOT.",
+    "transparencySubtitle": "We don't promise the moon. Here are our current limits.",
+    "transparencyItems": [
+      {
+        "title": "No account export (yet)",
+        "body": "GDPR is coming. We're working on 1-click export/deletion (P0)."
+      },
+      {
+        "title": "Not magic AI",
+        "body": "Sub-agents need clear data to work well."
+      },
+      {
+        "title": "Solo Founders Only",
+        "body": "Not designed for large teams."
+      }
+    ],
+    "pricingSurtitle": "04 / PRICING",
+    "pricingTitle": "One price. In black and white.",
+    "pricingSubtitle": "Join the cohort. Lifetime fixed price.",
+    "pricingMonth": "Monthly",
+    "pricingYear": "Yearly −20%",
+    "pricingCtaPrimary": "Join the cohort",
+    "pricingCtaSecondary": "Contact us",
+    "roadmapSurtitle": "05 / ROADMAP",
+    "roadmapTitle": "The next 5 milestones",
+    "roadmapSubtitle": "We stick to this. Nothing more.",
+    "roadmapItems": [
+      {
+        "title": "GDPR export and deletion",
+        "status": "In progress"
+      },
+      {
+        "title": "Deep Stripe integration",
+        "status": "Planned"
+      },
+      {
+        "title": "Marketing & SEO sub-agent",
+        "status": "Planned"
+      },
+      {
+        "title": "Custom webhooks (Zapier/Make)",
+        "status": "Planned"
+      },
+      {
+        "title": "Automated pitch deck generation",
+        "status": "Planned"
+      }
+    ],
+    "makerSurtitle": "06 / MAKER NOTE",
+    "makerTitle": "Built by a Solo Founder.",
+    "makerBody": "I built Helmdash because I was going crazy opening 15 tabs just to know if my startup was hitting a wall.",
+    "faqSurtitle": "07 / FAQ",
+    "faqTitle": "Frequently Asked Questions",
+    "faqItems": [
+      {
+        "q": "What is a cohort?",
+        "a": "A group of early-adopters with a lifetime locked price."
+      },
+      {
+        "q": "Where does my data go?",
+        "a": "It's encrypted and not used to train global models."
+      }
+    ],
+    "login": "Log in",
+    "cohort": "Cohort {name}",
+    "perMonth": "/ month",
+    "billedSemiannually": "Billed {amount} € every 6 months",
+    "footerCopyright": "© 2026 Helmdash · Built by a solo founder.",
+    "privacy": "Privacy",
+    "terms": "Terms"
   }
 }

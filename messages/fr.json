@@ -168,9 +168,125 @@
     "privacyPolicy": "Politique de confidentialité"
   },
   "landing": {
-    "heroTitle": "Le poste de pilotage qui lit dans vos données",
-    "heroSubtitle": "Dashboard, agent IA, hypothèses, finances, roadmap — tout ce dont un solo founder a besoin, en un seul endroit.",
-    "cta": "Commencer l'essai gratuit",
-    "trustedBy": "La confiance des solo founders"
+    "heroTitle": "Six outils ouverts.\\nZéro vue d'ensemble.\\nUne seule barre à tenir.",
+    "heroSubtitle": "Helmdash réunit tes finances, tes hypothèses, ta roadmap et ta veille dans un seul poste de pilotage — piloté par un agent qui lit et écrit directement dans tes données. Fini le copier-coller.",
+    "heroBadge": "Cohorte #{cohort} · {seats} places restantes · démarrage {date}",
+    "ctaPrimary": "Prendre la barre →",
+    "ctaSecondary": "Voir le produit",
+    "noCreditCard": "Pas de carte bancaire",
+    "socialProof": "Ils ont arrêté de jongler",
+    "problemSurtitle": "01 / LE PROBLÈME",
+    "problemTitle": "Tu ne diriges pas ton business. Tu cours après lui.",
+    "problemSubtitle": "Coder seul à minuit, c'est déjà assez dur. Le vrai coût, c'est le temps perdu à recoller les morceaux éparpillés.",
+    "pains": [
+      {
+        "tag": "01",
+        "title": "Le contexte s'évapore",
+        "body": "Ta décision d'hier est dans un doc un doc, le chiffre qui la justifie dans un tableur. Reconstituer prend 20 min."
+      },
+      {
+        "tag": "02",
+        "title": "Tu décides à l'aveugle",
+        "body": "« Est-ce qu'on peut se le permettre ? » demande d'ouvrir trois fichiers. Alors souvent, tu tranches au feeling."
+      },
+      {
+        "tag": "03",
+        "title": "Personne ne suit",
+        "body": "La veille, le suivi des hypothèses, le CRM : tout ça n'avance que quand tu t'en occupes."
+      },
+      {
+        "tag": "04",
+        "title": "L'IA est hors sol",
+        "body": "ChatGPT te répond bien — mais à froid. Il n'a ni tes chiffres, ni ton historique."
+      }
+    ],
+    "productSurtitle": "02 / LA SOLUTION",
+    "productTitle": "Un poste de pilotage. Un agent qui a les mains dans le cambouis.",
+    "productSubtitle": "L'agent central lit tes chiffres, met à jour tes hypothèses, délègue — et te rend une décision, pas un pavé de texte.",
+    "productFeatures": [
+      {
+        "title": "Il écrit, pas seulement lit",
+        "body": "L'agent met à jour directement dans tes données, avec ton accord."
+      },
+      {
+        "title": "Des sous-agents spécialisés",
+        "body": "Recherche, finance, growth : l'agent central orchestre et te rend une synthèse."
+      },
+      {
+        "title": "La mémoire de ton bateau",
+        "body": "Chaque décision garde son contexte. Tu ne repars jamais de zéro."
+      }
+    ],
+    "transparencySurtitle": "03 / TRANSPARENCE",
+    "transparencyTitle": "Ce que Helmdash N'EST PAS.",
+    "transparencySubtitle": "On ne promet pas la lune. Voici nos limites actuelles.",
+    "transparencyItems": [
+      {
+        "title": "Pas d'export de compte (pour l'instant)",
+        "body": "Le RGPD arrive. On bosse sur l'export/suppression en un clic (P0)."
+      },
+      {
+        "title": "Pas une IA magique",
+        "body": "Les sous-agents ont besoin de données claires pour bien travailler."
+      },
+      {
+        "title": "Uniquement pour Solo Founders",
+        "body": "Pas pensé pour les grandes équipes."
+      }
+    ],
+    "pricingSurtitle": "04 / PRICING",
+    "pricingTitle": "Un prix. Écrit noir sur blanc.",
+    "pricingSubtitle": "Rejoins la cohorte. Prix fixe à vie.",
+    "pricingMonth": "Mensuel",
+    "pricingYear": "Annuel −20%",
+    "pricingCtaPrimary": "Rejoindre la cohorte",
+    "pricingCtaSecondary": "Nous contacter",
+    "roadmapSurtitle": "05 / ROADMAP",
+    "roadmapTitle": "Les 5 prochains chantiers",
+    "roadmapSubtitle": "On s'y tient. Rien de plus.",
+    "roadmapItems": [
+      {
+        "title": "Export et suppression de compte RGPD",
+        "status": "En cours"
+      },
+      {
+        "title": "Intégration Stripe approfondie",
+        "status": "Prévu"
+      },
+      {
+        "title": "Sous-agent Marketing & SEO",
+        "status": "Prévu"
+      },
+      {
+        "title": "Webhook personnalisés (Zapier/Make)",
+        "status": "Prévu"
+      },
+      {
+        "title": "Génération de pitch deck automatisé",
+        "status": "Prévu"
+      }
+    ],
+    "makerSurtitle": "06 / MAKER NOTE",
+    "makerTitle": "Fait par un Solo Founder.",
+    "makerBody": "J'ai construit Helmdash parce que je devenais fou à ouvrir 15 onglets pour savoir si ma startup allait dans le mur.",
+    "faqSurtitle": "07 / FAQ",
+    "faqTitle": "Questions fréquentes",
+    "faqItems": [
+      {
+        "q": "Qu'est-ce qu'une cohorte ?",
+        "a": "Un groupe d'early-adopters avec un prix bloqué à vie."
+      },
+      {
+        "q": "Où vont mes données ?",
+        "a": "Elles sont chiffrées et ne servent pas à entraîner les modèles globaux."
+      }
+    ],
+    "login": "Se connecter",
+    "cohort": "Cohorte {name}",
+    "perMonth": "/ mois",
+    "billedSemiannually": "Facturé {amount} € tous les 6 mois",
+    "footerCopyright": "© 2026 Helmdash · Fait par un solo founder.",
+    "privacy": "Confidentialité",
+    "terms": "CGU"
   }
 }
