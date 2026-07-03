@@ -47,7 +47,7 @@ export function NotifyForm() {
 
         {submitted ? (
           <div className="p-6 rounded-xl bg-primary/10 border border-primary/20">
-            <p className="text-lg font-medium">✅ You are on the list!</p>
+            <p className="text-lg font-medium text-green-500">✅ You are on the list!</p>
             <p className="text-sm text-muted-foreground mt-2">
               We will keep you informed about the launch. In the meantime, follow us on <a href="https://twitter.com/helmdash" className="underline">Twitter</a>.
             </p>
