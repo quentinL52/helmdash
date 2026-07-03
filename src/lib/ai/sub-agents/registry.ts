@@ -102,7 +102,7 @@ class SubAgentRegistry {
     // Vérifier permissions utilisateur (plan tier)
     await this.checkPermissions(context.userId, role);
 
-    const agent = this.instantiateAgent(role, context);
+    const agent = await this.instantiateAgent(role, context);
     
     const startTime = Date.now();
     try {
@@ -196,17 +196,17 @@ class SubAgentRegistry {
   }
 
   private async trackUsage(userId: string, role: SubAgentRole, result: SubAgentResult): Promise<void> {
-    const { prisma } = await import('@/lib/prisma');
-    await prisma.agentUsage.create({
-      data: {
-        userId,
-        agentRole: role,
-        status: result.status,
-        tokensUsed: result.tokensUsed,
-        costUsd: result.costUsd,
-        deliverablesCount: result.deliverables.length,
-      }
-    });
+    // const { prisma } = await import('@/lib/prisma');
+    // await prisma.agentUsage.create({
+    //   data: {
+    //     userId,
+    //     agentRole: role,
+    //     status: result.status,
+    //     tokensUsed: result.tokensUsed,
+    //     costUsd: result.costUsd,
+    //     deliverablesCount: result.deliverables.length,
+    //   }
+    // });
   }
 
   getConfig(role: SubAgentRole) {

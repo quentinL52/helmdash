@@ -55,7 +55,7 @@ import { translations } from '@/lib/translations';
 interface FlatEntry extends ExpenseItem {
     monthId: string;
     monthLabel: string;
-    type: 'expense' | 'revenue';
+    type: 'expense' | 'income';
     isHeader?: boolean;
     headerLabel?: string;
 }
@@ -66,36 +66,26 @@ interface FinanceTableProps {
 
 export function FinanceTable({ timeframe }: FinanceTableProps) {
     const finance = useFounderStore(s => s.finance);
-    const deleteFinancialEntry = useFounderStore(s => s.deleteFinancialEntry);
-    const updateFinancialEntry = useFounderStore(s => s.updateFinancialEntry);
+    const deleteEntry = useFounderStore(s => s.deleteEntry);
+    const updateEntry = useFounderStore(s => s.updateEntry);
     const language = useFounderStore(s => s.language);
     const t = translations[language].finance.table;
     const common = translations[language].common;
     const formT = translations[language].finance.form;
 
-    const [deleteId, setDeleteId] = useState<{ monthId: string; entryId: string; type: 'expense' | 'revenue' } | null>(null);
+    const [deleteId, setDeleteId] = useState<{ monthId: string; entryId: string; type: 'expense' | 'income' } | null>(null);
     const [editingEntry, setEditingEntry] = useState<FlatEntry | null>(null);
 
     // Flatten entries and group by timeframe
     const entries: FlatEntry[] = useMemo(() => {
         // 1. Flatten all
-        const allEntries = finance.monthlyEntries.flatMap(month => {
-            const expenses = (month.expenses || []).map(e => ({
-                ...e,
-                monthId: month.id,
-                monthLabel: month.month,
-                type: 'expense' as const,
-                date: e.date || `${month.month}-01`,
-            }));
-            const incomes = (month.incomes || []).map(i => ({
-                ...i,
-                monthId: month.id,
-                monthLabel: month.month,
-                type: 'revenue' as const,
-                date: i.date || `${month.month}-01`,
-            }));
-            return [...expenses, ...incomes];
-        }).sort((a, b) => new Date(b.date!).getTime() - new Date(a.date!).getTime());
+        const allEntries: FlatEntry[] = finance.entries.map(e => ({
+            ...e,
+            monthId: e.id,
+            monthLabel: e.date.substring(0, 7),
+            type: e.type,
+            date: e.date
+        })).sort((a, b) => new Date(b.date!).getTime() - new Date(a.date!).getTime());
 
         // 2. Group
         const grouped: FlatEntry[] = [];
@@ -134,12 +124,13 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                     label: '',
                     amount: 0,
                     category: 'Divers',
-                    isRecurring: false,
+                    frequency: 'one-time',
                     monthId: '',
                     monthLabel: '',
                     type: 'expense',
                     isHeader: true,
-                    headerLabel
+                    headerLabel,
+                    date: ''
                 });
                 lastHeaderValue = headerValue;
             }
@@ -151,7 +142,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
 
     const handleDelete = () => {
         if (deleteId) {
-            deleteFinancialEntry(deleteId.monthId, deleteId.entryId, deleteId.type);
+            deleteEntry(deleteId.entryId);
             setDeleteId(null);
         }
     };
@@ -159,7 +150,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
     const handleUpdate = (e: React.FormEvent) => {
         e.preventDefault();
         if (editingEntry) {
-            updateFinancialEntry(editingEntry.monthId, editingEntry.id, editingEntry.type, {
+            updateEntry(editingEntry.id, {
                 label: editingEntry.label,
                 amount: editingEntry.amount,
                 category: editingEntry.category,
@@ -210,15 +201,15 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                         <TableCell className="text-gray-300">{entry.label}</TableCell>
                                         <TableCell>
                                             <div className="flex flex-col gap-1 items-start">
-                                                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${entry.type === 'revenue'
+                                                <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${entry.type === 'income'
                                                     ? 'bg-green-500/10 text-green-400'
                                                     : 'bg-red-500/10 text-red-400'
                                                     }`}>
-                                                    {entry.type === 'revenue' ? formT.income : formT.expense}
+                                                    {entry.type === 'income' ? formT.income : formT.expense}
                                                 </span>
                                                 <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
                                                     {entry.frequency === 'annual' ? (language === 'fr' ? 'Annuel' : 'Annual') : 
-                                                     (entry.frequency === 'monthly' || entry.isRecurring) ? (language === 'fr' ? 'Mensuel' : 'Monthly') : 
+                                                     (entry.frequency === 'monthly' ) ? (language === 'fr' ? 'Mensuel' : 'Monthly') : 
                                                      (language === 'fr' ? 'Ponctuel' : 'One-time')}
                                                 </span>
                                             </div>
@@ -331,7 +322,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                     <Select
                                         value={editingEntry.category}
                                         onValueChange={(val) => setEditingEntry({ ...editingEntry, category: val as ExpenseCategory })}
-                                        disabled={editingEntry.type === 'revenue'}
+                                        disabled={editingEntry.type === 'income'}
                                     >
                                         <SelectTrigger className="">
                                             <SelectValue placeholder="Select category" />
@@ -355,7 +346,7 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
                                 </Label>
                                 <div className="col-span-3">
                                     <Select
-                                        value={editingEntry.frequency || (editingEntry.isRecurring ? 'monthly' : 'one-time')}
+                                        value={editingEntry.frequency || 'one-time'}
                                         onValueChange={(val) => setEditingEntry({ ...editingEntry, frequency: val as any })}
                                     >
                                         <SelectTrigger className="">

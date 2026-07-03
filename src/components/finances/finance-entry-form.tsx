@@ -36,6 +36,7 @@ import { useFounderStore, ExpenseCategory } from '@/store/founder-store';
 import { format } from 'date-fns';
 import { translations } from '@/lib/translations';
 import { useGamification } from '@/hooks/use-gamification';
+import { toast } from '@/hooks/use-toast';
 
 const expenseSchema = z.object({
     label: z.string().min(2, "Label must be at least 2 characters"),
@@ -49,8 +50,8 @@ const expenseSchema = z.object({
 export function FinanceEntryForm() {
     const finance = useFounderStore(s => s.finance);
     const updateCashAvailable = useFounderStore(s => s.updateCashAvailable);
-    const addMonthlyEntry = useFounderStore(s => s.addMonthlyEntry);
-    const updateMonthlyEntry = useFounderStore(s => s.updateMonthlyEntry);
+    const addEntry = useFounderStore(s => s.addEntry);
+    
     const language = useFounderStore(s => s.language);
     const t = translations[language].finance.form;
     const [cashInput, setCashInput] = useState(finance.cashAvailable.toString());
@@ -77,94 +78,31 @@ export function FinanceEntryForm() {
     const { awardXP } = useGamification();
 
     const onSubmit = (values: z.infer<typeof expenseSchema>) => {
-        // Parse date string directly to avoid timezone issues
-        const [year, monthStr] = values.date.split('-');
-        const month = parseInt(monthStr, 10);
-        const currentMonthKey = `${year}-${monthStr}`;
+        addEntry({
+            label: values.label,
+            amount: values.amount,
+            category: values.type === 'expense' ? values.category : 'other',
+            frequency: values.frequency as any,
+            type: values.type === 'revenue' ? 'income' : 'expense',
+            date: values.date
+        });
 
-        // Check if entry exists for this month
-        const existingEntry = finance.monthlyEntries.find(e => e.month === currentMonthKey);
-
-        if (existingEntry) {
-            // Update existing
-            if (values.type === 'expense') {
-                const newExpenses = [
-                    ...(existingEntry.expenses || []),
-                    {
-                        id: crypto.randomUUID(),
-                        label: values.label,
-                        amount: values.amount,
-                        category: values.category as ExpenseCategory,
-                        isRecurring: values.frequency !== 'one-time',
-                        frequency: values.frequency as any,
-                        date: values.date
-                    }
-                ];
-                updateMonthlyEntry(existingEntry.id, { expenses: newExpenses });
-            } else {
-                // Revenue
-                const newIncomes = [
-                    ...(existingEntry.incomes || []),
-                    {
-                        id: crypto.randomUUID(),
-                        label: values.label,
-                        amount: values.amount,
-                        category: 'other' as ExpenseCategory,
-                        isRecurring: values.frequency !== 'one-time',
-                        frequency: values.frequency as any,
-                        date: values.date
-                    }
-                ];
-                updateMonthlyEntry(existingEntry.id, {
-                    revenue: existingEntry.revenue + values.amount,
-                    incomes: newIncomes
-                });
-                if (values.type === 'revenue' && values.amount > 0) {
-                    awardXP('first_revenue');
-                }
-            }
-        } else {
-            // Create new
-            const newEntry = {
-                id: crypto.randomUUID(),
-                month: currentMonthKey,
-                revenue: values.type === 'revenue' ? values.amount : 0,
-                expenses: values.type === 'expense' ? [
-                    {
-                        id: crypto.randomUUID(),
-                        label: values.label,
-                        amount: values.amount,
-                        category: values.category as ExpenseCategory,
-                        isRecurring: values.frequency !== 'one-time',
-                        frequency: values.frequency as any,
-                        date: values.date
-                    }
-                ] : [],
-                incomes: values.type === 'revenue' ? [
-                    {
-                        id: crypto.randomUUID(),
-                        label: values.label,
-                        amount: values.amount,
-                        category: 'other' as ExpenseCategory,
-                        isRecurring: values.frequency !== 'one-time',
-                        frequency: values.frequency as any,
-                        date: values.date
-                    }
-                ] : []
-            };
-            addMonthlyEntry(newEntry);
-            if (values.type === 'revenue' && values.amount > 0) {
-                awardXP('first_revenue');
-            }
+        if (values.type === 'revenue' && values.amount > 0) {
+            awardXP('first_revenue');
         }
 
+        
         form.reset({
             label: '',
             amount: 0,
             category: 'Divers',
-            type: values.type,
+            type: 'expense',
             date: values.date,
-            frequency: values.frequency
+            frequency: 'one-time'
+        });
+        toast({
+            title: language === 'fr' ? 'Succès' : 'Success',
+            description: language === 'fr' ? 'Opération ajoutée avec succès' : 'Entry added successfully',
         });
     };
 

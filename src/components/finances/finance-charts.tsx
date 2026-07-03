@@ -1,4 +1,5 @@
 'use client';
+import { getMonthlyEntries } from '@/lib/finance-utils';
 
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -28,7 +29,7 @@ export function FinanceCharts() {
         const currentMonthStr = format(today, 'yyyy-MM');
         
         // --- 1. Donut Chart Data (Current Month) ---
-        const sortedEntries = [...finance.monthlyEntries].sort((a, b) => b.month.localeCompare(a.month));
+        const sortedEntries = [...getMonthlyEntries(finance.entries)].sort((a, b) => b.month.localeCompare(a.month));
         const latestEntry = sortedEntries.find(e => e.month === currentMonthStr) || sortedEntries[0];
 
         const expensesByCategory: Record<string, number> = {};
@@ -39,7 +40,7 @@ export function FinanceCharts() {
                 let monthlyAmount = 0;
                 if (e.frequency === 'annual') {
                     monthlyAmount = e.amount / 12;
-                } else if (e.frequency === 'monthly' || (e.isRecurring && !e.frequency)) {
+                } else if (e.frequency === 'monthly' ) {
                     monthlyAmount = e.amount;
                 } else {
                     monthlyAmount = e.amount; // One-time expenses also count in the current month's pie
@@ -60,7 +61,7 @@ export function FinanceCharts() {
         
         const stackedBarData = pastMonths.map(date => {
             const monthStr = format(date, 'yyyy-MM');
-            const entry = finance.monthlyEntries.find(e => e.month === monthStr);
+            const entry = getMonthlyEntries(finance.entries).find(e => e.month === monthStr);
             
             const monthData: any = {
                 month: format(date, 'MMM yy'),

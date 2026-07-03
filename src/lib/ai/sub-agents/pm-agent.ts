@@ -63,7 +63,8 @@ GÉNÈRE UN JSON AVEC:
       model,
       prompt,
       temperature: 0.2,
-      maxTokens: 4000,
+      // @ts-ignore
+      maxTokens: 5000,
     });
 
     try {

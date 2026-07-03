@@ -1,4 +1,5 @@
 'use client';
+import { getMonthlyEntries } from '@/lib/finance-utils';
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,8 +16,8 @@ export function FounderScoreWidget({ isEditMode }: FounderScoreWidgetProps) {
   const { finance, hypotheses } = useFounderStore();
   const { totalXP } = useGamificationStore();
   
-  const runwayMonths = finance.monthlyEntries.length > 0 
-    ? Math.max(0, finance.cashAvailable / Math.abs(finance.monthlyEntries[0].expenses.reduce((sum, exp) => sum + exp.amount, 0)))
+  const runwayMonths = getMonthlyEntries(finance.entries).length > 0 
+    ? Math.max(0, finance.cashAvailable / Math.abs(getMonthlyEntries(finance.entries)[0].expenses.reduce((sum, exp) => sum + exp.amount, 0)))
     : 12;
     
   const runwayPercentage = Math.min(100, Math.max(0, (runwayMonths / 12) * 100));

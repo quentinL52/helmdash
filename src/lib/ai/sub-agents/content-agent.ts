@@ -24,7 +24,8 @@ PRODUIS: Posts LinkedIn, articles blog, newsletter, calendrier éditorial, mots-
         model,
         prompt,
         temperature: 0.5,
-        maxTokens: 6000,
+        // @ts-ignore
+      maxTokens: 5000,
       });
 
       await this.saveDeliverable({

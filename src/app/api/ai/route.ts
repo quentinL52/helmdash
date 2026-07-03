@@ -33,7 +33,18 @@ const ENV_KEY_MAP: Record<ProviderName, string[]> = {
  * Resolves the API key for a provider from environment variables.
  * Checks all known env var names for the given provider.
  */
-function resolveApiKey(provider: ProviderName): string | null {
+async function resolveApiKey(provider: ProviderName, userId: string): Promise<string | null> {
+  // 1. Fall back to DB
+  const { prisma } = await import('@/lib/prisma');
+  const dbKey = await prisma.aiSettings.findUnique({
+    where: { userId },
+  });
+  if (dbKey?.apiKey && dbKey.provider === provider) {
+    const { decryptApiKey } = await import('@/lib/ai/api-key-encryption');
+    return await decryptApiKey(dbKey.apiKey, userId);
+  }
+
+  // 2. Fall back to env vars
   const envKeys = ENV_KEY_MAP[provider];
   for (const envName of envKeys) {
     const value = process.env[envName];
@@ -79,7 +90,7 @@ async function handler(request: NextRequest, { userId }: { userId: string }) {
     const model: string = requestedModel ?? DEFAULT_MODELS[provider];
 
     // Ensure the requested provider has a valid API key
-    const apiKey = resolveApiKey(provider);
+    const apiKey = await resolveApiKey(provider, userId);
     if (!apiKey) {
       return NextResponse.json(
         {

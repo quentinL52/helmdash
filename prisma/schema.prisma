@@ -42,6 +42,7 @@ model User {
   leanCanvasSections  LeanCanvasSection[]
   scheduledTasks      ScheduledTask[]
   agentTasks          AgentTask[]
+  gamificationProfile GamificationProfile?
 
   @@map("users")
 }
@@ -517,3 +518,18 @@ model AgentTask {
   @@index([userId, status])
   @@map("agent_tasks")
 }
+model GamificationProfile {
+  userId        String   @id @map("user_id") @db.Uuid
+  xp            Int      @default(0)
+  level         Int      @default(1)
+  currentStreak Int      @default(0) @map("current_streak")
+  longestStreak Int      @default(0) @map("longest_streak")
+  lastActionAt  DateTime? @map("last_action_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("gamification_profiles")
+}
+

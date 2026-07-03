@@ -1,4 +1,5 @@
 'use client';
+import { getMonthlyEntries } from '@/lib/finance-utils';
 
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +14,7 @@ export function FinanceKPIs() {
         const today = new Date();
         const currentMonthStr = format(today, 'yyyy-MM');
         
-        const sortedEntries = [...finance.monthlyEntries].sort((a, b) => b.month.localeCompare(a.month));
+        const sortedEntries = [...getMonthlyEntries(finance.entries)].sort((a, b) => b.month.localeCompare(a.month));
         const latestEntry = sortedEntries.find(e => e.month === currentMonthStr) || sortedEntries[0];
 
         let recurringExpenses = 0;
@@ -22,7 +23,7 @@ export function FinanceKPIs() {
         if (latestEntry) {
             recurringExpenses = (latestEntry.expenses || [])
                 .reduce((sum, e) => {
-                    const isMonthly = e.frequency === 'monthly' || (e.isRecurring && !e.frequency);
+                    const isMonthly = e.frequency === 'monthly' ;
                     const isAnnual = e.frequency === 'annual';
                     if (isAnnual) return sum + (e.amount / 12);
                     if (isMonthly) return sum + e.amount;
@@ -31,7 +32,7 @@ export function FinanceKPIs() {
                 
             recurringIncomes = (latestEntry.incomes || [])
                 .reduce((sum, i) => {
-                    const isMonthly = i.frequency === 'monthly' || (i.isRecurring && !i.frequency);
+                    const isMonthly = i.frequency === 'monthly' ;
                     const isAnnual = i.frequency === 'annual';
                     if (isAnnual) return sum + (i.amount / 12);
                     if (isMonthly) return sum + i.amount;

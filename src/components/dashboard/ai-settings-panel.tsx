@@ -17,10 +17,11 @@ export function AISettingsPanel() {
   const { aiSettings, setAiSettings } = store;
   
   const [provider, setProvider] = useState<ProviderName>(aiSettings.provider || 'openai');
-  const [apiKey, setApiKey] = useState<string>(aiSettings.apiKeys?.[provider] || '');
+  const [apiKey, setApiKey] = useState<string>('');
   const [model, setModel] = useState<string>(aiSettings.model || '');
   const [modelsConfig, setModelsConfig] = useState<Record<string, string>>(aiSettings.modelsConfig || {});
   const [showKey, setShowKey] = useState(false);
+  const [configuredProviders, setConfiguredProviders] = useState<string[]>([]);
   
   const [availableModels, setAvailableModels] = useState<AIModel[]>([]);
   const [allProviderModels, setAllProviderModels] = useState<Record<string, AIModel[]>>({});
@@ -36,9 +37,25 @@ export function AISettingsPanel() {
     { id: 'mistral', name: 'Mistral AI' },
   ];
 
+  // Fetch configured providers on mount
+  useEffect(() => {
+    const fetchConfiguredProviders = async () => {
+      try {
+        const res = await fetch('/api/settings/ai-keys');
+        if (res.ok) {
+          const data = await res.json();
+          setConfiguredProviders(data.configuredProviders || []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch configured providers', err);
+      }
+    };
+    fetchConfiguredProviders();
+  }, []);
+
   // Update local state when provider changes
   useEffect(() => {
-    setApiKey(aiSettings.apiKeys?.[provider] || '');
+    setApiKey(''); // Clear API key input when switching providers
     setModel(aiSettings.provider === provider ? aiSettings.model || '' : '');
     setAvailableModels([]);
     setError('');
@@ -49,35 +66,37 @@ export function AISettingsPanel() {
   useEffect(() => {
     const fetchAll = async () => {
       const newAllModels: Record<string, AIModel[]> = {};
-      for (const p of PROVIDERS) {
-        const key = aiSettings.apiKeys?.[p.id];
-        if (key) {
-          try {
-            const res = await fetch(`/api/ai/models?provider=${p.id}`, { headers: { 'x-api-key': key } });
-            const data = await res.json();
-            if (res.ok && data.models) {
-              const unique = Array.from(new Map(data.models.map((m: any) => [m.id, m])).values());
-              newAllModels[p.id] = unique as AIModel[];
-            }
-          } catch (e) {}
-        }
+      for (const p of configuredProviders) {
+        try {
+          const res = await fetch(`/api/ai/models?provider=${p}`);
+          const data = await res.json();
+          if (res.ok && data.models) {
+            const unique = Array.from(new Map(data.models.map((m: any) => [m.id, m])).values());
+            newAllModels[p] = unique as AIModel[];
+          }
+        } catch (e) {}
       }
       setAllProviderModels(newAllModels);
     };
-    fetchAll();
-  }, [aiSettings.apiKeys]);
+    if (configuredProviders.length > 0) {
+      fetchAll();
+    }
+  }, [configuredProviders]);
 
-  const fetchModels = async (currentKey: string) => {
-    if (!currentKey) return;
+  const fetchModels = async (currentKey?: string) => {
+    const isConfigured = configuredProviders.includes(provider);
+    if (!currentKey && !isConfigured) return;
     
     setIsLoadingModels(true);
     setError('');
     
     try {
-      const res = await fetch(`/api/ai/models?provider=${provider}`, {
-        headers: { 'x-api-key': currentKey }
-      });
-      
+      const headers: Record<string, string> = {};
+      if (currentKey) {
+        headers['x-api-key'] = currentKey;
+      }
+
+      const res = await fetch(`/api/ai/models?provider=${provider}`, { headers });
       const data = await res.json();
       
       if (!res.ok) {
@@ -99,7 +118,9 @@ export function AISettingsPanel() {
   };
 
   const handleSave = async () => {
-    if (!apiKey) {
+    const isConfigured = configuredProviders.includes(provider);
+    
+    if (!apiKey && !isConfigured) {
       setError('Veuillez entrer une clé API');
       return;
     }
@@ -114,28 +135,39 @@ export function AISettingsPanel() {
     setSuccess('');
 
     try {
-      // Create new apiKeys object
-      const newApiKeys = {
-        ...aiSettings.apiKeys,
-        [provider]: apiKey
-      };
-
-      // Ensure provider is of type ProviderName before passing to setAiSettings
+      // Ensure provider is of type ProviderName
       const providerName = provider as ProviderName;
 
-      // Save to store
+      // If user entered a new key, save it to the server
+      if (apiKey) {
+        const res = await fetch('/api/settings/ai-keys', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ provider: providerName, apiKey })
+        });
+        
+        if (!res.ok) {
+          throw new Error('Erreur lors de la sauvegarde de la clé sur le serveur');
+        }
+        
+        if (!isConfigured) {
+          setConfiguredProviders(prev => [...prev, providerName]);
+        }
+      }
+
+      // Save provider and model settings to store
       setAiSettings({
         provider: providerName,
         model,
-        apiKeys: newApiKeys,
         modelsConfig
       });
 
       setSuccess('Configuration sauvegardée avec succès !');
+      setApiKey(''); // Clear key after save for security
       
-      // Fetch models to verify key works if we haven't already
+      // Fetch models to verify if we haven't already
       if (availableModels.length === 0) {
-        await fetchModels(apiKey);
+        await fetchModels();
       }
     } catch (err: any) {
       setError(err.message || 'Erreur lors de la sauvegarde');
@@ -143,6 +175,8 @@ export function AISettingsPanel() {
       setIsSaving(false);
     }
   };
+
+  const isCurrentProviderConfigured = configuredProviders.includes(provider);
 
   return (
     <Card className="bg-card/50 backdrop-blur border-accent/20 relative overflow-hidden group shadow-lg">
@@ -159,7 +193,7 @@ export function AISettingsPanel() {
               Configurez vos AI Co-founders. Choisissez votre fournisseur de modèle préféré.
             </CardDescription>
           </div>
-          {aiSettings.provider && aiSettings.apiKeys[aiSettings.provider] && (
+          {aiSettings.provider && configuredProviders.includes(aiSettings.provider) && (
             <Badge variant="outline" className="border-success text-success bg-success/10 font-pixel text-[10px]">
               <CheckCircle2 className="w-3 h-3 mr-1 inline" />
               CONFIGURÉ ({aiSettings.provider})
@@ -178,6 +212,7 @@ export function AISettingsPanel() {
                 className="font-pixel text-[10px] data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
               >
                 {p.name.toUpperCase()}
+                {configuredProviders.includes(p.id) && <CheckCircle2 className="w-3 h-3 ml-1 text-success inline" />}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -192,7 +227,7 @@ export function AISettingsPanel() {
                     type={showKey ? "text" : "password"}
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
-                    placeholder={`sk-...`}
+                    placeholder={isCurrentProviderConfigured ? "(Clé déjà configurée, entrez-en une nouvelle pour la modifier)" : `sk-...`}
                     className="bg-background/50 font-mono text-sm pr-10"
                   />
                   <Button
@@ -208,33 +243,37 @@ export function AISettingsPanel() {
                 <Button 
                   variant="outline" 
                   onClick={() => fetchModels(apiKey)}
-                  disabled={!apiKey || isLoadingModels}
+                  disabled={(!apiKey && !isCurrentProviderConfigured) || isLoadingModels}
                   className="font-pixel text-[10px]"
                 >
                   {isLoadingModels ? <Loader2 className="w-4 h-4 animate-spin" /> : "VÉRIFIER"}
                 </Button>
               </div>
               <p className="text-[10px] text-muted-foreground italic">
-                Votre clé est stockée localement dans votre navigateur (Zustand persist). Elle n'est envoyée qu'à l'API de {provider}.
+                Votre clé est chiffrée et stockée de manière sécurisée en base de données.
               </p>
             </div>
 
             <div className="space-y-2">
               <Label className="font-pixel text-xs text-muted-foreground">MODÈLE PRINCIPAL (Agent Core)</Label>
-              <Select value={model} onValueChange={setModel} disabled={availableModels.length === 0}>
+              <Select value={model} onValueChange={setModel} disabled={availableModels.length === 0 && !isCurrentProviderConfigured}>
                 <SelectTrigger className="bg-background/50 font-mono text-sm">
                   <SelectValue placeholder={
                     isLoadingModels ? "Chargement des modèles..." : 
-                    availableModels.length === 0 ? "Entrez votre clé pour voir les modèles" : 
+                    (availableModels.length === 0 && !isCurrentProviderConfigured) ? "Entrez votre clé pour voir les modèles" : 
                     "Sélectionnez un modèle"
                   } />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableModels.map((m, idx) => (
+                  {availableModels.length > 0 ? availableModels.map((m, idx) => (
                     <SelectItem key={`${m.id}-${idx}`} value={m.id} className="font-mono text-sm">
                       {m.name || m.id} <span className="text-muted-foreground text-xs ml-2">({m.id})</span>
                     </SelectItem>
-                  ))}
+                  )) : (
+                    <SelectItem value={model || "default"} className="font-mono text-sm">
+                      {model || "Modèle actuel"}
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -271,7 +310,6 @@ export function AISettingsPanel() {
                             </SelectGroup>
                           ))
                         ) : (
-                          // Fallback to currently available models if background fetch failed/pending
                           <SelectGroup>
                             <SelectLabel>{provider}</SelectLabel>
                             {availableModels.map((m, idx) => (
@@ -305,7 +343,7 @@ export function AISettingsPanel() {
             <div className="pt-4 flex justify-end">
               <Button 
                 onClick={handleSave} 
-                disabled={isSaving || !apiKey}
+                disabled={isSaving || (!apiKey && !isCurrentProviderConfigured)}
                 className="font-pixel text-xs bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_15px_rgba(var(--primary),0.3)]"
               >
                 {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}

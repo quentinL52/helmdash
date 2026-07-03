@@ -68,21 +68,28 @@ export async function getAuthenticatedUser(): Promise<AuthResult> {
  */
 export function withAuth<T>(
   handler: AuthenticatedHandler<T>,
-): (req: NextRequest, context?: { params: T }) => Promise<NextResponse>;
+): (req: NextRequest, context: any) => Promise<NextResponse>;
 
 export function withAuth<C extends { userId: string }>(
   handler: (req: NextRequest, context: C) => Promise<NextResponse>,
-): (req: NextRequest, context?: { params: unknown }) => Promise<NextResponse>;
+): (req: NextRequest, context: any) => Promise<NextResponse>;
 
 export function withAuth<T>(
   handler: ((req: NextRequest, context: { userId: string; params?: T }) => Promise<NextResponse>) | ((req: NextRequest, context: Record<string, unknown>) => Promise<NextResponse>),
-): (req: NextRequest, context?: { params: T | unknown }) => Promise<NextResponse> {
-  return async (req: NextRequest, context?: { params: T | unknown }) => {
+): (req: NextRequest, context: any) => Promise<NextResponse> {
+  return async (req: NextRequest, context: any) => {
     const auth = await getAuthenticatedUser();
     if (auth.error) return auth.error;
+    
+    // In Next.js 15, params might be a Promise, so we must await it if it exists.
+    let resolvedParams = {};
+    if (context && context.params) {
+       resolvedParams = context.params instanceof Promise ? await context.params : context.params;
+    }
+
     return (handler as (req: NextRequest, context: { userId: string; params?: unknown }) => Promise<NextResponse>)(
       req,
-      { userId: auth.user.id, params: (context?.params ?? {}) },
+      { userId: auth.user.id, ...context, params: resolvedParams },
     );
   };
 }

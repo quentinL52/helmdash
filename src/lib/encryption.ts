@@ -8,7 +8,7 @@ const scryptAsync = promisify(scrypt);
  * Utilise scrypt (KDF résistant au brute-force)
  */
 export async function deriveKey(password: string, salt: Uint8Array<ArrayBuffer>): Promise<Uint8Array<ArrayBuffer>> {
-  const derived = await scryptAsync(password, new Uint8Array(salt), 32);
+  const derived = await scryptAsync(password, new Uint8Array(salt), 32) as Buffer;
   const buf = Buffer.from(derived);
   return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
 }

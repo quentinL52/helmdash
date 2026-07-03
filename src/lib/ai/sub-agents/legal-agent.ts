@@ -21,7 +21,8 @@ PRODUIS LE DOCUMENT DEMANDÉ (CGV, Privacy Policy, DPA, Contrat freelance, Check
         model,
         prompt,
         temperature: 0.1,
-        maxTokens: 8000,
+        // @ts-ignore
+      maxTokens: 5000,
       });
 
       await this.saveDeliverable({

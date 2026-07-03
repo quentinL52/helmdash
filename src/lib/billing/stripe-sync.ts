@@ -6,7 +6,7 @@ export async function syncStripeToFinances(stripeObject: any, eventType: string)
   const customerId = stripeObject.customer as string;
 
   // Trouver user via stripeCustomerId
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findFirst({
     where: { stripeCustomerId: customerId }
   });
 
@@ -60,10 +60,15 @@ export async function syncStripeToFinances(stripeObject: any, eventType: string)
   // 5. Mettre à jour FinanceSettings (MRR, ARR, cashAvailable)
   const arr = mrr * 12;
 
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { mrr, arr }
+  });
+
   await prisma.financeSettings.upsert({
     where: { userId: user.id },
-    create: { userId: user.id, mrr, arr, cashAvailable: monthlyRevenue }, 
-    update: { mrr, arr, updatedAt: new Date() },
+    create: { userId: user.id, cashAvailable: monthlyRevenue }, 
+    update: { updatedAt: new Date() },
   });
 
   // 6. Recalculer Runway

@@ -117,7 +117,7 @@ import { anthropic } from '@ai-sdk/anthropic';
 import { google } from '@ai-sdk/google';
 import { mistral } from '@ai-sdk/mistral';
 
-export type AgentRole = 'core' | 'pm' | 'cfo' | 'growth' | 'legal' | 'tech' | 'research';
+export type AgentRole = 'core' | 'pm' | 'cfo' | 'growth' | 'legal' | 'tech_lead' | 'research' | 'content' | 'recruiting';
 
 export interface UserModelsConfig {
   core?: string;
@@ -125,8 +125,10 @@ export interface UserModelsConfig {
   cfo?: string;
   growth?: string;
   legal?: string;
-  tech?: string;
+  tech_lead?: string;
   research?: string;
+  content?: string;
+  recruiting?: string;
 }
 
 export const DEFAULT_MODELS_CONFIG: UserModelsConfig = {
@@ -135,8 +137,10 @@ export const DEFAULT_MODELS_CONFIG: UserModelsConfig = {
   cfo: 'gpt-4o',
   growth: 'claude-3-5-sonnet-20241022',
   legal: 'gpt-4o',
-  tech: 'claude-3-5-sonnet-20241022',
+  tech_lead: 'claude-3-5-sonnet-20241022',
   research: 'gpt-4o-mini',
+  content: 'claude-3-5-sonnet-20241022',
+  recruiting: 'gpt-4o-mini',
 };
 
 export function getModelForAgent(role: AgentRole, userConfig?: UserModelsConfig | null) {
