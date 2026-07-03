@@ -26,6 +26,7 @@ ROUTES=(
   "/api/ai/strategic-recommendations"
   "/api/billing/stripe/sync"
   "/api/memory/extract-entities"
+  "/api/ai/test-unauth"
 )
 
 FAILED=0
