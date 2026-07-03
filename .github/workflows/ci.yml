@@ -71,23 +71,22 @@ jobs:
       - name: Run lint
         run: npm run lint
 
+      - name: Lint hardcoded colors
+        run: node scripts/lint-colors.mjs
+
       - name: Run typecheck
         run: npm run typecheck
 
-      - name: Check for test script
-        id: check-test
-        run: |
-          if npm pkg get scripts.test 2>/dev/null | grep -q .; then
-            echo "has_test=true" >> "$GITHUB_OUTPUT"
-            echo "Test script found — will run tests."
-          else
-            echo "has_test=false" >> "$GITHUB_OUTPUT"
-            echo "No test script found — skipping test step."
-          fi
-
       - name: Run tests
-        if: steps.check-test.outputs.has_test == 'true'
         run: npm test
 
       - name: Build project
         run: npm run build
+
+      - name: Check Auth Routes
+        run: |
+          npm run start &
+          SERVER_PID=$!
+          npx wait-on http://localhost:3000
+          bash scripts/check-auth.sh
+          kill $SERVER_PID
