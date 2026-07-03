@@ -272,6 +272,13 @@
         "q": "Où vont mes données ?",
         "a": "Elles sont chiffrées et ne servent pas à entraîner les modèles globaux."
       }
-    ]
+    ],
+    "login": "Se connecter",
+    "cohort": "Cohorte {name}",
+    "perMonth": "/ mois",
+    "billedSemiannually": "Facturé {amount} € tous les 6 mois",
+    "footerCopyright": "© 2026 Helmdash · Fait par un solo founder.",
+    "privacy": "Confidentialité",
+    "terms": "CGU"
   }
 }
