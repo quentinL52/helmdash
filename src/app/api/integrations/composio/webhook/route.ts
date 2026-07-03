@@ -13,34 +13,34 @@ export async function POST(req: Request) {
     // Verify HMAC signature
     const secret = process.env.COMPOSIO_WEBHOOK_SECRET;
     if (!secret) {
-      console.warn('[Composio Webhook] COMPOSIO_WEBHOOK_SECRET not configured — skipping signature check');
-      // Fall through — in production this should be configured
+      return NextResponse.json(
+        { error: 'Webhook secret not configured' },
+        { status: 500 }
+      );
     }
 
     const body = await req.text();
     const signature = req.headers.get('x-signature') || req.headers.get('x-composio-signature');
 
-    if (secret) {
-      if (!signature) {
-        return NextResponse.json(
-          { error: 'Missing signature header' },
-          { status: 401 }
-        );
-      }
+    if (!signature) {
+      return NextResponse.json(
+        { error: 'Missing signature header' },
+        { status: 401 }
+      );
+    }
 
-      // Verify HMAC-SHA256
-      const expectedSignature = crypto
-        .createHmac('sha256', secret)
-        .update(body)
-        .digest('hex');
+    // Verify HMAC-SHA256
+    const expectedSignature = crypto
+      .createHmac('sha256', secret)
+      .update(body)
+      .digest('hex');
 
-      if (signature !== expectedSignature) {
-        console.warn('[Composio Webhook] Invalid signature — possible forgery attempt');
-        return NextResponse.json(
-          { error: 'Invalid signature' },
-          { status: 401 }
-        );
-      }
+    if (signature !== expectedSignature) {
+      console.warn('[Composio Webhook] Invalid signature — possible forgery attempt');
+      return NextResponse.json(
+        { error: 'Invalid signature' },
+        { status: 401 }
+      );
     }
 
     // Process webhook
