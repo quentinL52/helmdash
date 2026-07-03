@@ -103,7 +103,15 @@
     "theme": "Thème",
     "darkMode": "Mode sombre",
     "lightMode": "Mode clair",
-    "system": "Système"
+    "system": "Système",
+    "dataPrivacy": "Données & Confidentialité",
+    "dataPrivacyDesc": "Gérez vos données personnelles. L'export génère un fichier JSON avec l'ensemble de votre historique. La suppression est définitive.",
+    "exportData": "Exporter mes données",
+    "deleteAccount": "Supprimer mon compte",
+    "deleteAccountConfirmTitle": "Êtes-vous absolument sûr ?",
+    "deleteAccountConfirmDesc": "Cette action est irréversible. Elle supprimera définitivement votre compte, vos hypothèses, vos données financières et résiliera votre abonnement en cours.",
+    "exportSuccess": "Vos données ont été exportées.",
+    "deleteSuccess": "Votre compte a été supprimé."
   },
   "billing": {
     "title": "Abonnement & Facturation",

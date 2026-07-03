@@ -19,6 +19,7 @@ model User {
   mrr                  Float     @default(0)
   arr                  Float     @default(0)
   planStatus           String    @default("trialing") @map("plan_status")
+  deletionRequestedAt  DateTime? @map("deletion_requested_at")
   trialEndsAt          DateTime? @map("trial_ends_at")
   cohort               String?   @map("cohort")
   cohortRank           Int?      @map("cohort_rank")
