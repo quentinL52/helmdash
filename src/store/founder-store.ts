@@ -404,6 +404,8 @@ export interface AiSettings {
     model: string;
     /** Configuration of models per sub-agent role */
     modelsConfig: Record<string, string>;
+    /** List of providers that have an API key configured on the server */
+    configuredProviders: string[];
 }
 
 /** Profil du fondateur : identité et style d'écriture pour les agents IA */
@@ -661,7 +663,8 @@ const initialState = {
         provider: 'openai',
         model: 'gpt-4o',
         modelsConfig: {},
-    },
+        configuredProviders: [],
+    } as AiSettings,
     founderProfile: {
         linkedinUrl: '',
         writingStyleContext: '',

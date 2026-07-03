@@ -27,12 +27,22 @@ const VALID_PROVIDERS: ProviderName[] = ['openai', 'anthropic', 'gemini', 'mistr
  * Resolves the API key for a provider.
  * Priority: `x-api-key` header → environment variables.
  */
-function resolveApiKey(request: NextRequest, provider: ProviderName): string | null {
+async function resolveApiKey(request: NextRequest, provider: ProviderName, userId: string): Promise<string | null> {
   // 1. Check header
   const headerKey = request.headers.get('x-api-key');
   if (headerKey) return headerKey;
 
-  // 2. Fall back to env vars
+  // 2. Fall back to DB
+  const { prisma } = await import('@/lib/prisma');
+  const dbKey = await prisma.aiSettings.findUnique({
+    where: { userId },
+  });
+  if (dbKey?.apiKey && dbKey.provider === provider) {
+    const { decryptApiKey } = await import('@/lib/ai/api-key-encryption');
+    return await decryptApiKey(dbKey.apiKey, userId);
+  }
+
+  // 3. Fall back to env vars
   const envKeys = ENV_KEY_MAP[provider];
   for (const envName of envKeys) {
     const value = process.env[envName];
@@ -85,7 +95,7 @@ async function handlerGet(request: NextRequest, { userId }: { userId: string }) 
   }
 
   // Resolve API key
-  const apiKey = resolveApiKey(request, provider);
+  const apiKey = await resolveApiKey(request, provider, userId);
   if (!apiKey) {
     return NextResponse.json(
       {

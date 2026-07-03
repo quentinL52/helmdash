@@ -33,7 +33,7 @@ export function AgentTriggerButton({
   const { awardXP } = useGamificationStore();
   const { aiSettings } = store;
   
-  const isConfigured = !!aiSettings.provider && !!aiSettings.apiKeys[aiSettings.provider];
+  const isConfigured = !!aiSettings.provider && aiSettings.configuredProviders?.includes(aiSettings.provider);
   
   const [status, setStatus] = useState<'idle' | 'running' | 'success' | 'error'>('idle');
   const [result, setResult] = useState<any>(null);
@@ -57,7 +57,7 @@ export function AgentTriggerButton({
         body: JSON.stringify({
           provider: aiSettings.provider,
           model: aiSettings.model || 'gpt-4o',
-          apiKey: aiSettings.apiKeys[aiSettings.provider as keyof typeof aiSettings.apiKeys],
+          // apiKey is handled by the server now
           context: getContext(store),
           locale: 'fr'
         })

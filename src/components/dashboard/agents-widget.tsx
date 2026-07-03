@@ -83,7 +83,7 @@ export function AgentsWidget() {
   const { awardXP } = useGamificationStore();
   const { aiSettings } = store;
   
-  const isConfigured = !!aiSettings.provider && !!aiSettings.apiKeys[aiSettings.provider];
+  const isConfigured = !!aiSettings.provider && aiSettings.configuredProviders?.includes(aiSettings.provider);
   
   const [runs, setRuns] = useState<Record<AgentId, { status: AgentStatus; result?: any; error?: string }>>({} as any);
   const [selectedAgent, setSelectedAgent] = useState<AgentId | null>(null);
@@ -100,7 +100,7 @@ export function AgentsWidget() {
         body: JSON.stringify({
           provider: aiSettings.provider,
           model: aiSettings.model || 'gpt-4o', // fallback
-          apiKey: aiSettings.apiKeys[aiSettings.provider as keyof typeof aiSettings.apiKeys],
+          // apiKey is handled by the server now
           context: agent.getContext(store),
           locale: 'fr'
         })

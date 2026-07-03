@@ -60,7 +60,6 @@ async function handler(
     );
   }
 }
-}
 
 export const GET = withAuth(async (req: NextRequest, { userId }: { userId: string }) => {
   try {
