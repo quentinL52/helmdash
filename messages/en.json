@@ -272,6 +272,13 @@
         "q": "Where does my data go?",
         "a": "It's encrypted and not used to train global models."
       }
-    ]
+    ],
+    "login": "Log in",
+    "cohort": "Cohort {name}",
+    "perMonth": "/ month",
+    "billedSemiannually": "Billed {amount} € every 6 months",
+    "footerCopyright": "© 2026 Helmdash · Built by a solo founder.",
+    "privacy": "Privacy",
+    "terms": "Terms"
   }
 }
