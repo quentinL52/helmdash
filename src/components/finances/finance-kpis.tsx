@@ -14,7 +14,7 @@ export function FinanceKPIs() {
         const today = new Date();
         const currentMonthStr = format(today, 'yyyy-MM');
         
-        const sortedEntries = [...getMonthlyEntries(finance.entries)].sort((a, b) => b.month.localeCompare(a.month));
+        const sortedEntries = getMonthlyEntries(finance.entries);
         const latestEntry = sortedEntries.find(e => e.month === currentMonthStr) || sortedEntries[0];
 
         let recurringExpenses = 0;

@@ -16,8 +16,9 @@ export function FounderScoreWidget({ isEditMode }: FounderScoreWidgetProps) {
   const { finance, hypotheses } = useFounderStore();
   const { totalXP } = useGamificationStore();
   
-  const runwayMonths = getMonthlyEntries(finance.entries).length > 0 
-    ? Math.max(0, finance.cashAvailable / Math.abs(getMonthlyEntries(finance.entries)[0].expenses.reduce((sum, exp) => sum + exp.amount, 0)))
+  const monthlyEntries = getMonthlyEntries(finance.entries);
+  const runwayMonths = monthlyEntries.length > 0
+    ? Math.max(0, finance.cashAvailable / Math.abs(monthlyEntries[0].expenses.reduce((sum, exp) => sum + exp.amount, 0)))
     : 12;
     
   const runwayPercentage = Math.min(100, Math.max(0, (runwayMonths / 12) * 100));

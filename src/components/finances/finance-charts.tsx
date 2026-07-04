@@ -29,7 +29,8 @@ export function FinanceCharts() {
         const currentMonthStr = format(today, 'yyyy-MM');
         
         // --- 1. Donut Chart Data (Current Month) ---
-        const sortedEntries = [...getMonthlyEntries(finance.entries)].sort((a, b) => b.month.localeCompare(a.month));
+        const monthlyEntries = getMonthlyEntries(finance.entries);
+        const sortedEntries = monthlyEntries;
         const latestEntry = sortedEntries.find(e => e.month === currentMonthStr) || sortedEntries[0];
 
         const expensesByCategory: Record<string, number> = {};
@@ -61,7 +62,7 @@ export function FinanceCharts() {
         
         const stackedBarData = pastMonths.map(date => {
             const monthStr = format(date, 'yyyy-MM');
-            const entry = getMonthlyEntries(finance.entries).find(e => e.month === monthStr);
+            const entry = monthlyEntries.find(e => e.month === monthStr);
             
             const monthData: any = {
                 month: format(date, 'MMM yy'),
