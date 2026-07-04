@@ -11,9 +11,7 @@ export function RunwayWidget() {
 
     const metrics = useMemo(() => {
         // Simple calculation similar to chart
-        const sortedEntries = [...getMonthlyEntries(finance.entries)].sort((a, b) =>
-            b.month.localeCompare(a.month)
-        );
+        const sortedEntries = getMonthlyEntries(finance.entries);
 
         let monthlyBurn = 0;
         let trend = 'stable';
