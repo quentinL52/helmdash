@@ -1,0 +1,3 @@
+## 2026-07-05 - Redundant Data Processing in Render Methods
+**Learning:** `getMonthlyEntries` in `finance-utils.ts` already returns a sorted array. However, multiple components were unnecessarily spreading and re-sorting this array on every render or inside `useMemo` hooks. Furthermore, some components were calling `getMonthlyEntries` inside loops (e.g., mapping over months), causing the entire dataset to be re-parsed and re-sorted multiple times per render.
+**Action:** When a utility function already returns formatted/sorted data, cache its result in a local variable (or useMemo) and avoid redundant `.sort()` or `.find()` operations inside loops.
