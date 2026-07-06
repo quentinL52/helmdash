@@ -77,7 +77,9 @@ export async function GET() {
         }
 
         // Cascade supprime les données Prisma
+        console.time(`purge_user_${user.id}`);
         await prisma.user.delete({ where: { id: user.id } });
+        console.timeEnd(`purge_user_${user.id}`);
         
         // Supprimer de Supabase Auth
         // Justification : nous utilisons supabaseAdmin.auth.admin.deleteUser ici car cette purge

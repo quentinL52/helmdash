@@ -7,7 +7,10 @@ async function handler(req: NextRequest, { userId }: { userId: string }) {
     where: {
       userId,
       status: { notIn: ['done'] },
-      waitingOn: { not: null, not: '' }
+      AND: [
+        { waitingOn: { not: '' } },
+        { waitingOn: { not: null } }
+      ]
     },
     orderBy: { createdAt: 'asc' }
   });

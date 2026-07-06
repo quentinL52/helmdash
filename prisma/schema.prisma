@@ -769,5 +769,6 @@ model Waitlist {
   id        String   @id @default(uuid()) @db.Uuid
   email     String   @unique
   source    String   @default("landing")
+  status    String   @default("pending")
   createdAt DateTime @default(now()) @map("created_at")
 }

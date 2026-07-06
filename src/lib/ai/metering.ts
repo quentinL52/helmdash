@@ -27,16 +27,14 @@ export async function checkAiLimit(userId: string): Promise<{ allowed: boolean; 
   const limit = PRICING_CONFIG.plans.complete.limits.aiActions;
   const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
 
-  const usage = await prisma.aiUsage.findUnique({
+  const usages = await prisma.aiUsage.findMany({
     where: {
-      userId_month: {
-        userId,
-        month: currentMonth
-      }
+      userId,
+      month: currentMonth
     }
   });
 
-  const count = usage?.count || 0;
+  const count = usages.reduce((acc, u) => acc + u.actions, 0);
   return {
     allowed: count < limit,
     remaining: Math.max(0, limit - count)
@@ -55,23 +53,25 @@ export async function incrementAiUsage(userId: string): Promise<void> {
   }
 
   const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
-  const limit = PRICING_CONFIG.plans.complete.limits.aiActions;
+  const scope = 'global'; // default scope if not specified
 
   await prisma.aiUsage.upsert({
     where: {
-      userId_month: {
+      userId_month_scope: {
         userId,
-        month: currentMonth
+        month: currentMonth,
+        scope
       }
     },
     update: {
-      count: { increment: 1 }
+      actions: { increment: 1 }
     },
     create: {
       userId,
       month: currentMonth,
-      count: 1,
-      limit
+      scope,
+      model: 'default',
+      actions: 1
     }
   });
 }

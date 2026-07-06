@@ -1,4 +1,4 @@
-{
+﻿{
   "common": {
     "save": "Save",
     "cancel": "Cancel",
@@ -86,7 +86,7 @@
     "linkedinUrl": "LinkedIn URL",
     "linkedinPlaceholder": "https://linkedin.com/in/your-profile",
     "niche": "Niche / Industry",
-    "nichePlaceholder": "e.g., B2B SaaS, HealthTech, EdTech…",
+    "nichePlaceholder": "e.g., B2B SaaS, HealthTech, EdTechÔÇª",
     "writingStyle": "Writing style & Post examples",
     "writingStyleDesc": "Paste 2-3 of your best LinkedIn posts or describe your tone (e.g., \"Direct tone, short sentences, moderate emojis, always a concrete takeaway\"). The content agent will clone this style.",
     "mvpDateTitle": "MVP Target Date",
@@ -122,8 +122,8 @@
     "unsubscribedDescription": "Subscribe to unlock all features.",
     "subscribeNow": "Subscribe Now",
     "trialNotice": "You are on a 14-day free trial. Subscribe to keep access after it ends.",
-    "readonlyNotice": "Your trial or subscription has ended. Your data is safe — subscribe to regain full access.",
-    "allFeaturesIncluded": "All features included — no tiers, no limits. Price varies by sign-up cohort only.",
+    "readonlyNotice": "Your trial or subscription has ended. Your data is safe ÔÇö subscribe to regain full access.",
+    "allFeaturesIncluded": "All features included ÔÇö no tiers, no limits. Price varies by sign-up cohort only.",
     "priceLockedForLife": "Price locked for life",
     "priceLockedFor": "Price locked for {months} months",
     "monthly": "Monthly",
@@ -137,7 +137,7 @@
     "paymentEncrypted": "Encrypted payment via Stripe (PCI DSS Level 1)",
     "invoiceByEmail": "Invoices sent by email after each payment",
     "upgradeAnytime": "Upgrade/downgrade anytime, no fees",
-    "cancelAnytime": "No commitment — cancel anytime from your Stripe portal"
+    "cancelAnytime": "No commitment ÔÇö cancel anytime from your Stripe portal"
   },
   "cohort": {
     "founders": "Founding Member",
@@ -177,14 +177,14 @@
       "join": "Join the cohort"
     },
     "hero": {
-      "badge": "Cohort #4 · 12 seats left · starts Sept 15.",
+      "badge": "Cohort #4 ┬À 12 seats left ┬À starts Sept 15.",
       "title1": "Six tools open.",
       "title2": "Zero overview.",
       "title3": "One helm to steer.",
-      "desc": "Helmdash brings your finances, hypotheses, roadmap, and competitive intel into a single cockpit — piloted by an agent that reads and writes directly to your data. Stop copy-pasting between Notion, spreadsheets, and ChatGPT.",
-      "cta_main": "Take the helm →",
+      "desc": "Helmdash brings your finances, hypotheses, roadmap, and competitive intel into a single cockpit ÔÇö piloted by an agent that reads and writes directly to your data. Stop copy-pasting between Notion, spreadsheets, and ChatGPT.",
+      "cta_main": "Take the helm ÔåÆ",
       "cta_sec": "See the product",
-      "disclaimer": "Notion & CSV import in 2 mins · Cancel anytime",
+      "disclaimer": "No credit card required ┬À Notion & CSV import in 2 mins ┬À Cancel anytime",
       "social": "They stopped juggling",
       "audiences": [
         "indie hackers",
@@ -206,7 +206,7 @@
         {
           "tag": "02",
           "title": "Blind decision making",
-          "body": "« Can we afford this? » requires opening three files and doing manual math. So often, you just guess."
+          "body": "┬½ Can we afford this? ┬╗ requires opening three files and doing manual math. So often, you just guess."
         },
         {
           "tag": "03",
@@ -216,18 +216,18 @@
         {
           "tag": "04",
           "title": "AI doesn't know your business",
-          "body": "ChatGPT answers well — but cold. It has neither your numbers, your history, nor the permission to write to your tools."
+          "body": "ChatGPT answers well ÔÇö but cold. It has neither your numbers, your history, nor the permission to write to your tools."
         }
       ]
     },
     "solution": {
       "section": "02 / THE SOLUTION",
       "title": "A cockpit. An agent with its hands dirty.",
-      "desc": "The central agent reads your numbers, updates your hypotheses, delegates to specialized sub-agents — and gives you a decision, not a wall of text.",
+      "desc": "The central agent reads your numbers, updates your hypotheses, delegates to specialized sub-agents ÔÇö and gives you a decision, not a wall of text.",
       "features": [
         {
           "title": "It writes, not just reads",
-          "body": "The agent updates a hypothesis, creates a roadmap task, or logs a lead — directly in your data, with your approval."
+          "body": "The agent updates a hypothesis, creates a roadmap task, or logs a lead ÔÇö directly in your data, with your approval."
         },
         {
           "title": "Sub-agents, not a chatbot",
@@ -248,21 +248,21 @@
           "roadmap": "Roadmap",
           "crm": "CRM",
           "veille": "Intel",
-          "role": "solo · pre-seed"
+          "role": "solo ┬À pre-seed"
         },
         "main": {
           "title": "Overview",
           "updated": "updated 2 mins ago by agent",
           "mrr": "MRR",
-          "mrr_val": "€4,280",
-          "mrr_trend": "▲ 38% / 6 months",
+          "mrr_val": "Ôé¼4,280",
+          "mrr_trend": "Ôû▓ 38% / 6 months",
           "runway": "Runway",
           "runway_val": "8.2 months",
-          "runway_trend": "▼ 0.4 vs. April",
+          "runway_trend": "Ôû╝ 0.4 vs. April",
           "burn": "Burn / month",
-          "burn_val": "€3,100",
+          "burn_val": "Ôé¼3,100",
           "burn_trend": "stable",
-          "chart_title": "MRR · Last 6 months",
+          "chart_title": "MRR ┬À Last 6 months",
           "months": [
             "apr",
             "may",
@@ -272,7 +272,7 @@
             "sep"
           ],
           "hyp_title": "Lean Hypotheses",
-          "hyp_sub": "· 2 to test this week",
+          "hyp_sub": "┬À 2 to test this week",
           "hyp_status1": "VALIDATED",
           "hyp_text1": "Guided onboarding reduces Day 7 churn",
           "hyp_conf1": "conf. 82%",
@@ -285,7 +285,7 @@
         },
         "agent": {
           "name": "Helmsman",
-          "role": "agent · connected to your data",
+          "role": "agent ┬À connected to your data",
           "q1": "Can we afford a freelance designer for 2 months?",
           "sub": "Delegated to 2 sub-agents",
           "sub1": "Finance",
@@ -293,11 +293,11 @@
           "sub2": "Growth",
           "sub2_note": "churn impact",
           "ans1": "Yes, but it's tight. At ",
-          "ans2": " burn, a €1,400/mo freelancer drops your runway from ",
+          "ans2": " burn, a Ôé¼1,400/mo freelancer drops your runway from ",
           "ans3": " to ",
           "btn1": "Simulate in Finances",
           "btn2": "See details",
-          "input": "Ask your cockpit…"
+          "input": "Ask your cockpitÔÇª"
         }
       }
     },
@@ -307,8 +307,8 @@
       "steps": [
         {
           "title": "Plug in your tools",
-          "body": "Connect Stripe, import Notion and spreadsheets. Helmdash organizes everything into a unified model — finances, roadmap, hypotheses, CRM.",
-          "meta": "≈ 2 mins · nothing to rebuild"
+          "body": "Connect Stripe, import Notion and spreadsheets. Helmdash organizes everything into a unified model ÔÇö finances, roadmap, hypotheses, CRM.",
+          "meta": "Ôëê 2 mins ┬À nothing to rebuild"
         },
         {
           "title": "The agent gets its bearings",
@@ -317,8 +317,8 @@
         },
         {
           "title": "You steer, it executes",
-          "body": "You ask questions in plain english. It analyzes, delegates, and acts on your data — you approve with one click.",
-          "meta": "continuous · 24/7"
+          "body": "You ask questions in plain english. It analyzes, delegates, and acts on your data ÔÇö you approve with one click.",
+          "meta": "continuous ┬À 24/7"
         }
       ]
     },
@@ -326,37 +326,49 @@
       "section": "04 / POSITIONING",
       "title": "Every tool does one thing well. None connect them.",
       "desc": "We don't replace your editor or your LLM. We hold the big picture that none of them hold.",
-      "col1": "",
+      "col1": "WHAT YOU DO",
       "rows": [
         {
-          "label": "Built for",
-          "notion": "Teams & docs",
-          "cowork": "General work",
-          "helm": "Solo founders, specifically"
+          "label": "Business overview",
+          "notion": "DIY build",
+          "gpt": "ÔÇö",
+          "linear": "product only",
+          "helm": "native"
         },
         {
-          "label": "Your startup data",
-          "notion": "Pages you structure yourself",
-          "cowork": "Files & conversations",
-          "helm": "Pre-structured: runway, pipeline, hypotheses"
+          "label": "Financial / runway tracking",
+          "notion": "hacked sheet",
+          "gpt": "manual math",
+          "linear": "ÔÇö",
+          "helm": "real-time"
         },
         {
-          "label": "Knows your project",
-          "notion": "You organize it",
-          "cowork": "You bring the context",
-          "helm": "It's the whole point"
+          "label": "Acts on your data",
+          "notion": "manual",
+          "gpt": "read-only",
+          "linear": "manual",
+          "helm": "agent writes"
         },
         {
-          "label": "Momentum",
-          "notion": "—",
-          "cowork": "—",
-          "helm": "XP, streaks, quests"
+          "label": "Context memory",
+          "notion": "if you organize",
+          "gpt": "forgets",
+          "linear": "tickets",
+          "helm": "permanent"
         },
         {
-          "label": "AI costs",
-          "notion": "Add-on",
-          "cowork": "Usage-based plans",
-          "helm": "Flat, predictable"
+          "label": "Specialized sub-agents",
+          "notion": "ÔÇö",
+          "gpt": "generic",
+          "linear": "ÔÇö",
+          "helm": "10 roles"
+        },
+        {
+          "label": "Competitive intel",
+          "notion": "manual",
+          "gpt": "on demand",
+          "linear": "ÔÇö",
+          "helm": "automatic"
         }
       ],
       "footer": "Keep them all if you want. Helmdash imports their data and restores the thread."
@@ -366,59 +378,63 @@
       "title": "One price. Written in black and white.",
       "monthly": "Monthly",
       "yearly": "Annually",
-      "discount": "−20%",
-      "desc": "No « contact us », no hidden tiers. You join a cohort, and keep your founder rate as long as you stay.",
+      "discount": "ÔêÆ20%",
+      "desc": "No ┬½ contact us ┬╗, no hidden tiers. You join a cohort, and keep your founder rate as long as you stay.",
       "popular": "POPULAR",
       "plans": [
         {
-          "name": "Founder Deal",
-          "tagline": "For the first 100 founders. Rate locked forever.",
-          "price": "€15",
+          "name": "Starter",
+          "tagline": "For solo founders launching their first product.",
+          "price": "Ôé¼0",
           "per": "/ month",
-          "note": "Rate locked for life · first 100 only",
+          "note": "Free forever",
           "features": [
             "Full cockpit dashboard",
-            "Central AI agent + sub-agents",
-            "Stripe, Notion, CSV import",
-            "Unlimited context memory"
+            "Central AI agent (50 req/m)",
+            "Basic Finances, Roadmap, CRM",
+            "Stripe & Notion import",
+            "Limited context memory"
           ],
-          "cta": "Claim my spot →"
+          "cta": "Start for free"
         },
         {
-          "name": "BYOK (Core)",
-          "tagline": "Bring your own API key. No AI markup.",
-          "price": "€25",
+          "name": "Growth",
+          "tagline": "The full deck: 10 sub-agents + automated intel.",
+          "price": "Ôé¼16.50",
           "per": "/ month",
-          "note": "Bring Your Own Key",
+          "note": "or Ôé¼199 / yr ┬À ÔêÆ20%",
           "features": [
-            "Everything in Founder Deal",
-            "Your own OpenAI / Mistral key",
-            "No AI usage limit from our side",
-            "Full data export anytime"
+            "Everything in Starter, unlimited requests",
+            "10 specialized sub-agents",
+            "Automated competitive intel",
+            "Unlimited CRM + Lean Hypotheses",
+            "Team 3 seats ┬À SSO ┬À Audit logs",
+            "Unlimited runway simulations"
           ],
-          "cta": "Start with BYOK"
+          "cta": "Join the cohort ÔåÆ"
         },
         {
-          "name": "Complete",
-          "tagline": "AI included, zero config. Mistral Small built-in.",
-          "price": "€35",
-          "originalPrice": "€45",
+          "name": "Scale",
+          "tagline": "For growing startups and agencies.",
+          "price": "Ôé¼50",
           "per": "/ month",
-          "note": "€45 → €35 for the first 6 months",
+          "note": "or Ôé¼599 / yr",
           "features": [
-            "Everything in BYOK",
-            "Mistral Small included — no key needed",
-            "Up to 500 AI actions / month",
-            "Priority support"
+            "Everything in Growth, unlimited",
+            "Unlimited sub-agents",
+            "Custom MCP servers",
+            "On-premise possible",
+            "10 seats ┬À 99.9% SLA",
+            "Dedicated success manager"
           ],
-          "cta": "Start free trial"
+          "cta": "Contact us"
         }
       ]
     },
     "cta_final": {
       "title": "Stop piecing things together. Take the helm.",
-      "desc": "First 100 users (Founder deal) · starts Sept 15. Import your tools in 2 minutes.",
-      "btn_primary": "Reserve my seat →",
+      "desc": "Cohort #4 ┬À 12 seats ┬À starts Sept 15. Import tools in 2 mins, no card required.",
+      "btn_primary": "Reserve my seat ÔåÆ",
       "btn_secondary": "Review product"
     },
     "footer": {
@@ -453,7 +469,7 @@
           ]
         }
       ],
-      "copyright": "© 2026 Helmdash · Made in Lyon by a solo founder, for solo founders.",
+      "copyright": "┬® 2026 Helmdash ┬À Made in Lyon by a solo founder, for solo founders.",
       "legal": [
         "Privacy",
         "Terms",

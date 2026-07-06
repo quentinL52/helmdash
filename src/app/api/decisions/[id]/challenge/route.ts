@@ -59,7 +59,7 @@ Ta réponse doit être courte (2-3 paragraphes max).`;
     const updatedDecision = await prisma.decision.update({
       where: { id: decisionId },
       data: {
-        aiFeedback,
+        aiChallenge: aiFeedback,
         status: 'challenged'
       }
     });

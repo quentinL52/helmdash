@@ -185,7 +185,7 @@
       "desc": "Helmdash réunit tes finances, tes hypothèses, ta roadmap et ta veille dans un seul poste de pilotage — piloté par un agent qui lit et écrit directement dans tes données. Fini le copier-coller entre Notion, tableurs et ChatGPT.",
       "cta_main": "Prendre la barre →",
       "cta_sec": "Voir le produit",
-      "disclaimer": "Pas de carte bancaire · Import Notion & CSV en 2 min · Résiliable à tout moment",
+      "disclaimer": "Import Notion & CSV en 2 min · Résiliable à tout moment",
       "social": "Ils ont arrêté de jongler",
       "audiences": [
         "indie hackers",
@@ -327,49 +327,37 @@
       "section": "04 / POSITIONNEMENT",
       "title": "Chaque outil fait bien une chose. Aucun ne les relie.",
       "desc": "On ne remplace pas ton éditeur ni ton LLM. On tient la vue d'ensemble qu'aucun d'eux ne tient.",
-      "col1": "CE QUE TU FAIS",
+      "col1": "",
       "rows": [
         {
-          "label": "Vue d'ensemble du business",
-          "notion": "à monter soi-même",
-          "gpt": "—",
-          "linear": "produit only",
-          "helm": "native"
+          "label": "Pensé pour",
+          "notion": "Équipes & docs",
+          "cowork": "Travail général",
+          "helm": "Solo founders, spécifiquement"
         },
         {
-          "label": "Suivi financier / runway",
-          "notion": "tableur bricolé",
-          "gpt": "calcul manuel",
-          "linear": "—",
-          "helm": "temps réel"
+          "label": "Données startup",
+          "notion": "Pages à structurer soi-même",
+          "cowork": "Fichiers & conversations",
+          "helm": "Pré-structurées : runway, pipeline, hypothèses"
         },
         {
-          "label": "Agit dans tes données",
-          "notion": "manuel",
-          "gpt": "lecture seule",
-          "linear": "manuel",
-          "helm": "l'agent écrit"
+          "label": "Connaît le projet",
+          "notion": "Tu l'organises",
+          "cowork": "Tu apportes le contexte",
+          "helm": "C'est tout l'intérêt"
         },
         {
-          "label": "Mémoire du contexte",
-          "notion": "si tu ranges",
-          "gpt": "oublie",
-          "linear": "tickets",
-          "helm": "permanente"
-        },
-        {
-          "label": "Sous-agents spécialisés",
+          "label": "Momentum",
           "notion": "—",
-          "gpt": "générique",
-          "linear": "—",
-          "helm": "10 métiers"
+          "cowork": "—",
+          "helm": "XP, streaks, quêtes"
         },
         {
-          "label": "Veille concurrentielle",
-          "notion": "à la main",
-          "gpt": "sur demande",
-          "linear": "—",
-          "helm": "automatique"
+          "label": "Coûts IA",
+          "notion": "En supplément",
+          "cowork": "Plans à l'usage",
+          "helm": "Fixe, prévisible"
         }
       ],
       "footer": "Garde-les tous si tu veux. Helmdash importe leurs données et redonne le fil."
@@ -385,51 +373,52 @@
       "plans": [
         {
           "name": "Founder Deal",
-          "tagline": "L'offre de lancement limitée aux 100 premiers utilisateurs.",
+          "tagline": "Pour les 100 premiers fondateurs. Tarif verrouillé à vie.",
           "price": "15 €",
           "per": "/ mois",
-          "note": "Tarif verrouillé à vie",
+          "note": "Tarif verrouillé à vie · 100 premiers uniquement",
           "features": [
             "Poste de pilotage complet",
-            "Sous-agents spécialisés",
+            "Agent IA central + sous-agents",
             "Import Stripe, Notion, CSV",
-            "Clé API requise (BYOK)"
+            "Mémoire contextuelle illimitée"
           ],
-          "cta": "Profiter de l'offre"
+          "cta": "Réserver ma place →"
         },
         {
-          "name": "BYOK",
-          "tagline": "Pour ceux qui ont déjà leur propre clé API Mistral ou OpenAI.",
+          "name": "BYOK (Core)",
+          "tagline": "Apporte ta propre clé API. Aucun surcoût IA.",
           "price": "25 €",
           "per": "/ mois",
           "note": "Bring Your Own Key",
           "features": [
             "Tout le Founder Deal",
-            "Sans limite d'usage",
-            "Modèles au choix",
-            "Clé API requise (BYOK)"
+            "Ta propre clé OpenAI / Mistral",
+            "Aucune limite d'usage IA de notre côté",
+            "Export complet des données"
           ],
-          "cta": "Essai gratuit 14j"
+          "cta": "Démarrer en BYOK"
         },
         {
           "name": "Complet",
-          "tagline": "La solution clé en main, propulsée par Mistral Small.",
+          "tagline": "IA incluse, zéro config. Mistral Small intégré.",
           "price": "35 €",
+          "originalPrice": "45 €",
           "per": "/ mois",
-          "note": "Aucune clé requise",
+          "note": "45 € → 35 € pendant les 6 premiers mois",
           "features": [
-            "IA incluse (Mistral Small)",
-            "Aucune configuration requise",
-            "Limite d'usage généreuse",
+            "Tout le BYOK",
+            "Mistral Small inclus — aucune clé requise",
+            "Jusqu'à 500 actions IA / mois",
             "Support prioritaire"
           ],
-          "cta": "Essai gratuit 14j"
+          "cta": "Essai gratuit"
         }
       ]
     },
     "cta_final": {
       "title": "Arrête de recoller les morceaux. Prends la barre.",
-      "desc": "Cohorte #4 · 12 places · démarrage le 15 septembre. Import de tes outils en 2 minutes, aucune carte requise.",
+      "desc": "Les 100 premiers (Founder deal) · démarrage le 15 septembre. Import de tes outils en 2 minutes.",
       "btn_primary": "Réserver ma place →",
       "btn_secondary": "Revoir le produit"
     },

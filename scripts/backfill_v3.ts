@@ -6,9 +6,6 @@ async function main() {
   
   // 1. Update existing contacts
   const contacts = await prisma.contact.updateMany({
-    where: {
-      dormant: null
-    },
     data: {
       dormant: false,
     }
@@ -19,9 +16,6 @@ async function main() {
   // For now, founderDeal and priceLockedForever default to false in Prisma,
   // but existing rows might need to be explicitly set if the DB allows nulls where it shouldn't.
   const users = await prisma.user.updateMany({
-    where: {
-      founderDeal: null
-    },
     data: {
       founderDeal: false,
       priceLockedForever: false

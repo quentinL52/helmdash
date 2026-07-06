@@ -12,8 +12,7 @@ async function handler(req: NextRequest, { userId }: { userId: string }) {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        aiUsage: true,
-        planConfig: true
+        aiUsages: true
       }
     });
 
@@ -25,12 +24,12 @@ async function handler(req: NextRequest, { userId }: { userId: string }) {
     const hypotheses = await prisma.hypothesis.findMany({ where: { userId } });
     const contacts = await prisma.contact.findMany({ where: { userId } });
     const tasks = await prisma.task.findMany({ where: { userId } });
-    const financialEntries = await prisma.financialEntry.findMany({ where: { userId } });
+    const financeEntries = await prisma.financeEntry.findMany({ where: { userId } });
     const interactions = await prisma.interaction.findMany({ where: { userId } });
     const dailyPlans = await prisma.dailyPlan.findMany({ where: { userId } });
     const inboxItems = await prisma.inboxItem.findMany({ where: { userId } });
     const sweepResults = await prisma.sweepResult.findMany({ where: { userId } });
-    const journals = await prisma.journalEntry.findMany({ where: { userId } });
+    // const journals = await prisma.journalEntry.findMany({ where: { userId } });
 
     const zip = new AdmZip();
 
@@ -40,12 +39,11 @@ async function handler(req: NextRequest, { userId }: { userId: string }) {
     zip.addFile('hypotheses.json', Buffer.from(JSON.stringify(hypotheses, null, 2)));
     zip.addFile('contacts.json', Buffer.from(JSON.stringify(contacts, null, 2)));
     zip.addFile('tasks_roadmap.json', Buffer.from(JSON.stringify(tasks, null, 2)));
-    zip.addFile('financial_entries.json', Buffer.from(JSON.stringify(financialEntries, null, 2)));
+    zip.addFile('financeEntries.json', Buffer.from(JSON.stringify(financeEntries, null, 2)));
     zip.addFile('interactions.json', Buffer.from(JSON.stringify(interactions, null, 2)));
     zip.addFile('daily_plans.json', Buffer.from(JSON.stringify(dailyPlans, null, 2)));
     zip.addFile('inbox_items.json', Buffer.from(JSON.stringify(inboxItems, null, 2)));
-    zip.addFile('sweep_results.json', Buffer.from(JSON.stringify(sweepResults, null, 2)));
-    zip.addFile('journals.json', Buffer.from(JSON.stringify(journals, null, 2)));
+    zip.addFile('sweepResults.json', Buffer.from(JSON.stringify(sweepResults, null, 2)));
 
     // Generate buffer
     const zipBuffer = zip.toBuffer();

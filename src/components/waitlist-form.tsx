@@ -9,6 +9,8 @@ export function WaitlistForm() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
+  const [botField, setBotField] = useState('');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
@@ -20,7 +22,7 @@ export function WaitlistForm() {
       const res = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, botField }),
       });
 
       if (!res.ok) {
@@ -48,6 +50,15 @@ export function WaitlistForm() {
   return (
     <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10, maxWidth: 360 }}>
       <div style={{ display: "flex", gap: 8 }}>
+        <input
+          type="text"
+          name="bot_field"
+          style={{ display: 'none' }}
+          tabIndex={-1}
+          autoComplete="off"
+          value={botField}
+          onChange={(e) => setBotField(e.target.value)}
+        />
         <input
           type="email"
           placeholder="Entrez votre email"

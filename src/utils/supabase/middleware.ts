@@ -91,6 +91,16 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(url)
     }
 
+    // 3. Protection de la route Admin
+    if (request.nextUrl.pathname.startsWith('/admin')) {
+        const adminEmail = process.env.ADMIN_EMAIL || 'quentin.lefevre52@gmail.com'; // fallback if not set
+        if (!user || user.email !== adminEmail) {
+            const url = request.nextUrl.clone()
+            url.pathname = '/dashboard'
+            return NextResponse.redirect(url)
+        }
+    }
+
     // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
     // creating a new response object with NextResponse.next() make sure to:
     // 1. Pass the request in it, like so:

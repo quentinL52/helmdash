@@ -17,6 +17,7 @@ export const PRICING_CONFIG = {
   founderDeal: {
     maxUsers: 100,
     price: { key: 'founder_monthly', amount: 1500, interval: 'month' },
+    priceLockedForever: true,
     planProvided: 'complete' as PlanType, // Founder deal unlocks complete features
   },
   plans: {
@@ -38,7 +39,7 @@ export const PRICING_CONFIG = {
     complete: {
       name: 'Complete',
       prices: {
-        monthly: { key: 'complete_monthly', amount: 3500 },
+        monthly: { key: 'complete_monthly', amount: 3500 }, // Promo: 35€ instead of 45€ for 6 months
         yearly: { key: 'complete_yearly', amount: 35000 },
       },
       features: [

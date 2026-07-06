@@ -29,7 +29,9 @@ async function handler(req: NextRequest, { userId }: { userId: string }) {
           userId,
           title,
           context,
-          status: 'pending'
+          category: body.category || 'other',
+          options: body.options || [],
+          status: body.status || 'open'
         }
       });
       return NextResponse.json({ decision });

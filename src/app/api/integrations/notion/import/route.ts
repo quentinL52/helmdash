@@ -69,7 +69,6 @@ async function handler(req: NextRequest, { userId }: { userId: string }) {
             userId,
             title,
             status: mappedStatus,
-            priority: 'medium',
             dueDate: new Date()
           }
         });

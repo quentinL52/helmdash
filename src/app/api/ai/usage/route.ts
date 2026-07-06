@@ -25,16 +25,14 @@ async function handler(req: NextRequest, { userId }: { userId: string }) {
   const currentMonth = new Date().toISOString().slice(0, 7);
   const limit = PRICING_CONFIG.plans.complete.limits.aiActions;
 
-  const usage = await prisma.aiUsage.findUnique({
+  const usages = await prisma.aiUsage.findMany({
     where: {
-      userId_month: {
-        userId,
-        month: currentMonth
-      }
+      userId,
+      month: currentMonth
     }
   });
 
-  const count = usage?.count || 0;
+  const count = usages.reduce((acc, u) => acc + (u.actions || 0), 0);
   
   return NextResponse.json({
     tracked: true,

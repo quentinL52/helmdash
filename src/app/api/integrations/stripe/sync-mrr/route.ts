@@ -35,13 +35,12 @@ async function handler(req: NextRequest, { userId }: { userId: string }) {
     }
 
     // Save MRR snapshot as a financial entry
-    await prisma.financialEntry.create({
+    await prisma.financeOneTimeEntry.create({
       data: {
         userId,
-        type: 'income',
-        amount: totalMRR || 0, // Fallback to 0 if no subs
+        amount: totalMRR || 0,
         category: 'mrr-snapshot',
-        description: 'Synchronisation Stripe MRR',
+        label: 'Synchronisation Stripe MRR',
         date: new Date()
       }
     });

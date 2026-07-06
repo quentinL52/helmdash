@@ -427,6 +427,8 @@ export interface FounderStore {
     planStatus: PlanStatus;
     plan: PlanType | null;
     founderDeal: boolean;
+    cohort: number | null;
+    cohortRank: number | null;
     hypotheses: Hypothesis[];
     finance: FinanceData;
     journalEntries: JournalEntry[];
@@ -557,6 +559,8 @@ export interface FounderStore {
     setPlanStatus: (status: PlanStatus) => void;
     setPlan: (plan: PlanType | null) => void;
     setFounderDeal: (val: boolean) => void;
+    setCohort: (val: number | null) => void;
+    setCohortRank: (val: number | null) => void;
     setAiSettings: (settings: Partial<AiSettings>) => void;
     setFounderProfile: (profile: Partial<FounderProfile>) => void;
     updateGoToMarket: (updates: Partial<GoToMarketStrategy>) => void;
@@ -582,6 +586,8 @@ const initialState = {
     planStatus: 'trialing' as PlanStatus,
     plan: null as PlanType | null,
     founderDeal: false,
+    cohort: null,
+    cohortRank: null,
     language: 'fr' as const,
     hypotheses: [],
     finance: {
@@ -705,6 +711,8 @@ export const useFounderStore = create<FounderStore>()(
             setPlanStatus: (status) => set({ planStatus: status }),
             setPlan: (plan) => set({ plan }),
             setFounderDeal: (val) => set({ founderDeal: val }),
+            setCohort: (val) => set({ cohort: val }),
+            setCohortRank: (val) => set({ cohortRank: val }),
             setLanguage: (lang) => set({ language: lang }),
             setAiSettings: (settings) => set((state) => ({ aiSettings: { ...state.aiSettings, ...settings } })),
             setFounderProfile: (profile) => set((state) => ({ founderProfile: { ...state.founderProfile, ...profile } })),

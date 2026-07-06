@@ -57,7 +57,7 @@ async function handler(req: NextRequest, { userId }: { userId: string }) {
       key = priceConfig.key;
       // We will look up price ID from env or stripe client mapping
       const { resolvePrice } = await import('@/lib/billing/stripe-client');
-      priceId = resolvePrice(key);
+      priceId = resolvePrice(key as any);
     }
 
     let customerId = user.stripeCustomerId;

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { withAuth } from '@/lib/security/with-auth';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 function getTodayString() {
   return new Date().toISOString().split('T')[0];
 }

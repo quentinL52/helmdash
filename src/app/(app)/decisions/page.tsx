@@ -14,7 +14,7 @@ type Decision = {
   title: string;
   context: string | null;
   status: 'pending' | 'approved' | 'challenged' | 'rejected';
-  aiFeedback: string | null;
+  aiChallenge: any | null;
   updatedAt: string;
 };
 
@@ -179,14 +179,12 @@ export default function DecisionsPage() {
                   <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{decision.context}</p>
                 )}
                 
-                {decision.aiFeedback && (
-                  <div className="mt-4 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20 relative">
-                    <div className="absolute -top-3 left-4 bg-background px-2 text-xs font-semibold text-amber-500 flex items-center gap-1">
-                      <Swords className="w-3 h-3" /> Sparring Partner
+                {decision.aiChallenge && (
+                  <div className="mt-3 text-xs bg-muted/50 p-3 rounded text-muted-foreground border border-border/50 relative">
+                    <span className="absolute -top-2 -left-2 text-lg">💡</span>
+                    <div className="ml-2 font-mono whitespace-pre-wrap">
+                      {typeof decision.aiChallenge === 'string' ? decision.aiChallenge : JSON.stringify(decision.aiChallenge)}
                     </div>
-                    <p className="text-sm text-amber-600/90 dark:text-amber-400/90 whitespace-pre-wrap leading-relaxed mt-1">
-                      {decision.aiFeedback}
-                    </p>
                   </div>
                 )}
               </CardContent>
