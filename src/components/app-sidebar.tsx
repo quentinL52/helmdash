@@ -24,6 +24,7 @@ import {
     Bot,
     Trophy,
     BrainCircuit,
+    Swords,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/utils/supabase/client';
@@ -43,6 +44,7 @@ export function AppSidebar() {
     const navItems = [
         { href: '/agent', label: t('agent'), icon: Bot },
         { href: '/dashboard', label: t('dashboard'), icon: LayoutDashboard },
+        { href: '/decisions', label: t('decisions'), icon: Swords },
         { href: '/progression', label: t('progression'), icon: Trophy },
         { href: '/hypotheses', label: t('hypotheses'), icon: FlaskConical },
         { href: '/finances', label: t('finances'), icon: PieChart },

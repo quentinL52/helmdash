@@ -15,56 +15,56 @@ import { CreditCard, Crown, Sparkles, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useFounderStore } from '@/store/founder-store';
 import {
-  COHORT_CONFIG,
+  PRICING_CONFIG,
   getAvailablePeriods,
-  type Cohort,
+  type PlanType,
   type Period,
-} from '@/lib/billing/cohort-config';
+} from '@/lib/billing/pricing-config';
 
-interface CohortStatus {
-  current: Cohort;
-  seatsLeft: number | null;
-  cohorts: {
-    founders: { taken: number; max: number };
-    early: { taken: number; max: number };
+interface PricingStatus {
+  founderDeal: {
+    isAvailable: boolean;
+    seatsLeft: number;
+    taken: number;
+    max: number;
   };
+  plans: typeof PRICING_CONFIG.plans;
 }
 
-const COHORT_BADGES: Record<Cohort, { icon: typeof Crown; className: string }> = {
-  founders: { icon: Crown, className: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
-  early: { icon: Sparkles, className: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
-  full: { icon: CreditCard, className: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+const PLAN_BADGES: Record<PlanType, { icon: typeof Crown; className: string }> = {
+  core: { icon: CreditCard, className: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
+  complete: { icon: Sparkles, className: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
 };
 
 export function BillingPanel() {
   const [isLoading, setIsLoading] = useState(false);
-  const [cohortStatus, setCohortStatus] = useState<CohortStatus | null>(null);
-  const [selectedPeriod, setSelectedPeriod] = useState<Period>('semi_annual');
+  const [pricingStatus, setPricingStatus] = useState<PricingStatus | null>(null);
+  const [selectedPeriod, setSelectedPeriod] = useState<Period>('monthly');
   const { toast } = useToast();
   const t = useTranslations('billing');
   const tc = useTranslations('cohort');
   const te = useTranslations('errors');
 
   const planStatus = useFounderStore((s) => s.planStatus);
-  const cohort = useFounderStore((s) => s.cohort);
-  const cohortRank = useFounderStore((s) => s.cohortRank);
+  const plan = useFounderStore((s) => s.plan);
+  const founderDeal = useFounderStore((s) => s.founderDeal);
 
   useEffect(() => {
-    fetch('/api/billing/cohort-status')
+    fetch('/api/billing/pricing-status')
       .then((r) => r.json())
-      .then(setCohortStatus)
+      .then(setPricingStatus)
       .catch(() => {});
   }, []);
 
-  const isSubscribed = planStatus === 'active' && cohort;
+  const isSubscribed = planStatus === 'active' && plan;
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (planKey: PlanType | 'founder') => {
     setIsLoading(true);
     try {
       const res = await fetch('/api/billing/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ period: selectedPeriod }),
+        body: JSON.stringify({ period: selectedPeriod, plan: planKey }),
       });
       const data = await res.json();
 
@@ -99,15 +99,6 @@ export function BillingPanel() {
     }
   };
 
-  const currentCohort = cohortStatus?.current ?? 'full';
-  const availablePeriods = getAvailablePeriods(currentCohort);
-
-  useEffect(() => {
-    if (!availablePeriods.includes(selectedPeriod)) {
-      setSelectedPeriod(availablePeriods[0]);
-    }
-  }, [currentCohort, availablePeriods, selectedPeriod]);
-
   return (
     <Card className="border-t-4 border-t-primary">
       <CardHeader>
@@ -122,19 +113,17 @@ export function BillingPanel() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {isSubscribed && cohort ? (
+        {isSubscribed && plan ? (
           <SubscribedView
-            cohort={cohort}
-            cohortRank={cohortRank}
+            plan={plan}
+            founderDeal={founderDeal}
             onPortal={handlePortal}
             isLoading={isLoading}
           />
         ) : (
           <CheckoutView
             planStatus={planStatus}
-            currentCohort={currentCohort}
-            cohortStatus={cohortStatus}
-            availablePeriods={availablePeriods}
+            pricingStatus={pricingStatus}
             selectedPeriod={selectedPeriod}
             onSelectPeriod={setSelectedPeriod}
             onCheckout={handleCheckout}
@@ -147,39 +136,32 @@ export function BillingPanel() {
 }
 
 function SubscribedView({
-  cohort,
-  cohortRank,
+  plan,
+  founderDeal,
   onPortal,
   isLoading,
 }: {
-  cohort: Cohort;
-  cohortRank: number | null;
+  plan: PlanType;
+  founderDeal: boolean;
   onPortal: () => void;
   isLoading: boolean;
 }) {
   const t = useTranslations('billing');
-  const tc = useTranslations('cohort');
-  const BadgeIcon = COHORT_BADGES[cohort].icon;
-  const config = COHORT_CONFIG[cohort];
-  const lockLabel =
-    config.lockMonths === null
-      ? t('priceLockedForLife')
-      : t('priceLockedFor', { months: config.lockMonths });
+  const BadgeIcon = PLAN_BADGES[plan].icon;
+  const planName = PRICING_CONFIG.plans[plan].name;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
         <Badge
           variant="outline"
-          className={`text-sm px-3 py-1 ${COHORT_BADGES[cohort].className}`}
+          className={`text-sm px-3 py-1 ${PLAN_BADGES[plan].className}`}
         >
           <BadgeIcon className="w-4 h-4 mr-1.5" />
-          {tc(cohort)}
-          {cohortRank ? ` #${cohortRank}` : ''}
+          {planName}
+          {founderDeal && <span className="ml-2 bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded text-xs">Founder Deal</span>}
         </Badge>
       </div>
-
-      <p className="text-sm text-muted-foreground">{lockLabel}</p>
 
       <Button onClick={onPortal} disabled={isLoading} variant="outline">
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -191,29 +173,21 @@ function SubscribedView({
 
 function CheckoutView({
   planStatus,
-  currentCohort,
-  cohortStatus,
-  availablePeriods,
+  pricingStatus,
   selectedPeriod,
   onSelectPeriod,
   onCheckout,
   isLoading,
 }: {
   planStatus: string;
-  currentCohort: Cohort;
-  cohortStatus: CohortStatus | null;
-  availablePeriods: Period[];
+  pricingStatus: PricingStatus | null;
   selectedPeriod: Period;
   onSelectPeriod: (p: Period) => void;
-  onCheckout: () => void;
+  onCheckout: (plan: PlanType | 'founder') => void;
   isLoading: boolean;
 }) {
   const t = useTranslations('billing');
-  const tc = useTranslations('cohort');
-  const config = COHORT_CONFIG[currentCohort];
-  const priceEntry = config.prices[selectedPeriod];
-
-  const periodSuffixKey = selectedPeriod === 'monthly' ? 'perMonth' : selectedPeriod === 'semi_annual' ? 'perSemiAnnual' : 'perYear';
+  const periodSuffixKey = selectedPeriod === 'monthly' ? 'perMonth' : 'perYear';
 
   return (
     <div className="space-y-6">
@@ -229,49 +203,73 @@ function CheckoutView({
         </div>
       )}
 
-      {cohortStatus && currentCohort !== 'full' && (
-        <div className="flex items-center gap-2">
-          <Badge
-            variant="outline"
-            className={COHORT_BADGES[currentCohort].className}
-          >
-            {currentCohort === 'founders'
-              ? tc('foundingSeatsLeft', { count: cohortStatus.seatsLeft ?? 0 })
-              : tc('earlySeatsLeft', { count: cohortStatus.seatsLeft ?? 0 })}
-          </Badge>
-        </div>
-      )}
-
-      <div className="flex gap-2">
-        {availablePeriods.map((p) => (
+      <div className="flex gap-2 mb-6">
+        {['monthly', 'yearly'].map((p) => (
           <Button
             key={p}
             variant={selectedPeriod === p ? 'default' : 'outline'}
             size="sm"
-            onClick={() => onSelectPeriod(p)}
+            onClick={() => onSelectPeriod(p as Period)}
           >
-            {t(p === 'semi_annual' ? 'semiAnnual' : p)}
+            {t(p)}
           </Button>
         ))}
       </div>
 
-      {priceEntry && (
-        <div className="text-3xl font-bold">
-          {(priceEntry.amount / 100).toFixed(2)}€
-          <span className="text-base font-normal text-muted-foreground ml-1">
-            {t(periodSuffixKey)}
-          </span>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Core Plan */}
+        <div className="border border-border rounded-xl p-5 flex flex-col">
+          <h3 className="font-bold text-lg mb-2">{PRICING_CONFIG.plans.core.name}</h3>
+          <div className="text-3xl font-bold mb-4">
+            {(PRICING_CONFIG.plans.core.prices[selectedPeriod].amount / 100).toFixed(0)}€
+            <span className="text-sm font-normal text-muted-foreground ml-1">{t(periodSuffixKey)}</span>
+          </div>
+          <ul className="text-sm text-muted-foreground space-y-2 mb-6 flex-1">
+            {PRICING_CONFIG.plans.core.features.map((f, i) => <li key={i}>• {f}</li>)}
+          </ul>
+          <Button onClick={() => onCheckout('core')} disabled={isLoading} variant="outline" className="w-full">
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {t('subscribeNow')}
+          </Button>
+        </div>
+
+        {/* Complete Plan */}
+        <div className="border border-primary rounded-xl p-5 flex flex-col bg-primary/5">
+          <h3 className="font-bold text-lg text-primary mb-2">{PRICING_CONFIG.plans.complete.name}</h3>
+          <div className="text-3xl font-bold text-primary mb-4">
+            {(PRICING_CONFIG.plans.complete.prices[selectedPeriod].amount / 100).toFixed(0)}€
+            <span className="text-sm font-normal text-primary/70 ml-1">{t(periodSuffixKey)}</span>
+          </div>
+          <ul className="text-sm text-foreground space-y-2 mb-6 flex-1">
+            {PRICING_CONFIG.plans.complete.features.map((f, i) => <li key={i}>• {f}</li>)}
+          </ul>
+          <Button onClick={() => onCheckout('complete')} disabled={isLoading} className="w-full">
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {t('subscribeNow')}
+          </Button>
+        </div>
+      </div>
+
+      {pricingStatus?.founderDeal.isAvailable && (
+        <div className="mt-8 border border-amber-500 rounded-xl p-5 bg-amber-500/10">
+          <div className="flex justify-between items-start mb-2">
+            <h3 className="font-bold text-lg text-amber-500 flex items-center gap-2">
+              <Crown className="w-5 h-5" />
+              Founder Deal (Lifetime)
+            </h3>
+            <Badge variant="outline" className="bg-amber-500/20 text-amber-500 border-amber-500/30">
+              {pricingStatus.founderDeal.seatsLeft} seats left
+            </Badge>
+          </div>
+          <p className="text-sm mb-4">
+            Get all <strong>Complete</strong> plan features for a locked-in price of {(PRICING_CONFIG.founderDeal.price.amount / 100).toFixed(0)}€ / month for life.
+          </p>
+          <Button onClick={() => onCheckout('founder')} disabled={isLoading} className="w-full bg-amber-500 hover:bg-amber-600 text-white">
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Claim Founder Deal
+          </Button>
         </div>
       )}
-
-      <p className="text-sm text-muted-foreground">
-        {t('allFeaturesIncluded')}
-      </p>
-
-      <Button onClick={onCheckout} disabled={isLoading} className="w-full">
-        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        {t('subscribeNow')}
-      </Button>
     </div>
   );
 }

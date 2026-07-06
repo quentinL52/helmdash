@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#0E1B2E"/>
-  <path d="M16 4L4 12v8l12 8 12-8v-8L16 4z" fill="#F0522E" opacity="0.9"/>
-  <path d="M16 8L8 14v4l8 5 8-5v-4l-8-6z" fill="#F0522E"/>
-  <text x="16" y="21" text-anchor="middle" fill="#0E1B2E" font-family="monospace" font-size="11" font-weight="bold">H</text>
-</svg>

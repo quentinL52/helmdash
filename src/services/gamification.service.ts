@@ -5,6 +5,16 @@ const prisma = new PrismaClient();
 export const XP_RULES = {
   FINANCE_ENTRY_ADDED: 10,
   FINANCE_SETTINGS_UPDATED: 5,
+  QUEST_COMPLETED: 10,
+  DECISION_DECIDED: 15,
+  CONTACT_INTERACTION_ADDED: 5,
+  CONTACT_FOLLOWUP_DONE: 10,
+  DAILY_PLAN_CREATED: 20,
+  SWEEP_COMPLETED: 15,
+};
+
+export const QUESTS = {
+  ONBOARDING_PROFILE: 'onboarding_profile',
 };
 
 export class GamificationService {
@@ -63,5 +73,36 @@ export class GamificationService {
     return prisma.gamificationProfile.findUnique({
       where: { userId },
     });
+  }
+
+  /**
+   * Complete a quest and award XP if not already completed
+   */
+  static async completeQuest(userId: string, questId: string, xpReward: number = XP_RULES.QUEST_COMPLETED) {
+    try {
+      const profile = await prisma.gamificationProfile.findUnique({
+        where: { userId },
+      });
+
+      if (profile?.completedQuests.includes(questId)) {
+        return null; // Already completed
+      }
+
+      await prisma.gamificationProfile.upsert({
+        where: { userId },
+        update: {
+          completedQuests: { push: questId },
+        },
+        create: {
+          userId,
+          completedQuests: [questId],
+        },
+      });
+
+      return await this.addXp(userId, xpReward);
+    } catch (error) {
+      console.error('GamificationService.completeQuest error:', error);
+      return null;
+    }
   }
 }

@@ -1,12 +1,8 @@
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/billing/stripe-client';
 import { prisma } from '@/lib/prisma';
-import {
-  incrementTotal,
-  releaseSeat,
-} from '@/lib/billing/cohort-service';
-import { computeLockedUntil } from '@/lib/billing/cohort-service';
-import type { Cohort } from '@/lib/billing/cohort-config';
+import { releaseFounderSeat } from '@/lib/billing/pricing-service';
+import { type PlanType, PRICING_CONFIG } from '@/lib/billing/pricing-config';
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -50,26 +46,25 @@ export async function POST(req: Request) {
       case 'checkout.session.completed': {
         const session = event.data.object as any;
         const userId = session.metadata?.userId as string | undefined;
-        const cohort = session.metadata?.cohort as Cohort | undefined;
+        const planKey = session.metadata?.plan as PlanType | 'founder' | undefined;
         const subscriptionId = session.subscription as string | undefined;
 
-        if (!userId || !cohort || !subscriptionId) break;
+        if (!userId || !planKey || !subscriptionId) break;
 
         await prisma.$transaction(async (tx: any) => {
           // Delete the seat reservation
           await tx.seatReservation
             .deleteMany({ where: { sessionId: session.id } });
 
-          const cohortRank = await incrementTotal(tx);
-          const cohortLockedUntil = computeLockedUntil(cohort);
+          const isFounderDeal = planKey === 'founder';
+          const assignedPlan = isFounderDeal ? PRICING_CONFIG.founderDeal.planProvided : planKey;
 
           await tx.user.update({
             where: { id: userId },
             data: {
               planStatus: 'active',
-              cohort,
-              cohortRank,
-              cohortLockedUntil,
+              plan: assignedPlan,
+              founderDeal: isFounderDeal,
               stripeSubscriptionId: subscriptionId,
               stripeCustomerId: session.customer as string,
             },
@@ -89,11 +84,8 @@ export async function POST(req: Request) {
         if (reservation) {
           await prisma.$transaction(async (tx: any) => {
             await tx.seatReservation.delete({ where: { sessionId } });
-            if (
-              reservation.cohort === 'founders' ||
-              reservation.cohort === 'early'
-            ) {
-              await releaseSeat(tx, reservation.cohort);
+            if (reservation.cohort === 'founder') {
+              await releaseFounderSeat(tx);
             }
           });
         }

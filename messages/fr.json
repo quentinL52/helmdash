@@ -22,6 +22,7 @@
   },
   "nav": {
     "dashboard": "Tableau de bord",
+    "decisions": "Décisions",
     "hypotheses": "Hypothèses",
     "finances": "Finances",
     "roadmap": "Roadmap",
@@ -168,125 +169,327 @@
     "privacyPolicy": "Politique de confidentialité"
   },
   "landing": {
-    "heroTitle": "Six outils ouverts.\\nZéro vue d'ensemble.\\nUne seule barre à tenir.",
-    "heroSubtitle": "Helmdash réunit tes finances, tes hypothèses, ta roadmap et ta veille dans un seul poste de pilotage — piloté par un agent qui lit et écrit directement dans tes données. Fini le copier-coller.",
-    "heroBadge": "Cohorte #{cohort} · {seats} places restantes · démarrage {date}",
-    "ctaPrimary": "Prendre la barre →",
-    "ctaSecondary": "Voir le produit",
-    "noCreditCard": "Pas de carte bancaire",
-    "socialProof": "Ils ont arrêté de jongler",
-    "problemSurtitle": "01 / LE PROBLÈME",
-    "problemTitle": "Tu ne diriges pas ton business. Tu cours après lui.",
-    "problemSubtitle": "Coder seul à minuit, c'est déjà assez dur. Le vrai coût, c'est le temps perdu à recoller les morceaux éparpillés.",
-    "pains": [
-      {
-        "tag": "01",
-        "title": "Le contexte s'évapore",
-        "body": "Ta décision d'hier est dans un doc un doc, le chiffre qui la justifie dans un tableur. Reconstituer prend 20 min."
-      },
-      {
-        "tag": "02",
-        "title": "Tu décides à l'aveugle",
-        "body": "« Est-ce qu'on peut se le permettre ? » demande d'ouvrir trois fichiers. Alors souvent, tu tranches au feeling."
-      },
-      {
-        "tag": "03",
-        "title": "Personne ne suit",
-        "body": "La veille, le suivi des hypothèses, le CRM : tout ça n'avance que quand tu t'en occupes."
-      },
-      {
-        "tag": "04",
-        "title": "L'IA est hors sol",
-        "body": "ChatGPT te répond bien — mais à froid. Il n'a ni tes chiffres, ni ton historique."
+    "nav": {
+      "problem": "Le problème",
+      "solution": "La solution",
+      "comparison": "Comparatif",
+      "pricing": "Pricing",
+      "login": "Se connecter",
+      "join": "Rejoindre la cohorte"
+    },
+    "hero": {
+      "badge": "Cohorte #4 · 12 places restantes · démarrage 15 sept.",
+      "title1": "Six outils ouverts.",
+      "title2": "Zéro vue d'ensemble.",
+      "title3": "Une seule barre à tenir.",
+      "desc": "Helmdash réunit tes finances, tes hypothèses, ta roadmap et ta veille dans un seul poste de pilotage — piloté par un agent qui lit et écrit directement dans tes données. Fini le copier-coller entre Notion, tableurs et ChatGPT.",
+      "cta_main": "Prendre la barre →",
+      "cta_sec": "Voir le produit",
+      "disclaimer": "Pas de carte bancaire · Import Notion & CSV en 2 min · Résiliable à tout moment",
+      "social": "Ils ont arrêté de jongler",
+      "audiences": [
+        "indie hackers",
+        "micro-SaaS",
+        "bootstrappers",
+        "solopreneurs"
+      ]
+    },
+    "problem": {
+      "section": "01 / LE PROBLÈME",
+      "title": "Tu ne diriges pas ton business. Tu cours après lui.",
+      "desc": "Coder seul à minuit, c'est déjà assez dur. Le vrai coût, c'est le temps perdu à recoller les morceaux éparpillés dans quinze onglets.",
+      "cards": [
+        {
+          "tag": "01",
+          "title": "Le contexte s'évapore",
+          "body": "Ta décision d'hier est dans un doc Notion, le chiffre qui la justifie dans un tableur, le raisonnement dans un vieux thread ChatGPT. Reconstituer prend 20 min à chaque fois."
+        },
+        {
+          "tag": "02",
+          "title": "Tu décides à l'aveugle",
+          "body": "« Est-ce qu'on peut se le permettre ? » demande d'ouvrir trois fichiers et de faire le calcul à la main. Alors souvent, tu tranches au feeling."
+        },
+        {
+          "tag": "03",
+          "title": "Personne ne suit à ta place",
+          "body": "La veille concurrente, le suivi des hypothèses, le pipe CRM : tout ça n'avance que quand tu t'en occupes. C'est-à-dire jamais assez."
+        },
+        {
+          "tag": "04",
+          "title": "L'IA ne connaît pas ton business",
+          "body": "ChatGPT te répond bien — mais à froid. Il n'a ni tes chiffres, ni ton historique, ni le droit d'écrire quoi que ce soit dans tes outils."
+        }
+      ]
+    },
+    "solution": {
+      "section": "02 / LA SOLUTION",
+      "title": "Un poste de pilotage. Un agent qui a les mains dans le cambouis.",
+      "desc": "L'agent central lit tes chiffres, met à jour tes hypothèses, délègue à des sous-agents spécialisés — et te rend une décision, pas un pavé de texte.",
+      "features": [
+        {
+          "title": "Il écrit, pas seulement lit",
+          "body": "L'agent met à jour une hypothèse, crée une tâche roadmap ou logue un prospect — directement dans tes données, avec ton accord."
+        },
+        {
+          "title": "Des sous-agents, pas un chatbot",
+          "body": "Recherche, finance, growth, produit : chacun a son domaine et ses outils. L'agent central orchestre et te rend une synthèse."
+        },
+        {
+          "title": "La mémoire de ton bateau",
+          "body": "Chaque décision garde son contexte : le chiffre, le raisonnement, la date. Tu ne repars jamais de zéro."
+        }
+      ],
+      "mock": {
+        "url": "helmdash.app / poste-de-pilotage",
+        "sidebar": {
+          "title": "PILOTAGE",
+          "overview": "Vue d'ensemble",
+          "finance": "Finances",
+          "hypotheses": "Hypothèses",
+          "roadmap": "Roadmap",
+          "crm": "CRM",
+          "veille": "Veille",
+          "role": "solo · pré-seed"
+        },
+        "main": {
+          "title": "Vue d'ensemble",
+          "updated": "mise à jour il y a 2 min par l'agent",
+          "mrr": "MRR",
+          "mrr_val": "4 280 €",
+          "mrr_trend": "▲ 38% / 6 mois",
+          "runway": "Runway",
+          "runway_val": "8,2 mois",
+          "runway_trend": "▼ 0,4 vs. avril",
+          "burn": "Burn / mois",
+          "burn_val": "3 100 €",
+          "burn_trend": "stable",
+          "chart_title": "MRR · 6 derniers mois",
+          "months": [
+            "avr",
+            "mai",
+            "juin",
+            "juil",
+            "août",
+            "sept"
+          ],
+          "hyp_title": "Hypothèses Lean",
+          "hyp_sub": "· 2 à tester cette semaine",
+          "hyp_status1": "VALIDÉE",
+          "hyp_text1": "L'onboarding guidé réduit le churn J7",
+          "hyp_conf1": "conf. 82%",
+          "hyp_status2": "À TESTER",
+          "hyp_text2": "Les devs paient pour la veille auto",
+          "hyp_conf2": "conf. 41%",
+          "hyp_status3": "À TESTER",
+          "hyp_text3": "Le tarif annuel augmente la rétention",
+          "hyp_conf3": "conf. 33%"
+        },
+        "agent": {
+          "name": "Barreur",
+          "role": "agent · connecté à tes données",
+          "q1": "On peut se payer un freelance design 2 mois ?",
+          "sub": "Délégué à 2 sous-agents",
+          "sub1": "Finance",
+          "sub1_note": "burn + runway",
+          "sub2": "Growth",
+          "sub2_note": "impact churn",
+          "ans1": "Oui, mais serré. À ",
+          "ans2": " de burn, un freelance à 1 400 €/mois ramène ton runway de ",
+          "ans3": " à ",
+          "btn1": "Simuler dans Finances",
+          "btn2": "Voir le détail",
+          "input": "Demande à ton poste de pilotage…"
+        }
       }
-    ],
-    "productSurtitle": "02 / LA SOLUTION",
-    "productTitle": "Un poste de pilotage. Un agent qui a les mains dans le cambouis.",
-    "productSubtitle": "L'agent central lit tes chiffres, met à jour tes hypothèses, délègue — et te rend une décision, pas un pavé de texte.",
-    "productFeatures": [
-      {
-        "title": "Il écrit, pas seulement lit",
-        "body": "L'agent met à jour directement dans tes données, avec ton accord."
-      },
-      {
-        "title": "Des sous-agents spécialisés",
-        "body": "Recherche, finance, growth : l'agent central orchestre et te rend une synthèse."
-      },
-      {
-        "title": "La mémoire de ton bateau",
-        "body": "Chaque décision garde son contexte. Tu ne repars jamais de zéro."
-      }
-    ],
-    "transparencySurtitle": "03 / TRANSPARENCE",
-    "transparencyTitle": "Ce que Helmdash N'EST PAS.",
-    "transparencySubtitle": "On ne promet pas la lune. Voici nos limites actuelles.",
-    "transparencyItems": [
-      {
-        "title": "Pas d'export de compte (pour l'instant)",
-        "body": "Le RGPD arrive. On bosse sur l'export/suppression en un clic (P0)."
-      },
-      {
-        "title": "Pas une IA magique",
-        "body": "Les sous-agents ont besoin de données claires pour bien travailler."
-      },
-      {
-        "title": "Uniquement pour Solo Founders",
-        "body": "Pas pensé pour les grandes équipes."
-      }
-    ],
-    "pricingSurtitle": "04 / PRICING",
-    "pricingTitle": "Un prix. Écrit noir sur blanc.",
-    "pricingSubtitle": "Rejoins la cohorte. Prix fixe à vie.",
-    "pricingMonth": "Mensuel",
-    "pricingYear": "Annuel −20%",
-    "pricingCtaPrimary": "Rejoindre la cohorte",
-    "pricingCtaSecondary": "Nous contacter",
-    "roadmapSurtitle": "05 / ROADMAP",
-    "roadmapTitle": "Les 5 prochains chantiers",
-    "roadmapSubtitle": "On s'y tient. Rien de plus.",
-    "roadmapItems": [
-      {
-        "title": "Export et suppression de compte RGPD",
-        "status": "En cours"
-      },
-      {
-        "title": "Intégration Stripe approfondie",
-        "status": "Prévu"
-      },
-      {
-        "title": "Sous-agent Marketing & SEO",
-        "status": "Prévu"
-      },
-      {
-        "title": "Webhook personnalisés (Zapier/Make)",
-        "status": "Prévu"
-      },
-      {
-        "title": "Génération de pitch deck automatisé",
-        "status": "Prévu"
-      }
-    ],
-    "makerSurtitle": "06 / MAKER NOTE",
-    "makerTitle": "Fait par un Solo Founder.",
-    "makerBody": "J'ai construit Helmdash parce que je devenais fou à ouvrir 15 onglets pour savoir si ma startup allait dans le mur.",
-    "faqSurtitle": "07 / FAQ",
-    "faqTitle": "Questions fréquentes",
-    "faqItems": [
-      {
-        "q": "Qu'est-ce qu'une cohorte ?",
-        "a": "Un groupe d'early-adopters avec un prix bloqué à vie."
-      },
-      {
-        "q": "Où vont mes données ?",
-        "a": "Elles sont chiffrées et ne servent pas à entraîner les modèles globaux."
-      }
-    ],
-    "login": "Se connecter",
-    "cohort": "Cohorte {name}",
-    "perMonth": "/ mois",
-    "billedSemiannually": "Facturé {amount} € tous les 6 mois",
-    "footerCopyright": "© 2026 Helmdash · Fait par un solo founder.",
-    "privacy": "Confidentialité",
-    "terms": "CGU"
+    },
+    "how_it_works": {
+      "section": "03 / COMMENT ÇA MARCHE",
+      "title": "Opérationnel avant ton prochain café.",
+      "steps": [
+        {
+          "title": "Branche tes outils",
+          "body": "Connecte Stripe, importe ton Notion et tes tableurs. Helmdash range tout dans un modèle unique — finances, roadmap, hypothèses, CRM.",
+          "meta": "≈ 2 min · rien à reconstruire"
+        },
+        {
+          "title": "L'agent prend ses marques",
+          "body": "Il lit ton historique, calcule tes métriques, repère les hypothèses en attente et te fait un premier point de situation.",
+          "meta": "premier brief en < 5 min"
+        },
+        {
+          "title": "Tu pilotes, il exécute",
+          "body": "Tu poses tes questions en langage naturel. Il analyse, délègue, et agit dans tes données — tu valides d'un clic.",
+          "meta": "en continu · 7j/7"
+        }
+      ]
+    },
+    "comparison": {
+      "section": "04 / POSITIONNEMENT",
+      "title": "Chaque outil fait bien une chose. Aucun ne les relie.",
+      "desc": "On ne remplace pas ton éditeur ni ton LLM. On tient la vue d'ensemble qu'aucun d'eux ne tient.",
+      "col1": "CE QUE TU FAIS",
+      "rows": [
+        {
+          "label": "Vue d'ensemble du business",
+          "notion": "à monter soi-même",
+          "gpt": "—",
+          "linear": "produit only",
+          "helm": "native"
+        },
+        {
+          "label": "Suivi financier / runway",
+          "notion": "tableur bricolé",
+          "gpt": "calcul manuel",
+          "linear": "—",
+          "helm": "temps réel"
+        },
+        {
+          "label": "Agit dans tes données",
+          "notion": "manuel",
+          "gpt": "lecture seule",
+          "linear": "manuel",
+          "helm": "l'agent écrit"
+        },
+        {
+          "label": "Mémoire du contexte",
+          "notion": "si tu ranges",
+          "gpt": "oublie",
+          "linear": "tickets",
+          "helm": "permanente"
+        },
+        {
+          "label": "Sous-agents spécialisés",
+          "notion": "—",
+          "gpt": "générique",
+          "linear": "—",
+          "helm": "10 métiers"
+        },
+        {
+          "label": "Veille concurrentielle",
+          "notion": "à la main",
+          "gpt": "sur demande",
+          "linear": "—",
+          "helm": "automatique"
+        }
+      ],
+      "footer": "Garde-les tous si tu veux. Helmdash importe leurs données et redonne le fil."
+    },
+    "pricing": {
+      "section": "05 / PRICING",
+      "title": "Un prix. Écrit noir sur blanc.",
+      "monthly": "Mensuel",
+      "yearly": "Annuel",
+      "discount": "−20%",
+      "desc": "Un tarif transparent. Démarrez avec un essai gratuit de 14 jours, puis choisissez le plan qui vous correspond.",
+      "popular": "POPULAIRE",
+      "plans": [
+        {
+          "name": "Founder Deal",
+          "tagline": "L'offre de lancement limitée aux 100 premiers utilisateurs.",
+          "price": "15 €",
+          "per": "/ mois",
+          "note": "Tarif verrouillé à vie",
+          "features": [
+            "Poste de pilotage complet",
+            "Sous-agents spécialisés",
+            "Import Stripe, Notion, CSV",
+            "Clé API requise (BYOK)"
+          ],
+          "cta": "Profiter de l'offre"
+        },
+        {
+          "name": "BYOK",
+          "tagline": "Pour ceux qui ont déjà leur propre clé API Mistral ou OpenAI.",
+          "price": "25 €",
+          "per": "/ mois",
+          "note": "Bring Your Own Key",
+          "features": [
+            "Tout le Founder Deal",
+            "Sans limite d'usage",
+            "Modèles au choix",
+            "Clé API requise (BYOK)"
+          ],
+          "cta": "Essai gratuit 14j"
+        },
+        {
+          "name": "Complet",
+          "tagline": "La solution clé en main, propulsée par Mistral Small.",
+          "price": "35 €",
+          "per": "/ mois",
+          "note": "Aucune clé requise",
+          "features": [
+            "IA incluse (Mistral Small)",
+            "Aucune configuration requise",
+            "Limite d'usage généreuse",
+            "Support prioritaire"
+          ],
+          "cta": "Essai gratuit 14j"
+        }
+      ]
+    },
+    "cta_final": {
+      "title": "Arrête de recoller les morceaux. Prends la barre.",
+      "desc": "Cohorte #4 · 12 places · démarrage le 15 septembre. Import de tes outils en 2 minutes, aucune carte requise.",
+      "btn_primary": "Réserver ma place →",
+      "btn_secondary": "Revoir le produit"
+    },
+    "footer": {
+      "desc": "Le poste de pilotage du solo founder. Un dashboard, un agent, zéro onglet en trop.",
+      "cols": [
+        {
+          "head": "PRODUIT",
+          "links": [
+            "Le poste de pilotage",
+            "L'agent Barreur",
+            "Sous-agents",
+            "Intégrations",
+            "Changelog"
+          ]
+        },
+        {
+          "head": "RESSOURCES",
+          "links": [
+            "Guide du solo founder",
+            "Modèles Lean",
+            "Documentation",
+            "Feuille de route"
+          ]
+        },
+        {
+          "head": "COHORTE",
+          "links": [
+            "Prochaine cohorte",
+            "Discord",
+            "Parrainage",
+            "Contact"
+          ]
+        }
+      ],
+      "copyright": "© 2026 Helmdash · Fait à Lyon par un solo founder, pour les solo founders.",
+      "legal": [
+        "Confidentialité",
+        "CGU",
+        "Statut"
+      ]
+    }
+  },
+  "onboarding": {
+    "title": "Onboarding",
+    "questions": {
+      "q1": "En quelques mots, c'est quoi l'idée de ta boîte ?",
+      "q2": "Qui es-tu et pourquoi tu te lances là-dedans ?",
+      "q3": "C'est pour qui et quel est leur vrai problème ?",
+      "q4": "C'est quoi le plus gros risque qui pourrait tuer ce projet ?",
+      "q5": "Dans 90 jours, tu veux être où exactement ?",
+      "q6": "Comment tu comptes gagner de l'argent avec ça ?"
+    },
+    "inputPlaceholder": "Tape ta réponse ici...",
+    "skip": "Passer cette question",
+    "submit": "Envoyer",
+    "recapTitle": "Voilà ce que j'ai compris.",
+    "recapSubtitle": "Vérifie et ajuste les bases de ton projet.",
+    "finish": "Ça me va, configurer mon tableau de bord",
+    "consentWeekly": "M'envoyer un brief hebdo",
+    "consentJournal": "Activer le journal d'humeur quotidien"
   }
 }

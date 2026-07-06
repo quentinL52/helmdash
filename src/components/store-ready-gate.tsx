@@ -14,13 +14,40 @@ export function StoreReadyGate({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const hydrateFromApi = async () => {
             try {
-                const res = await fetch('/api/data/finances');
-                if (res.ok) {
-                    const data = await res.json();
+                const [financesRes, canvasRes, hypothesesRes, roadmapRes] = await Promise.all([
+                    fetch('/api/data/finances'),
+                    fetch('/api/data/canvas'),
+                    fetch('/api/data/hypotheses'),
+                    fetch('/api/data/roadmap')
+                ]);
+
+                if (financesRes.ok) {
+                    const data = await financesRes.json();
                     useFounderStore.getState().hydrateFinances(data);
                 }
+                
+                if (canvasRes.ok) {
+                    const data = await canvasRes.json();
+                    if (data.canvasData) {
+                        useFounderStore.getState().hydrate({ leanCanvas: { ...useFounderStore.getState().leanCanvas, ...data.canvasData } });
+                    }
+                }
+
+                if (hypothesesRes.ok) {
+                    const data = await hypothesesRes.json();
+                    if (data.hypotheses) {
+                        useFounderStore.getState().hydrate({ hypotheses: data.hypotheses });
+                    }
+                }
+
+                if (roadmapRes.ok) {
+                    const data = await roadmapRes.json();
+                    if (data.roadmap) {
+                        useFounderStore.getState().hydrate({ roadmap: data.roadmap });
+                    }
+                }
             } catch (e) {
-                console.error('Failed to hydrate finances from API', e);
+                console.error('Failed to hydrate store from API', e);
             }
         };
 

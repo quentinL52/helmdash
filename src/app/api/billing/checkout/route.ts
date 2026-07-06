@@ -3,11 +3,12 @@ import { z } from 'zod';
 import { stripe, resolvePrice } from '@/lib/billing/stripe-client';
 import { prisma } from '@/lib/prisma';
 import { withAuth } from '@/lib/security/with-auth';
-import { determineCohort } from '@/lib/billing/cohort-service';
-import { getAvailablePeriods, type Period } from '@/lib/billing/cohort-config';
+import { reserveFounderSeat } from '@/lib/billing/pricing-service';
+import { PRICING_CONFIG, type Period, type PlanType } from '@/lib/billing/pricing-config';
 
 const bodySchema = z.object({
-  period: z.enum(['monthly', 'semi_annual', 'yearly']),
+  plan: z.enum(['core', 'complete', 'founder']),
+  period: z.enum(['monthly', 'yearly']),
 });
 
 async function handler(req: NextRequest, { userId }: { userId: string }) {
@@ -19,7 +20,7 @@ async function handler(req: NextRequest, { userId }: { userId: string }) {
     );
   }
 
-  const { period } = parsed.data;
+  const { plan, period } = parsed.data;
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
@@ -34,17 +35,30 @@ async function handler(req: NextRequest, { userId }: { userId: string }) {
   }
 
   const result = await prisma.$transaction(async (tx: any) => {
-    const cohort = await determineCohort(tx);
-    const availablePeriods = getAvailablePeriods(cohort);
+    let priceId = '';
+    let key = '';
 
-    if (!availablePeriods.includes(period as Period)) {
-      return {
-        error: `Period "${period}" is not available for cohort "${cohort}". Valid: ${availablePeriods.join(', ')}`,
-        status: 400 as const,
-      };
+    if (plan === 'founder') {
+      const reserved = await reserveFounderSeat(tx);
+      if (!reserved) {
+        return { error: 'Founder deal is sold out.', status: 400 as const };
+      }
+      // Assuming you have a helper to get stripe price ID like `resolvePrice` but we removed it? Let's just use the key.
+      key = PRICING_CONFIG.founderDeal.price.key;
+      priceId = process.env.STRIPE_PRICE_FOUNDER_MONTHLY || '';
+    } else {
+      const planConfig = PRICING_CONFIG.plans[plan as PlanType];
+      if (!planConfig) return { error: 'Invalid plan', status: 400 as const };
+      
+      const priceConfig = planConfig.prices[period as Period];
+      if (!priceConfig) {
+        return { error: `Period ${period} not available for ${plan}`, status: 400 as const };
+      }
+      key = priceConfig.key;
+      // We will look up price ID from env or stripe client mapping
+      const { resolvePrice } = await import('@/lib/billing/stripe-client');
+      priceId = resolvePrice(key);
     }
-
-    const { priceId, key } = resolvePrice(cohort, period as Period);
 
     let customerId = user.stripeCustomerId;
     if (!customerId) {
@@ -69,28 +83,28 @@ async function handler(req: NextRequest, { userId }: { userId: string }) {
       success_url: `${baseUrl}/settings?billing=success`,
       cancel_url: `${baseUrl}/settings?billing=canceled`,
       expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
-      metadata: { userId: user.id, cohort, priceKey: key },
+      metadata: { userId: user.id, plan, period, priceKey: key },
     });
 
-    if (cohort !== 'full') {
+    if (plan === 'founder') {
       await tx.seatReservation.create({
         data: {
           userId: user.id,
-          cohort,
+          cohort: 'founder', // Reuse cohort string or change schema
           sessionId: checkoutSession.id,
           expiresAt: new Date(Date.now() + 30 * 60 * 1000),
         },
       });
     }
 
-    return { url: checkoutSession.url, cohort };
+    return { url: checkoutSession.url, plan };
   });
 
   if ('error' in result) {
     return NextResponse.json({ error: result.error }, { status: result.status });
   }
 
-  return NextResponse.json({ url: result.url, cohort: result.cohort });
+  return NextResponse.json({ url: result.url, plan: result.plan });
 }
 
 export const POST = withAuth(handler);

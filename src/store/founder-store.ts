@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { toast } from '@/hooks/use-toast';
-import type { Cohort, PlanStatus } from '@/lib/billing/cohort-config';
+import type { PlanStatus, PlanType } from '@/lib/billing/pricing-config';
 
 
 
@@ -425,8 +425,8 @@ export interface FounderStore {
     // --- State ---
     userId: string | null;
     planStatus: PlanStatus;
-    cohort: Cohort | null;
-    cohortRank: number | null;
+    plan: PlanType | null;
+    founderDeal: boolean;
     hypotheses: Hypothesis[];
     finance: FinanceData;
     journalEntries: JournalEntry[];
@@ -456,9 +456,9 @@ export interface FounderStore {
     // --- Actions ---
 
     // Hypotheses
-    addHypothesis: (hypothesis: Omit<Hypothesis, 'id' | 'createdAt' | 'updatedAt'>) => void;
-    updateHypothesis: (id: string, updates: Partial<Hypothesis>) => void;
-    deleteHypothesis: (id: string) => void;
+    addHypothesis: (hypothesis: Omit<Hypothesis, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+    updateHypothesis: (id: string, updates: Partial<Hypothesis>) => Promise<void>;
+    deleteHypothesis: (id: string) => Promise<void>;
 
     // Finances
     updateCashAvailable: (amount: number) => void;
@@ -540,14 +540,14 @@ export interface FounderStore {
     removeSwotItem: (type: 'strengths' | 'weaknesses' | 'opportunities' | 'threats', index: number) => void;
 
     // Canvas
-    updateCanvasSection: (sectionId: string, content: string) => void;
+    updateCanvasSection: (sectionId: string, content: string) => Promise<void>;
     saveLeanCanvasSnapshot: () => void;
     deleteLeanCanvasSnapshot: (id: string) => void;
 
     // Roadmap
-    addRoadmapItem: (item: Omit<RoadmapItem, 'id' | 'createdAt' | 'updatedAt'>) => void;
-    updateRoadmapItem: (id: string, updates: Partial<RoadmapItem>) => void;
-    deleteRoadmapItem: (id: string) => void;
+    addRoadmapItem: (item: Omit<RoadmapItem, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+    updateRoadmapItem: (id: string, updates: Partial<RoadmapItem>) => Promise<void>;
+    deleteRoadmapItem: (id: string) => Promise<void>;
 
     // --- Settings / i18n ---
     language: 'fr' | 'en';
@@ -555,8 +555,8 @@ export interface FounderStore {
     hydrate: (state: Partial<FounderStore>) => void;
     setUserId: (id: string | null) => void;
     setPlanStatus: (status: PlanStatus) => void;
-    setCohort: (cohort: Cohort | null) => void;
-    setCohortRank: (rank: number | null) => void;
+    setPlan: (plan: PlanType | null) => void;
+    setFounderDeal: (val: boolean) => void;
     setAiSettings: (settings: Partial<AiSettings>) => void;
     setFounderProfile: (profile: Partial<FounderProfile>) => void;
     updateGoToMarket: (updates: Partial<GoToMarketStrategy>) => void;
@@ -580,8 +580,8 @@ const calculateObjectiveProgress = (krs: KeyResult[]): number => {
 const initialState = {
     userId: null,
     planStatus: 'trialing' as PlanStatus,
-    cohort: null as Cohort | null,
-    cohortRank: null as number | null,
+    plan: null as PlanType | null,
+    founderDeal: false,
     language: 'fr' as const,
     hypotheses: [],
     finance: {
@@ -703,8 +703,8 @@ export const useFounderStore = create<FounderStore>()(
 
             setUserId: (id) => set({ userId: id }),
             setPlanStatus: (status) => set({ planStatus: status }),
-            setCohort: (cohort) => set({ cohort }),
-            setCohortRank: (rank) => set({ cohortRank: rank }),
+            setPlan: (plan) => set({ plan }),
+            setFounderDeal: (val) => set({ founderDeal: val }),
             setLanguage: (lang) => set({ language: lang }),
             setAiSettings: (settings) => set((state) => ({ aiSettings: { ...state.aiSettings, ...settings } })),
             setFounderProfile: (profile) => set((state) => ({ founderProfile: { ...state.founderProfile, ...profile } })),
@@ -713,29 +713,71 @@ export const useFounderStore = create<FounderStore>()(
             setDashboardLayout: (layout) => set({ dashboardLayout: layout }),
             reset: () => set(initialState),
             hydrate: (state) => set({ ...state }),
-            addHypothesis: (hypothesis) => set((state) => ({
-                hypotheses: [
-                    ...state.hypotheses,
-                    {
-                        ...hypothesis,
-                        id: crypto.randomUUID(),
-                        createdAt: new Date().toISOString(),
-                        updatedAt: new Date().toISOString(),
-                    },
-                ],
-            })),
+            addHypothesis: async (hypothesis) => {
+                const id = crypto.randomUUID();
+                const now = new Date().toISOString();
+                const newHypothesis = { ...hypothesis, id, createdAt: now, updatedAt: now } as Hypothesis;
+                
+                set((state) => ({ hypotheses: [ ...state.hypotheses, newHypothesis ] }));
 
-            updateHypothesis: (id, updates) => set((state) => ({
-                hypotheses: state.hypotheses.map((h) =>
-                    h.id === id
-                        ? { ...h, ...updates, updatedAt: new Date().toISOString() }
-                        : h
-                ),
-            })),
+                try {
+                    const res = await fetch('/api/data/hypotheses', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'add', payload: newHypothesis })
+                    });
+                    if (!res.ok) throw new Error('API Error');
+                } catch (e) {
+                    toast({ title: 'Erreur', description: 'Impossible de sauvegarder', variant: 'destructive' });
+                    set((state) => ({ hypotheses: state.hypotheses.filter((h) => h.id !== id) }));
+                }
+            },
 
-            deleteHypothesis: (id) => set((state) => ({
-                hypotheses: state.hypotheses.filter((h) => h.id !== id),
-            })),
+            updateHypothesis: async (id, updates) => {
+                let previousHypothesis: Hypothesis | undefined;
+                set((state) => {
+                    previousHypothesis = state.hypotheses.find(h => h.id === id);
+                    return {
+                        hypotheses: state.hypotheses.map((h) => h.id === id ? { ...h, ...updates, updatedAt: new Date().toISOString() } : h)
+                    };
+                });
+                
+                try {
+                    const res = await fetch('/api/data/hypotheses', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'update', payload: { id, ...updates } })
+                    });
+                    if (!res.ok) throw new Error('API Error');
+                } catch (e) {
+                    toast({ title: 'Erreur', description: 'Impossible de sauvegarder', variant: 'destructive' });
+                    if (previousHypothesis) {
+                        set((state) => ({ hypotheses: state.hypotheses.map((h) => h.id === id ? previousHypothesis! : h) }));
+                    }
+                }
+            },
+
+            deleteHypothesis: async (id) => {
+                let previousHypothesis: Hypothesis | undefined;
+                set((state) => {
+                    previousHypothesis = state.hypotheses.find(h => h.id === id);
+                    return { hypotheses: state.hypotheses.filter((h) => h.id !== id) };
+                });
+                
+                try {
+                    const res = await fetch('/api/data/hypotheses', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'delete', payload: { id } })
+                    });
+                    if (!res.ok) throw new Error('API Error');
+                } catch (e) {
+                    toast({ title: 'Erreur', description: 'Impossible de supprimer', variant: 'destructive' });
+                    if (previousHypothesis) {
+                        set((state) => ({ hypotheses: [ ...state.hypotheses, previousHypothesis! ] }));
+                    }
+                }
+            },
 
             updateCashAvailable: async (amount) => {
                 let previousAmount: number;
@@ -825,7 +867,7 @@ export const useFounderStore = create<FounderStore>()(
                 const newEntry = { ...entry, id };
                 
                 set((state) => ({
-                    finance: { ...state.finance, entries: [...state.finance.entries, newEntry] }
+                    finance: { ...state.finance, entries: [...(state.finance.entries || []), newEntry] }
                 }));
 
                 try {
@@ -842,7 +884,7 @@ export const useFounderStore = create<FounderStore>()(
                 } catch (e) {
                     toast({ title: 'Erreur', description: 'Impossible de sauvegarder', variant: 'destructive' });
                     set((state) => ({
-                        finance: { ...state.finance, entries: state.finance.entries.filter(e => e.id !== id) }
+                        finance: { ...state.finance, entries: (state.finance.entries || []).filter(e => e.id !== id) }
                     }));
                 }
             },
@@ -850,11 +892,11 @@ export const useFounderStore = create<FounderStore>()(
             updateEntry: async (id, updates) => {
                 let previousEntry: ExpenseItem | undefined;
                 set((state) => {
-                    previousEntry = state.finance.entries.find(e => e.id === id);
+                    previousEntry = (state.finance.entries || []).find(e => e.id === id);
                     return {
                         finance: {
                             ...state.finance,
-                            entries: state.finance.entries.map(e => e.id === id ? { ...e, ...updates } : e)
+                            entries: (state.finance.entries || []).map(e => e.id === id ? { ...e, ...updates } : e)
                         }
                     };
                 });
@@ -872,7 +914,7 @@ export const useFounderStore = create<FounderStore>()(
                         set((state) => ({
                             finance: {
                                 ...state.finance,
-                                entries: state.finance.entries.map(e => e.id === id ? previousEntry! : e)
+                                entries: (state.finance.entries || []).map(e => e.id === id ? previousEntry! : e)
                             }
                         }));
                     }
@@ -882,11 +924,11 @@ export const useFounderStore = create<FounderStore>()(
             deleteEntry: async (id) => {
                 let previousEntry: ExpenseItem | undefined;
                 set((state) => {
-                    previousEntry = state.finance.entries.find(e => e.id === id);
+                    previousEntry = (state.finance.entries || []).find(e => e.id === id);
                     return {
                         finance: {
                             ...state.finance,
-                            entries: state.finance.entries.filter(e => e.id !== id)
+                            entries: (state.finance.entries || []).filter(e => e.id !== id)
                         }
                     };
                 });
@@ -902,7 +944,7 @@ export const useFounderStore = create<FounderStore>()(
                     toast({ title: 'Erreur', description: 'Impossible de supprimer', variant: 'destructive' });
                     if (previousEntry) {
                         set((state) => ({
-                            finance: { ...state.finance, entries: [...state.finance.entries, previousEntry!] }
+                            finance: { ...state.finance, entries: [...(state.finance.entries || []), previousEntry!] }
                         }));
                     }
                 }
@@ -912,7 +954,7 @@ export const useFounderStore = create<FounderStore>()(
                 const id = crypto.randomUUID();
                 const newEntry = { ...entry, id };
                 set((state) => ({
-                    finance: { ...state.finance, oneTimeEntries: [...state.finance.oneTimeEntries, newEntry] }
+                    finance: { ...state.finance, oneTimeEntries: [...(state.finance.oneTimeEntries || []), newEntry] }
                 }));
 
                 try {
@@ -925,7 +967,7 @@ export const useFounderStore = create<FounderStore>()(
                 } catch (e) {
                     toast({ title: 'Erreur', description: 'Impossible d\'ajouter', variant: 'destructive' });
                     set((state) => ({
-                        finance: { ...state.finance, oneTimeEntries: state.finance.oneTimeEntries.filter(e => e.id !== id) }
+                        finance: { ...state.finance, oneTimeEntries: (state.finance.oneTimeEntries || []).filter(e => e.id !== id) }
                     }));
                 }
             },
@@ -933,9 +975,9 @@ export const useFounderStore = create<FounderStore>()(
             deleteOneTimeEntry: async (id) => {
                 let previousEntry: OneTimeEntry | undefined;
                 set((state) => {
-                    previousEntry = state.finance.oneTimeEntries.find(e => e.id === id);
+                    previousEntry = (state.finance.oneTimeEntries || []).find(e => e.id === id);
                     return {
-                        finance: { ...state.finance, oneTimeEntries: state.finance.oneTimeEntries.filter(e => e.id !== id) }
+                        finance: { ...state.finance, oneTimeEntries: (state.finance.oneTimeEntries || []).filter(e => e.id !== id) }
                     };
                 });
                 
@@ -950,7 +992,7 @@ export const useFounderStore = create<FounderStore>()(
                     toast({ title: 'Erreur', description: 'Impossible de supprimer', variant: 'destructive' });
                     if (previousEntry) {
                         set((state) => ({
-                            finance: { ...state.finance, oneTimeEntries: [...state.finance.oneTimeEntries, previousEntry!] }
+                            finance: { ...state.finance, oneTimeEntries: [...(state.finance.oneTimeEntries || []), previousEntry!] }
                         }));
                     }
                 }
@@ -1190,12 +1232,24 @@ export const useFounderStore = create<FounderStore>()(
                 scenarioAnalyses: state.scenarioAnalyses.filter((s) => s.id !== id),
             })),
 
-            updateCanvasSection: (sectionId, content) => set((state) => ({
-                leanCanvas: {
-                    ...state.leanCanvas,
-                    [sectionId]: content,
-                },
-            })),
+            updateCanvasSection: async (sectionId, content) => {
+                let previousContent: string = '';
+                set((state) => {
+                    previousContent = state.leanCanvas[sectionId] || '';
+                    return { leanCanvas: { ...state.leanCanvas, [sectionId]: content } };
+                });
+                try {
+                    const res = await fetch('/api/data/canvas', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'updateSection', payload: { sectionId, content } })
+                    });
+                    if (!res.ok) throw new Error('API Error');
+                } catch (e) {
+                    toast({ title: 'Erreur', description: 'Impossible de sauvegarder', variant: 'destructive' });
+                    set((state) => ({ leanCanvas: { ...state.leanCanvas, [sectionId]: previousContent } }));
+                }
+            },
 
             saveLeanCanvasSnapshot: () => set((state) => {
                 const newSnapshot = {
@@ -1213,27 +1267,71 @@ export const useFounderStore = create<FounderStore>()(
             })),
 
             // Roadmap Actions
-            addRoadmapItem: (item) => set((state) => ({
-                roadmap: [
-                    ...state.roadmap,
-                    {
-                        ...item,
-                        id: crypto.randomUUID(),
-                        createdAt: new Date().toISOString(),
-                        updatedAt: new Date().toISOString(),
+            addRoadmapItem: async (item) => {
+                const id = crypto.randomUUID();
+                const now = new Date().toISOString();
+                const newItem = { ...item, id, createdAt: now, updatedAt: now } as RoadmapItem;
+                
+                set((state) => ({ roadmap: [ ...state.roadmap, newItem ] }));
+
+                try {
+                    const res = await fetch('/api/data/roadmap', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'add', payload: newItem })
+                    });
+                    if (!res.ok) throw new Error('API Error');
+                } catch (e) {
+                    toast({ title: 'Erreur', description: 'Impossible de sauvegarder', variant: 'destructive' });
+                    set((state) => ({ roadmap: state.roadmap.filter((r) => r.id !== id) }));
+                }
+            },
+
+            updateRoadmapItem: async (id, updates) => {
+                let previousItem: RoadmapItem | undefined;
+                set((state) => {
+                    previousItem = state.roadmap.find(r => r.id === id);
+                    return {
+                        roadmap: state.roadmap.map((item) => item.id === id ? { ...item, ...updates, updatedAt: new Date().toISOString() } : item)
+                    };
+                });
+                
+                try {
+                    const res = await fetch('/api/data/roadmap', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'update', payload: { id, ...updates } })
+                    });
+                    if (!res.ok) throw new Error('API Error');
+                } catch (e) {
+                    toast({ title: 'Erreur', description: 'Impossible de sauvegarder', variant: 'destructive' });
+                    if (previousItem) {
+                        set((state) => ({ roadmap: state.roadmap.map((item) => item.id === id ? previousItem! : item) }));
                     }
-                ]
-            })),
+                }
+            },
 
-            updateRoadmapItem: (id, updates) => set((state) => ({
-                roadmap: state.roadmap.map(item =>
-                    item.id === id ? { ...item, ...updates, updatedAt: new Date().toISOString() } : item
-                )
-            })),
-
-            deleteRoadmapItem: (id) => set((state) => ({
-                roadmap: state.roadmap.filter(item => item.id !== id)
-            })),
+            deleteRoadmapItem: async (id) => {
+                let previousItem: RoadmapItem | undefined;
+                set((state) => {
+                    previousItem = state.roadmap.find(r => r.id === id);
+                    return { roadmap: state.roadmap.filter((item) => item.id !== id) };
+                });
+                
+                try {
+                    const res = await fetch('/api/data/roadmap', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'delete', payload: { id } })
+                    });
+                    if (!res.ok) throw new Error('API Error');
+                } catch (e) {
+                    toast({ title: 'Erreur', description: 'Impossible de supprimer', variant: 'destructive' });
+                    if (previousItem) {
+                        set((state) => ({ roadmap: [ ...state.roadmap, previousItem! ] }));
+                    }
+                }
+            },
 
             // CRM Actions
             addContact: (contact) => set((state) => ({

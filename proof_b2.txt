@@ -1,0 +1,13 @@
+TEST 1 (Merge local hd-55+hd-56): PASS
+✅ Landing claims check passed. Aucun mot interdit détecté.
+
+TEST 2 (Add SSO in hero): FAIL
+❌ [ERREUR BANNED_EVERYWHERE] "sso" trouvé dans page.tsx.
+❌ Échec : Veuillez retirer ces claims non validés avant de merger.
+
+TEST 3 (Add Notion outside Roadmap): FAIL
+❌ [ERREUR BANNED_OUTSIDE_ROADMAP] "notion" trouvé HORS de la roadmap dans page.tsx.
+❌ Échec : Veuillez retirer ces claims non validés avant de merger.
+
+TEST 4 (Add Notion in Roadmap): PASS
+✅ Landing claims check passed. Aucun mot interdit détecté.

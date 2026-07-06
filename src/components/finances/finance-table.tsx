@@ -79,7 +79,8 @@ export function FinanceTable({ timeframe }: FinanceTableProps) {
     // Flatten entries and group by timeframe
     const entries: FlatEntry[] = useMemo(() => {
         // 1. Flatten all
-        const allEntries: FlatEntry[] = finance.entries.map(e => ({
+        const entriesToMap = Array.isArray(finance.entries) ? finance.entries : [];
+        const allEntries: FlatEntry[] = entriesToMap.map(e => ({
             ...e,
             monthId: e.id,
             monthLabel: e.date.substring(0, 7),

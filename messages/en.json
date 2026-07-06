@@ -168,125 +168,332 @@
     "privacyPolicy": "Privacy Policy"
   },
   "landing": {
-    "heroTitle": "Six open tools.\\nZero overview.\\nOne helm to steer.",
-    "heroSubtitle": "Helmdash gathers your finances, hypotheses, roadmap and watch in a single cockpit — steered by an agent that reads and writes directly to your data. No more copy-pasting.",
-    "heroBadge": "Cohort #{cohort} · {seats} spots left · starts {date}",
-    "ctaPrimary": "Take the Helm →",
-    "ctaSecondary": "View product",
-    "noCreditCard": "No credit card",
-    "socialProof": "They stopped juggling",
-    "problemSurtitle": "01 / THE PROBLEM",
-    "problemTitle": "You're not running your business. You're chasing it.",
-    "problemSubtitle": "Coding alone at midnight is hard enough. The real cost is the time lost piecing together scattered info.",
-    "pains": [
-      {
-        "tag": "01",
-        "title": "Context evaporates",
-        "body": "Yesterday's decision is in a doc, the justifying metric in a sheet. Reconstructing takes 20 mins."
-      },
-      {
-        "tag": "02",
-        "title": "Flying blind",
-        "body": "« Can we afford this? » means opening three files. So you just guess."
-      },
-      {
-        "tag": "03",
-        "title": "No one follows up",
-        "body": "Competitive watch, hypothesis tracking, CRM: nothing moves unless you do it."
-      },
-      {
-        "tag": "04",
-        "title": "AI is disconnected",
-        "body": "ChatGPT answers well — but cold. It has no data, no history."
+    "nav": {
+      "problem": "The problem",
+      "solution": "The solution",
+      "comparison": "Comparison",
+      "pricing": "Pricing",
+      "login": "Login",
+      "join": "Join the cohort"
+    },
+    "hero": {
+      "badge": "Cohort #4 · 12 seats left · starts Sept 15.",
+      "title1": "Six tools open.",
+      "title2": "Zero overview.",
+      "title3": "One helm to steer.",
+      "desc": "Helmdash brings your finances, hypotheses, roadmap, and competitive intel into a single cockpit — piloted by an agent that reads and writes directly to your data. Stop copy-pasting between Notion, spreadsheets, and ChatGPT.",
+      "cta_main": "Take the helm →",
+      "cta_sec": "See the product",
+      "disclaimer": "No credit card required · Notion & CSV import in 2 mins · Cancel anytime",
+      "social": "They stopped juggling",
+      "audiences": [
+        "indie hackers",
+        "micro-SaaS",
+        "bootstrappers",
+        "solopreneurs"
+      ]
+    },
+    "problem": {
+      "section": "01 / THE PROBLEM",
+      "title": "You aren't running your business. You're chasing it.",
+      "desc": "Coding alone at midnight is hard enough. The real cost is the time lost piecing together fragments scattered across fifteen tabs.",
+      "cards": [
+        {
+          "tag": "01",
+          "title": "Context evaporates",
+          "body": "Yesterday's decision is in a Notion doc, the justifying metric in a spreadsheet, the reasoning in an old ChatGPT thread. Reconstructing it takes 20 mins every time."
+        },
+        {
+          "tag": "02",
+          "title": "Blind decision making",
+          "body": "« Can we afford this? » requires opening three files and doing manual math. So often, you just guess."
+        },
+        {
+          "tag": "03",
+          "title": "Nobody follows up for you",
+          "body": "Competitive intel, hypothesis tracking, CRM pipeline: none of it moves unless you move it. Which means never enough."
+        },
+        {
+          "tag": "04",
+          "title": "AI doesn't know your business",
+          "body": "ChatGPT answers well — but cold. It has neither your numbers, your history, nor the permission to write to your tools."
+        }
+      ]
+    },
+    "solution": {
+      "section": "02 / THE SOLUTION",
+      "title": "A cockpit. An agent with its hands dirty.",
+      "desc": "The central agent reads your numbers, updates your hypotheses, delegates to specialized sub-agents — and gives you a decision, not a wall of text.",
+      "features": [
+        {
+          "title": "It writes, not just reads",
+          "body": "The agent updates a hypothesis, creates a roadmap task, or logs a lead — directly in your data, with your approval."
+        },
+        {
+          "title": "Sub-agents, not a chatbot",
+          "body": "Research, finance, growth, product: each has its domain and tools. The central agent orchestrates and synthesizes."
+        },
+        {
+          "title": "The memory of your ship",
+          "body": "Every decision keeps its context: the metric, the reasoning, the date. You never start from zero again."
+        }
+      ],
+      "mock": {
+        "url": "helmdash.app / cockpit",
+        "sidebar": {
+          "title": "STEERING",
+          "overview": "Overview",
+          "finance": "Finances",
+          "hypotheses": "Hypotheses",
+          "roadmap": "Roadmap",
+          "crm": "CRM",
+          "veille": "Intel",
+          "role": "solo · pre-seed"
+        },
+        "main": {
+          "title": "Overview",
+          "updated": "updated 2 mins ago by agent",
+          "mrr": "MRR",
+          "mrr_val": "€4,280",
+          "mrr_trend": "▲ 38% / 6 months",
+          "runway": "Runway",
+          "runway_val": "8.2 months",
+          "runway_trend": "▼ 0.4 vs. April",
+          "burn": "Burn / month",
+          "burn_val": "€3,100",
+          "burn_trend": "stable",
+          "chart_title": "MRR · Last 6 months",
+          "months": [
+            "apr",
+            "may",
+            "jun",
+            "jul",
+            "aug",
+            "sep"
+          ],
+          "hyp_title": "Lean Hypotheses",
+          "hyp_sub": "· 2 to test this week",
+          "hyp_status1": "VALIDATED",
+          "hyp_text1": "Guided onboarding reduces Day 7 churn",
+          "hyp_conf1": "conf. 82%",
+          "hyp_status2": "TO TEST",
+          "hyp_text2": "Devs pay for automated intel",
+          "hyp_conf2": "conf. 41%",
+          "hyp_status3": "TO TEST",
+          "hyp_text3": "Annual pricing increases retention",
+          "hyp_conf3": "conf. 33%"
+        },
+        "agent": {
+          "name": "Helmsman",
+          "role": "agent · connected to your data",
+          "q1": "Can we afford a freelance designer for 2 months?",
+          "sub": "Delegated to 2 sub-agents",
+          "sub1": "Finance",
+          "sub1_note": "burn + runway",
+          "sub2": "Growth",
+          "sub2_note": "churn impact",
+          "ans1": "Yes, but it's tight. At ",
+          "ans2": " burn, a €1,400/mo freelancer drops your runway from ",
+          "ans3": " to ",
+          "btn1": "Simulate in Finances",
+          "btn2": "See details",
+          "input": "Ask your cockpit…"
+        }
       }
-    ],
-    "productSurtitle": "02 / THE SOLUTION",
-    "productTitle": "A cockpit. An agent with its hands dirty.",
-    "productSubtitle": "The central agent reads metrics, updates hypotheses, delegates — and gives you a decision, not a wall of text.",
-    "productFeatures": [
-      {
-        "title": "It writes, doesn't just read",
-        "body": "The agent updates directly in your data, with your approval."
-      },
-      {
-        "title": "Specialized sub-agents",
-        "body": "Research, finance, growth: the central agent orchestrates and synthesizes."
-      },
-      {
-        "title": "The memory of your ship",
-        "body": "Every decision keeps its context. You never start from scratch."
-      }
-    ],
-    "transparencySurtitle": "03 / TRANSPARENCY",
-    "transparencyTitle": "What Helmdash IS NOT.",
-    "transparencySubtitle": "We don't promise the moon. Here are our current limits.",
-    "transparencyItems": [
-      {
-        "title": "No account export (yet)",
-        "body": "GDPR is coming. We're working on 1-click export/deletion (P0)."
-      },
-      {
-        "title": "Not magic AI",
-        "body": "Sub-agents need clear data to work well."
-      },
-      {
-        "title": "Solo Founders Only",
-        "body": "Not designed for large teams."
-      }
-    ],
-    "pricingSurtitle": "04 / PRICING",
-    "pricingTitle": "One price. In black and white.",
-    "pricingSubtitle": "Join the cohort. Lifetime fixed price.",
-    "pricingMonth": "Monthly",
-    "pricingYear": "Yearly −20%",
-    "pricingCtaPrimary": "Join the cohort",
-    "pricingCtaSecondary": "Contact us",
-    "roadmapSurtitle": "05 / ROADMAP",
-    "roadmapTitle": "The next 5 milestones",
-    "roadmapSubtitle": "We stick to this. Nothing more.",
-    "roadmapItems": [
-      {
-        "title": "GDPR export and deletion",
-        "status": "In progress"
-      },
-      {
-        "title": "Deep Stripe integration",
-        "status": "Planned"
-      },
-      {
-        "title": "Marketing & SEO sub-agent",
-        "status": "Planned"
-      },
-      {
-        "title": "Custom webhooks (Zapier/Make)",
-        "status": "Planned"
-      },
-      {
-        "title": "Automated pitch deck generation",
-        "status": "Planned"
-      }
-    ],
-    "makerSurtitle": "06 / MAKER NOTE",
-    "makerTitle": "Built by a Solo Founder.",
-    "makerBody": "I built Helmdash because I was going crazy opening 15 tabs just to know if my startup was hitting a wall.",
-    "faqSurtitle": "07 / FAQ",
-    "faqTitle": "Frequently Asked Questions",
-    "faqItems": [
-      {
-        "q": "What is a cohort?",
-        "a": "A group of early-adopters with a lifetime locked price."
-      },
-      {
-        "q": "Where does my data go?",
-        "a": "It's encrypted and not used to train global models."
-      }
-    ],
-    "login": "Log in",
-    "cohort": "Cohort {name}",
-    "perMonth": "/ month",
-    "billedSemiannually": "Billed {amount} € every 6 months",
-    "footerCopyright": "© 2026 Helmdash · Built by a solo founder.",
-    "privacy": "Privacy",
-    "terms": "Terms"
+    },
+    "how_it_works": {
+      "section": "03 / HOW IT WORKS",
+      "title": "Operational before your next coffee.",
+      "steps": [
+        {
+          "title": "Plug in your tools",
+          "body": "Connect Stripe, import Notion and spreadsheets. Helmdash organizes everything into a unified model — finances, roadmap, hypotheses, CRM.",
+          "meta": "≈ 2 mins · nothing to rebuild"
+        },
+        {
+          "title": "The agent gets its bearings",
+          "body": "It reads your history, calculates metrics, spots pending hypotheses, and gives you an initial situation brief.",
+          "meta": "first brief in < 5 mins"
+        },
+        {
+          "title": "You steer, it executes",
+          "body": "You ask questions in plain english. It analyzes, delegates, and acts on your data — you approve with one click.",
+          "meta": "continuous · 24/7"
+        }
+      ]
+    },
+    "comparison": {
+      "section": "04 / POSITIONING",
+      "title": "Every tool does one thing well. None connect them.",
+      "desc": "We don't replace your editor or your LLM. We hold the big picture that none of them hold.",
+      "col1": "WHAT YOU DO",
+      "rows": [
+        {
+          "label": "Business overview",
+          "notion": "DIY build",
+          "gpt": "—",
+          "linear": "product only",
+          "helm": "native"
+        },
+        {
+          "label": "Financial / runway tracking",
+          "notion": "hacked sheet",
+          "gpt": "manual math",
+          "linear": "—",
+          "helm": "real-time"
+        },
+        {
+          "label": "Acts on your data",
+          "notion": "manual",
+          "gpt": "read-only",
+          "linear": "manual",
+          "helm": "agent writes"
+        },
+        {
+          "label": "Context memory",
+          "notion": "if you organize",
+          "gpt": "forgets",
+          "linear": "tickets",
+          "helm": "permanent"
+        },
+        {
+          "label": "Specialized sub-agents",
+          "notion": "—",
+          "gpt": "generic",
+          "linear": "—",
+          "helm": "10 roles"
+        },
+        {
+          "label": "Competitive intel",
+          "notion": "manual",
+          "gpt": "on demand",
+          "linear": "—",
+          "helm": "automatic"
+        }
+      ],
+      "footer": "Keep them all if you want. Helmdash imports their data and restores the thread."
+    },
+    "pricing": {
+      "section": "05 / PRICING",
+      "title": "One price. Written in black and white.",
+      "monthly": "Monthly",
+      "yearly": "Annually",
+      "discount": "−20%",
+      "desc": "No « contact us », no hidden tiers. You join a cohort, and keep your founder rate as long as you stay.",
+      "popular": "POPULAR",
+      "plans": [
+        {
+          "name": "Starter",
+          "tagline": "For solo founders launching their first product.",
+          "price": "€0",
+          "per": "/ month",
+          "note": "Free forever",
+          "features": [
+            "Full cockpit dashboard",
+            "Central AI agent (50 req/m)",
+            "Basic Finances, Roadmap, CRM",
+            "Stripe & Notion import",
+            "Limited context memory"
+          ],
+          "cta": "Start for free"
+        },
+        {
+          "name": "Growth",
+          "tagline": "The full deck: 10 sub-agents + automated intel.",
+          "price": "€16.50",
+          "per": "/ month",
+          "note": "or €199 / yr · −20%",
+          "features": [
+            "Everything in Starter, unlimited requests",
+            "10 specialized sub-agents",
+            "Automated competitive intel",
+            "Unlimited CRM + Lean Hypotheses",
+            "Team 3 seats · SSO · Audit logs",
+            "Unlimited runway simulations"
+          ],
+          "cta": "Join the cohort →"
+        },
+        {
+          "name": "Scale",
+          "tagline": "For growing startups and agencies.",
+          "price": "€50",
+          "per": "/ month",
+          "note": "or €599 / yr",
+          "features": [
+            "Everything in Growth, unlimited",
+            "Unlimited sub-agents",
+            "Custom MCP servers",
+            "On-premise possible",
+            "10 seats · 99.9% SLA",
+            "Dedicated success manager"
+          ],
+          "cta": "Contact us"
+        }
+      ]
+    },
+    "cta_final": {
+      "title": "Stop piecing things together. Take the helm.",
+      "desc": "Cohort #4 · 12 seats · starts Sept 15. Import tools in 2 mins, no card required.",
+      "btn_primary": "Reserve my seat →",
+      "btn_secondary": "Review product"
+    },
+    "footer": {
+      "desc": "The cockpit for the solo founder. One dashboard, one agent, zero extra tabs.",
+      "cols": [
+        {
+          "head": "PRODUCT",
+          "links": [
+            "The Cockpit",
+            "Helmsman Agent",
+            "Sub-agents",
+            "Integrations",
+            "Changelog"
+          ]
+        },
+        {
+          "head": "RESOURCES",
+          "links": [
+            "Solo Founder Guide",
+            "Lean Templates",
+            "Documentation",
+            "Roadmap"
+          ]
+        },
+        {
+          "head": "COHORT",
+          "links": [
+            "Next Cohort",
+            "Discord",
+            "Referrals",
+            "Contact"
+          ]
+        }
+      ],
+      "copyright": "© 2026 Helmdash · Made in Lyon by a solo founder, for solo founders.",
+      "legal": [
+        "Privacy",
+        "Terms",
+        "Status"
+      ]
+    }
+  },
+  "onboarding": {
+    "title": "Onboarding",
+    "questions": {
+      "q1": "In a few words, what's your startup idea?",
+      "q2": "Who are you and why are you building this?",
+      "q3": "Who is this for and what is their real problem?",
+      "q4": "What's the single biggest risk that could kill this project?",
+      "q5": "Where exactly do you want to be in 90 days?",
+      "q6": "How do you plan to make money with this?"
+    },
+    "inputPlaceholder": "Type your answer here...",
+    "skip": "Skip this question",
+    "submit": "Submit",
+    "recapTitle": "Here is what I understood.",
+    "recapSubtitle": "Review and adjust the foundations of your project.",
+    "finish": "Looks good, set up my dashboard",
+    "consentWeekly": "Send me a weekly brief",
+    "consentJournal": "Enable daily mood journal"
   }
 }

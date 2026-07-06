@@ -10,6 +10,7 @@ export interface MonthlyFinance {
 }
 
 export function getMonthlyEntries(entries: ExpenseItem[]): MonthlyFinance[] {
+    if (!entries || !Array.isArray(entries)) return [];
     const monthlyMap: Record<string, MonthlyFinance> = {};
 
     entries.forEach(entry => {

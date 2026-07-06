@@ -10,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
+import { useFounderStore } from '@/store/founder-store';
+
 const LOCALES = [
   { code: 'en', label: 'English' },
   { code: 'fr', label: 'Français' },
@@ -17,9 +19,13 @@ const LOCALES = [
 
 export function LanguageSwitcher() {
   const router = useRouter();
+  const setLanguage = useFounderStore(s => s.setLanguage);
 
   const switchLocale = async (locale: string) => {
     document.cookie = `NEXT_LOCALE=${locale};path=/;max-age=${60 * 60 * 24 * 365}`;
+    
+    // Synchronize Zustand store for instantaneous client-side UI updates
+    setLanguage(locale as 'fr' | 'en');
 
     try {
       await fetch('/api/settings/profile', {

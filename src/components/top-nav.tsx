@@ -32,13 +32,14 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { LanguageSwitcher } from '@/components/language-switcher';
+// ... existing imports ...
 import { ModeToggle } from '@/components/mode-toggle';
 
 export function TopNav() {
     const pathname = usePathname();
     const router = useRouter();
     const language = useFounderStore(s => s.language);
-    const setLanguage = useFounderStore(s => s.setLanguage);
     const [user, setUser] = useState<any>(null);
     const supabase = createClient();
     const t = translations[language].nav;
@@ -75,10 +76,6 @@ export function TopNav() {
         { href: '/crm', label: t.crm, icon: Users },
         { href: '/journal', label: t.journal, icon: BookOpen },
     ];
-
-    const toggleLanguage = () => {
-        setLanguage(language === 'fr' ? 'en' : 'fr');
-    };
 
     return (
         <header className="h-[50px] border-b border-border flex items-center px-4 bg-background/80 backdrop-blur-md sticky top-0 z-50 justify-between">
@@ -144,15 +141,7 @@ export function TopNav() {
 
             <div className="flex items-center gap-2 ml-2">
                 <ModeToggle />
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={toggleLanguage}
-                    className="h-8 px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
-                >
-                    <Languages className="w-3.5 h-3.5 mr-1.5" />
-                    {language.toUpperCase()}
-                </Button>
+                <LanguageSwitcher />
             </div>
         </header>
     );

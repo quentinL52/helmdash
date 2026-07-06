@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { CohortBadge } from '@/components/marketing/cohort-badge';
-import { COHORT_CONFIG } from '@/lib/billing/cohort-config';
+import { PRICING_CONFIG } from '@/lib/billing/pricing-config';
 
 const HelmIcon = ({ size = 24, color = 'currentColor' }: { size?: number; color?: string }) => (
   <svg width={size} height={size} viewBox="0 0 100 100" fill="none" style={{ color }}>
@@ -31,8 +31,7 @@ const HelmIcon = ({ size = 24, color = 'currentColor' }: { size?: number; color?
 
 export default function LandingPage() {
   const t = useTranslations('landing');
-  const [period, setPeriod] = useState<'yearly' | 'semi_annual' | 'monthly'>('semi_annual');
-  const currentCohort = 'early'; // Assume 'early' for the MVP, could be fetched dynamically
+  const [period, setPeriod] = useState<'yearly' | 'semi_annual' | 'monthly'>('monthly');
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary selection:text-primary-foreground" style={{ fontFamily: '"IBM Plex Sans", system-ui, sans-serif' }}>
@@ -148,16 +147,33 @@ export default function LandingPage() {
           <p className="text-base text-muted-foreground max-w-[600px] mb-10">{t('pricingSubtitle')}</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-3xl">
-            <div className="bg-primary text-primary-foreground text-primary-foreground border-[1.5px] border-primary rounded-2xl p-7 relative">
+            {/* BYOK Core */}
+            <div className="bg-background text-foreground border-[1.5px] border-border rounded-2xl p-7 relative">
               <div className="flex items-center gap-2 mb-1.5">
-                <h3 className="text-base font-semibold tracking-[-0.3px] font-mono">{t('cohort', { name: currentCohort.toUpperCase() })}</h3>
+                <h3 className="text-base font-semibold tracking-[-0.3px] font-mono">{PRICING_CONFIG.plans.core.name}</h3>
               </div>
               <div className="flex items-baseline gap-1.5 mt-5 mb-1">
-                <span className="text-[40px] font-semibold tracking-[-2px] leading-none font-mono">{COHORT_CONFIG[currentCohort].prices.semi_annual?.amount ? (COHORT_CONFIG[currentCohort].prices.semi_annual.amount / 100 / 6).toFixed(0) : 0} €</span>
+                <span className="text-[40px] font-semibold tracking-[-2px] leading-none font-mono">{(PRICING_CONFIG.plans.core.prices.monthly.amount / 100).toFixed(0)} €</span>
                 <span className="text-sm text-muted-foreground font-mono"> {t('perMonth')}</span>
               </div>
-              <div className="text-[11.5px] text-muted-foreground mb-5 font-mono">{t('billedSemiannually', { amount: COHORT_CONFIG[currentCohort].prices.semi_annual?.amount ? (COHORT_CONFIG[currentCohort].prices.semi_annual.amount / 100).toFixed(0) : 0 })}</div>
-              <a href="/auth" className="mt-8 block text-center text-sm font-semibold py-3 rounded-lg bg-primary text-foreground transition-opacity hover:opacity-90 font-mono">{t('pricingCtaPrimary')}</a>
+              <div className="text-[11.5px] text-muted-foreground mb-5 font-mono">{PRICING_CONFIG.plans.core.features[0]}</div>
+              <a href="/auth" className="mt-8 block text-center text-sm font-semibold py-3 rounded-lg bg-secondary text-foreground transition-opacity hover:opacity-90 font-mono">{t('pricingCtaPrimary')}</a>
+            </div>
+            
+            {/* Complete */}
+            <div className="bg-primary text-primary-foreground text-primary-foreground border-[1.5px] border-primary rounded-2xl p-7 relative">
+              <div className="absolute top-0 right-8 -translate-y-1/2">
+                 <span className="bg-background text-foreground text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-border">Founder Deal: {(PRICING_CONFIG.founderDeal.price.amount / 100).toFixed(0)}€/mo</span>
+              </div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <h3 className="text-base font-semibold tracking-[-0.3px] font-mono">{PRICING_CONFIG.plans.complete.name}</h3>
+              </div>
+              <div className="flex items-baseline gap-1.5 mt-5 mb-1">
+                <span className="text-[40px] font-semibold tracking-[-2px] leading-none font-mono">{(PRICING_CONFIG.plans.complete.prices.monthly.amount / 100).toFixed(0)} €</span>
+                <span className="text-sm text-muted-foreground font-mono"> {t('perMonth')}</span>
+              </div>
+              <div className="text-[11.5px] text-primary-foreground/80 mb-5 font-mono">{PRICING_CONFIG.plans.complete.features[0]}</div>
+              <a href="/auth" className="mt-8 block text-center text-sm font-semibold py-3 rounded-lg bg-background text-foreground transition-opacity hover:opacity-90 font-mono">{t('pricingCtaPrimary')}</a>
             </div>
           </div>
         </div>
