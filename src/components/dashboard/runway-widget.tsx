@@ -11,15 +11,13 @@ export function RunwayWidget() {
 
     const metrics = useMemo(() => {
         // Simple calculation similar to chart
-        const sortedEntries = [...getMonthlyEntries(finance.entries)].sort((a, b) =>
-            b.month.localeCompare(a.month)
-        );
+        const monthlyEntries = getMonthlyEntries(finance.entries);
 
         let monthlyBurn = 0;
         let trend = 'stable';
 
-        if (sortedEntries.length > 0) {
-            const lastMonth = sortedEntries[0];
+        if (monthlyEntries.length > 0) {
+            const lastMonth = monthlyEntries[0];
             
             const recurringExpenses = (lastMonth.expenses || [])
                 .reduce((sum, e) => {
