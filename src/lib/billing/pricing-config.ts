@@ -1,13 +1,11 @@
 export type PlanType = 'core' | 'complete';
-export type Period = 'monthly' | 'yearly';
+export type Period = 'monthly';
 export type PlanStatus = 'trialing' | 'active' | 'readonly';
 
 export type StripePriceKey =
   | 'founder_monthly'
   | 'core_monthly'
-  | 'complete_monthly'
-  | 'core_yearly'
-  | 'complete_yearly';
+  | 'complete_monthly';
 
 export interface PlanLimitConfig {
   aiActions: number; // 0 or Infinity for unlimited
@@ -25,7 +23,6 @@ export const PRICING_CONFIG = {
       name: 'BYOK (Core)',
       prices: {
         monthly: { key: 'core_monthly', amount: 2500 },
-        yearly: { key: 'core_yearly', amount: 25000 }, // Equivalent to 10 months
       },
       features: [
         'Bring your own key',
@@ -40,7 +37,6 @@ export const PRICING_CONFIG = {
       name: 'Complete',
       prices: {
         monthly: { key: 'complete_monthly', amount: 3500 }, // Promo: 35€ instead of 45€ for 6 months
-        yearly: { key: 'complete_yearly', amount: 35000 },
       },
       features: [
         'Mistral Small included',

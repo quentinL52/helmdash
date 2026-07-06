@@ -18,8 +18,6 @@ export const STRIPE_PRICES: Record<StripePriceKey, string> = {
   founder_monthly: process.env.STRIPE_PRICE_FOUNDER_MONTHLY ?? '',
   core_monthly: process.env.STRIPE_PRICE_CORE_MONTHLY ?? '',
   complete_monthly: process.env.STRIPE_PRICE_COMPLETE_MONTHLY ?? '',
-  core_yearly: process.env.STRIPE_PRICE_CORE_YEARLY ?? '',
-  complete_yearly: process.env.STRIPE_PRICE_COMPLETE_YEARLY ?? '',
 };
 
 export function resolvePrice(

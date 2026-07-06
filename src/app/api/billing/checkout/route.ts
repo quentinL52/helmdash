@@ -8,7 +8,7 @@ import { PRICING_CONFIG, type Period, type PlanType } from '@/lib/billing/pricin
 
 const bodySchema = z.object({
   plan: z.enum(['core', 'complete', 'founder']),
-  period: z.enum(['monthly', 'yearly']),
+  period: z.enum(['monthly']),
 });
 
 async function handler(req: NextRequest, { userId }: { userId: string }) {

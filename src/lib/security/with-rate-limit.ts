@@ -53,8 +53,8 @@ function memoryRateLimit(key: string, rpm: number): RateLimitResult {
 
 // ── Upstash Redis (production) ──────────────────────────────
 async function upstashRateLimit(key: string, rpm: number): Promise<RateLimitResult> {
-  const url = process.env.UPSTASH_REDIS_URL;
-  const token = process.env.UPSTASH_REDIS_TOKEN;
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
   if (!url || !token) {
     console.warn('[withRateLimit] Upstash not configured, using memory store');

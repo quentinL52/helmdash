@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
       // Envoi de l'email de confirmation via Resend
       if (process.env.RESEND_API_KEY) {
         await resend.emails.send({
-          from: 'Helmdash <hello@helmdash.com>',
+          from: 'Helmdash <hello@helmdash.app>',
           to: email,
           subject: 'Confirmez votre place sur la liste d\'attente Helmdash',
           html: `

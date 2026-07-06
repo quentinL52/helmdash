@@ -11,6 +11,7 @@ import { z } from 'zod';
 const envSchema = z.object({
   // ── Database ──────────────────────────────────────────────
   DATABASE_URL: z.string().url(),
+  DIRECT_URL: z.string().url().optional(),
 
   // ── Supabase ──────────────────────────────────────────────
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
@@ -29,19 +30,16 @@ const envSchema = z.object({
   MASTER_ENCRYPTION_KEY: z.string().min(1, 'MASTER_ENCRYPTION_KEY is required for API key encryption at rest'),
 
   // ── Rate Limiting ─────────────────────────────────────────
-  UPSTASH_REDIS_URL: z.string().url().optional(),
-  REDIS_URL: z.string().url().optional(),
+  UPSTASH_REDIS_REST_URL: z.string().url().optional(),
+  UPSTASH_REDIS_REST_TOKEN: z.string().min(1).optional(),
 
   // ── Stripe ────────────────────────────────────────────────
   STRIPE_SECRET_KEY: z.string().min(1),
   STRIPE_WEBHOOK_SECRET: z.string().min(1),
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().min(1),
-  STRIPE_PRICE_FOUNDERS_6M: z.string().optional(),
-  STRIPE_PRICE_EARLY_6M: z.string().optional(),
-  STRIPE_PRICE_EARLY_YEARLY: z.string().optional(),
-  STRIPE_PRICE_FULL_MONTHLY: z.string().optional(),
-  STRIPE_PRICE_FULL_6M: z.string().optional(),
-  STRIPE_PRICE_FULL_YEARLY: z.string().optional(),
+  STRIPE_PRICE_FOUNDER_MONTHLY: z.string().optional(),
+  STRIPE_PRICE_CORE_MONTHLY: z.string().optional(),
+  STRIPE_PRICE_COMPLETE_MONTHLY: z.string().optional(),
 
   // ── Composio ──────────────────────────────────────────────
   COMPOSIO_API_KEY: z.string().optional(),
@@ -50,10 +48,22 @@ const envSchema = z.object({
   // ── Email ─────────────────────────────────────────────────
   RESEND_API_KEY: z.string().optional(),
 
+  // ── Observability ─────────────────────────────────────────
+  SENTRY_DSN: z.string().url().optional(),
+  NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
+  POSTHOG_KEY: z.string().optional(),
+  NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
+
   // ── App Config ────────────────────────────────────────────
   NEXT_PUBLIC_APP_URL: z.string().url().default('http://localhost:3000'),
   CRON_SECRET: z.string().min(1, 'CRON_SECRET is required for cron job security'),
   HERMES_API_KEY: z.string().optional(),
+
+  // ── Feature Flags ─────────────────────────────────────────
+  ENABLE_SUB_AGENTS: z.string().optional(),
+  ENABLE_STRIPE_SYNC: z.string().optional(),
+  ENABLE_WEB_SEARCH: z.string().optional(),
+  ENABLE_MEMORY_GRAPH: z.string().optional(),
 
   // ── Environment ───────────────────────────────────────────
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
@@ -89,5 +99,5 @@ export const env = parseEnv();
  * Helper to check if at least one AI provider key is configured.
  */
 export function hasAiProvider(): boolean {
-  return !!(env.OPENAI_API_KEY || env.ANTHROPIC_API_KEY || env.GOOGLE_AI_API_KEY || env.MISTRAL_API_KEY || env.AI_API_KEY);
+  return !!(env.OPENAI_API_KEY || env.ANTHROPIC_API_KEY || env.GOOGLE_AI_API_KEY || env.GEMINI_API_KEY || env.MISTRAL_API_KEY || env.AI_API_KEY);
 }
