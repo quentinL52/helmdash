@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { WaitlistForm } from '@/components/waitlist-form';
 
 export default function LandingPage() {
   const [period, setPeriod] = useState<'year' | 'month'>('month');
@@ -84,7 +85,8 @@ export default function LandingPage() {
       <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(233,228,216,.82)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(14,27,46,.1)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "14px 32px", display: "flex", alignItems: "center", gap: 20 }}>
           <a href="#top" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <img src="/helmdash-lockup-on-cream.png" alt="Helmdash" style={{ height: 26, width: "auto" }} />
+            <img src="/helmdash-mark-navy-512.png" alt="Helmdash Icon" style={{ width: 26, height: 26 }} />
+            <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontWeight: 600, fontSize: 18, letterSpacing: "-0.5px" }}>Helmdash</span>
           </a>
           <nav style={{ fontFamily: '"IBM Plex Mono", monospace', display: "flex", gap: 26, marginLeft: 24, fontSize: 13, color: "#4a5666", fontWeight: 500 }}>
             <a href="#probleme" className="hover:text-[#0E1B2E] transition-colors">{t('nav.problem')}</a>
@@ -93,19 +95,19 @@ export default function LandingPage() {
             <a href="#pricing" className="hover:text-[#0E1B2E] transition-colors">{t('nav.pricing')}</a>
           </nav>
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 16 }}>
-            <LanguageSwitcher />
-            <Link href="/auth" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 13, fontWeight: 500, color: "#4a5666" }}>{t('nav.login')}</Link>
-            <a href="#pricing" className="hover:-translate-y-[1px] hover:shadow-[0_6px_16px_rgba(14,27,46,0.22)] transition-all" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 13, fontWeight: 600, background: "#0E1B2E", color: "#F5F1E8", padding: "9px 16px", borderRadius: 8 }}>{t('nav.join')}</a>
+            <LanguageSwitcher iconColor="#0E1B2E" />
+            {/* <Link href="/auth" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 13, fontWeight: 500, color: "#4a5666" }}>{t('nav.login')}</Link> */}
+            <a href="#top" className="hover:-translate-y-[1px] hover:shadow-[0_6px_16px_rgba(14,27,46,0.22)] transition-all" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 13, fontWeight: 600, background: "#0E1B2E", color: "#F5F1E8", padding: "9px 16px", borderRadius: 8 }}>Join the waitlist</a>
           </div>
         </div>
       </header>
 
       {/* ===== HERO ===== */}
       <section id="top" style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 32px 40px", position: "relative" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, border: "1px solid rgba(14,27,46,.18)", borderRadius: 100, padding: "5px 12px 5px 8px", marginBottom: 32 }}>
+        {/* <div style={{ display: "inline-flex", alignItems: "center", gap: 8, border: "1px solid rgba(14,27,46,.18)", borderRadius: 100, padding: "5px 12px 5px 8px", marginBottom: 32 }}>
           <span style={{ width: 7, height: 7, borderRadius: "50%", background: accent, boxShadow: "0 0 0 3px rgba(240,82,46,.18)" }}></span>
           <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 12, fontWeight: 500, letterSpacing: ".2px", color: "#3a4656" }}>{t('hero.badge')}</span>
-        </div>
+        </div> */}
 
         <h1 style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: "clamp(38px,6.4vw,82px)", fontWeight: 600, letterSpacing: "-2.5px", lineHeight: 1.02, margin: "0 0 26px", maxWidth: 960 }}>
           {t('hero.title1')}<br />{t('hero.title2')}<br /><span style={{ color: "#8a8474" }}>{t('hero.title3')}</span>
@@ -115,13 +117,10 @@ export default function LandingPage() {
           {t('hero.desc')}
         </p>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center", marginBottom: 16 }}>
-          <a href="#pricing" className="hover:-translate-y-[2px] hover:shadow-[0_10px_28px_rgba(240,82,46,0.32)] transition-all" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 15, fontWeight: 600, background: accent, color: "#0E1B2E", padding: "15px 26px", borderRadius: 10 }}>{t('hero.cta_main')}</a>
-          <a href="#solution" className="hover:bg-[rgba(14,27,46,0.05)] transition-colors" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 15, fontWeight: 600, color: "#0E1B2E", padding: "15px 22px", borderRadius: 10, border: "1px solid rgba(14,27,46,.22)" }}>{t('hero.cta_sec')}</a>
-        </div>
+        <div style={{ marginBottom: 16 }}><WaitlistForm /></div>
         <p style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 12.5, color: "#8a8474", margin: 0 }}>{t('hero.disclaimer')}</p>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 56, paddingTop: 22, borderTop: "1px solid rgba(14,27,46,.12)" }}>
+        {/* <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 56, paddingTop: 22, borderTop: "1px solid rgba(14,27,46,.12)" }}>
           <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 11, letterSpacing: "1.5px", color: "#8a8474", textTransform: "uppercase" }}>{t('hero.social')}</span>
           <div style={{ flex: 1, height: 1, background: "rgba(14,27,46,.08)" }}></div>
           <div style={{ fontFamily: '"IBM Plex Mono", monospace', display: "flex", gap: 22, fontSize: 13, fontWeight: 600, color: "#3a4656", flexWrap: "wrap" }}>
@@ -130,7 +129,7 @@ export default function LandingPage() {
             <span>{t('hero.audiences.2')}</span><span>·</span>
             <span>{t('hero.audiences.3')}</span>
           </div>
-        </div>
+        </div> */}
       </section>
 
       {/* ===== PROBLÈME ===== */}
@@ -396,8 +395,7 @@ export default function LandingPage() {
             <h2 style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: "clamp(30px,4vw,52px)", fontWeight: 600, letterSpacing: "-2px", lineHeight: 1.05, margin: "0 0 20px" }}>{t('cta_final.title')}</h2>
             <p style={{ fontSize: 18, color: "#a9b2c0", margin: "0 0 34px" }}>{t('cta_final.desc')}</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
-              <a href="#" className="hover:-translate-y-[2px] hover:shadow-[0_12px_30px_rgba(240,82,46,.35)] transition-all" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 15, fontWeight: 600, background: accent, color: "#0E1B2E", padding: "15px 28px", borderRadius: 10 }}>{t('cta_final.btn_primary')}</a>
-              <a href="#solution" className="hover:bg-[rgba(234,230,220,0.06)] transition-colors" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 15, fontWeight: 600, color: "#EAE6DC", padding: "15px 24px", borderRadius: 10, border: "1px solid rgba(234,230,220,.24)" }}>{t('cta_final.btn_secondary')}</a>
+              <a href="#top" className="hover:-translate-y-[2px] hover:shadow-[0_12px_30px_rgba(240,82,46,.35)] transition-all" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 15, fontWeight: 600, background: accent, color: "#0E1B2E", padding: "15px 28px", borderRadius: 10 }}>Join the waitlist</a>
             </div>
           </div>
         </div>
@@ -409,7 +407,8 @@ export default function LandingPage() {
           <div style={{ display: "flex", flexWrap: "wrap", gap: 40, justifyContent: "space-between", alignItems: "flex-start", paddingBottom: 36, borderBottom: "1px solid rgba(234,230,220,.08)" }}>
             <div style={{ maxWidth: 300 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                <img src="/helmdash-lockup-on-navy.png" alt="Helmdash" style={{ height: 24, width: "auto" }} />
+                <img src="/helmdash-mark-cream-512.png" alt="Helmdash Icon" style={{ width: 24, height: 24 }} />
+                <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontWeight: 600, fontSize: 17, color: "#EAE6DC", letterSpacing: "-0.5px" }}>Helmdash</span>
               </div>
               <p style={{ fontSize: 13.5, lineHeight: 1.55, margin: 0, color: "#6e7b90" }}>{t('footer.desc')}</p>
             </div>

@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { StoreSync } from '@/components/store-sync';
+import { CookieBanner } from '@/components/cookie-banner';
 import "./globals.css";
 import type { Metadata } from 'next';
 import { IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
@@ -46,6 +47,7 @@ export default async function RootLayout({
           >
             <StoreSync />
             {children}
+            <CookieBanner />
             <Toaster />
           </ThemeProvider>
         </NextIntlClientProvider>

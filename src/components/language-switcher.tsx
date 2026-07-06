@@ -17,7 +17,7 @@ const LOCALES = [
   { code: 'fr', label: 'Français' },
 ] as const;
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ iconColor }: { iconColor?: string }) {
   const router = useRouter();
   const setLanguage = useFounderStore(s => s.setLanguage);
 
@@ -44,7 +44,7 @@ export function LanguageSwitcher() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-8 w-8">
-          <Globe className="h-4 w-4" />
+          <Globe className="h-4 w-4" style={{ color: iconColor }} />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

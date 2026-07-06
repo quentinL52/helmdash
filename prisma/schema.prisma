@@ -764,3 +764,10 @@ model Decision {
   @@index([userId, status])
   @@map("decisions")
 }
+
+model Waitlist {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
+  source    String   @default("landing")
+  createdAt DateTime @default(now()) @map("created_at")
+}

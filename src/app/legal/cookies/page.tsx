@@ -1,31 +1,19 @@
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Politique des Cookies — Helmdash',
-  description: 'Gestion des cookies sur Helmdash.',
-};
-
 export default function CookiesPage() {
   return (
-    <main className="max-w-3xl mx-auto px-6 py-16 prose prose-sm dark:prose-invert">
-      <h1>Politique des Cookies</h1>
-      <p className="text-muted-foreground text-sm">Dernière mise à jour : juillet 2026</p>
+    <div style={{ maxWidth: 800, margin: "0 auto", padding: "60px 20px", fontFamily: '"IBM Plex Sans", sans-serif', color: "#0E1B2E" }}>
+      <h1 style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 32, marginBottom: 32 }}>Politique des Cookies</h1>
+      
+      <p style={{ marginBottom: 16 }}>Dernière mise à jour : 15 Septembre 2026</p>
+      
+      <h2 style={{ fontSize: 24, marginTop: 32, marginBottom: 16 }}>1. Cookies Strictement Nécessaires</h2>
+      <p style={{ marginBottom: 16 }}>
+        Nous utilisons des cookies indispensables au fonctionnement de la plateforme (Maintien de la session via Supabase, préférences de langue). Ces cookies ne peuvent pas être désactivés.
+      </p>
 
-      <h2>Cookies utilisés</h2>
-      <p>Helmdash utilise <strong>uniquement</strong> les cookies techniques suivants :</p>
-      <table>
-        <thead>
-          <tr><th>Cookie</th><th>Durée</th><th>Finalité</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>sb-*-auth-token</code></td><td>Session</td><td>Authentification Supabase</td></tr>
-          <tr><td><code>__session</code></td><td>Session</td><td>Jeton de session</td></tr>
-        </tbody>
-      </table>
-      <p><strong>Aucun cookie publicitaire, analytics ou tracking tiers</strong> n&apos;est utilisé. Les analytics PostHog sont cookieless (session uniquement, en mémoire).</p>
-
-      <h2>Gestion</h2>
-      <p>Vous pouvez supprimer ces cookies à tout moment via les paramètres de votre navigateur.</p>
-    </main>
+      <h2 style={{ fontSize: 24, marginTop: 32, marginBottom: 16 }}>2. Cookies Analytiques</h2>
+      <p style={{ marginBottom: 16 }}>
+        Nous ne collectons aucune donnée analytique tierce (pas de Google Analytics, pas de Meta Pixel). Votre navigation sur le poste de pilotage reste privée. L'observabilité interne se limite aux actions de l'agent.
+      </p>
+    </div>
   );
 }

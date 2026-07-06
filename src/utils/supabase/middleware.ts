@@ -74,6 +74,11 @@ export async function updateSession(request: NextRequest) {
             return supabaseResponse;
         }
 
+        // Exception pour la route waitlist (publique)
+        if (request.nextUrl.pathname === '/api/waitlist') {
+            return supabaseResponse;
+        }
+
         // Refus d'accès si aucune méthode d'authentification n'est valide
         return NextResponse.json({ error: 'Unauthorized access' }, { status: 401, headers: corsHeaders });
     }

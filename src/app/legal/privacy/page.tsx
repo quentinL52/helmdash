@@ -1,45 +1,31 @@
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Politique de Confidentialité — Helmdash',
-  description: 'Comment Helmdash traite vos données personnelles.',
-};
-
 export default function PrivacyPage() {
   return (
-    <main className="max-w-3xl mx-auto px-6 py-16 prose prose-sm dark:prose-invert">
-      <h1>Politique de Confidentialité</h1>
-      <p className="text-muted-foreground text-sm">Dernière mise à jour : juillet 2026</p>
+    <div style={{ maxWidth: 800, margin: "0 auto", padding: "60px 20px", fontFamily: '"IBM Plex Sans", sans-serif', color: "#0E1B2E" }}>
+      <h1 style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 32, marginBottom: 32 }}>Politique de Confidentialité</h1>
+      
+      <p style={{ marginBottom: 16 }}>Dernière mise à jour : 15 Septembre 2026</p>
+      
+      <h2 style={{ fontSize: 24, marginTop: 32, marginBottom: 16 }}>1. Éditeur du Service</h2>
+      <p style={{ marginBottom: 16 }}>
+        Le service Helmdash est édité par un Solo Founder basé à Lyon, France.
+        <br />Contact : [EMAIL_CONTACT]
+      </p>
 
-      <h2>1. Données collectées</h2>
-      <p>Helmdash collecte uniquement les données nécessaires au fonctionnement du service :</p>
-      <ul>
-        <li><strong>Compte</strong> : email, nom (via Supabase Auth)</li>
-        <li><strong>Données métier</strong> : finances, hypothèses, contacts, contenu — stockées dans Supabase (UE)</li>
-        <li><strong>Mémoire vectorielle</strong> : embeddings et notes pour la mémoire de l&apos;agent (pgvector, UE)</li>
-        <li><strong>Logs d&apos;audit</strong> : actions clés (hashées, immuables) pour la sécurité</li>
-      </ul>
+      <h2 style={{ fontSize: 24, marginTop: 32, marginBottom: 16 }}>2. Hébergement et Données</h2>
+      <p style={{ marginBottom: 16 }}>
+        Les données sont hébergées par Supabase (AWS) sur des serveurs situés en Union Européenne (Irlande/Francfort).
+        Vos clés d'API (OpenAI, Anthropic, Mistral) sont chiffrées en base de données et ne sont jamais partagées à des tiers.
+      </p>
 
-      <h2>2. Absence de cookies</h2>
-      <p>Helmdash n&apos;utilise <strong>aucun cookie</strong> publicitaire ou de tracking. Les sessions utilisent les cookies techniques strictement nécessaires à l&apos;authentification (Supabase Auth).</p>
+      <h2 style={{ fontSize: 24, marginTop: 32, marginBottom: 16 }}>3. Utilisation de l'Intelligence Artificielle</h2>
+      <p style={{ marginBottom: 16 }}>
+        Helmdash utilise des modèles d'IA tiers. Aucune de vos données privées n'est utilisée pour entraîner ces modèles. L'utilisation de modèles par l'API garantit la confidentialité selon les conditions d'utilisation strictes (Zéro rétention d'entraînement) de nos fournisseurs.
+      </p>
 
-      <h2>3. Sous-traitants</h2>
-      <ul>
-        <li><strong>Supabase</strong> (UE) — Base de données, Auth, Storage</li>
-        <li><strong>Vercel</strong> (UE) — Hébergement</li>
-        <li><strong>OpenAI / Anthropic</strong> (US) — Appels IA (anonymisés, sans données identifiantes)</li>
-        <li><strong>Stripe</strong> (US) — Paiements (aucune donnée bancaire stockée chez Helmdash)</li>
-      </ul>
-
-      <h2>4. Vos droits</h2>
-      <p>Conformément au RGPD, vous pouvez à tout moment :</p>
-      <ul>
-        <li>Accéder à vos données</li>
-        <li>Les exporter (JSON)</li>
-        <li>Les rectifier</li>
-        <li>Les supprimer (suppression complète du compte)</li>
-      </ul>
-      <p>Contact : <a href="mailto:privacy@helmdash.app">privacy@helmdash.app</a></p>
-    </main>
+      <h2 style={{ fontSize: 24, marginTop: 32, marginBottom: 16 }}>4. Droits des utilisateurs (RGPD)</h2>
+      <p style={{ marginBottom: 16 }}>
+        Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement (droit à l'oubli), et de portabilité de vos données. Vous pouvez exercer ces droits en nous contactant directement ou via l'interface de l'application (suppression du compte en 1 clic).
+      </p>
+    </div>
   );
 }
