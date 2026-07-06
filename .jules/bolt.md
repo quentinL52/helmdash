@@ -1,0 +1,3 @@
+## 2024-07-06 - Removing redundant sorts and caching results
+**Learning:** Functions that parse and aggregate data and already return sorted data (like `getMonthlyEntries` in `finance-utils.ts`) shouldn't have their results spread and redundantly sorted (`[...getMonthlyEntries()].sort(...)`). This causes unnecessary O(N log N) operations, especially in loops or `useMemo` hooks.
+**Action:** Always check the return values and guarantees of utility functions. If a function sorts data, use its output directly. Cache the results of these functions in local variables within `useMemo` or component scope to prevent evaluating them multiple times per render cycle.

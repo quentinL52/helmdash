@@ -66,8 +66,10 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
     const formT = translations[language]?.finance?.form;
 
     const data = useMemo(() => {
+        const monthlyEntries = getMonthlyEntries(finance.entries);
+
         // 1. Flatten all transactions with dates
-        const baseTransactions = getMonthlyEntries(finance.entries).flatMap(month => {
+        const baseTransactions = monthlyEntries.flatMap(month => {
             const expenses = (month.expenses || []).map(e => ({
                 date: new Date(e.date || `${month.month}-01`),
                 amount: e.amount,
@@ -88,8 +90,7 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
         const currentMonthStr = format(today, 'yyyy-MM');
 
         const projectedTransactions = [...baseTransactions];
-        const sortedEntries = [...getMonthlyEntries(finance.entries)].sort((a, b) => b.month.localeCompare(a.month));
-        const latestEntry = sortedEntries.find(e => e.month === currentMonthStr) || sortedEntries[0];
+        const latestEntry = monthlyEntries.find(e => e.month === currentMonthStr) || monthlyEntries[0];
 
         if (latestEntry) {
             const futureMonths = eachMonthOfInterval({ start: addMonths(today, 1), end });
@@ -217,8 +218,8 @@ export function RunwayChart({ timeframe, setTimeframe }: RunwayChartProps) {
         const currentMonthStr = format(today, 'yyyy-MM');
         
         // Find current month's entry, or fallback to the most recent month
-        const sortedEntries = [...getMonthlyEntries(finance.entries)].sort((a, b) => b.month.localeCompare(a.month));
-        const latestEntry = sortedEntries.find(e => e.month === currentMonthStr) || sortedEntries[0];
+        const monthlyEntries = getMonthlyEntries(finance.entries);
+        const latestEntry = monthlyEntries.find(e => e.month === currentMonthStr) || monthlyEntries[0];
 
         if (!latestEntry) return '∞';
 
