@@ -1,0 +1,4 @@
+## 2024-07-28 - [Missing Authorization on Cron Endpoint]
+**Vulnerability:** The `/api/cron/process-scheduled` endpoint in Next.js lacked an explicit `req: Request` parameter and did not check the `Authorization` header, even though it accessed `process.env.CRON_SECRET` and performed sensitive data deletion. This allowed any unauthenticated user to trigger the cron job, causing potential permanent data deletion and excessive task execution.
+**Learning:** Next.js Route Handlers require explicitly defining the `req: Request` parameter to access headers and perform authentication checks. Simply having a comment about a secret or reading it from `process.env` does not enforce it.
+**Prevention:** Always verify incoming headers (like `Authorization`) against secrets in Next.js API routes handling cron jobs, and ensure the request parameter is present to access those headers. Ensure endpoints fail securely if configuration variables are missing.
