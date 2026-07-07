@@ -1,14 +1,22 @@
 {
   "seo": {
     "title": "Helmdash — The solo founder cockpit",
-    "description": "The solo founder's cockpit. One dashboard, one agent, zero extra tabs.",
+    "description": "Helmdash is the AI-powered cockpit for solo founders. Unified dashboard for finances, roadmap, hypotheses & competitive intel. Join the waitlist.",
     "faq": {
       "q1": "What is Helmdash?",
       "a1": "Helmdash is a unified dashboard designed for solo founders. It brings together your finances, hypotheses, roadmap, and competitive intelligence into a single interface.",
       "q2": "Does Helmdash use AI?",
       "a2": "Yes, Helmdash features an integrated AI agent that not only reads your data but can also execute tasks like updating hypotheses or creating roadmap items based on your instructions.",
       "q3": "How is Helmdash different from Notion or Excel?",
-      "a3": "Unlike generic tools, Helmdash is specifically built for indie hackers and solo founders, providing structured frameworks, proactive AI insights, and zero context switching."
+      "a3": "Unlike generic tools, Helmdash is specifically built for indie hackers and solo founders, providing structured frameworks, proactive AI insights, and zero context switching.",
+      "q4": "Is Helmdash free?",
+      "a4": "We offer a 14-day free trial. After that, you can choose between a BYOK (Bring Your Own Key) plan or a Complete plan with AI included.",
+      "q5": "What integrations does Helmdash support?",
+      "a5": "Helmdash currently supports easy imports from Notion and CSV. Stripe integration is coming soon to automatically sync your MRR and financial data.",
+      "q6": "Can I use my own API key?",
+      "a6": "Yes, our BYOK plan allows you to plug in your own OpenAI or Mistral API key, so you only pay for what you use without any markup.",
+      "q7": "Is my data private?",
+      "a7": "Absolutely. We use secure servers in the EU and do not train AI models on your private data. Your API keys are encrypted and never shared."
     }
   },
   "common": {

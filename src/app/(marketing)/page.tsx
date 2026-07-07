@@ -2,11 +2,18 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { WaitlistForm } from '@/components/waitlist-form';
 import { Check, ChevronDown } from 'lucide-react';
 import { JsonLd } from '@/components/seo/JsonLd';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default function LandingPage() {
   const [period, setPeriod] = useState<'year' | 'month'>('month');
@@ -127,6 +134,38 @@ export default function LandingPage() {
           '@type': 'Answer',
           text: seoT('faq.a3')
         }
+      },
+      {
+        '@type': 'Question',
+        name: seoT('faq.q4'),
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: seoT('faq.a4')
+        }
+      },
+      {
+        '@type': 'Question',
+        name: seoT('faq.q5'),
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: seoT('faq.a5')
+        }
+      },
+      {
+        '@type': 'Question',
+        name: seoT('faq.q6'),
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: seoT('faq.a6')
+        }
+      },
+      {
+        '@type': 'Question',
+        name: seoT('faq.q7'),
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: seoT('faq.a7')
+        }
       }
     ]
   };
@@ -140,13 +179,13 @@ export default function LandingPage() {
       <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(233,228,216,.82)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(14,27,46,.1)" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "14px 32px", display: "flex", alignItems: "center", gap: 20 }}>
           <a href="#top" style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <img src="/helmdash-mark-navy-512.png" alt="Helmdash Icon" style={{ width: 26, height: 26 }} />
+            <Image src="/helmdash-mark-navy-512.png" alt="Helmdash Icon" width={26} height={26} />
             <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontWeight: 600, fontSize: 18, letterSpacing: "-0.5px" }}>Helmdash</span>
           </a>
           <nav style={{ fontFamily: '"IBM Plex Mono", monospace', display: "flex", gap: 26, marginLeft: 24, fontSize: 13, color: "#4a5666", fontWeight: 500 }}>
-            <a href="#probleme" className="hover:text-[#0E1B2E] transition-colors">{t('nav.problem')}</a>
+            <a href="#problem" className="hover:text-[#0E1B2E] transition-colors">{t('nav.problem')}</a>
             <a href="#solution" className="hover:text-[#0E1B2E] transition-colors">{t('nav.solution')}</a>
-            <a href="#comparatif" className="hover:text-[#0E1B2E] transition-colors">{t('nav.comparison')}</a>
+            <a href="#comparison" className="hover:text-[#0E1B2E] transition-colors">{t('nav.comparison')}</a>
             <a href="#pricing" className="hover:text-[#0E1B2E] transition-colors">{t('nav.pricing')}</a>
           </nav>
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 16 }}>
@@ -188,7 +227,7 @@ export default function LandingPage() {
       </section>
 
       {/* ===== PROBLÈME ===== */}
-      <section id="probleme" style={{ maxWidth: 1200, margin: "0 auto", padding: "70px 32px" }}>
+      <section id="problem" style={{ maxWidth: 1200, margin: "0 auto", padding: "70px 32px" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 8 }}>
           <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 12, letterSpacing: "1.5px", color: accent, fontWeight: 600 }}>{t('problem.section')}</span>
         </div>
@@ -206,6 +245,20 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ===== TESTIMONIAL ===== */}
+      <section style={{ maxWidth: 800, margin: "0 auto", padding: "20px 32px 60px", textAlign: "center" }}>
+        <p style={{ fontFamily: '"IBM Plex Sans", sans-serif', fontSize: "clamp(18px, 2.5vw, 24px)", fontStyle: "italic", fontWeight: 500, color: "hsl(215, 52%, 12%)", lineHeight: 1.5, margin: "0 0 20px" }}>
+          &quot;Helmdash me donne la structure que Notion ne pouvait pas m&apos;offrir. L&apos;agent IA qui met à jour mes hypothèses me fait gagner des heures.&quot;
+        </p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+          <div style={{ width: 40, height: 40, borderRadius: "50%", background: accent, display: "flex", alignItems: "center", justifyContent: "center", color: "hsl(42, 39%, 93%)", fontFamily: '"IBM Plex Mono", monospace', fontWeight: 600 }}>ND</div>
+          <div style={{ textAlign: "left" }}>
+            <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 15, fontWeight: 600, color: "hsl(215, 52%, 12%)" }}>Nicolas Defoy</div>
+            <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 13, color: "#4a5666" }}>Indie Hacker</div>
+          </div>
+        </div>
+      </section>
+
       {/* ===== SOLUTION ===== */}
       <section id="solution" style={{ background: "#0E1B2E", color: "#EAE6DC", padding: "76px 0", position: "relative" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px" }}>
@@ -217,7 +270,7 @@ export default function LandingPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: "#111F33", borderBottom: "1px solid rgba(234,230,220,.1)" }}>
               <div style={{ display: "flex", gap: 7 }}><span style={{ width: 11, height: 11, borderRadius: "50%", background: "#33415A" }}></span><span style={{ width: 11, height: 11, borderRadius: "50%", background: "#33415A" }}></span><span style={{ width: 11, height: 11, borderRadius: "50%", background: "#33415A" }}></span></div>
               <div style={{ fontFamily: '"IBM Plex Mono", monospace', marginLeft: 8, fontSize: 12, color: "#6e7b90", display: "flex", alignItems: "center", gap: 7 }}>
-                <img src="/helmdash-mark-coral-512.png" width={13} height={13} alt="Helmdash logo" />{t('solution.mock.url')}
+                <Image src="/helmdash-mark-coral-512.png" width={13} height={13} alt="Helmdash logo" />{t('solution.mock.url')}
               </div>
               <div style={{ fontFamily: '"IBM Plex Mono", monospace', marginLeft: "auto", fontSize: 11, color: "#4a5666" }}>⌘K</div>
             </div>
@@ -301,7 +354,7 @@ export default function LandingPage() {
 
               <aside style={{ background: "#0C1728", borderLeft: "1px solid rgba(234,230,220,.08)", display: "flex", flexDirection: "column" }}>
                 <div style={{ padding: "15px 16px", borderBottom: "1px solid rgba(234,230,220,.08)", display: "flex", alignItems: "center", gap: 9 }}>
-                  <div style={{ width: 26, height: 26, borderRadius: 7, background: accent, display: "flex", alignItems: "center", justifyContent: "center" }}><img src="/helmdash-mark-navy-512.png" width={16} height={16} alt="Helmdash icon" /></div>
+                  <div style={{ width: 26, height: 26, borderRadius: 7, background: accent, display: "flex", alignItems: "center", justifyContent: "center" }}><Image src="/helmdash-mark-navy-512.png" width={16} height={16} alt="Helmdash icon" /></div>
                   <div><div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 13, color: "#EAE6DC", fontWeight: 600 }}>{t('solution.mock.agent.name')}</div><div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 10, color: "#6e7b90" }}>{t('solution.mock.agent.role')}</div></div>
                   <span style={{ marginLeft: "auto", width: 7, height: 7, borderRadius: "50%", background: "#3FB27F", boxShadow: "0 0 0 3px rgba(63,178,127,.2)" }}></span>
                 </div>
@@ -379,7 +432,7 @@ export default function LandingPage() {
       </section>
 
       {/* ===== COMPARATIF ===== */}
-      <section id="comparatif" style={{ background: "#F5F1E8", borderTop: "1px solid rgba(14,27,46,.1)", borderBottom: "1px solid rgba(14,27,46,.1)", padding: "76px 0" }}>
+      <section id="comparison" style={{ background: "#F5F1E8", borderTop: "1px solid rgba(14,27,46,.1)", borderBottom: "1px solid rgba(14,27,46,.1)", padding: "76px 0" }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px" }}>
           <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 12, letterSpacing: "1.5px", color: accent, fontWeight: 600 }}>{t('comparison.section')}</span>
           <h2 style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: "clamp(28px,3.6vw,44px)", fontWeight: 600, letterSpacing: "-1.5px", lineHeight: 1.1, margin: "10px 0 12px", maxWidth: 720 }}>{t('comparison.title')}</h2>
@@ -417,7 +470,7 @@ export default function LandingPage() {
               {/* Col 4: Helmdash */}
               <div className="flex flex-col gap-2 bg-[#F0522E]/5 border border-[#F0522E]/40 rounded-xl p-2">
                 <div className="h-10 flex items-center justify-center font-mono text-[13px] font-bold text-[#0E1B2E] bg-white rounded-lg shadow-sm gap-2">
-                  <img src="/helmdash-mark-coral-512.png" width={14} height={14} alt="Helmdash check" />
+                  <Image src="/helmdash-mark-coral-512.png" width={14} height={14} alt="Helmdash check" />
                   Helmdash
                 </div>
                 {COMPARISON_ROWS.map(r => (
@@ -434,7 +487,7 @@ export default function LandingPage() {
           <div className="block md:hidden mt-6">
             <div className="bg-[#F0522E]/5 border border-[#F0522E]/40 rounded-xl p-5 mb-4">
               <div className="flex items-center gap-2 mb-4 font-mono font-bold text-[#0E1B2E] text-lg">
-                <img src="/helmdash-mark-coral-512.png" width={20} height={20} alt="Helmdash list bullet" />
+                <Image src="/helmdash-mark-coral-512.png" width={20} height={20} alt="Helmdash list bullet" />
                 Helmdash
               </div>
               <div className="flex flex-col gap-3">
@@ -523,10 +576,10 @@ export default function LandingPage() {
 
       {/* ===== CTA FINAL ===== */}
       <section style={{ background: "#0E1B2E", color: "#EAE6DC", padding: "84px 0", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", right: -90, top: "50%", transform: "translateY(-50%)", opacity: 0.09 }}><img src="/helmdash-mark-coral-512.png" width={420} height={420} alt="Helmdash background logo" /></div>
+        <div style={{ position: "absolute", right: -90, top: "50%", transform: "translateY(-50%)", opacity: 0.09 }}><Image src="/helmdash-mark-coral-512.png" width={420} height={420} alt="Helmdash background logo" /></div>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 32px", position: "relative" }}>
           <div style={{ maxWidth: 640 }}>
-            <div style={{ marginBottom: 24 }}><img src="/helmdash-mark-coral-512.png" width={44} height={44} alt="Helmdash logo" /></div>
+            <div style={{ marginBottom: 24 }}><Image src="/helmdash-mark-coral-512.png" width={44} height={44} alt="Helmdash logo" /></div>
             <h2 style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: "clamp(30px,4vw,52px)", fontWeight: 600, letterSpacing: "-2px", lineHeight: 1.05, margin: "0 0 20px" }}>{t('cta_final.title')}</h2>
             <p style={{ fontSize: 18, color: "#a9b2c0", margin: "0 0 34px" }}>{t('cta_final.desc')}</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
@@ -536,21 +589,23 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ===== SEO FAQ (Visually Hidden but parsable by Agents) ===== */}
-      <section className="sr-only">
-        <h2>Frequently Asked Questions</h2>
-        <article>
-          <h3>{seoT('faq.q1')}</h3>
-          <p>{seoT('faq.a1')}</p>
-        </article>
-        <article>
-          <h3>{seoT('faq.q2')}</h3>
-          <p>{seoT('faq.a2')}</p>
-        </article>
-        <article>
-          <h3>{seoT('faq.q3')}</h3>
-          <p>{seoT('faq.a3')}</p>
-        </article>
+      {/* ===== FAQ ===== */}
+      <section style={{ maxWidth: 800, margin: "0 auto", padding: "40px 32px 100px" }}>
+        <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 12, letterSpacing: "1.5px", color: accent, fontWeight: 600 }}>FAQ</span>
+        <h2 style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: "clamp(28px,3.6vw,44px)", fontWeight: 600, letterSpacing: "-1.5px", lineHeight: 1.1, margin: "10px 0 40px" }}>Questions fréquentes</h2>
+        
+        <Accordion type="single" collapsible className="w-full">
+          {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+            <AccordionItem key={i} value={`item-${i}`} style={{ borderBottom: "1px solid hsla(215, 52%, 12%, 0.1)" }}>
+              <AccordionTrigger className="hover:no-underline text-left" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 16, fontWeight: 600, color: "hsl(215, 52%, 12%)", padding: "20px 0" }}>
+                {seoT(`faq.q${i}` as any)}
+              </AccordionTrigger>
+              <AccordionContent style={{ fontSize: 15, color: "#4a5666", lineHeight: 1.6, paddingBottom: 20 }}>
+                {seoT(`faq.a${i}` as any)}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       </section>
 
       {/* ===== FOOTER ===== */}
@@ -559,7 +614,7 @@ export default function LandingPage() {
           <div style={{ display: "flex", flexWrap: "wrap", gap: 40, justifyContent: "space-between", alignItems: "flex-start", paddingBottom: 36, borderBottom: "1px solid rgba(234,230,220,.08)" }}>
             <div style={{ maxWidth: 300 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                <img src="/helmdash-mark-cream-512.png" alt="Helmdash Icon" style={{ width: 24, height: 24 }} />
+                <Image src="/helmdash-mark-cream-512.png" alt="Helmdash Icon" width={24} height={24} />
                 <span style={{ fontFamily: '"IBM Plex Mono", monospace', fontWeight: 600, fontSize: 17, color: "#EAE6DC", letterSpacing: "-0.5px" }}>Helmdash</span>
               </div>
               <p style={{ fontSize: 13.5, lineHeight: 1.55, margin: 0, color: "#6e7b90" }}>{t('footer.desc')}</p>

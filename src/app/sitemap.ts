@@ -40,5 +40,41 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
       },
     },
+    {
+      url: `${appUrl}/legal/privacy`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+      alternates: {
+        languages: {
+          en: `${appUrl}/en/legal/privacy`,
+          fr: `${appUrl}/fr/legal/privacy`,
+        },
+      },
+    },
+    {
+      url: `${appUrl}/legal/terms`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+      alternates: {
+        languages: {
+          en: `${appUrl}/en/legal/terms`,
+          fr: `${appUrl}/fr/legal/terms`,
+        },
+      },
+    },
+    {
+      url: `${appUrl}/legal/status`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.3,
+      alternates: {
+        languages: {
+          en: `${appUrl}/en/legal/status`,
+          fr: `${appUrl}/fr/legal/status`,
+        },
+      },
+    },
   ]
 }

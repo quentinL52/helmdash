@@ -1,14 +1,22 @@
 {
   "seo": {
     "title": "Helmdash — Le poste de pilotage du solo founder",
-    "description": "Le poste de pilotage du solo founder. Un dashboard, un agent, zéro onglet en trop.",
+    "description": "Helmdash est le poste de pilotage IA des solo founders. Dashboard unifié : finances, roadmap, hypothèses & veille. Rejoignez la liste d'attente.",
     "faq": {
       "q1": "Qu'est-ce que Helmdash ?",
       "a1": "Helmdash est un tableau de bord unifié conçu pour les solo founders. Il rassemble vos finances, vos hypothèses, votre roadmap et votre veille concurrentielle dans une seule interface.",
       "q2": "Est-ce que Helmdash utilise l'IA ?",
       "a2": "Oui, Helmdash intègre un agent IA qui non seulement lit vos données, mais peut aussi exécuter des tâches comme la mise à jour d'hypothèses ou la création d'éléments de roadmap selon vos instructions.",
       "q3": "En quoi Helmdash est-il différent de Notion ou Excel ?",
-      "a3": "Contrairement aux outils généralistes, Helmdash est spécialement conçu pour les indie hackers, offrant des structures adaptées, des analyses proactives par IA et supprimant les changements de contexte."
+      "a3": "Contrairement aux outils généralistes, Helmdash est spécialement conçu pour les indie hackers, offrant des structures adaptées, des analyses proactives par IA et supprimant les changements de contexte.",
+      "q4": "Est-ce que Helmdash est gratuit ?",
+      "a4": "Nous proposons un essai gratuit de 14 jours. Ensuite, vous pouvez choisir entre un plan BYOK (Apportez votre clé API) ou un plan Complet avec l'IA incluse.",
+      "q5": "Quelles intégrations sont supportées par Helmdash ?",
+      "a5": "Helmdash supporte actuellement l'import facile depuis Notion et CSV. L'intégration Stripe arrive bientôt pour synchroniser automatiquement votre MRR et vos finances.",
+      "q6": "Puis-je utiliser ma propre clé API ?",
+      "a6": "Oui, notre plan BYOK vous permet de brancher votre propre clé API OpenAI ou Mistral. Vous ne payez que ce que vous consommez, sans aucune marge de notre part.",
+      "q7": "Mes données sont-elles privées ?",
+      "a7": "Absolument. Nous utilisons des serveurs sécurisés en UE et n'entraînons aucun modèle d'IA sur vos données privées. Vos clés API sont chiffrées et ne sont jamais partagées."
     }
   },
   "common": {

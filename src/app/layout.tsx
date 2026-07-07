@@ -98,11 +98,26 @@ export default async function RootLayout({
     url: appUrl,
   };
 
+  const softwareApplicationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Helmdash',
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    url: appUrl,
+    offers: {
+      '@type': 'Offer',
+      price: '15.00',
+      priceCurrency: 'EUR'
+    }
+  };
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
         <JsonLd data={organizationSchema} />
         <JsonLd data={websiteSchema} />
+        <JsonLd data={softwareApplicationSchema} />
       </head>
       <body className={`${ibmPlexMono.variable} ${ibmPlexSans.variable} font-sans antialiased`}>
         <NextIntlClientProvider messages={messages}>
