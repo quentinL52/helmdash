@@ -75,7 +75,7 @@ export async function updateSession(request: NextRequest) {
         }
 
         // Exception pour la route waitlist (publique)
-        if (request.nextUrl.pathname === '/api/waitlist') {
+        if (request.nextUrl.pathname.startsWith('/api/waitlist')) {
             return supabaseResponse;
         }
 
