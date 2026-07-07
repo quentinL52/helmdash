@@ -5,7 +5,7 @@ import "./globals.css";
 import type { Metadata } from 'next';
 import { IBM_Plex_Mono, IBM_Plex_Sans } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages } from 'next-intl/server';
+import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['latin'],
@@ -22,7 +22,7 @@ const ibmPlexSans = IBM_Plex_Sans({
 import { ThemeProvider } from '@/components/theme-provider';
 import { JsonLd } from '@/components/seo/JsonLd';
 
-import { getTranslations, getLocale } from 'next-intl/server';
+
 
 export async function generateMetadata() {
   const t = await getTranslations('seo');
