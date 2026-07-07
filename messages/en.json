@@ -122,8 +122,8 @@
     "unsubscribedDescription": "Subscribe to unlock all features.",
     "subscribeNow": "Subscribe Now",
     "trialNotice": "You are on a 14-day free trial. Subscribe to keep access after it ends.",
-    "readonlyNotice": "Your trial or subscription has ended. Your data is safe — subscribe to regain full access.",
-    "allFeaturesIncluded": "All features included — no tiers, no limits. Price varies by sign-up cohort only.",
+    "readonlyNotice": "Your trial or subscription has ended. Your data is safe. Subscribe to regain full access.",
+    "allFeaturesIncluded": "All features included. No tiers, no limits. Price varies by sign-up cohort only.",
     "priceLockedForLife": "Price locked for life",
     "priceLockedFor": "Price locked for {months} months",
     "monthly": "Monthly",
@@ -137,7 +137,7 @@
     "paymentEncrypted": "Encrypted payment via Stripe (PCI DSS Level 1)",
     "invoiceByEmail": "Invoices sent by email after each payment",
     "upgradeAnytime": "Upgrade/downgrade anytime, no fees",
-    "cancelAnytime": "No commitment — cancel anytime from your Stripe portal"
+    "cancelAnytime": "No commitment. Cancel anytime from your Stripe portal"
   },
   "cohort": {
     "founders": "Founding Member",
@@ -181,7 +181,7 @@
       "title1": "Six tools open.",
       "title2": "Zero overview.",
       "title3": "One helm to steer.",
-      "desc": "Helmdash brings your finances, hypotheses, roadmap, and competitive intel into a single cockpit — piloted by an agent that reads and writes directly to your data. Stop copy-pasting between Notion, spreadsheets, and ChatGPT.",
+      "desc": "Helmdash brings your finances, hypotheses, roadmap, and competitive intel into a single cockpit, piloted by an agent that reads and writes directly to your data. Stop copy-pasting between Notion, spreadsheets, and your favorite LLM.",
       "cta_main": "Take the helm →",
       "cta_sec": "See the product",
       "disclaimer": "Notion & CSV import in 2 mins · Cancel anytime",
@@ -216,18 +216,18 @@
         {
           "tag": "04",
           "title": "AI doesn't know your business",
-          "body": "ChatGPT answers well — but cold. It has neither your numbers, your history, nor the permission to write to your tools."
+          "body": "Your favorite LLM answers well, but cold. It has neither your numbers, your history, nor the permission to write to your tools."
         }
       ]
     },
     "solution": {
       "section": "02 / THE SOLUTION",
       "title": "A cockpit. An agent with its hands dirty.",
-      "desc": "The central agent reads your numbers, updates your hypotheses, delegates to specialized sub-agents — and gives you a decision, not a wall of text.",
+      "desc": "The central agent reads your numbers, updates your hypotheses, delegates to specialized sub-agents, and gives you a decision, not a wall of text.",
       "features": [
         {
           "title": "It writes, not just reads",
-          "body": "The agent updates a hypothesis, creates a roadmap task, or logs a lead — directly in your data, with your approval."
+          "body": "The agent updates a hypothesis, creates a roadmap task, or logs a lead, directly in your data, with your approval."
         },
         {
           "title": "Sub-agents, not a chatbot",
@@ -307,7 +307,7 @@
       "steps": [
         {
           "title": "Plug in your tools",
-          "body": "Connect Stripe, import Notion and spreadsheets. Helmdash organizes everything into a unified model — finances, roadmap, hypotheses, CRM.",
+          "body": "Connect Stripe, import Notion and spreadsheets. Helmdash organizes everything into a unified model: finances, roadmap, hypotheses, CRM.",
           "meta": "≈ 2 mins · nothing to rebuild"
         },
         {
@@ -317,7 +317,7 @@
         },
         {
           "title": "You steer, it executes",
-          "body": "You ask questions in plain english. It analyzes, delegates, and acts on your data — you approve with one click.",
+          "body": "You ask questions in plain english. It analyzes, delegates, and acts on your data, you approve with one click.",
           "meta": "continuous · 24/7"
         }
       ]
@@ -326,6 +326,7 @@
       "section": "04 / POSITIONING",
       "title": "Every tool does one thing well. None connect them.",
       "desc": "We don't replace your editor or your LLM. We hold the big picture that none of them hold.",
+      "toggle": "Compare with Notion & Claude",
       "col1": "",
       "rows": [
         {
@@ -377,10 +378,10 @@
           "per": "/ month",
           "note": "Rate locked for life · first 100 only",
           "features": [
-            "Full cockpit dashboard",
-            "Central AI agent + sub-agents",
-            "Stripe, Notion, CSV import",
-            "Unlimited context memory"
+            "Full cockpit + AI Agent",
+            "Private early founders community access",
+            "Priority support & direct access",
+            "Voting rights on future roadmap"
           ],
           "cta": "Claim my spot →"
         },
@@ -407,7 +408,7 @@
           "note": "€45 → €35 for the first 6 months",
           "features": [
             "Everything in BYOK",
-            "Mistral Small included — no key needed",
+            "Mistral Small included, no key needed",
             "Up to 500 AI actions / month",
             "Priority support"
           ],
@@ -448,16 +449,78 @@
           "links": [
             "Next Cohort",
             "Discord",
-            "Referrals",
             "Contact"
           ]
         }
       ],
-      "copyright": "© 2026 Helmdash · Made in Lyon by a solo founder, for solo founders.",
+      "copyright": "© 2026 Helmdash · Made by a solo founder, for solo founders.",
       "legal": [
         "Privacy",
         "Terms",
         "Status"
+      ]
+    }
+  },
+  "legal_pages": {
+    "privacy": {
+      "tag": "PRIVACY",
+      "title": "Privacy Policy",
+      "updated": "Last updated: September 15, 2026",
+      "sections": [
+        {
+          "title": "1. Publisher",
+          "body": "Helmdash is published by a Solo Founder.\nContact: hello@helmdash.app"
+        },
+        {
+          "title": "2. Hosting and Data",
+          "body": "Data is hosted by Supabase (AWS) on servers located in the European Union (Ireland/Frankfurt). Your API keys (OpenAI, Anthropic, Mistral) are encrypted in the database and are never shared with third parties."
+        },
+        {
+          "title": "3. Use of Artificial Intelligence",
+          "body": "Helmdash uses third-party AI models. None of your private data is used to train these models. Using models via API ensures privacy according to the strict terms of service (Zero data retention for training) of our providers."
+        },
+        {
+          "title": "4. User Rights (GDPR)",
+          "body": "In accordance with the GDPR, you have the right to access, rectify, erase (right to be forgotten), and port your data. You can exercise these rights by contacting us directly or via the application interface (1-click account deletion)."
+        }
+      ]
+    },
+    "terms": {
+      "tag": "TERMS",
+      "title": "Terms of Service",
+      "updated": "Last updated: September 15, 2026",
+      "sections": [
+        {
+          "title": "1. Purpose",
+          "body": "These Terms govern the access and use of Helmdash, an AI-powered cockpit for startup founders."
+        },
+        {
+          "title": "2. Subscription and Payment",
+          "body": "Access to the service is billed according to the current plans (Founder Deal, BYOK, Full). Payments are secured by Stripe. No refunds are given for partial months. The 14-day trial is free and without commitment."
+        },
+        {
+          "title": "3. Third-party API Keys (BYOK Plan)",
+          "body": "Users of the 'Bring Your Own Key' plan are responsible for the use, billing, and limits of their own API keys (OpenAI, Anthropic, Mistral). Helmdash disclaims all liability in the event of quota limits or API suspension by the provider."
+        },
+        {
+          "title": "4. Limitation of Liability",
+          "body": "The advice and analysis provided by the Helmdash Agent are generated by artificial intelligence. They cannot replace the advice of an expert (accountant, lawyer, financial advisor). The user is the sole decision-maker."
+        }
+      ]
+    },
+    "status": {
+      "tag": "STATUS",
+      "title": "Service Status",
+      "updated": "Last updated: September 15, 2026",
+      "sections": [
+        {
+          "title": "All systems operational",
+          "body": "No active incidents at the moment."
+        },
+        {
+          "title": "Incident History",
+          "body": "No incidents reported in the last 90 days."
+        }
       ]
     }
   },

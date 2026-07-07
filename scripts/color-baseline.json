@@ -1,0 +1,13 @@
+{
+  "app/(marketing)/contact/page.tsx": 22,
+  "app/(marketing)/demo/page.tsx": 46,
+  "app/(marketing)/page.tsx": 58,
+  "app/api/waitlist/route.ts": 2,
+  "app/globals.css": 3,
+  "app/legal/cookies/page.tsx": 1,
+  "app/legal/privacy/page.tsx": 8,
+  "app/legal/status/page.tsx": 8,
+  "app/legal/terms/page.tsx": 8,
+  "components/cookie-banner.tsx": 5,
+  "components/waitlist-form.tsx": 6
+}

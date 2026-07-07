@@ -98,7 +98,7 @@ export default function LandingPage() {
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 16 }}>
             <LanguageSwitcher iconColor="#0E1B2E" />
             {/* <Link href="/auth" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 13, fontWeight: 500, color: "#4a5666" }}>{t('nav.login')}</Link> */}
-            <a href="#top" className="hover:-translate-y-[1px] hover:shadow-[0_6px_16px_rgba(14,27,46,0.22)] transition-all" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 13, fontWeight: 600, background: "#0E1B2E", color: "#F5F1E8", padding: "9px 16px", borderRadius: 8 }}>Join the waitlist</a>
+            <a href="#top" className="hover:-translate-y-[1px] hover:shadow-[0_6px_16px_rgba(14,27,46,0.22)] transition-all" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 13, fontWeight: 600, background: "#0E1B2E", color: "#F5F1E8", padding: "9px 16px", borderRadius: 8 }}>{t('nav.join')}</a>
           </div>
         </div>
       </header>
@@ -335,27 +335,27 @@ export default function LandingPage() {
           <div className="hidden md:block mt-8">
             <div className="grid grid-cols-4 gap-4">
               {/* Col 1: Labels */}
-              <div className="flex flex-col pt-12 gap-2">
+              <div className="flex flex-col pt-14 gap-2">
                 {COMPARISON_ROWS.map(r => (
-                  <div key={r.label} className="min-h-[44px] flex items-center text-[14px] text-[#8a95a6] font-medium font-mono">
+                  <div key={r.label} className="h-[52px] flex items-center text-[14px] text-[#8a95a6] font-medium font-mono pr-2">
                     {r.label}
                   </div>
                 ))}
               </div>
               {/* Col 2: Notion */}
               <div className="flex flex-col gap-2">
-                <div className="h-12 flex items-center justify-center font-mono text-[13px] font-bold text-[#3a4656] mb-2">Notion</div>
+                <div className="h-12 flex items-center justify-center font-mono text-[13px] font-bold text-[#3a4656]">Notion</div>
                 {COMPARISON_ROWS.map(r => (
-                  <div key={r.label} className="min-h-[44px] flex items-center justify-center text-center text-[13px] text-[#8a95a6] font-mono bg-[#EFEADD]/40 rounded-md">
+                  <div key={r.label} className="h-[52px] flex items-center justify-center text-center text-[13px] text-[#8a95a6] font-mono bg-[#EFEADD]/40 rounded-md px-2 leading-tight">
                     {r.notion}
                   </div>
                 ))}
               </div>
               {/* Col 3: Claude / Cowork */}
               <div className="flex flex-col gap-2">
-                <div className="h-12 flex items-center justify-center font-mono text-[13px] font-bold text-[#3a4656] mb-2">Claude / Cowork</div>
+                <div className="h-12 flex items-center justify-center font-mono text-[13px] font-bold text-[#3a4656]">Claude / Cowork</div>
                 {COMPARISON_ROWS.map(r => (
-                  <div key={r.label} className="min-h-[44px] flex items-center justify-center text-center text-[13px] text-[#8a95a6] font-mono bg-[#EFEADD]/40 rounded-md">
+                  <div key={r.label} className="h-[52px] flex items-center justify-center text-center text-[13px] text-[#8a95a6] font-mono bg-[#EFEADD]/40 rounded-md px-2 leading-tight">
                     {r.cowork}
                   </div>
                 ))}
@@ -367,7 +367,7 @@ export default function LandingPage() {
                   Helmdash
                 </div>
                 {COMPARISON_ROWS.map(r => (
-                  <div key={r.label} className="min-h-[44px] flex items-center justify-start px-2 text-[13px] font-semibold text-[#0E1B2E] font-mono gap-2">
+                  <div key={r.label} className="h-[52px] flex items-center justify-start px-3 text-[13px] font-semibold text-[#0E1B2E] font-mono gap-2 leading-tight">
                     <Check size={16} className="text-[#F0522E] shrink-0" />
                     {r.helm}
                   </div>
@@ -400,7 +400,7 @@ export default function LandingPage() {
               onClick={() => setShowCompare(!showCompare)}
               className="w-full flex items-center justify-between p-4 bg-white border border-[rgba(14,27,46,.1)] rounded-xl font-mono text-[13px] font-semibold text-[#3a4656]"
             >
-              Compare with Notion & Claude
+              {t('comparison.toggle')}
               <ChevronDown size={16} className={`transition-transform ${showCompare ? 'rotate-180' : ''}`} />
             </button>
 
@@ -476,7 +476,7 @@ export default function LandingPage() {
             <h2 style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: "clamp(30px,4vw,52px)", fontWeight: 600, letterSpacing: "-2px", lineHeight: 1.05, margin: "0 0 20px" }}>{t('cta_final.title')}</h2>
             <p style={{ fontSize: 18, color: "#a9b2c0", margin: "0 0 34px" }}>{t('cta_final.desc')}</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
-              <a href="#top" className="hover:-translate-y-[2px] hover:shadow-[0_12px_30px_rgba(240,82,46,.35)] transition-all" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 15, fontWeight: 600, background: accent, color: "#0E1B2E", padding: "15px 28px", borderRadius: 10 }}>Join the waitlist</a>
+              <a href="#top" className="hover:-translate-y-[2px] hover:shadow-[0_12px_30px_rgba(240,82,46,.35)] transition-all" style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 15, fontWeight: 600, background: accent, color: "#0E1B2E", padding: "15px 28px", borderRadius: 10 }}>{t('cta_final.btn_primary')}</a>
             </div>
           </div>
         </div>
@@ -494,28 +494,28 @@ export default function LandingPage() {
               <p style={{ fontSize: 13.5, lineHeight: 1.55, margin: 0, color: "#6e7b90" }}>{t('footer.desc')}</p>
             </div>
             <div style={{ display: "flex", gap: 56, flexWrap: "wrap" }}>
-              {[
-                { head: t('footer.cols.0.head'), links: [t('footer.cols.0.links.0'), t('footer.cols.0.links.1'), t('footer.cols.0.links.2'), t('footer.cols.0.links.3'), t('footer.cols.0.links.4')] },
-                { head: t('footer.cols.1.head'), links: [t('footer.cols.1.links.0'), t('footer.cols.1.links.1'), t('footer.cols.1.links.2'), t('footer.cols.1.links.3')] },
-                { head: t('footer.cols.2.head'), links: [t('footer.cols.2.links.0'), t('footer.cols.2.links.1'), t('footer.cols.2.links.2'), t('footer.cols.2.links.3')] }
-              ].map(c => (
-                <div key={c.head}>
-                  <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 11, letterSpacing: "1px", color: "#4a5666", marginBottom: 14 }}>{c.head}</div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
-                    {c.links.map(l => (
-                      <a key={l} href="mailto:hello@helmdash.com" className="hover:text-[#EAE6DC] transition-colors" style={{ fontSize: 13.5, color: "#9aa4b3" }}>{l}</a>
-                    ))}
-                  </div>
+              <div>
+                <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 11, letterSpacing: "1px", color: "#4a5666", marginBottom: 14 }}>{t('footer.cols.0.head')}</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                  <a href="#solution" className="hover:text-[#EAE6DC] transition-colors" style={{ fontSize: 13.5, color: "#9aa4b3" }}>{t('footer.cols.0.links.0')}</a>
+                  <a href="#solution" className="hover:text-[#EAE6DC] transition-colors" style={{ fontSize: 13.5, color: "#9aa4b3" }}>{t('footer.cols.0.links.1')}</a>
                 </div>
-              ))}
+              </div>
+              <div>
+                <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 11, letterSpacing: "1px", color: "#4a5666", marginBottom: 14 }}>{t('footer.cols.2.head')}</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                  <a href="#pricing" className="hover:text-[#EAE6DC] transition-colors" style={{ fontSize: 13.5, color: "#9aa4b3" }}>{t('footer.cols.2.links.0')}</a>
+                  <a href="/contact" className="hover:text-[#EAE6DC] transition-colors" style={{ fontSize: 13.5, color: "#9aa4b3" }}>{t('footer.cols.2.links.2')}</a>
+                </div>
+              </div>
             </div>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "space-between", alignItems: "center", paddingTop: 22 }}>
             <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 12, color: "#5a6678" }}>{t('footer.copyright')}</div>
             <div style={{ fontFamily: '"IBM Plex Mono", monospace', display: "flex", gap: 20, fontSize: 12, color: "#5a6678" }}>
-              <a href="mailto:hello@helmdash.com" className="hover:text-[#9aa4b3] transition-colors">{t('footer.legal.0')}</a>
-              <a href="mailto:hello@helmdash.com" className="hover:text-[#9aa4b3] transition-colors">{t('footer.legal.1')}</a>
-              <a href="mailto:hello@helmdash.com" className="hover:text-[#9aa4b3] transition-colors">{t('footer.legal.2')}</a>
+              <a href="/legal/privacy" className="hover:text-[#9aa4b3] transition-colors">{t('footer.legal.0')}</a>
+              <a href="/legal/terms" className="hover:text-[#9aa4b3] transition-colors">{t('footer.legal.1')}</a>
+              <a href="/legal/status" className="hover:text-[#9aa4b3] transition-colors">{t('footer.legal.2')}</a>
             </div>
           </div>
         </div>

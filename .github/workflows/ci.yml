@@ -74,12 +74,14 @@ jobs:
       - name: Lint hardcoded colors
         run: node scripts/lint-colors.mjs
 
+      - name: Run Color Ratchet
+        run: node scripts/color-ratchet.mjs
+
       - name: Check i18n key sync
         run: node scripts/check-i18n.mjs
 
       - name: Scan hardcoded French strings
         run: node scripts/find-hardcoded-fr.mjs
-        continue-on-error: true
 
       - name: Run typecheck
         run: npm run typecheck
@@ -90,10 +92,11 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Check Auth Routes
+      - name: Check Auth Routes & Landing Claims
         run: |
           npm run start &
           SERVER_PID=$!
           npx wait-on http://localhost:3000
           bash scripts/check-auth.sh
+          node scripts/check-landing-claims.mjs
           kill $SERVER_PID

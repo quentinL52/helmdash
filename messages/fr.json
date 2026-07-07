@@ -123,8 +123,8 @@
     "unsubscribedDescription": "Abonnez-vous pour débloquer toutes les fonctionnalités.",
     "subscribeNow": "S'abonner maintenant",
     "trialNotice": "Vous êtes en essai gratuit de 14 jours. Abonnez-vous pour conserver l'accès ensuite.",
-    "readonlyNotice": "Votre essai ou abonnement est terminé. Vos données sont en sécurité — abonnez-vous pour retrouver l'accès complet.",
-    "allFeaturesIncluded": "Toutes les fonctionnalités incluses — pas de niveaux, pas de limites. Le prix varie selon la cohorte d'inscription uniquement.",
+    "readonlyNotice": "Votre essai ou abonnement est terminé. Vos données sont en sécurité. Abonnez-vous pour retrouver l'accès complet.",
+    "allFeaturesIncluded": "Toutes les fonctionnalités incluses. Pas de niveaux, pas de limites. Le prix varie selon la cohorte d'inscription uniquement.",
     "priceLockedForLife": "Prix verrouillé à vie",
     "priceLockedFor": "Prix verrouillé pendant {months} mois",
     "monthly": "Mensuel",
@@ -138,7 +138,7 @@
     "paymentEncrypted": "Paiement chiffré via Stripe (PCI DSS Level 1)",
     "invoiceByEmail": "Factures envoyées par email après chaque paiement",
     "upgradeAnytime": "Upgrade/downgrade à tout moment, sans frais",
-    "cancelAnytime": "Pas d'engagement — annulation possible depuis votre portail Stripe"
+    "cancelAnytime": "Pas d'engagement. Annulation possible depuis votre portail Stripe"
   },
   "cohort": {
     "founders": "Membre fondateur",
@@ -182,7 +182,7 @@
       "title1": "Six outils ouverts.",
       "title2": "Zéro vue d'ensemble.",
       "title3": "Une seule barre à tenir.",
-      "desc": "Helmdash réunit tes finances, tes hypothèses, ta roadmap et ta veille dans un seul poste de pilotage — piloté par un agent qui lit et écrit directement dans tes données. Fini le copier-coller entre Notion, tableurs et ChatGPT.",
+      "desc": "Helmdash réunit tes finances, tes hypothèses, ta roadmap et ta veille dans un seul poste de pilotage, piloté par un agent qui lit et écrit directement dans tes données. Fini le copier-coller entre Notion, tableurs et ton LLM préféré.",
       "cta_main": "Prendre la barre →",
       "cta_sec": "Voir le produit",
       "disclaimer": "Import Notion & CSV en 2 min · Résiliable à tout moment",
@@ -217,18 +217,18 @@
         {
           "tag": "04",
           "title": "L'IA ne connaît pas ton business",
-          "body": "ChatGPT te répond bien — mais à froid. Il n'a ni tes chiffres, ni ton historique, ni le droit d'écrire quoi que ce soit dans tes outils."
+          "body": "Ton LLM préféré te répond bien, mais à froid. Il n'a ni tes chiffres, ni ton historique, ni le droit d'écrire quoi que ce soit dans tes outils."
         }
       ]
     },
     "solution": {
       "section": "02 / LA SOLUTION",
       "title": "Un poste de pilotage. Un agent qui a les mains dans le cambouis.",
-      "desc": "L'agent central lit tes chiffres, met à jour tes hypothèses, délègue à des sous-agents spécialisés — et te rend une décision, pas un pavé de texte.",
+      "desc": "L'agent central lit tes chiffres, met à jour tes hypothèses, délègue à des sous-agents spécialisés, et te rend une décision, pas un pavé de texte.",
       "features": [
         {
           "title": "Il écrit, pas seulement lit",
-          "body": "L'agent met à jour une hypothèse, crée une tâche roadmap ou logue un prospect — directement dans tes données, avec ton accord."
+          "body": "L'agent met à jour une hypothèse, crée une tâche roadmap ou logue un prospect, directement dans tes données, avec ton accord."
         },
         {
           "title": "Des sous-agents, pas un chatbot",
@@ -308,7 +308,7 @@
       "steps": [
         {
           "title": "Branche tes outils",
-          "body": "Connecte Stripe, importe ton Notion et tes tableurs. Helmdash range tout dans un modèle unique — finances, roadmap, hypothèses, CRM.",
+          "body": "Connecte Stripe, importe ton Notion et tes tableurs. Helmdash range tout dans un modèle unique : finances, roadmap, hypothèses, CRM.",
           "meta": "≈ 2 min · rien à reconstruire"
         },
         {
@@ -318,7 +318,7 @@
         },
         {
           "title": "Tu pilotes, il exécute",
-          "body": "Tu poses tes questions en langage naturel. Il analyse, délègue, et agit dans tes données — tu valides d'un clic.",
+          "body": "Tu poses tes questions en langage naturel. Il analyse, délègue, et agit dans tes données, tu valides d'un clic.",
           "meta": "en continu · 7j/7"
         }
       ]
@@ -327,6 +327,7 @@
       "section": "04 / POSITIONNEMENT",
       "title": "Chaque outil fait bien une chose. Aucun ne les relie.",
       "desc": "On ne remplace pas ton éditeur ni ton LLM. On tient la vue d'ensemble qu'aucun d'eux ne tient.",
+      "toggle": "Comparer avec Notion & Claude",
       "col1": "",
       "rows": [
         {
@@ -378,10 +379,10 @@
           "per": "/ mois",
           "note": "Tarif verrouillé à vie · 100 premiers uniquement",
           "features": [
-            "Poste de pilotage complet",
-            "Agent IA central + sous-agents",
-            "Import Stripe, Notion, CSV",
-            "Mémoire contextuelle illimitée"
+            "Poste de pilotage + Agent IA",
+            "Accès communauté privée early founders",
+            "Support prioritaire & accès direct",
+            "Droit de vote sur la roadmap future"
           ],
           "cta": "Réserver ma place →"
         },
@@ -408,7 +409,7 @@
           "note": "45 € → 35 € pendant les 6 premiers mois",
           "features": [
             "Tout le BYOK",
-            "Mistral Small inclus — aucune clé requise",
+            "Mistral Small inclus, aucune clé requise",
             "Jusqu'à 500 actions IA / mois",
             "Support prioritaire"
           ],
@@ -449,16 +450,78 @@
           "links": [
             "Prochaine cohorte",
             "Discord",
-            "Parrainage",
             "Contact"
           ]
         }
       ],
-      "copyright": "© 2026 Helmdash · Fait à Lyon par un solo founder, pour les solo founders.",
+      "copyright": "© 2026 Helmdash · Fait par un solo founder, pour les solo founders.",
       "legal": [
         "Confidentialité",
         "CGU",
         "Statut"
+      ]
+    }
+  },
+  "legal_pages": {
+    "privacy": {
+      "tag": "CONFIDENTIALITÉ",
+      "title": "Politique de confidentialité",
+      "updated": "Dernière mise à jour : 15 Septembre 2026",
+      "sections": [
+        {
+          "title": "1. Éditeur du Service",
+          "body": "Le service Helmdash est édité par un Solo Founder.\nContact : hello@helmdash.app"
+        },
+        {
+          "title": "2. Hébergement et Données",
+          "body": "Les données sont hébergées par Supabase (AWS) sur des serveurs situés en Union Européenne (Irlande/Francfort). Vos clés d'API (OpenAI, Anthropic, Mistral) sont chiffrées en base de données et ne sont jamais partagées à des tiers."
+        },
+        {
+          "title": "3. Utilisation de l'Intelligence Artificielle",
+          "body": "Helmdash utilise des modèles d'IA tiers. Aucune de vos données privées n'est utilisée pour entraîner ces modèles. L'utilisation de modèles par l'API garantit la confidentialité selon les conditions d'utilisation strictes (Zéro rétention d'entraînement) de nos fournisseurs."
+        },
+        {
+          "title": "4. Droits des utilisateurs (RGPD)",
+          "body": "Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement (droit à l'oubli), et de portabilité de vos données. Vous pouvez exercer ces droits en nous contactant directement ou via l'interface de l'application (suppression du compte en 1 clic)."
+        }
+      ]
+    },
+    "terms": {
+      "tag": "CGU",
+      "title": "Conditions Générales d'Utilisation (CGU)",
+      "updated": "Dernière mise à jour : 15 Septembre 2026",
+      "sections": [
+        {
+          "title": "1. Objet",
+          "body": "Les présentes CGU encadrent l'accès et l'utilisation du service Helmdash, un poste de pilotage doté d'une intelligence artificielle pour les fondateurs d'entreprises."
+        },
+        {
+          "title": "2. Abonnement et Paiement",
+          "body": "L'accès au service est facturé selon les plans en vigueur (Founder Deal, BYOK, Complet). Les paiements sont sécurisés par Stripe. Aucun remboursement n'est effectué pour les mois entamés. L'essai de 14 jours est gratuit et sans engagement."
+        },
+        {
+          "title": "3. Clés d'API Tiers (Plan BYOK)",
+          "body": "Les utilisateurs du plan 'Bring Your Own Key' sont responsables de l'utilisation, de la facturation et des limites de leurs propres clés API (OpenAI, Anthropic, Mistral). Helmdash décline toute responsabilité en cas de dépassement de quota ou de suspension d'API par le fournisseur."
+        },
+        {
+          "title": "4. Limitation de Responsabilité",
+          "body": "Les conseils et l'analyse fournis par l'Agent Helmdash sont générés par intelligence artificielle. Ils ne sauraient remplacer l'avis d'un expert (comptable, avocat, conseiller financier). L'utilisateur est seul décisionnaire."
+        }
+      ]
+    },
+    "status": {
+      "tag": "STATUT",
+      "title": "Statut du Service",
+      "updated": "Dernière mise à jour : 15 Septembre 2026",
+      "sections": [
+        {
+          "title": "Tous les systèmes sont opérationnels",
+          "body": "Aucun incident n'est actuellement en cours."
+        },
+        {
+          "title": "Historique des incidents",
+          "body": "Aucun incident signalé dans les 90 derniers jours."
+        }
       ]
     }
   },

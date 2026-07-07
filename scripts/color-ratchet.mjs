@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..', 'src');
+const baselinePath = path.resolve(__dirname, 'color-baseline.json');
 
 const targetColors = [
   '14,27,46',
@@ -13,10 +14,10 @@ const targetColors = [
   '#F0522E' // accent
 ];
 
-const ALLOWED_MAX_OCCURRENCES = 250; // The threshold. The exact number from audit is ~234 but might vary slightly due to recent edits. 
+const isUpdate = process.argv.includes('--update');
 
-function countColors(dir) {
-  let count = 0;
+function getCountsPerFile(dir) {
+  let fileCounts = {};
   const files = fs.readdirSync(dir);
   
   for (const file of files) {
@@ -24,9 +25,10 @@ function countColors(dir) {
     const stat = fs.statSync(fullPath);
     
     if (stat.isDirectory()) {
-      count += countColors(fullPath);
+      Object.assign(fileCounts, getCountsPerFile(fullPath));
     } else if (file.endsWith('.tsx') || file.endsWith('.ts') || file.endsWith('.css')) {
       const content = fs.readFileSync(fullPath, 'utf8');
+      let count = 0;
       
       for (const color of targetColors) {
         // case insensitive search
@@ -36,16 +38,56 @@ function countColors(dir) {
           count += matches.length;
         }
       }
+      if (count > 0) {
+        // Store relative path to be stable across environments
+        const relativePath = path.relative(rootDir, fullPath).replace(/\\/g, '/');
+        fileCounts[relativePath] = count;
+      }
     }
   }
-  return count;
+  return fileCounts;
 }
 
-const currentOccurrences = countColors(rootDir);
-console.log(`Found ${currentOccurrences} hardcoded colors (threshold: ${ALLOWED_MAX_OCCURRENCES}).`);
+const currentCounts = getCountsPerFile(rootDir);
 
-if (currentOccurrences > ALLOWED_MAX_OCCURRENCES) {
-  console.error(`❌ Ratchet failed! Current occurrences (${currentOccurrences}) exceed the allowed maximum (${ALLOWED_MAX_OCCURRENCES}). Please use CSS variables instead of hardcoded colors.`);
+if (isUpdate) {
+  fs.writeFileSync(baselinePath, JSON.stringify(currentCounts, null, 2));
+  console.log('✅ Baseline updated.');
+  process.exit(0);
+}
+
+let baseline = {};
+if (fs.existsSync(baselinePath)) {
+  baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+} else {
+  console.log('⚠️ No baseline found. Run `node scripts/color-ratchet.mjs --update` to create one.');
+}
+
+let hasErrors = false;
+let totalCurrent = 0;
+let totalBaseline = 0;
+
+for (const [file, count] of Object.entries(currentCounts)) {
+  totalCurrent += count;
+  const baselineCount = baseline[file] || 0;
+  
+  if (count > baselineCount) {
+    console.error(`❌ Ratchet failed for ${file}! Current: ${count}, Baseline: ${baselineCount}.`);
+    hasErrors = true;
+  }
+}
+
+for (const [file, baselineCount] of Object.entries(baseline)) {
+  totalBaseline += baselineCount;
+  if (!currentCounts[file]) {
+    // File was deleted or cleared of colors, this is good!
+  }
+}
+
+console.log(`Color occurrences: ${totalCurrent} (Baseline total: ${totalBaseline})`);
+
+if (hasErrors) {
+  console.error(`❌ Color ratchet failed. Do not add new hardcoded colors. Use CSS variables instead.`);
   process.exit(1);
 } else {
   console.log('✅ Color ratchet passed.');

@@ -40,7 +40,10 @@ export async function updateSession(request: NextRequest) {
     const isApiRoute = request.nextUrl.pathname.startsWith('/api')
     
     // Les routes API ne sont plus publiques par défaut
-    const isPublicRoute = request.nextUrl.pathname === '/' || isAuthRoute;
+    const isPublicRoute = request.nextUrl.pathname === '/' || 
+                          isAuthRoute || 
+                          request.nextUrl.pathname.startsWith('/contact') || 
+                          request.nextUrl.pathname.startsWith('/legal');
 
     // 1. Protection et filtrage des routes API
     if (isApiRoute) {
