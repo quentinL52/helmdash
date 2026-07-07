@@ -1,4 +1,16 @@
 {
+  "seo": {
+    "title": "Helmdash — Le poste de pilotage du solo founder",
+    "description": "Le poste de pilotage du solo founder. Un dashboard, un agent, zéro onglet en trop.",
+    "faq": {
+      "q1": "Qu'est-ce que Helmdash ?",
+      "a1": "Helmdash est un tableau de bord unifié conçu pour les solo founders. Il rassemble vos finances, vos hypothèses, votre roadmap et votre veille concurrentielle dans une seule interface.",
+      "q2": "Est-ce que Helmdash utilise l'IA ?",
+      "a2": "Oui, Helmdash intègre un agent IA qui non seulement lit vos données, mais peut aussi exécuter des tâches comme la mise à jour d'hypothèses ou la création d'éléments de roadmap selon vos instructions.",
+      "q3": "En quoi Helmdash est-il différent de Notion ou Excel ?",
+      "a3": "Contrairement aux outils généralistes, Helmdash est spécialement conçu pour les indie hackers, offrant des structures adaptées, des analyses proactives par IA et supprimant les changements de contexte."
+    }
+  },
   "common": {
     "save": "Enregistrer",
     "cancel": "Annuler",
