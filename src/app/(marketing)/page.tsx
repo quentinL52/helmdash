@@ -245,19 +245,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ===== TESTIMONIAL ===== */}
-      <section style={{ maxWidth: 800, margin: "0 auto", padding: "20px 32px 60px", textAlign: "center" }}>
-        <p style={{ fontFamily: '"IBM Plex Sans", sans-serif', fontSize: "clamp(18px, 2.5vw, 24px)", fontStyle: "italic", fontWeight: 500, color: "hsl(215, 52%, 12%)", lineHeight: 1.5, margin: "0 0 20px" }}>
-          &quot;Helmdash me donne la structure que Notion ne pouvait pas m&apos;offrir. L&apos;agent IA qui met à jour mes hypothèses me fait gagner des heures.&quot;
-        </p>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
-          <div style={{ width: 40, height: 40, borderRadius: "50%", background: accent, display: "flex", alignItems: "center", justifyContent: "center", color: "hsl(42, 39%, 93%)", fontFamily: '"IBM Plex Mono", monospace', fontWeight: 600 }}>ND</div>
-          <div style={{ textAlign: "left" }}>
-            <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 15, fontWeight: 600, color: "hsl(215, 52%, 12%)" }}>Nicolas Defoy</div>
-            <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 13, color: "#4a5666" }}>Indie Hacker</div>
-          </div>
-        </div>
-      </section>
+
 
       {/* ===== SOLUTION ===== */}
       <section id="solution" style={{ background: "#0E1B2E", color: "#EAE6DC", padding: "76px 0", position: "relative" }}>
