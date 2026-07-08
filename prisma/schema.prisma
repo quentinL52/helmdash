@@ -65,6 +65,7 @@ model User {
   dailyPlans            DailyPlan[]
   sweepResults          SweepResult[]
   decisions             Decision[]
+  agentProposals        AgentProposal[]
 
   @@map("users")
 }
@@ -771,4 +772,21 @@ model Waitlist {
   source    String   @default("landing")
   status    String   @default("pending")
   createdAt DateTime @default(now()) @map("created_at")
+}
+
+model AgentProposal {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @map("user_id") @db.Uuid
+  conversationId String   @map("conversation_id")
+  domain         String
+  action         String
+  payload        Json
+  diff           Json?
+  status         String   @default("pending") // pending | confirmed | rejected
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@map("agent_proposals")
 }

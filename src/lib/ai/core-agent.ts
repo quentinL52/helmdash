@@ -60,7 +60,7 @@ export const buildCoreTools = (userId: string) => {
      * Crée, met à jour ou supprime une donnée dans un onglet du dashboard
      */
     write_dashboard_tab: tool({
-      description: "Crée, met à jour ou supprime une donnée dans un onglet du dashboard.",
+      description: "PROPOSE la création, mise à jour ou suppression d'une donnée dans un onglet du dashboard. L'action ne sera exécutée qu'après confirmation.",
       parameters: zodSchema(z.object({
         tabName: z.enum(['finances', 'hypotheses', 'gtm', 'crm', 'roadmap', 'canvas']),
         action: z.enum(['create', 'update', 'delete']),
@@ -69,44 +69,30 @@ export const buildCoreTools = (userId: string) => {
       })),
       // @ts-ignore
       execute: async ({ tabName, action, id, data }: any) => {
-        const PrismaModel = await getPrismaModel(tabName);
-        
-        // Valider les données selon le schéma de l'onglet
         const validatedData = validateTabData(tabName, data);
 
-        let result;
-        switch (action) {
-          case 'create':
-            result = await PrismaModel.create({
-              data: {
-                ...validatedData,
-                userId,
-              },
-            });
-            break;
-         
-          case 'update':
-            if (!id) throw new Error('ID requis pour update');
-            result = await PrismaModel.update({
-              where: { id, userId },
-              data: validatedData,
-            });
-            break;
-         
-          case 'delete':
-            if (!id) throw new Error('ID requis pour delete');
-            result = await PrismaModel.delete({
-              where: { id, userId },
-            });
-            break;
-        }
+        const { PrismaClient } = await import('@prisma/client');
+        const prisma = new PrismaClient();
+        
+        const proposal = await prisma.agentProposal.create({
+          data: {
+            userId,
+            conversationId: 'page-agent',
+            domain: tabName,
+            action,
+            payload: id ? { id, ...validatedData } : validatedData as any,
+            status: 'pending'
+          }
+        });
+        await prisma.$disconnect();
 
         return {
           success: true,
+          type: 'proposal',
           action,
           tab: tabName,
-          record: result,
-          message: `Action '${action}' effectuée avec succès sur '${tabName}'.`,
+          proposalId: proposal.id,
+          message: `Proposition enregistrée. TU DOIS IMPÉRATIVEMENT inclure ce texte exact dans ta réponse : [PROPOSAL:${proposal.id}]`,
         };
       },
     }),
@@ -419,7 +405,7 @@ TON LANGAGE :
 
 TES OUTILS (tous réels, pas simulés) :
 - read_dashboard_tab : lis VRAIMENT les finances, hypothèses, GTM, CRM, roadmap, canvas
-- write_dashboard_tab : crée/modifie/supprime VRAIMENT des données avec validation Zod
+- write_dashboard_tab : PROPOSE la création/modification/suppression de données (l'utilisateur devra confirmer l'écriture via le bouton généré).
 - query_memory / write_memory : mémoire vectorielle persistante (chaque décision, chaque insight)
 - spawn_sub_agent : délègue à un sous-agent spécialisé (pm, cfo, growth, legal, tech_lead, research, content, recruiting)
 - web_search : recherche web temps réel (via Composio SerpAPI)
