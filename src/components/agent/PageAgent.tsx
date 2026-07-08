@@ -4,6 +4,28 @@ import { useState, useRef, useEffect } from 'react';
 import { Bot, X, Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { ProposalCard } from './ProposalCard';
+
+function MessageContent({ content }: { content: string }) {
+  const regex = /\[PROPOSAL:([a-zA-Z0-9-]+)\]/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(content)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(<span key={lastIndex}>{content.substring(lastIndex, match.index)}</span>);
+    }
+    parts.push(<ProposalCard key={match[1]} proposalId={match[1]} />);
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < content.length) {
+    parts.push(<span key={lastIndex}>{content.substring(lastIndex)}</span>);
+  }
+
+  return <>{parts}</>;
+}
 
 interface Message {
   role: 'user' | 'assistant';
@@ -132,10 +154,10 @@ export function PageAgent({ userId, pageLabel, pageContext }: PageAgentProps) {
                   'max-w-[88%] rounded-xl px-3 py-2 text-[13px] leading-relaxed',
                   msg.role === 'user'
                     ? 'ml-auto bg-primary/10 text-foreground rounded-br-sm'
-                    : 'bg-muted text-foreground rounded-bl-sm'
+                    : 'bg-muted text-foreground rounded-bl-sm w-full'
                 )}
               >
-                {msg.content}
+                <MessageContent content={msg.content} />
               </div>
             ))}
             {loading && (
