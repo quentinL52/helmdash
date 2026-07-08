@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Mail, Linkedin, Twitter } from 'lucide-react';
+import { Mail, Linkedin, Twitter, Rocket } from 'lucide-react';
 import Link from 'next/link';
 import { LanguageSwitcher } from '@/components/language-switcher';
 
@@ -38,6 +38,26 @@ export default function ContactPage() {
             <div>
               <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 13, color: "#4a5666", marginBottom: 4 }}>Email</div>
               <div style={{ fontSize: 18, fontWeight: 600, color: "#0E1B2E" }}>hello@helmdash.app</div>
+            </div>
+          </a>
+
+          <a href="https://www.indiehackers.com/product/helmdash" target="_blank" rel="noreferrer" className="hover:-translate-y-[2px] transition-all" style={{ display: "flex", alignItems: "center", gap: 16, background: "#F5F1E8", padding: "24px", borderRadius: 16, border: "1px solid rgba(14,27,46,.1)" }}>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(14,27,46,.05)", display: "flex", alignItems: "center", justifyContent: "center", color: "#0E1B2E" }}>
+              <Rocket size={24} />
+            </div>
+            <div>
+              <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 13, color: "#4a5666", marginBottom: 4 }}>Indie Hackers</div>
+              <div style={{ fontSize: 18, fontWeight: 600, color: "#0E1B2E" }}>Helmdash</div>
+            </div>
+          </a>
+
+          <a href="https://www.producthunt.com/products/helmdash" target="_blank" rel="noreferrer" className="hover:-translate-y-[2px] transition-all" style={{ display: "flex", alignItems: "center", gap: 16, background: "#F5F1E8", padding: "24px", borderRadius: 16, border: "1px solid rgba(14,27,46,.1)" }}>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(14,27,46,.05)", display: "flex", alignItems: "center", justifyContent: "center", color: "#F28A2E" }}>
+              <span style={{ fontSize: 24, fontWeight: 800 }}>P</span>
+            </div>
+            <div>
+              <div style={{ fontFamily: '"IBM Plex Mono", monospace', fontSize: 13, color: "#4a5666", marginBottom: 4 }}>Product Hunt</div>
+              <div style={{ fontSize: 18, fontWeight: 600, color: "#0E1B2E" }}>Helmdash</div>
             </div>
           </a>
 

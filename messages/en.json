@@ -194,7 +194,14 @@
       "comparison": "Comparison",
       "pricing": "Pricing",
       "login": "Login",
-      "join": "Join the cohort"
+      "join": "Join the waitlist"
+    },
+    "thankYou": {
+      "title": "Welcome aboard!",
+      "message1": "Thank you for joining the waitlist!",
+      "message2": "We are launching on September 15th. We'll keep you updated via email.",
+      "impatient": "We can't wait to start the Helmdash adventure with you.",
+      "followUs": "In the meantime, follow our journey:"
     },
     "hero": {
       "badge": "Cohort #4 · 12 seats left · starts Sept 15.",

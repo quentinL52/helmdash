@@ -20,8 +20,8 @@ export async function GET(req: NextRequest) {
     }
 
     if (entry.status === 'confirmed') {
-      // Déjà confirmé, on redirige vers l'accueil avec un paramètre de succès
-      return NextResponse.redirect(new URL('/?success=already_confirmed', req.url));
+      // Déjà confirmé, on redirige vers la page de remerciement
+      return NextResponse.redirect(new URL('/thank-you', req.url));
     }
 
     // Mise à jour du statut
@@ -30,8 +30,8 @@ export async function GET(req: NextRequest) {
       data: { status: 'confirmed' },
     });
 
-    // Redirection vers l'accueil avec un message de succès
-    return NextResponse.redirect(new URL('/?success=confirmed', req.url));
+    // Redirection vers la page de remerciement
+    return NextResponse.redirect(new URL('/thank-you', req.url));
   } catch (error) {
     console.error('Waitlist confirm error:', error);
     return NextResponse.redirect(new URL('/?error=internal_error', req.url));

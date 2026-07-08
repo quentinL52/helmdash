@@ -195,7 +195,14 @@
       "comparison": "Comparatif",
       "pricing": "Pricing",
       "login": "Se connecter",
-      "join": "Rejoindre la cohorte"
+      "join": "Rejoindre la liste d'attente"
+    },
+    "thankYou": {
+      "title": "Bienvenue à bord !",
+      "message1": "Merci chaleureusement d'avoir rejoint la liste d'attente !",
+      "message2": "Le lancement est prévu le 15 septembre. Helmdash te tiendra au courant de la suite.",
+      "impatient": "Nous sommes impatients de démarrer l'aventure Helmdash avec toi.",
+      "followUs": "En attendant, n'hésite pas à nous contacter ou à suivre notre parcours :"
     },
     "hero": {
       "badge": "Cohorte #4 · 12 places restantes · démarrage 15 sept.",
