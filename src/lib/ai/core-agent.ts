@@ -26,9 +26,9 @@ export const buildCoreTools = (userId: string) => {
      * Lit les données d'un onglet spécifique du dashboard
      */
     read_dashboard_tab: tool({
-      description: "Lit les données d'un onglet spécifique du dashboard (finances, hypotheses, gtm, crm, roadmap, canvas).",
+      description: "Lit les données d'un onglet spécifique du dashboard (finances, hypotheses, gtm, crm, roadmap, canvas, decisions, inbox, dailyPlan).",
       parameters: zodSchema(z.object({
-        tabName: z.enum(['finances', 'hypotheses', 'gtm', 'crm', 'roadmap', 'canvas']),
+        tabName: z.enum(['finances', 'hypotheses', 'gtm', 'crm', 'roadmap', 'canvas', 'decisions', 'inbox', 'dailyPlan']),
         filters: z.record(z.any()).optional().describe('Filtres optionnels (ex: month pour finances, status pour hypotheses)'),
       })),
       // @ts-ignore
@@ -62,7 +62,7 @@ export const buildCoreTools = (userId: string) => {
     write_dashboard_tab: tool({
       description: "Crée, met à jour ou supprime une donnée dans un onglet du dashboard.",
       parameters: zodSchema(z.object({
-        tabName: z.enum(['finances', 'hypotheses', 'gtm', 'crm', 'roadmap', 'canvas']),
+        tabName: z.enum(['finances', 'hypotheses', 'gtm', 'crm', 'roadmap', 'canvas', 'decisions', 'inbox', 'dailyPlan']),
         action: z.enum(['create', 'update', 'delete']),
         id: z.string().uuid().optional().describe('Requis pour update/delete'),
         data: z.record(z.any()).describe("Les données à créer ou modifier (validées selon l'onglet)."),
@@ -418,13 +418,18 @@ TON LANGAGE :
 - Quand tu poses une question, c'est pour faire avancer — pas pour meubler.
 
 TES OUTILS (tous réels, pas simulés) :
-- read_dashboard_tab : lis VRAIMENT les finances, hypothèses, GTM, CRM, roadmap, canvas
-- write_dashboard_tab : crée/modifie/supprime VRAIMENT des données avec validation Zod
+- read_dashboard_tab : lis VRAIMENT les finances, hypothèses, GTM, CRM, roadmap, canvas, décisions, inbox, daily_plan
+- write_dashboard_tab : PROPOSE des modifications de données (finances, hypothèses, GTM, CRM, roadmap, canvas, décisions, inbox, daily_plan) à l'utilisateur, qui devra les confirmer via l'interface.
 - query_memory / write_memory : mémoire vectorielle persistante (chaque décision, chaque insight)
 - spawn_sub_agent : délègue à un sous-agent spécialisé (pm, cfo, growth, legal, tech_lead, research, content, recruiting)
 - web_search : recherche web temps réel (via Composio SerpAPI)
 - stripe_sync : synchronise les données Stripe (MRR, abonnements, factures)
 - schedule_recurring : planifie des tâches récurrentes (revue hebdo, sync finances)
+
+EXEMPLES D'USAGE DES NOUVEAUX MODULES :
+- "Qu'est-ce que je dois faire aujourd'hui ?" -> Utilise read_dashboard_tab sur dailyPlan.
+- "J'hésite entre Vercel et Netlify." -> Utilise write_dashboard_tab sur decisions pour proposer une nouvelle décision.
+- "Note cette idée: appeler Paul." -> Utilise write_dashboard_tab sur inbox pour proposer un nouvel InboxItem classé en 'idea' ou 'task'.
 
 RÈGLES D'ENGAGEMENT :
 1. Commence TOUJOURS par lire les données avant de répondre — ne devine jamais un chiffre.

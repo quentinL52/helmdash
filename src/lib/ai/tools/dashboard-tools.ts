@@ -77,12 +77,52 @@ export const ContactSchema = z.object({
   email: z.string().email().optional().or(z.literal('')),
   linkedin: z.string().url().optional().or(z.literal('')),
   status: z.enum(['À contacter', 'En discussion', 'Qualifié', 'Client', 'Perdu']).default('À contacter'),
-  lastContactDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  nextActionDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  pipelineStage: z.string().optional(),
+  lastContactDate: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/).or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)),
+  nextActionDate: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/).or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).optional(),
   nextActionLabel: z.string().optional(),
+  nextAction: z.string().optional(),
+  lastInteractionAt: z.string().optional(),
+  waitingOn: z.string().optional(),
+  dealValue: z.number().optional(),
+  dormant: z.boolean().default(false),
+  notionId: z.string().optional(),
   notes: z.string().optional(),
   tags: z.array(z.string()).default([]),
 });
+
+// --- Decision ---
+export const DecisionSchema = z.object({
+  id: z.string().uuid().optional(),
+  title: z.string(),
+  context: z.string().optional(),
+  category: z.enum(['product', 'gtm', 'pricing', 'structural', 'other']),
+  options: z.any(), // Json
+  aiChallenge: z.any().optional(), // Json
+  decidedOption: z.string().optional(),
+  rationale: z.string().optional(),
+  status: z.enum(['open', 'decided', 'revisited']).default('open'),
+  decidedAt: z.string().optional(),
+  reviewAt: z.string().optional(),
+});
+
+// --- InboxItem ---
+export const InboxItemSchema = z.object({
+  id: z.string().uuid().optional(),
+  content: z.string(),
+  classifiedAs: z.string().optional(), // task|contact|note|idea
+  classifiedAt: z.string().optional(),
+});
+
+// --- DailyPlan ---
+export const DailyPlanSchema = z.object({
+  id: z.string().uuid().optional(),
+  date: z.string(),
+  top3: z.any(), // Json
+  snoozed: z.any().default([]), // Json
+  shutdownAt: z.string().optional(),
+});
+
 
 // --- Roadmap ---
 export const RoadmapItemSchema = z.object({
@@ -110,6 +150,9 @@ export type GTM = z.infer<typeof GTMSchema>;
 export type Contact = z.infer<typeof ContactSchema>;
 export type RoadmapItem = z.infer<typeof RoadmapItemSchema>;
 export type CanvasSection = z.infer<typeof CanvasSectionSchema>;
+export type Decision = z.infer<typeof DecisionSchema>;
+export type InboxItem = z.infer<typeof InboxItemSchema>;
+export type DailyPlan = z.infer<typeof DailyPlanSchema>;
 
 /**
  * Map des onglets vers leurs schémas de validation
@@ -121,6 +164,9 @@ export const TAB_SCHEMAS = {
   crm: ContactSchema,
   roadmap: RoadmapItemSchema,
   canvas: CanvasSectionSchema,
+  decisions: DecisionSchema,
+  inbox: InboxItemSchema,
+  dailyPlan: DailyPlanSchema,
 } as const;
 
 export type TabName = keyof typeof TAB_SCHEMAS;
@@ -156,6 +202,12 @@ export async function getPrismaModel(tabName: TabName) {
       return prisma.roadmapItem as any;
     case 'canvas':
       return prisma.leanCanvasSection as any;
+    case 'decisions':
+      return prisma.decision as any;
+    case 'inbox':
+      return prisma.inboxItem as any;
+    case 'dailyPlan':
+      return prisma.dailyPlan as any;
     default:
       throw new Error(`No Prisma model for tab: ${tabName}`);
   }
