@@ -43,6 +43,7 @@ export async function updateSession(request: NextRequest) {
     const isPublicRoute = request.nextUrl.pathname === '/' || 
                           isAuthRoute || 
                           request.nextUrl.pathname.startsWith('/contact') || 
+                          request.nextUrl.pathname.startsWith('/thank-you') || 
                           request.nextUrl.pathname.startsWith('/legal');
 
     // 1. Protection et filtrage des routes API
