@@ -22,7 +22,7 @@ export function WaitlistForm() {
       const res = await fetch('/api/waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, botField }),
+        body: JSON.stringify({ email, _hp_email: botField }),
       });
 
       if (!res.ok) {
@@ -52,7 +52,7 @@ export function WaitlistForm() {
       <div style={{ display: "flex", gap: 8 }}>
         <input
           type="text"
-          name="bot_field"
+          name="_hp_email"
           style={{ display: 'none' }}
           tabIndex={-1}
           autoComplete="off"
