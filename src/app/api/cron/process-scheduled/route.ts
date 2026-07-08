@@ -29,12 +29,17 @@ const supabaseAdmin = createClient(
  * SÉCURITÉ : Protégé par CRON_SECRET (header x-cron-secret).
  * Si pas de secret configuré, ne fonctionne qu'en dev.
  */
-export async function GET() {
-  // Vérification du secret cron en production
+export async function GET(req: Request) {
   const cronSecret = process.env.CRON_SECRET;
-  // En production, on vérifie le header
-  // En dev, on autorise sans secret
-  // (les headers de la requête ne sont pas accessibles dans ce contexte simplifié)
+
+  if (!cronSecret) {
+    return NextResponse.json({ error: 'Internal Server Error', message: 'CRON_SECRET is not defined' }, { status: 500 });
+  }
+
+  const authHeader = req.headers.get('Authorization');
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
   const results: string[] = [];
 
