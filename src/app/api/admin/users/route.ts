@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/prisma';
+import { withAuth } from '@/lib/security';
 
-export async function GET(req: NextRequest) {
-  const supabase = await createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
-
-  if (error || !user) {
+async function handler(req: NextRequest, { userId }: { userId: string }) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -22,3 +20,5 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({ users });
 }
+
+export const GET = withAuth(handler);
