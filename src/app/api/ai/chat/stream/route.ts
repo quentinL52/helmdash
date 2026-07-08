@@ -3,6 +3,7 @@ import { openai } from '@ai-sdk/openai';
 import { streamText } from 'ai';
 import { CoreAgent } from '@/lib/ai/core-agent';
 import { withAuth, withRateLimit } from '@/lib/security';
+import { assertQuota, recordAiAction } from '@/lib/billing/metering';
 
 export const maxDuration = 60;
 
@@ -18,6 +19,15 @@ async function handler(
   { userId }: { userId: string },
 ) {
   try {
+        try {
+            await assertQuota(userId);
+        } catch (e: any) {
+            if (e.code === 'quota_reached') {
+                return NextResponse.json({ code: 'quota_reached', error: 'AI actions limit reached for this month.' }, { status: 403 });
+            }
+            throw e;
+        }
+
     const { messages } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
@@ -38,6 +48,9 @@ async function handler(
       system: systemPrompt,
       messages,
       tools,
+      onFinish: async ({ usage }) => {
+        await recordAiAction(userId, 'chat-stream', usage?.totalTokens || 0, 'gpt-4o').catch(console.error);
+      },
       onError: (error) => {
         console.error('[Chat Stream] Error:', error);
       },
