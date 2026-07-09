@@ -1,0 +1,3 @@
+## 2024-05-14 - Redundant array sorting in React components
+**Learning:** React components sometimes defensively clone and re-sort data that is already returned sorted by utility functions (e.g., `getMonthlyEntries` which sorts descending by month). The redundant `[...getMonthlyEntries(...)].sort(...)` causes unnecessary O(N log N) sorting and object allocations on every render or `useMemo` execution.
+**Action:** Always check the return value of utility functions before adding defensive clones or sorts. In performance-critical components (like charts or dashboards), cache the result of these utility functions in local variables rather than calling them multiple times within the same `useMemo` or render block.
