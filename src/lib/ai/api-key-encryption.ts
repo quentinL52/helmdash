@@ -87,9 +87,18 @@ export interface DecryptedAiSettings {
 }
 
 export async function decryptAiSettings(
-  encryptedSettings: { provider: string; encryptedApiKey: string; modelsConfig?: string },
+  encryptedSettings: { provider: string; encryptedApiKey: string; modelsConfig?: string } | null,
   userId: string
 ): Promise<DecryptedAiSettings> {
+  // Fallback to system defaults if user hasn't configured BYOK
+  if (!encryptedSettings) {
+    return {
+      provider: 'openai',
+      apiKey: process.env.OPENAI_API_KEY || '',
+      modelsConfig: undefined,
+    };
+  }
+
   return {
     provider: encryptedSettings.provider,
     apiKey: await decryptApiKey(encryptedSettings.encryptedApiKey, userId),

@@ -1,5 +1,7 @@
 import { AgentTaskHistory } from '@/components/agent/AgentTaskHistory';
+import { ChatUI } from '@/components/agent/ChatUI';
 import { createClient } from '@/utils/supabase/server';
+import { prisma } from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 
 export const metadata = {
@@ -15,6 +17,13 @@ export default async function AgentPage() {
     redirect('/login');
   }
 
+  // Fetch the most recent conversation to re-hydrate the chat
+  const recentConv = await prisma.conversation.findFirst({
+    where: { userId: user.id },
+    orderBy: { updatedAt: 'desc' },
+    select: { id: true }
+  });
+
   return (
     <div className="flex-1 flex flex-col p-4 lg:p-8 bg-muted/20 h-full">
       <div className="w-full max-w-7xl mx-auto flex flex-col h-full space-y-4">
@@ -29,8 +38,8 @@ export default async function AgentPage() {
 
         <div className="flex-1 grid grid-cols-1 xl:grid-cols-4 gap-4 min-h-0">
           {/* Chat principal (migré) */}
-          <div className="xl:col-span-3 min-h-0 flex items-center justify-center border rounded-lg bg-background">
-            <p className="text-muted-foreground">L'interface de chat a été retirée (migration en cours).</p>
+          <div className="xl:col-span-3 min-h-0 flex flex-col">
+            <ChatUI initialConversationId={recentConv?.id} />
           </div>
 
           {/* Panneau latéral : historique des tâches */}

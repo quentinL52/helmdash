@@ -378,13 +378,17 @@ export class CoreAgent {
     return buildCoreTools(this.userId);
   }
 
-  async buildSystemPrompt(): Promise<string> {
-    const recentContext = await memory.buildContextWindow(this.userId, 'startup strategy objectives', 2000);
-    const decisions = await memory.buildContextWindow(this.userId, 'decision', 1500);
-    const decryptedSettings = await decryptAiSettings(
+  async getProviderConfig() {
+    return decryptAiSettings(
       await this.getAiSettings(),
       this.userId
     );
+  }
+
+  async buildSystemPrompt(): Promise<string> {
+    const recentContext = await memory.buildContextWindow(this.userId, 'startup strategy objectives', 2000);
+    const decisions = await memory.buildContextWindow(this.userId, 'decision', 1500);
+    const decryptedSettings = await this.getProviderConfig();
 
     // Récupérer le nom du founder depuis le profil
     let founderName = 'Fondateur';

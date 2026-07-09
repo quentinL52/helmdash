@@ -70,7 +70,7 @@ async function upstashRateLimit(key: string, rpm: number): Promise<RateLimitResu
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify([
+      body: JSON.stringify(
         ['eval', `
           local key = KEYS[1]
           local limit = tonumber(ARGV[1])
@@ -85,8 +85,8 @@ async function upstashRateLimit(key: string, rpm: number): Promise<RateLimitResu
           else
             return {0, 0, ttl}
           end
-        `, 1, key, rpm, 60],
-      ]),
+        `, 1, key, rpm, 60]
+      ),
     });
 
     if (!response.ok) {
@@ -94,8 +94,8 @@ async function upstashRateLimit(key: string, rpm: number): Promise<RateLimitResu
       return memoryRateLimit(key, rpm);
     }
 
-    const result = await response.json();
-    const data = result?.[0] ?? result;
+    const json = await response.json();
+    const data = json.result;
     if (Array.isArray(data) && data.length >= 3) {
       return {
         allowed: data[0] === 1,
@@ -113,7 +113,7 @@ async function upstashRateLimit(key: string, rpm: number): Promise<RateLimitResu
 
 // ── Public wrapper ─────────────────────────────────────────
 export function withRateLimit<T = unknown>(
-  handler: (req: NextRequest, context: { userId: string; params: T }) => Promise<NextResponse>,
+  handler: (req: NextRequest, context: { userId: string; params: T }) => Promise<NextResponse | Response>,
   config: RateLimitConfig = {},
 ) {
   const rpm = config.rpm ?? 60;
@@ -138,16 +138,16 @@ export function withRateLimit<T = unknown>(
 
     const response = await handler(req, context);
 
-    // Add rate-limit headers
-    const responseBody = await response.json().catch(() => ({}));
-    return NextResponse.json(responseBody, {
+    // Add rate-limit headers without consuming the body (to preserve streams)
+    const newHeaders = new Headers(response.headers);
+    newHeaders.set('X-RateLimit-Limit', String(rpm));
+    newHeaders.set('X-RateLimit-Remaining', String(result.remaining));
+    newHeaders.set('X-RateLimit-Reset', String(result.reset));
+
+    return new Response(response.body, {
       status: response.status,
-      headers: {
-        ...Object.fromEntries(response.headers.entries()),
-        'X-RateLimit-Limit': String(rpm),
-        'X-RateLimit-Remaining': String(result.remaining),
-        'X-RateLimit-Reset': String(result.reset),
-      },
-    });
+      statusText: response.statusText,
+      headers: newHeaders,
+    }) as NextResponse;
   };
 }
