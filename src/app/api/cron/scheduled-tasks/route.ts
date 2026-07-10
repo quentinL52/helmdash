@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 const CRON_SECRET = process.env.CRON_SECRET;
 
 export async function GET(req: Request) {
+  if (!CRON_SECRET) return NextResponse.json({ error: 'Configuration error' }, { status: 500 });
   // Vérification sécurité cron
   const authHeader = req.headers.get('Authorization');
   if (authHeader !== `Bearer ${CRON_SECRET}`) {
