@@ -1,7 +1,7 @@
 'use client';
 import { getMonthlyEntries } from '@/lib/finance-utils';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useFounderStore } from '@/store/founder-store';
 import { useGamificationStore } from '@/store/gamification-store';
@@ -16,11 +16,14 @@ export function FounderScoreWidget({ isEditMode }: FounderScoreWidgetProps) {
   const { finance, hypotheses } = useFounderStore();
   const { totalXP } = useGamificationStore();
   
-  const runwayMonths = getMonthlyEntries(finance.entries).length > 0 
-    ? Math.max(0, finance.cashAvailable / Math.abs(getMonthlyEntries(finance.entries)[0].expenses.reduce((sum, exp) => sum + exp.amount, 0)))
-    : 12;
-    
-  const runwayPercentage = Math.min(100, Math.max(0, (runwayMonths / 12) * 100));
+  const { runwayMonths, runwayPercentage } = useMemo(() => {
+    const monthlyEntries = getMonthlyEntries(finance.entries);
+    const months = monthlyEntries.length > 0
+      ? Math.max(0, finance.cashAvailable / Math.abs(monthlyEntries[0].expenses.reduce((sum, exp) => sum + exp.amount, 0)))
+      : 12;
+    const percentage = Math.min(100, Math.max(0, (months / 12) * 100));
+    return { runwayMonths: months, runwayPercentage: percentage };
+  }, [finance]);
   
   const validatedHypotheses = hypotheses.filter(h => h.status === 'validated').length;
   const totalHypotheses = Math.max(1, hypotheses.length);
