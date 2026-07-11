@@ -26,15 +26,22 @@ const supabaseAdmin = createClient(
  * Appelé par Vercel Cron (/minute, /heure).
  * Traite les tâches planifiées arrivées à échéance et la queue sub-agents.
  *
- * SÉCURITÉ : Protégé par CRON_SECRET (header x-cron-secret).
+ * SÉCURITÉ : Protégé par CRON_SECRET (header Authorization).
  * Si pas de secret configuré, ne fonctionne qu'en dev.
  */
-export async function GET() {
+export async function GET(req: Request) {
   // Vérification du secret cron en production
   const cronSecret = process.env.CRON_SECRET;
-  // En production, on vérifie le header
-  // En dev, on autorise sans secret
-  // (les headers de la requête ne sont pas accessibles dans ce contexte simplifié)
+
+  if (!cronSecret) {
+    console.error('[Cron] CRON_SECRET is not configured');
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+
+  const authHeader = req.headers.get('Authorization');
+  if (authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
   const results: string[] = [];
 
