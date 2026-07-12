@@ -18,7 +18,8 @@ export function RecurringExpensesList() {
         const today = new Date();
         const currentMonthStr = format(today, 'yyyy-MM');
         
-        const sortedEntries = [...getMonthlyEntries(finance.entries)].sort((a, b) => b.month.localeCompare(a.month));
+        // getMonthlyEntries already returns a new array sorted descending by month
+        const sortedEntries = getMonthlyEntries(finance.entries);
         const latestEntry = sortedEntries.find(e => e.month === currentMonthStr) || sortedEntries[0];
 
         if (!latestEntry) return { recurringExpenses: [], latestMonthId: null };

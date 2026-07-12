@@ -27,10 +27,10 @@ export function FinanceCharts() {
     const { donutData, barData } = useMemo(() => {
         const today = new Date();
         const currentMonthStr = format(today, 'yyyy-MM');
+        const monthlyEntries = getMonthlyEntries(finance.entries);
         
         // --- 1. Donut Chart Data (Current Month) ---
-        const sortedEntries = [...getMonthlyEntries(finance.entries)].sort((a, b) => b.month.localeCompare(a.month));
-        const latestEntry = sortedEntries.find(e => e.month === currentMonthStr) || sortedEntries[0];
+        const latestEntry = monthlyEntries.find(e => e.month === currentMonthStr) || monthlyEntries[0];
 
         const expensesByCategory: Record<string, number> = {};
         
@@ -58,10 +58,11 @@ export function FinanceCharts() {
         // --- 2. Bar Chart Data (Past 6 Months Stacked) ---
         const start = subMonths(today, 5);
         const pastMonths = eachMonthOfInterval({ start, end: today });
+        const entriesByMonth = Object.fromEntries(monthlyEntries.map(e => [e.month, e]));
         
         const stackedBarData = pastMonths.map(date => {
             const monthStr = format(date, 'yyyy-MM');
-            const entry = getMonthlyEntries(finance.entries).find(e => e.month === monthStr);
+            const entry = entriesByMonth[monthStr];
             
             const monthData: any = {
                 month: format(date, 'MMM yy'),
