@@ -5,6 +5,11 @@ const CRON_SECRET = process.env.CRON_SECRET;
 
 export async function GET(req: Request) {
   // Vérification sécurité cron
+  if (!CRON_SECRET) {
+    console.error('[Cron] CRON_SECRET is not defined');
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+
   const authHeader = req.headers.get('Authorization');
   if (authHeader !== `Bearer ${CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
