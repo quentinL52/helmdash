@@ -5,8 +5,14 @@ import { PRICING_CONFIG } from '@/lib/billing/pricing-config';
 // This endpoint is meant to be called by a cron job on the 1st of every month
 // E.g., Vercel Cron or GitHub Actions.
 export async function GET(request: Request) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret) {
+    console.error('[Cron] CRON_SECRET is not defined');
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+
   const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
