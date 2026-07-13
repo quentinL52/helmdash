@@ -5,6 +5,11 @@ import { processSubAgentQueue } from '@/lib/queue/sub-agent-queue';
 const CRON_SECRET = process.env.CRON_SECRET;
 
 export async function GET(req: Request) {
+  if (!CRON_SECRET) {
+    console.error('[Cron] CRON_SECRET is not defined');
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+
   // Vérification sécurité cron
   const authHeader = req.headers.get('Authorization');
   if (authHeader !== `Bearer ${CRON_SECRET}`) {
