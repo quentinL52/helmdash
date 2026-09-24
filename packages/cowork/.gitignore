@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Production output
+dist/
+
+# Logs & temp
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.tsbuildinfo
+
+# Cowork runtime data & locks
+.cowork/
+*.csv.lock
+*.lock
+
+# Environment & Secrets
+.env
+.env.*
+*.env

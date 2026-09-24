@@ -54,3 +54,9 @@ build_log*.txt
 # agent
 .agents
 nul
+
+# cowork local companion
+*.csv.lock
+.cowork/*.lock
+.cowork/secrets.env
+packages/cowork/dist/

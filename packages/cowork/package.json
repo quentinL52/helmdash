@@ -1,0 +1,37 @@
+{
+  "name": "@helmdash/cowork",
+  "version": "0.1.0",
+  "description": "Local-first project companion module for solopreneurs & Claude Cowork",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "cowork": "bin/cowork.js",
+    "helmdash-cowork": "bin/cowork.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "solopreneur",
+    "claude-code",
+    "cowork",
+    "kanban",
+    "lean-canvas",
+    "decision-log",
+    "ical",
+    "helmdash"
+  ],
+  "author": "Helmdash",
+  "license": "AGPL-3.0-only",
+  "dependencies": {
+    "commander": "^13.1.0",
+    "picocolors": "^1.1.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.7"
+  }
+}
