@@ -102,6 +102,37 @@ Per-feature unit economics are a query, not an estimate. Plan limits read from a
 
 ---
 
+## Companion Module: @helmdash/cowork & MCP Server
+
+In addition to the cloud dashboard, the repository includes **`@helmdash/cowork`** (`packages/cowork`), an installable, local-first companion module that connects solo founder workflows directly to **Anthropic's Model Context Protocol (MCP)**, **Claude Code**, and **Claude Desktop**.
+
+```mermaid
+flowchart LR
+    A["Solo Founder"] -->|"Claude Code / Claude Desktop / Cursor"| B["@helmdash/cowork MCP Server"]
+    B -->|"Stdio Transport"| C[".cowork/ Data Store"]
+    C --> D1["tasks.csv (Kanban & Backlog)"]
+    C --> D2["decisions.csv (Decision Log)"]
+    C --> D3["context.md (Lean Canvas)"]
+    C --> D4["calendar.ics (iCal RFC 5545)"]
+    A -->|"npx @helmdash/cowork ui"| E["Local Ephemeral Kanban Webview :3333"]
+```
+
+### Key Capabilities
+
+1. **Native Model Context Protocol (MCP) Server (`cowork mcp`)** : Connects directly to Claude Desktop (`claude_desktop_config.json`) and Claude Code / Cursor (`.mcp.json`). Exposes typed project management tools without hallucinations:
+   - `cowork_get_project_health` : Real-time pulse (MVP target countdown, Kanban task distribution, Top 3 daily focus, open dilemmas).
+   - `cowork_get_project_context` : Reads the structured Lean Canvas, customer segment (ICP), and founder profile.
+   - `cowork_get_tasks` & `cowork_add_task` : Typed Kanban operations with category, priority, and due dates.
+   - `cowork_update_task_status` : Moves tasks across states (`todo`, `in_progress`, `blocked`, `done`), automatically updating `calendar.ics`.
+   - `cowork_add_decision` : Consistently records strategic choices and architecture dilemmas into `decisions.csv`.
+2. **Local-First & Git-Versioned (`.cowork/`)** : All data is stored in RFC 4180 CSV, Markdown, and standard RFC 5545 iCalendar (`calendar.ics`), protected by atomic file locking (`.lock`) and automatic schema migrations.
+3. **Ephemeral Kanban Webview (`cowork ui`)** : Runs on `http://localhost:3333` with drag-and-drop task movement, and automatically terminates after **15 minutes of inactivity** to prevent background RAM exhaustion.
+4. **Structured Onboarding Interview (`/cowork-onboard`)** : Equips Claude Code with Helmdash's 6 foundational founder questions and deterministic follow-up rules to frame any repository in minutes.
+
+See [packages/cowork/README.md](packages/cowork/README.md) for full documentation, CLI commands, and schema specifications.
+
+---
+
 ## Quality gates
 
 CI runs on every PR into `main`. Beyond lint, typecheck, tests, and build, it enforces five checks that exist because of specific mistakes worth preventing.
@@ -133,7 +164,7 @@ Two more scripts keep internationalization honest: a key-sync check across local
 | i18n | next-intl, English and French, enforced by CI |
 | Observability | Sentry, PostHog |
 | Testing | Vitest with v8 coverage, Playwright end to end |
-| Integrations | Composio MCP |
+| Integrations | Composio MCP, Model Context Protocol (MCP) via `@helmdash/cowork` |
 
 50 Prisma models across finance, CRM, GTM, roadmap, lean canvas, hypotheses, gamification, memory, and billing.
 
@@ -160,6 +191,7 @@ npm run build                # color ratchet, then next build
 ## Layout
 
 ```
+packages/cowork/     Local-first companion CLI & Model Context Protocol (MCP) Stdio server
 src/lib/ai/          Agent orchestrator, provider registry, BYOK key encryption
 src/app/(app)/       Authenticated dashboard
 src/app/(marketing)/ Public landing, claim-linted
